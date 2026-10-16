@@ -41,7 +41,7 @@ const Print = {
     this.after();
     this.opened = true;
     emit('print-before');   // 부품: 단계 막대 끝 칸, 문제 정답 표시 등
-    if (!Settings.values.printInk || !Session.doc) return;
+    if (!Settings.values.printInk || !Settings.enabled('ink') || !Session.doc) return;
     for (const slide of Stage.slides) {
       const strokes = Session.doc.slides[slide.dataset.key];
       if (Array.isArray(strokes) && strokes.length) this.appendInk(slide, strokes);

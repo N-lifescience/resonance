@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>live ink</title>
+<meta name="test-timeout" content="120">
+<!-- 실시간 판서: 교사 하나와 학생 둘(나중에 하나 더)을 iframe으로 띄우고 로컬 전송(BroadcastChannel)으로 잇는다. -->
+<script>window.Exploragram = { ready: Promise.resolve() };</script>
+<script src="harness.js"></script>
+<style>iframe { width: 640px; height: 360px; border: 1px solid #ccc; }</style>
+</head>
+<body>
+<pre id="results"></pre>
+<script>
+const frames = {};
+let T, A, B, C;
+const log = [];   // 교사가 보낸 메시지 이름
+
+function frame(name, src) {
+  return new Promise((resolve) => {
+    const f = document.createElement('iframe');
+    f.src = src;
+    f.onload = () => resolve(f);
+    document.body.append(f);
+    frames[name] = f;
+  });
+}
+
+async function until(fn, ms) {
+  const t0 = Date.now();
+  let last = '';
+  while (Date.now() - t0 < (ms || 6000)) {
+    try { if (fn()) return; } catch (err) { last = err.message; }
+    await wait(50);
+  }
+  throw new Error(`시간 초과: ${fn}${last ? ` (${last})` : ''}`);
+}
+
+async function open(name, query) {
+  const f = await frame(name, `live-deck.html?live=local${query || ''}`);
+  await until(() => f.contentWindow.Exploragram && f.contentWindow.Exploragram.ready);
+  await f.contentWindow.Exploragram.ready;
+  return f.contentWindow.Exploragram._internal;
+}
+
+const doc = (name) => frames[name].contentDocument;
+const visible = (el) => !!el && !el.hidden && el.getClientRects().length > 0;
+const inkOn = (name) => doc(name).documentElement.classList.contains('ch-live-ink');
+
+// 교사 iframe 무대 좌표(1280×720)로 펜 입력
+function tptr(type, x, y) {
+  const w = frames.t.contentWindow;
+  const deck = T.Stage.deck;
+  const r = deck.getBoundingClientRect();
+  const s = r.width / 1280;
+  deck.dispatchEvent(new w.PointerEvent(type, {
+    bubbles: true, cancelable: true, composed: true, pointerId: 1, pointerType: 'mouse', isPrimary: true,
+    button: 0, buttons: type === 'pointerup' ? 0 : 1, clientX: r.left + x * s, clientY: r.top + y * s,
+  }));
+}
+function draw(points) {
+  T.Tools.set('pen');
+  tptr('pointerdown', ...points[0]);
+  for (const p of points.slice(1)) tptr('pointermove', ...p);
+  tptr('pointerup', ...points[points.length - 1]);
+}
+// 정수로 반올림하고 겹친 점을 뺀 좌표: 학생이 받는 모양
+function wire(p) {
+  const out = [];
+  for (let i = 0; i < p.length; i += 2) {
+    const x = Math.round(p[i]);
+    const y = Math.round(p[i + 1]);
+    if (out.length && out[out.length - 2] === x && out[out.length - 1] === y) continue;
+    out.push(x, y);
+  }
+  return out.join();
+}
+const page = (X) => X.Ink.page || [];
+const ink = () => log.filter((e) => e === 'ink').length;
+
+test('교사가 실시간을 켜고 학생 둘이 들어온다', async () => {
+  T = await open('t');
+  T.Live.startTeacher();
+  await until(() => /^\d{6}$/.test(T.Live.code) && T.Live.main, 5000);
+  const send = T.Live.main.send;
+  T.Live.main.send = (ev, p) => { log.push(ev); return send(ev, p); };
+  A = await open('a', `&join=${T.Live.code}`);
+  B = await open('b', `&join=${T.Live.code}`);
+  await until(() => A.Live.teacher && B.Live.teacher);
+  assert(T.Settings.enabled('liveInk'), '처음에는 켜져 있다');
+  assert(inkOn('a'), '학생 화면에 판서층');
+  assert(visible(doc('a').querySelector('.ch-ink')), '판서층이 보인다');
+  assert(!visible(doc('a').querySelector('.ch-toolbar')), '학생은 판서 도구가 없다');
+});
+
+test('교사가 쓰면 학생 화면에 같은 판서가 그려진다', async () => {
+  draw([[100, 100], [150, 110.4], [220.6, 160], [300, 200]]);
+  const t = page(T)[0];
+  assert(t, '교사 판서');
+  await until(() => page(A).length === 1 && wire(page(A)[0].p) === wire(t.p) && page(B).length === 1);
+  const s = page(A)[0];
+  eq(s.c, t.c);
+  eq(s.w, t.w);
+  eq(s.t, 'pen');
+  eq(A.Live.inkPlay.size, 0, '다 그렸다');
+  eq(Object.values(A.Session.doc.slides).flat().length, 0, '학생 기기의 판서 문서에는 넣지 않는다');
+});
+
+test('쓰는 도중에도 묶어서 보내고, 묶음 수는 간격만큼만', async () => {
+  const before = ink();
+  T.Tools.set('pen');
+  tptr('pointerdown', 400, 300);
+  for (let i = 1; i <= 24; i++) { tptr('pointermove', 400 + i * 10, 300 + (i % 5) * 4); await wait(50); }
+  await until(() => page(A).length === 2 && page(A)[1].p.length >= 4, 3000);
+  assert(T.Ink.gesture, '아직 손을 떼지 않았다');
+  tptr('pointerup', 640, 316);
+  await until(() => wire(page(A)[1].p) === wire(page(T)[1].p));
+  const n = ink() - before;
+  assert(n >= 2 && n <= 6, `1.2초 획을 ${n}번에 나눠 보냈다`);
+});
+
+test('형광펜·되돌리기·이 장 지우기도 학생 화면에 반영된다', async () => {
+  T.Tools.set('hl');
+  tptr('pointerdown', 120, 400);
+  tptr('pointermove', 300, 400);
+  tptr('pointerup', 500, 400);
+  await until(() => page(A).length === 3);
+  eq(page(A)[2].t, 'hl');
+  T.Ink.undo();
+  await until(() => page(A).length === 2);
+  T.Ink.clear();
+  await until(() => page(A).length === 0 && page(B).length === 0);
+  T.Ink.undo();
+  await until(() => page(A).length === 2 && A.Live.inkPlay.size === 0);
+  eq(wire(page(A)[0].p), wire(page(T)[0].p), '되살아난 획');
+});
+
+test('늦게 들어온 학생도 지금까지 쓴 판서를 받는다', async () => {
+  C = await open('c', `&join=${T.Live.code}`);
+  await until(() => C.Live.teacher);
+  await until(() => page(C).length === 2 && wire(page(C)[1].p) === wire(page(T)[1].p));
+});
+
+test('넘기면 새 장의 판서를, 돌아오면 받아 둔 판서를 보여 준다(다시 보내지 않는다)', async () => {
+  T.Nav.go(3);
+  await until(() => A.Nav.state.slide === 3);
+  eq(page(A).length, 0, '새 장은 비어 있다');
+  draw([[600, 500], [700, 520]]);
+  await until(() => page(A).length === 1);
+  await wait(500);
+  const before = ink();
+  T.Nav.go(0);
+  await until(() => A.Nav.state.slide === 0 && page(A).length === 2);
+  await wait(600);
+  eq(ink() - before, 0, '바뀐 것이 없으면 판서를 다시 보내지 않는다');
+});
+
+test('교사가 칠판을 열면 따라가는 학생도 칠판, 칠판에 쓴 판서와 바탕이 보인다', async () => {
+  T.Board.open();
+  await until(() => visible(doc('a').querySelector('.ch-board')) && A.Ink.ref.kind === 'board');
+  assert(doc('a').body.classList.contains('ch-board-on'), '슬라이드는 가린다');
+  eq(page(A).length, 0);
+  draw([[200, 200], [400, 300]]);
+  await until(() => page(A).length === 1);
+  T.Board.setBg('green');
+  await until(() => doc('a').querySelector('.ch-board').dataset.bg === 'green');
+  assert(doc('a').body.classList.contains('ch-dark-page'), '초록 칠판은 어두운 바탕');
+  T.Board.add();
+  await until(() => A.Ink.ref.index === 1 && page(A).length === 0);
+  eq(doc('a').querySelector('.ch-board-label').textContent, '칠판 2 / 2');
+  T.Board.prev();
+  await until(() => A.Ink.ref.index === 0 && page(A).length === 1);
+});
+
+test('다른 장을 보는 학생에게는 「선생님은 칠판 화면」 띠, 누르면 칠판으로', async () => {
+  eq(A.Live.teacher.slide, 0, '교사는 1장 위에 칠판을 열었다');
+  A.Live.move(1);   // 교사가 연 다음 장(4장)으로
+  await until(() => !A.Live.follow && A.Nav.state.slide === 3 && !visible(doc('a').querySelector('.ch-board')));
+  const bar = doc('a').querySelector('.ch-live-bar');
+  await until(() => visible(bar) && bar.textContent.includes('선생님은 칠판 화면'));
+  eq(A.Ink.ref.kind, 'slide', '지난 장의 판서');
+  bar.querySelector('button').click();
+  await until(() => visible(doc('a').querySelector('.ch-board')) && A.Ink.ref.kind === 'board');
+});
+
+test('칠판을 닫으면 학생도 슬라이드로 돌아온다', async () => {
+  T.Board.close();
+  await until(() => !visible(doc('a').querySelector('.ch-board')) && A.Ink.ref.kind === 'slide');
+  assert(!doc('a').body.classList.contains('ch-board-on'));
+  assert(!doc('a').body.classList.contains('ch-dark-page'), '어두운 바탕을 걷는다');
+  eq(A.Nav.state.slide, 0);
+  eq(page(A).map((x) => wire(x.p)).join('|'), page(T).map((x) => wire(x.p)).join('|'), '1장의 판서');
+});
+
+test('실시간 창의 「학생 화면에 판서 보이기」를 끄면 학생 화면에서 사라지고, 켜면 돌아온다', async () => {
+  const box = doc('t').querySelector('.ch-live .ch-switch input[data-key="liveInk"]');
+  assert(box && box.checked, '실시간 창에 스위치');
+  box.click();
+  await until(() => !inkOn('a') && !inkOn('b'));
+  assert(!visible(doc('a').querySelector('.ch-ink')), '판서층을 숨긴다');
+  eq(T.Settings.values.liveInk, false, '⚙ 설정과 같은 값');
+  const before = ink();
+  draw([[800, 100], [900, 150]]);
+  await wait(800);
+  eq(ink() - before, 0, '꺼져 있는 동안은 보내지 않는다');
+  box.click();
+  await until(() => inkOn('a') && page(A).length === 3 && A.Live.inkPlay.size === 0);   // 꺼져 있는 동안 쓴 획도 받는다
+  eq(wire(page(A)[2].p), wire(page(T)[2].p));
+  assert(visible(doc('a').querySelector('.ch-ink')));
+});
+
+test('반을 바꾸면 학생은 받아 둔 판서를 버리고 새 반의 판서를 받는다', async () => {
+  await T.Session.addClass('2반');
+  await T.Session.switchTo('2반');
+  await until(() => page(A).length === 0 && A.Live.inkEp === T.Live.inkEp);
+  draw([[300, 300], [350, 350]]);
+  await until(() => page(A).length === 1);
+  await T.Session.switchTo('기본');
+  await until(() => page(A).length === 3);
+});
+
+test('묶음을 놓친 학생은 쪽 전체를 다시 받아 맞춘다', async () => {
+  const pg = `s${T.Nav.state.slide}`;
+  // 앞 판 번호가 맞지 않는 묶음: 놓친 것으로 보고 다시 달라고 한다
+  const bc = new BroadcastChannel(`ch-live-${T.Live.code}`);
+  bc.postMessage({ event: 'ink', payload: { tid: T.Live.tid, ep: T.Live.inkEp, pg, rev: 999999, base: 999998, put: [[777, 0, '#000000', 6, [1, 1]]] } });
+  bc.close();
+  await until(() => A.Live.inkPages.get(pg).rev === -1, 2000);
+  await until(() => A.Live.inkPages.get(pg).rev > 0 && page(A).length === page(T).length, 6000);
+  assert(!page(A).some((s) => wire(s.p) === '1,1'), '어긋난 묶음은 그리지 않았다');
+});
+
+test('모양이 틀린 판서, 다른 교사의 판서는 무시한다', async () => {
+  const n = page(A).length;
+  const pg = `s${T.Nav.state.slide}`;
+  const rev = A.Live.inkPages.get(pg).rev;
+  const bc = new BroadcastChannel(`ch-live-${T.Live.code}`);
+  bc.postMessage({ event: 'ink', payload: { tid: 'fake0000', ep: T.Live.inkEp, pg, rev: rev + 1, base: rev, put: [[900, 0, '#000000', 6, [5, 5]]] } });
+  bc.postMessage({ event: 'ink', payload: { tid: T.Live.tid, ep: T.Live.inkEp, pg, rev: rev + 1, base: rev, put: [[901, 0, 'javascript:1', 6, [5, 5]]] } });
+  bc.postMessage({ event: 'ink', payload: { tid: T.Live.tid, ep: T.Live.inkEp, pg: 's99', snap: [] } });
+  bc.close();
+  await wait(400);
+  eq(page(A).length, n);
+  eq(A.Live.inkPages.get(pg).rev, rev);
+});
+
+test('⚙ 설정에서 판서를 끄면 학생 화면의 판서도 꺼진다', async () => {
+  await T.Settings.set('ink', false);
+  await until(() => !inkOn('a'));
+  await T.Settings.set('ink', true);
+  await until(() => inkOn('a'));
+});
+
+test('⚙ 설정에서 실시간 수업을 끄면 수업이 끝나고 학생 화면의 판서·칠판도 걷힌다', async () => {
+  T.Board.open();
+  await until(() => visible(doc('a').querySelector('.ch-board')));
+  await T.Settings.set('live', false);
+  eq(T.Live.role, null, '수업이 끝났다');
+  await until(() => doc('a').querySelector('.ch-live-join h2').textContent === '수업이 끝났어요');
+  assert(!inkOn('a'), '판서층을 숨긴다');
+  assert(!visible(doc('a').querySelector('.ch-board')), '칠판을 걷는다');
+  eq(page(A).length, 0, '받아 둔 판서를 버린다');
+  assert(!visible(doc('t').querySelector('.ch-tb-btn[data-name="live"]')), '교사 툴바의 실시간 단추도 사라진다');
+  await T.Settings.set('live', true);
+  T.Board.close();
+});
+</script>
+</body>
+</html>

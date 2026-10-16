@@ -1,4 +1,4 @@
-/*! exploragram engine v2.1.0 | © N-lifescience | https://github.com/N-lifescience/exploragram */
+/*! exploragram engine v2.2.0 | © N-lifescience | https://github.com/N-lifescience/exploragram */
 /* ---- 00-tokens.css ---- */
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css");
 
@@ -147,7 +147,10 @@ body:not(.ch-board-on) .ch-board-only { display: none !important; }
 
 /* ---- 31-settings.css ---- */
 .ch-motion-off .ch-deck *, .ch-motion-off .ch-deck *::before, .ch-motion-off .ch-deck *::after { animation: none !important; transition: none !important; }
-.ch-pop-settings { width: 340px; max-width: calc(100vw - 48px); }
+.ch-pop-settings { width: 340px; max-width: calc(100vw - 48px); max-height: calc(100vh - 48px); overflow-y: auto; overscroll-behavior: contain; word-break: keep-all; overflow-wrap: anywhere; }
+.ch-set-group + .ch-set-group { margin-top: 6px; padding-top: 8px; border-top: 1px solid rgba(255, 255, 255, .1); }
+.ch-set-group[hidden] { display: none; }
+.ch-set-group h4 { margin: 2px 4px 0; font-size: 13px; font-weight: 700; color: var(--ch-ui-mute); }
 .ch-switch { display: grid; grid-template-columns: 52px 1fr; gap: 12px; align-items: center; padding: 10px 4px; cursor: pointer; }
 .ch-switch input { appearance: none; -webkit-appearance: none; position: relative; width: 48px; height: 28px; margin: 0; border-radius: 99px; background: #4A4F59; cursor: pointer; transition: background .2s; }
 .ch-switch input::after { content: ""; position: absolute; left: 3px; top: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff; transition: transform .2s var(--ch-ease-out); }
@@ -155,7 +158,15 @@ body:not(.ch-board-on) .ch-board-only { display: none !important; }
 .ch-switch input:checked::after { transform: translateX(20px); }
 .ch-switch input:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 .ch-switch b { display: block; font-size: 15px; }
-.ch-switch small { display: block; margin-top: 2px; font-size: 12px; color: var(--ch-ui-mute); }
+.ch-switch small { display: block; margin-top: 2px; font-size: 12px; color: var(--ch-ui-mute); text-wrap: pretty; }
+.ch-switch :is(b, small) { word-break: keep-all; overflow-wrap: anywhere; }
+.ch-switch.is-blocked { cursor: default; }
+.ch-switch.is-blocked b { color: var(--ch-ui-mute); }
+.ch-switch input:disabled { opacity: .35; cursor: not-allowed; }
+/* 꺼진 기능(⚙ 설정의 기능 켜고 끄기): 툴바·양옆 도구에서 숨긴다 */
+html.ch-off-ink :is(.ch-tb-tools, .ch-tb-style, .ch-tb-edit, .ch-tb-class, .ch-hud, .ch-ink, .ch-ink-live) { display: none !important; }
+html.ch-off-board :is(.ch-tb-board, .ch-hud .ch-seg) { display: none !important; }
+html.ch-off-live .ch-tb-btn[data-name="live"] { display: none !important; }
 .slide .w { white-space: nowrap; }
 /* 손등 지우개 맞추기: 화면 전체를 덮고 닿은 크기를 잰다 */
 .ch-calib { position: fixed; inset: 0; z-index: 95; display: grid; place-content: center; justify-items: center; gap: 18px; padding: 24px; background: rgba(22, 24, 29, .92); color: #fff; font-family: var(--ch-font); text-align: center; touch-action: none; user-select: none; -webkit-user-select: none; }
@@ -804,6 +815,7 @@ html:not(.ch-editing) .ch-ed-ui { display: none !important; }
 .ch-live-qr img { display: block; width: 164px; height: 164px; image-rendering: pixelated; }
 .ch-live-qr small { display: block; max-width: 220px; color: #1F2328; word-break: break-all; }
 .ch-live-btns { display: flex; flex-wrap: wrap; gap: 6px; }
+.ch-live .ch-switch { padding: 4px 0; }
 
 /* 학생 값 분포: 아래 가운데. 막대 하나가 값 하나(또는 값 묶음) */
 .ch-live-dist { position: fixed; z-index: 8500; left: 50%; bottom: calc(var(--ch-reserve-bottom, 0px) + 24px); transform: translateX(-50%); width: min(760px, calc(100vw - 32px)); display: flex; flex-direction: column; gap: 10px; padding: 12px 16px 14px; border-radius: 14px; background: var(--ch-ui); box-shadow: 0 12px 32px rgba(0, 0, 0, .35); }
@@ -850,6 +862,8 @@ html:not(.ch-editing) .ch-ed-ui { display: none !important; }
 /* 학생 모드: 판서·넘기기 도구는 없다. 단계 막대는 교사를 따라가므로 잠겨 있지만 흐리게 하지 않는다. */
 html.ch-live-student { --ch-reserve-left: 0px !important; --ch-reserve-right: 0px !important; --ch-reserve-bottom: 0px !important; }
 html.ch-live-student :is(.ch-toolbar, .ch-tb-handle, .ch-hud, .ch-progress, .ch-ink, .ch-ink-live, .ch-dropzone) { display: none !important; }
+/* 선생님이 「학생 화면에 판서 보이기」를 켜면 받은 판서만 보인다(학생은 쓰지 못한다) */
+html.ch-live-student.ch-live-ink .ch-ink { display: block !important; }
 html.ch-live-student :is(.ch-stops, .ch-yearline) input:disabled, html.ch-live-student .ch-switch-btn:disabled { opacity: 1; cursor: default; }
 
 @media print { .ch-live-ui { display: none !important; } }

@@ -53,8 +53,10 @@ async function runPage(file) {
       await send('Emulation.setEmulatedMedia', { features });
     }
     await send('Page.navigate', { url: pathToFileURL(resolve(file)).href });
+    // <meta name="test-timeout" content="90">: 오래 걸리는 페이지(초). 없으면 30초.
+    const limit = Number((/<meta name="test-timeout" content="(\d+)"/.exec(readFileSync(file, 'utf8')) || [])[1]) || 30;
     let summary = 'pending';
-    for (let t = 0; t < 120 && summary === 'pending'; t++) {
+    for (let t = 0; t < limit * 4 && summary === 'pending'; t++) {
       await sleep(250);
       summary = (await evaluate("document.getElementById('results')?.dataset.summary || 'pending'")) || 'pending';
     }

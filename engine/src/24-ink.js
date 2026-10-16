@@ -21,6 +21,7 @@ const Tools = {
   penWidth: PEN_WIDTHS[1],
   hlColor: HL_COLORS[0],
   set(tool) {
+    if (tool !== 'hand' && !Settings.enabled('ink')) tool = 'hand';   // 판서를 끈 기기에서는 손만
     this.current = tool;
     document.body.dataset.tool = tool;
     emit('tool', tool);
@@ -41,6 +42,7 @@ const Ink = {
   laser: [],
   laserHead: null,
   laserRAF: 0,
+  mirror: null,      // 실시간 학생 화면: 교사 판서를 받아 두는 문서(저장하지 않는다). 있으면 Session.doc 대신 그린다.
 
   init() {
     this.layer = h('div', { class: 'ch-ink', 'aria-hidden': 'true' });
@@ -99,7 +101,10 @@ const Ink = {
     this.redraw();
   },
 
-  get page() { return this.ref && Session.doc ? InkModel.page(Session.doc, this.ref) : null; },
+  get page() {
+    const doc = this.mirror || Session.doc;
+    return this.ref && doc ? InkModel.page(doc, this.ref) : null;
+  },
 
   setPage(ref) {
     this.cancelGesture();
@@ -108,6 +113,7 @@ const Ink = {
     if (!r || r.kind !== ref.kind || r.key !== ref.key || r.index !== ref.index) this.lastUp = -1e9;
     this.ref = ref;
     this.redraw();
+    emit('ink-dirty');   // 실시간 수업: 학생 화면의 판서 쪽을 맞춘다
   },
 
   cancelGesture() {
@@ -130,6 +136,7 @@ const Ink = {
     this.laser = [];
     this.laserHead = null;
     this.ctx.laser.clearRect(0, 0, STAGE_W, STAGE_H);
+    if (g) emit('ink-dirty');
   },
 
   redraw() {
@@ -271,6 +278,7 @@ const Ink = {
     }
     else if (g.tool === 'hl') g.stroke = { t: 'hl', c: Tools.hlColor, w: HL_WIDTH, p: start };
     this.extend(g.x0, g.y0);
+    if (g.stroke) emit('ink-dirty');
   },
 
   move(e) {
@@ -295,6 +303,7 @@ const Ink = {
       g.stroke = null;
       g.live = null;
       this.clearLive();                                   // 그리던 선을 걷어 낸다
+      emit('ink-dirty');
     }
     if (g.raw && g.live) return;                          // 펜 획은 pointerrawupdate가 이미 그렸다
     this.feed(e);
@@ -340,13 +349,14 @@ const Ink = {
       ctx.lineTo(x, y);
       ctx.stroke();
       p.push(InkGeom.round(x), InkGeom.round(y));
+      emit('ink-dirty');
     } else if (g.tool === 'eraser') {
       // 빠르게 문질러 표본 사이가 벌어져도 빠짐없이 지우도록 반지름의 절반 간격으로 채운다
       const [x0, y0] = g.last || [x, y];
       const n = Math.max(1, Math.ceil(Math.hypot(x - x0, y - y0) / (ERASER_R / 2)));
       const before = g.removed.length;
       for (let i = 1; i <= n; i++) g.removed.push(...InkModel.eraseAt(g.page, x0 + ((x - x0) * i) / n, y0 + ((y - y0) * i) / n, ERASER_R));
-      if (g.removed.length > before) this.redraw();
+      if (g.removed.length > before) { this.redraw(); emit('ink-dirty'); }
       g.last = [x, y];
       this.ring(x, y);
     } else if (g.tool === 'laser') {
@@ -377,6 +387,7 @@ const Ink = {
       InkModel.add(Session.hist, this.page, g.stroke);
       this.redraw();
       Session.changed();
+      emit('ink-dirty');
       // 무대 판서층이 화면에 오른 다음(두 번째 프레임) 비운다: 바로 비우면 한 프레임 깜빡인다.
       // 그사이 새 획이 시작됐으면 그 획이 끝날 때 함께 비운다(지난 획은 이미 판서층에도 있다).
       if (g.live) requestAnimationFrame(() => requestAnimationFrame(() => { if (!(this.gesture && this.gesture.live)) this.clearLive(); }));
@@ -452,6 +463,7 @@ const Ink = {
     this.redraw();
     if (!changed) return false;
     Session.changed();
+    emit('ink-dirty');
     return true;
   },
 
@@ -462,6 +474,7 @@ const Ink = {
     this.redraw();
     if (!changed) return false;
     Session.changed();
+    emit('ink-dirty');
     return true;
   },
 };

@@ -29,15 +29,16 @@ const btn = (name) => document.querySelector(`.ch-toolbar [data-name="${name}"]`
 const sw = (k) => document.querySelector(`.ch-pop input[data-key="${k}"]`);
 const clean = (text) => text.replace(/\u2060/g, '');
 
-test('기본 설정: 손등 지우기만 켜져 있다', () => {
-  eq(I().Settings.values, { motionOff: false, printInk: false, palmErase: true, palmSize: 0 });
+test('기본 설정: 기능은 모두 켜져 있고, 그 밖에는 손등 지우기만 켜져 있다', () => {
+  eq(I().Settings.values, { ink: true, board: true, live: true, liveInk: true, motionOff: false, printInk: false, palmErase: true, palmSize: 0 });
 });
-test('⚙ 설정 버튼과 이름이 있는 스위치 세 개', () => {
+test('⚙ 설정 버튼과 이름이 있는 스위치 일곱 개(기능 넷, 화면 하나, 판서 둘)', () => {
   btn('gear').click();
-  eq(document.querySelectorAll('.ch-pop .ch-switch').length, 3);
+  eq(document.querySelectorAll('.ch-pop .ch-switch').length, 7);
+  eq([...document.querySelectorAll('.ch-pop .ch-set-group h4')].map((x) => x.textContent), ['기능 켜고 끄기', '화면', '판서']);
   for (const input of document.querySelectorAll('.ch-pop .ch-switch input')) {
     assert(input.closest('label').textContent.trim(), 'accessible label');
-    eq(input.checked, input.dataset.key === 'palmErase');
+    eq(input.checked, ['ink', 'board', 'live', 'liveInk', 'palmErase'].includes(input.dataset.key), input.dataset.key);
   }
 });
 test('움직임 끄기는 바로 적용되고 저장된다', async () => {
@@ -67,10 +68,10 @@ test('인쇄에 판서 포함 설정도 저장된다', async () => {
   eq((await I().Store.get('settings')).printInk, true);
 });
 test('설정 재초기화는 저장값을 적용하고 버튼을 중복 생성하지 않는다', async () => {
-  I().Settings.values = { motionOff: false, printInk: false, palmErase: false, palmSize: 0 };
+  I().Settings.values = { ink: true, board: true, live: true, liveInk: true, motionOff: false, printInk: false, palmErase: false, palmSize: 0 };
   I().Settings.apply();
   await I().Settings.init();
-  eq(I().Settings.values, { motionOff: true, printInk: true, palmErase: true, palmSize: 0 });
+  eq(I().Settings.values, { ink: true, board: true, live: true, liveInk: true, motionOff: true, printInk: true, palmErase: true, palmSize: 0 });
   eq(I().Ink.palmErase, true);
   assert(document.documentElement.classList.contains('ch-motion-off'), 'restored');
   eq(document.querySelectorAll('.ch-toolbar [data-name="gear"]').length, 1);
@@ -80,7 +81,7 @@ test('알 수 없는 설정 키는 저장되지 않는다', async () => {
   await I().Settings.set('unknown', true);
   await I().Settings.set('__proto__', true);
   eq(await I().Store.get('settings'), old);
-  eq(Object.keys(I().Settings.values), ['motionOff', 'printInk', 'palmErase', 'palmSize']);
+  eq(Object.keys(I().Settings.values), ['ink', 'board', 'live', 'liveInk', 'motionOff', 'printInk', 'palmErase', 'palmSize']);
 });
 test('설정을 끄면 효과와 입력 UI가 함께 복원된다', async () => {
   await I().Settings.set('motionOff', false);
@@ -91,11 +92,100 @@ test('설정을 끄면 효과와 입력 UI가 함께 복원된다', async () => 
   eq(sw('palmErase').checked, false);
   assert(getComputedStyle(document.querySelector('.step')).transitionDuration.split(',').some((t) => parseFloat(t) > 0), 'transition restored');
 });
+const shown = (el) => !!el && el.getClientRects().length > 0;   // 부모가 숨겨져도 잡힌다
+const small = (k) => sw(k).closest('.ch-switch').querySelector('small').textContent;
+const gear = () => { if (!document.querySelector('.ch-pop-settings')) btn('gear').click(); };
+test('판서를 끄면 판서 도구·칠판·양옆 도구가 사라지고 손 도구만 남는다', async () => {
+  gear();
+  I().Tools.set('pen');
+  sw('ink').click();
+  eq(I().Settings.values.ink, false);
+  assert(document.documentElement.classList.contains('ch-off-ink'), 'class');
+  for (const n of ['hand', 'pen', 'hl', 'eraser', 'laser', 'style', 'undo', 'clear', 'class', 'slides', 'board']) assert(!shown(btn(n)), `${n} 숨김`);
+  for (const hud of document.querySelectorAll('.ch-hud')) assert(!shown(hud), '양옆 도구 숨김');
+  assert(!shown(document.querySelector('.ch-ink')), '판서층 숨김');
+  eq(I().Tools.current, 'hand', '쓰던 펜은 손으로');
+  I().Tools.set('pen');
+  eq(I().Tools.current, 'hand', '펜을 고를 수 없다');
+  document.body.dispatchEvent(new KeyboardEvent('keydown', { key: 'p', code: 'KeyP', bubbles: true }));
+  eq(I().Tools.current, 'hand', '단축키 p도 안 된다');
+  I().Board.open();
+  eq(I().Board.active, false, '칠판도 열리지 않는다');
+  for (const n of ['edit', 'next', 'toc', 'gear']) assert(shown(btn(n)), `${n}은 그대로`);
+  eq(sw('board').disabled, true, '판서에 기대는 칠판 스위치는 잠긴다');
+  eq(sw('board').checked, false);
+  eq(small('board'), '판서를 켜야 쓸 수 있습니다');
+  eq(small('liveInk'), '판서를 켜야 쓸 수 있습니다');
+  assert(document.querySelector('.ch-pop .ch-set-group[data-need="ink"]').hidden, '판서 설정 묶음은 숨긴다');
+  await wait(100);
+  eq((await I().Store.get('settings')).ink, false);
+});
+test('판서를 다시 켜면 도구가 돌아오고 칠판 스위치는 저장값대로', () => {
+  sw('ink').click();
+  eq(sw('board').disabled, false);
+  eq(sw('board').checked, true);
+  eq(small('board'), '슬라이드 대신 빈 칠판을 열어 씁니다');
+  for (const n of ['pen', 'undo', 'board']) assert(shown(btn(n)), `${n} 보임`);
+  assert(!document.querySelector('.ch-pop .ch-set-group[data-need="ink"]').hidden, '판서 설정 묶음');
+  I().Tools.set('pen');
+  eq(I().Tools.current, 'pen');
+  I().Tools.set('hand');
+});
+test('칠판만 끄면 슬라이드·칠판 전환이 사라지고, 열려 있던 칠판은 닫힌다', () => {
+  I().Board.open();
+  eq(I().Board.active, true);
+  gear();
+  sw('board').click();
+  eq(I().Board.active, false, '칠판을 닫는다');
+  gear();   // 칠판을 닫으면 떠 있던 창도 닫힌다
+  assert(!shown(btn('board')) && !shown(btn('slides')), '전환 단추 숨김');
+  for (const seg of document.querySelectorAll('.ch-hud .ch-seg')) assert(!shown(seg), '양옆 도구의 전환도 숨김');
+  document.body.dispatchEvent(new KeyboardEvent('keydown', { key: 'c', code: 'KeyC', bubbles: true }));
+  eq(I().Board.active, false, '단축키 c도 안 된다');
+  assert(shown(btn('pen')), '판서는 그대로');
+  sw('board').click();
+  assert(shown(btn('board')), '다시 켜면 돌아온다');
+});
+test('실시간 수업을 끄면 「실시간」 단추가 사라지고, 학생 화면 판서 스위치는 이유와 함께 잠긴다', () => {
+  gear();
+  sw('live').click();
+  assert(!shown(btn('live')), '실시간 단추 숨김');
+  eq(sw('liveInk').disabled, true);
+  eq(small('liveInk'), '실시간 수업을 켜야 쓸 수 있습니다');
+  sw('ink').click();
+  eq(small('liveInk'), '판서와 실시간 수업을 켜야 쓸 수 있습니다', '둘 다 꺼져 있으면 둘 다 말한다');
+  sw('ink').click();
+  sw('live').click();
+  assert(shown(btn('live')), '다시 켜면 돌아온다');
+  eq(sw('liveInk').disabled, false);
+  eq(sw('liveInk').checked, true, '저장값은 그대로였다');
+});
+test('편집 기능은 스위치가 없고 늘 보인다', () => {
+  assert(!document.querySelector('.ch-switch input[data-key="edit"]'));
+  assert(shown(btn('edit')));
+});
+test('기능 설정은 재초기화해도 남는다(이 기기의 다른 수업 파일)', async () => {
+  gear();
+  sw('ink').click();
+  await wait(100);
+  I().Settings.values.ink = true;
+  await I().Settings.init();
+  eq(I().Settings.values.ink, false);
+  assert(document.documentElement.classList.contains('ch-off-ink'), '다시 꺼진 모양');
+  await I().Settings.set('ink', true);
+  assert(!document.documentElement.classList.contains('ch-off-ink'));
+});
+test('설정 창은 작은 화면에서 넘치면 안에서 스크롤된다', () => {
+  gear();
+  const pop = document.querySelector('.ch-pop-settings');
+  eq(getComputedStyle(pop).overflowY, 'auto');
+  assert(pop.getBoundingClientRect().bottom <= innerHeight, `창 안: ${pop.getBoundingClientRect().bottom} / ${innerHeight}`);
+});
 test('손상된 저장값은 설정을 켜지 않으며 모르는 키는 무시한다', async () => {
   await I().Settings.set('printInk', false);
   await I().Store.set('settings', { motionOff: 'false', printInk: null, palmErase: 1, palmSize: 'x', unknown: true });
   await I().Settings.init();
-  eq(I().Settings.values, { motionOff: false, printInk: false, palmErase: false, palmSize: 0 });
+  eq(I().Settings.values, { ink: true, board: true, live: true, liveInk: true, motionOff: false, printInk: false, palmErase: false, palmSize: 0 });
   eq(I().Ink.palmErase, false);
   eq(document.documentElement.classList.contains('ch-motion-off'), false);
 });

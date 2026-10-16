@@ -1,5 +1,8 @@
 .ch-motion-off .ch-deck *, .ch-motion-off .ch-deck *::before, .ch-motion-off .ch-deck *::after { animation: none !important; transition: none !important; }
-.ch-pop-settings { width: 340px; max-width: calc(100vw - 48px); }
+.ch-pop-settings { width: 340px; max-width: calc(100vw - 48px); max-height: calc(100vh - 48px); overflow-y: auto; overscroll-behavior: contain; word-break: keep-all; overflow-wrap: anywhere; }
+.ch-set-group + .ch-set-group { margin-top: 6px; padding-top: 8px; border-top: 1px solid rgba(255, 255, 255, .1); }
+.ch-set-group[hidden] { display: none; }
+.ch-set-group h4 { margin: 2px 4px 0; font-size: 13px; font-weight: 700; color: var(--ch-ui-mute); }
 .ch-switch { display: grid; grid-template-columns: 52px 1fr; gap: 12px; align-items: center; padding: 10px 4px; cursor: pointer; }
 .ch-switch input { appearance: none; -webkit-appearance: none; position: relative; width: 48px; height: 28px; margin: 0; border-radius: 99px; background: #4A4F59; cursor: pointer; transition: background .2s; }
 .ch-switch input::after { content: ""; position: absolute; left: 3px; top: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff; transition: transform .2s var(--ch-ease-out); }
@@ -7,7 +10,15 @@
 .ch-switch input:checked::after { transform: translateX(20px); }
 .ch-switch input:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 .ch-switch b { display: block; font-size: 15px; }
-.ch-switch small { display: block; margin-top: 2px; font-size: 12px; color: var(--ch-ui-mute); }
+.ch-switch small { display: block; margin-top: 2px; font-size: 12px; color: var(--ch-ui-mute); text-wrap: pretty; }
+.ch-switch :is(b, small) { word-break: keep-all; overflow-wrap: anywhere; }
+.ch-switch.is-blocked { cursor: default; }
+.ch-switch.is-blocked b { color: var(--ch-ui-mute); }
+.ch-switch input:disabled { opacity: .35; cursor: not-allowed; }
+/* 꺼진 기능(⚙ 설정의 기능 켜고 끄기): 툴바·양옆 도구에서 숨긴다 */
+html.ch-off-ink :is(.ch-tb-tools, .ch-tb-style, .ch-tb-edit, .ch-tb-class, .ch-hud, .ch-ink, .ch-ink-live) { display: none !important; }
+html.ch-off-board :is(.ch-tb-board, .ch-hud .ch-seg) { display: none !important; }
+html.ch-off-live .ch-tb-btn[data-name="live"] { display: none !important; }
 .slide .w { white-space: nowrap; }
 /* 손등 지우개 맞추기: 화면 전체를 덮고 닿은 크기를 잰다 */
 .ch-calib { position: fixed; inset: 0; z-index: 95; display: grid; place-content: center; justify-items: center; gap: 18px; padding: 24px; background: rgba(22, 24, 29, .92); color: #fff; font-family: var(--ch-font); text-align: center; touch-action: none; user-select: none; -webkit-user-select: none; }

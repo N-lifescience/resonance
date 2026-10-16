@@ -1,13 +1,28 @@
 // ⚙ 설정: 이 PC의 저장소에 저장하고 수업 화면에 즉시 적용한다.
+// 기능 스위치(판서·칠판·실시간 수업·학생 화면 판서)는 엔진이 늘 넣어 두는 기능을 이 기기에서 켜고 끈다.
+// 저장소 키가 수업과 상관없으므로 한 번 끄면 이 기기에서 여는 다른 수업 파일에서도 꺼져 있다. 편집 기능은 스위치가 없다.
 const Settings = {
-  values: { motionOff: false, printInk: false, palmErase: true, palmSize: 0 },
+  values: { ink: true, board: true, live: true, liveInk: true, motionOff: false, printInk: false, palmErase: true, palmSize: 0 },
   button: null,
   extras: [],   // 다른 모듈이 설정 창 아래에 붙이는 묶음(그림 채우기·저장 등)
-  ITEMS: [
-    ['motionOff', '움직임 끄기', '슬라이드 전환과 단계 효과를 끕니다'],
-    ['printInk', '인쇄에 판서 포함', '지금 반의 판서와 칠판을 함께 인쇄합니다'],
-    ['palmErase', '손등·손바닥으로 지우기', '넓게 닿는 터치를 지우개로 씁니다. 잘 안 되면 「손으로 맞추기」'],
+  ITEMS: {
+    ink: ['판서', '펜, 형광펜, 지우개, 레이저로 화면에 씁니다. 학교 전자칠판의 펜을 쓰려면 꺼 두세요'],
+    board: ['칠판', '슬라이드 대신 빈 칠판을 열어 씁니다'],
+    live: ['실시간 수업', '학생 기기가 선생님 화면을 따라오고 학생 답이 선생님 화면에 모입니다'],
+    liveInk: ['학생 화면에 판서 보이기', '실시간 수업 중 선생님 판서를 학생 기기에 그대로 보여 줍니다'],
+    motionOff: ['움직임 끄기', '슬라이드 전환과 단계 효과를 끕니다'],
+    printInk: ['인쇄에 판서 포함', '지금 반의 판서와 칠판을 함께 인쇄합니다'],
+    palmErase: ['손등·손바닥으로 지우기', '넓게 닿는 터치를 지우개로 씁니다. 잘 안 되면 「손으로 맞추기」'],
+  },
+  // [제목, 스위치들, 이 기능이 꺼지면 묶음을 숨김]
+  GROUPS: [
+    ['기능 켜고 끄기', ['ink', 'board', 'live', 'liveInk']],
+    ['화면', ['motionOff']],
+    ['판서', ['printInk', 'palmErase'], 'ink'],
   ],
+  // 다른 기능이 켜져 있어야 쓸 수 있는 스위치. 막혀 있으면 꺼진 모양으로 잠그고 설명을 바꾼다.
+  NEEDS: { board: ['ink'], liveInk: ['ink', 'live'], printInk: ['ink'], palmErase: ['ink'] },
+  NEED_TEXT: { ink: '판서를 켜야 쓸 수 있습니다', live: '실시간 수업을 켜야 쓸 수 있습니다', 'ink live': '판서와 실시간 수업을 켜야 쓸 수 있습니다' },   // 꺼져 있는 기능 → 설명
 
   async init() {
     const saved = await Store.get('settings');
@@ -23,16 +38,34 @@ const Settings = {
     }
   },
 
+  // 켜져 있고, 기대는 기능도 모두 켜져 있는가
+  enabled(key) { return !!this.values[key] && (this.NEEDS[key] || []).every((k) => this.values[k]); },
+
   panel() {
-    return h('div', { class: 'ch-pop-settings' }, h('h3', { text: '설정' }),
-      ...this.ITEMS.map(([key, label, desc]) => h('label', { class: 'ch-switch' },
-        h('input', {
-          type: 'checkbox', 'data-key': key, checked: this.values[key],
-          onchange: (e) => this.set(key, e.target.checked),
-        }),
-        h('span', null, h('b', { text: label }), h('small', { text: desc })))),
-      Toolbar.menuItem('손으로 맞추기 (이 칠판에서 손등 지우개 인식)', () => { Toolbar.closePop(); this.calibrate(); }),
+    const el = h('div', { class: 'ch-pop-settings' }, h('h3', { text: '설정' }),
+      ...this.GROUPS.map(([title, keys, need]) => h('div', { class: 'ch-set-group', 'data-need': need || null },
+        h('h4', { text: title }),
+        ...keys.map((key) => this.row(key)),
+        keys.includes('palmErase') ? Toolbar.menuItem('손으로 맞추기 (이 칠판에서 손등 지우개 인식)', () => { Toolbar.closePop(); this.calibrate(); }) : null)),
       ...this.extras.map((fn) => fn()));
+    this.sync(el);
+    return el;
+  },
+
+  // 스위치 한 줄. 실시간 수업 창도 같은 줄을 쓴다(sync가 함께 맞춘다).
+  row(key) {
+    const [label, desc] = this.ITEMS[key];
+    return h('label', { class: 'ch-switch' },
+      h('input', {
+        type: 'checkbox', 'data-key': key, checked: this.values[key],
+        onchange: async (e) => {
+          const want = e.target.checked;
+          if (key === 'live' && !want && Live.role === 'teacher'
+            && !await Ask.ask('실시간 수업 중이에요. 끄면 수업이 끝나요.', { ok: '끄기' })) { this.sync(); return; }
+          this.set(key, want);
+        },
+      }),
+      h('span', null, h('b', { text: label }), h('small', { text: desc })));
   },
 
   set(key, value) {
@@ -43,11 +76,35 @@ const Settings = {
   },
 
   apply() {
-    document.documentElement.classList.toggle('ch-motion-off', this.values.motionOff);
+    const root = document.documentElement.classList;
+    root.toggle('ch-motion-off', this.values.motionOff);
     emit('motion', this.values.motionOff);   // 저장값은 첫 장이 보인 뒤에 읽으므로, 그 사이 저절로 움직인 부품이 멈추게 알린다
     Ink.palmErase = this.values.palmErase;
     Ink.palmSize = this.values.palmSize;
-    for (const input of qsa('.ch-pop-settings input[data-key]')) input.checked = this.values[input.dataset.key];
+    // 꺼진 기능은 툴바·양옆 도구에서 숨기고(CSS), 쓰던 중이면 멈춘다
+    root.toggle('ch-off-ink', !this.enabled('ink'));
+    root.toggle('ch-off-board', !this.enabled('board'));
+    root.toggle('ch-off-live', !this.enabled('live'));
+    if (!this.enabled('ink') && Tools.current !== 'hand') Tools.set('hand');
+    if (!this.enabled('board') && Board.active) Board.close();
+    this.sync();
+    emit('features');   // 실시간 수업이 학생에게 보내는 것을 맞춘다
+  },
+
+  // 화면에 있는 스위치(⚙ 설정 창, 실시간 수업 창)를 저장값에 맞춘다
+  sync(root) {
+    for (const input of qsa('.ch-switch input[data-key]', root)) {
+      const key = input.dataset.key;
+      if (!this.ITEMS[key]) continue;
+      const missing = (this.NEEDS[key] || []).filter((k) => !this.values[k]);
+      const blocked = missing.length > 0;
+      input.disabled = blocked;
+      input.checked = !blocked && this.values[key];
+      input.closest('.ch-switch').classList.toggle('is-blocked', blocked);
+      const small = input.closest('.ch-switch').querySelector('small');
+      if (small) small.textContent = (blocked && this.NEED_TEXT[missing.join(' ')]) || this.ITEMS[key][1];
+    }
+    for (const group of qsa('.ch-set-group[data-need]', root)) group.hidden = !this.values[group.dataset.need];
   },
 
   // 손가락 끝으로 한 번, 손등(검지 마디)으로 한 번 문질러 이 칠판이 알려 주는 닿은 크기를 잰다.

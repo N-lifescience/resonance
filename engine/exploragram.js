@@ -1,7 +1,7 @@
-/*! exploragram engine v2.1.0 | © N-lifescience | https://github.com/N-lifescience/exploragram */
+/*! exploragram engine v2.2.0 | © N-lifescience | https://github.com/N-lifescience/exploragram */
 (function () {
 'use strict';
-const VERSION = '2.1.0';
+const VERSION = '2.2.0';
 const LIVE_CONFIG = {"url":"https://qtwigpxinccudhprrdnb.supabase.co","key":"sb_publishable_-3KCWch7Q7sBQbcdVzxR4g_imovkZv5","site":"https://n-lifescience.github.io/exploragram/"};
 /* ---- 00-core.js ---- */
 // 공통 상수, 작은 DOM 도우미, 이벤트 훅, 공개 객체 Exploragram.
@@ -904,6 +904,7 @@ const Tools = {
   penWidth: PEN_WIDTHS[1],
   hlColor: HL_COLORS[0],
   set(tool) {
+    if (tool !== 'hand' && !Settings.enabled('ink')) tool = 'hand';   // 판서를 끈 기기에서는 손만
     this.current = tool;
     document.body.dataset.tool = tool;
     emit('tool', tool);
@@ -924,6 +925,7 @@ const Ink = {
   laser: [],
   laserHead: null,
   laserRAF: 0,
+  mirror: null,      // 실시간 학생 화면: 교사 판서를 받아 두는 문서(저장하지 않는다). 있으면 Session.doc 대신 그린다.
 
   init() {
     this.layer = h('div', { class: 'ch-ink', 'aria-hidden': 'true' });
@@ -982,7 +984,10 @@ const Ink = {
     this.redraw();
   },
 
-  get page() { return this.ref && Session.doc ? InkModel.page(Session.doc, this.ref) : null; },
+  get page() {
+    const doc = this.mirror || Session.doc;
+    return this.ref && doc ? InkModel.page(doc, this.ref) : null;
+  },
 
   setPage(ref) {
     this.cancelGesture();
@@ -991,6 +996,7 @@ const Ink = {
     if (!r || r.kind !== ref.kind || r.key !== ref.key || r.index !== ref.index) this.lastUp = -1e9;
     this.ref = ref;
     this.redraw();
+    emit('ink-dirty');   // 실시간 수업: 학생 화면의 판서 쪽을 맞춘다
   },
 
   cancelGesture() {
@@ -1013,6 +1019,7 @@ const Ink = {
     this.laser = [];
     this.laserHead = null;
     this.ctx.laser.clearRect(0, 0, STAGE_W, STAGE_H);
+    if (g) emit('ink-dirty');
   },
 
   redraw() {
@@ -1154,6 +1161,7 @@ const Ink = {
     }
     else if (g.tool === 'hl') g.stroke = { t: 'hl', c: Tools.hlColor, w: HL_WIDTH, p: start };
     this.extend(g.x0, g.y0);
+    if (g.stroke) emit('ink-dirty');
   },
 
   move(e) {
@@ -1178,6 +1186,7 @@ const Ink = {
       g.stroke = null;
       g.live = null;
       this.clearLive();                                   // 그리던 선을 걷어 낸다
+      emit('ink-dirty');
     }
     if (g.raw && g.live) return;                          // 펜 획은 pointerrawupdate가 이미 그렸다
     this.feed(e);
@@ -1223,13 +1232,14 @@ const Ink = {
       ctx.lineTo(x, y);
       ctx.stroke();
       p.push(InkGeom.round(x), InkGeom.round(y));
+      emit('ink-dirty');
     } else if (g.tool === 'eraser') {
       // 빠르게 문질러 표본 사이가 벌어져도 빠짐없이 지우도록 반지름의 절반 간격으로 채운다
       const [x0, y0] = g.last || [x, y];
       const n = Math.max(1, Math.ceil(Math.hypot(x - x0, y - y0) / (ERASER_R / 2)));
       const before = g.removed.length;
       for (let i = 1; i <= n; i++) g.removed.push(...InkModel.eraseAt(g.page, x0 + ((x - x0) * i) / n, y0 + ((y - y0) * i) / n, ERASER_R));
-      if (g.removed.length > before) this.redraw();
+      if (g.removed.length > before) { this.redraw(); emit('ink-dirty'); }
       g.last = [x, y];
       this.ring(x, y);
     } else if (g.tool === 'laser') {
@@ -1260,6 +1270,7 @@ const Ink = {
       InkModel.add(Session.hist, this.page, g.stroke);
       this.redraw();
       Session.changed();
+      emit('ink-dirty');
       // 무대 판서층이 화면에 오른 다음(두 번째 프레임) 비운다: 바로 비우면 한 프레임 깜빡인다.
       // 그사이 새 획이 시작됐으면 그 획이 끝날 때 함께 비운다(지난 획은 이미 판서층에도 있다).
       if (g.live) requestAnimationFrame(() => requestAnimationFrame(() => { if (!(this.gesture && this.gesture.live)) this.clearLive(); }));
@@ -1335,6 +1346,7 @@ const Ink = {
     this.redraw();
     if (!changed) return false;
     Session.changed();
+    emit('ink-dirty');
     return true;
   },
 
@@ -1345,6 +1357,7 @@ const Ink = {
     this.redraw();
     if (!changed) return false;
     Session.changed();
+    emit('ink-dirty');
     return true;
   },
 };
@@ -1362,7 +1375,7 @@ const Board = {
   boardBtn: null,
 
   init() {
-    this.label = h('div', { class: 'ch-board-label', role: 'status', 'aria-live': 'polite' });
+    this.label = h('div', { class: 'ch-board-label', role: 'status', 'aria-live': 'polite', 'data-no-keep': '' });   // 엔진 글: 어절 보정 안 함
     this.el = h('div', { class: 'ch-board', 'data-bg': 'white', 'aria-label': '칠판', hidden: true }, this.label);
     Stage.deck.append(this.el);
     // 지금 보는 쪽에 불이 들어오는 두 칸 전환(누르면 그쪽으로 간다). 한 단추가 글자를 바꾸면 지금 상태인지 갈 곳인지 헷갈린다.
@@ -1394,7 +1407,7 @@ const Board = {
   toggle() { if (this.active) this.close(); else this.open(); },
 
   open() {
-    if (this.active) return;
+    if (this.active || !Settings.enabled('board')) return;
     this.active = true;
     Nav.override = this;
     document.body.classList.add('ch-board-on');
@@ -1927,6 +1940,7 @@ const Toolbar = {
   },
 
   onKey(e) {
+    if (!Settings.enabled('ink')) return;   // 판서를 끈 기기: 도구 단축키·되돌리기 없음
     const k = keyName(e);
     if ((e.ctrlKey || e.metaKey) && k === 'z') { e.preventDefault(); Ink.undo(); return; }
     if (e.ctrlKey || e.metaKey || e.altKey) return;
@@ -1937,15 +1951,30 @@ const Toolbar = {
 
 /* ---- 31-settings.js ---- */
 // ⚙ 설정: 이 PC의 저장소에 저장하고 수업 화면에 즉시 적용한다.
+// 기능 스위치(판서·칠판·실시간 수업·학생 화면 판서)는 엔진이 늘 넣어 두는 기능을 이 기기에서 켜고 끈다.
+// 저장소 키가 수업과 상관없으므로 한 번 끄면 이 기기에서 여는 다른 수업 파일에서도 꺼져 있다. 편집 기능은 스위치가 없다.
 const Settings = {
-  values: { motionOff: false, printInk: false, palmErase: true, palmSize: 0 },
+  values: { ink: true, board: true, live: true, liveInk: true, motionOff: false, printInk: false, palmErase: true, palmSize: 0 },
   button: null,
   extras: [],   // 다른 모듈이 설정 창 아래에 붙이는 묶음(그림 채우기·저장 등)
-  ITEMS: [
-    ['motionOff', '움직임 끄기', '슬라이드 전환과 단계 효과를 끕니다'],
-    ['printInk', '인쇄에 판서 포함', '지금 반의 판서와 칠판을 함께 인쇄합니다'],
-    ['palmErase', '손등·손바닥으로 지우기', '넓게 닿는 터치를 지우개로 씁니다. 잘 안 되면 「손으로 맞추기」'],
+  ITEMS: {
+    ink: ['판서', '펜, 형광펜, 지우개, 레이저로 화면에 씁니다. 학교 전자칠판의 펜을 쓰려면 꺼 두세요'],
+    board: ['칠판', '슬라이드 대신 빈 칠판을 열어 씁니다'],
+    live: ['실시간 수업', '학생 기기가 선생님 화면을 따라오고 학생 답이 선생님 화면에 모입니다'],
+    liveInk: ['학생 화면에 판서 보이기', '실시간 수업 중 선생님 판서를 학생 기기에 그대로 보여 줍니다'],
+    motionOff: ['움직임 끄기', '슬라이드 전환과 단계 효과를 끕니다'],
+    printInk: ['인쇄에 판서 포함', '지금 반의 판서와 칠판을 함께 인쇄합니다'],
+    palmErase: ['손등·손바닥으로 지우기', '넓게 닿는 터치를 지우개로 씁니다. 잘 안 되면 「손으로 맞추기」'],
+  },
+  // [제목, 스위치들, 이 기능이 꺼지면 묶음을 숨김]
+  GROUPS: [
+    ['기능 켜고 끄기', ['ink', 'board', 'live', 'liveInk']],
+    ['화면', ['motionOff']],
+    ['판서', ['printInk', 'palmErase'], 'ink'],
   ],
+  // 다른 기능이 켜져 있어야 쓸 수 있는 스위치. 막혀 있으면 꺼진 모양으로 잠그고 설명을 바꾼다.
+  NEEDS: { board: ['ink'], liveInk: ['ink', 'live'], printInk: ['ink'], palmErase: ['ink'] },
+  NEED_TEXT: { ink: '판서를 켜야 쓸 수 있습니다', live: '실시간 수업을 켜야 쓸 수 있습니다', 'ink live': '판서와 실시간 수업을 켜야 쓸 수 있습니다' },   // 꺼져 있는 기능 → 설명
 
   async init() {
     const saved = await Store.get('settings');
@@ -1961,16 +1990,34 @@ const Settings = {
     }
   },
 
+  // 켜져 있고, 기대는 기능도 모두 켜져 있는가
+  enabled(key) { return !!this.values[key] && (this.NEEDS[key] || []).every((k) => this.values[k]); },
+
   panel() {
-    return h('div', { class: 'ch-pop-settings' }, h('h3', { text: '설정' }),
-      ...this.ITEMS.map(([key, label, desc]) => h('label', { class: 'ch-switch' },
-        h('input', {
-          type: 'checkbox', 'data-key': key, checked: this.values[key],
-          onchange: (e) => this.set(key, e.target.checked),
-        }),
-        h('span', null, h('b', { text: label }), h('small', { text: desc })))),
-      Toolbar.menuItem('손으로 맞추기 (이 칠판에서 손등 지우개 인식)', () => { Toolbar.closePop(); this.calibrate(); }),
+    const el = h('div', { class: 'ch-pop-settings' }, h('h3', { text: '설정' }),
+      ...this.GROUPS.map(([title, keys, need]) => h('div', { class: 'ch-set-group', 'data-need': need || null },
+        h('h4', { text: title }),
+        ...keys.map((key) => this.row(key)),
+        keys.includes('palmErase') ? Toolbar.menuItem('손으로 맞추기 (이 칠판에서 손등 지우개 인식)', () => { Toolbar.closePop(); this.calibrate(); }) : null)),
       ...this.extras.map((fn) => fn()));
+    this.sync(el);
+    return el;
+  },
+
+  // 스위치 한 줄. 실시간 수업 창도 같은 줄을 쓴다(sync가 함께 맞춘다).
+  row(key) {
+    const [label, desc] = this.ITEMS[key];
+    return h('label', { class: 'ch-switch' },
+      h('input', {
+        type: 'checkbox', 'data-key': key, checked: this.values[key],
+        onchange: async (e) => {
+          const want = e.target.checked;
+          if (key === 'live' && !want && Live.role === 'teacher'
+            && !await Ask.ask('실시간 수업 중이에요. 끄면 수업이 끝나요.', { ok: '끄기' })) { this.sync(); return; }
+          this.set(key, want);
+        },
+      }),
+      h('span', null, h('b', { text: label }), h('small', { text: desc })));
   },
 
   set(key, value) {
@@ -1981,11 +2028,35 @@ const Settings = {
   },
 
   apply() {
-    document.documentElement.classList.toggle('ch-motion-off', this.values.motionOff);
+    const root = document.documentElement.classList;
+    root.toggle('ch-motion-off', this.values.motionOff);
     emit('motion', this.values.motionOff);   // 저장값은 첫 장이 보인 뒤에 읽으므로, 그 사이 저절로 움직인 부품이 멈추게 알린다
     Ink.palmErase = this.values.palmErase;
     Ink.palmSize = this.values.palmSize;
-    for (const input of qsa('.ch-pop-settings input[data-key]')) input.checked = this.values[input.dataset.key];
+    // 꺼진 기능은 툴바·양옆 도구에서 숨기고(CSS), 쓰던 중이면 멈춘다
+    root.toggle('ch-off-ink', !this.enabled('ink'));
+    root.toggle('ch-off-board', !this.enabled('board'));
+    root.toggle('ch-off-live', !this.enabled('live'));
+    if (!this.enabled('ink') && Tools.current !== 'hand') Tools.set('hand');
+    if (!this.enabled('board') && Board.active) Board.close();
+    this.sync();
+    emit('features');   // 실시간 수업이 학생에게 보내는 것을 맞춘다
+  },
+
+  // 화면에 있는 스위치(⚙ 설정 창, 실시간 수업 창)를 저장값에 맞춘다
+  sync(root) {
+    for (const input of qsa('.ch-switch input[data-key]', root)) {
+      const key = input.dataset.key;
+      if (!this.ITEMS[key]) continue;
+      const missing = (this.NEEDS[key] || []).filter((k) => !this.values[k]);
+      const blocked = missing.length > 0;
+      input.disabled = blocked;
+      input.checked = !blocked && this.values[key];
+      input.closest('.ch-switch').classList.toggle('is-blocked', blocked);
+      const small = input.closest('.ch-switch').querySelector('small');
+      if (small) small.textContent = (blocked && this.NEED_TEXT[missing.join(' ')]) || this.ITEMS[key][1];
+    }
+    for (const group of qsa('.ch-set-group[data-need]', root)) group.hidden = !this.values[group.dataset.need];
   },
 
   // 손가락 끝으로 한 번, 손등(검지 마디)으로 한 번 문질러 이 칠판이 알려 주는 닿은 크기를 잰다.
@@ -2156,7 +2227,7 @@ const Print = {
     this.after();
     this.opened = true;
     emit('print-before');   // 부품: 단계 막대 끝 칸, 문제 정답 표시 등
-    if (!Settings.values.printInk || !Session.doc) return;
+    if (!Settings.values.printInk || !Settings.enabled('ink') || !Session.doc) return;
     for (const slide of Stage.slides) {
       const strokes = Session.doc.slides[slide.dataset.key];
       if (Array.isArray(strokes) && strokes.length) this.appendInk(slide, strokes);
@@ -6467,6 +6538,8 @@ const Editor = {
 // 저장 안 함·식별 안 함: 이름·번호·DB 없이 탭 메모리에만 두고, 닫으면 사라진다. 실시간을 켜지 않으면 아무것도 하지 않는다.
 // 채널 둘: 교사 → 학생 'ch-live-<코드>'(학생이 구독), 학생 → 교사 'ch-live-<코드>-in'(교사만 구독, 학생은 구독 없이 보낸다).
 // 그래서 학생 메시지는 다른 학생에게 퍼지지 않는다. 전송은 Supabase Realtime(broadcast) 또는 같은 PC 탭끼리(BroadcastChannel).
+// 실시간 판서(⚙ 「학생 화면에 판서 보이기」): 교사가 보는 쪽(장·칠판)의 판서를 묶어 보낸다. 묶음마다 판 번호(rev)를 붙이고
+// 앞 판 번호(base)가 맞을 때만 이어 그린다. 놓쳤거나 늦게 들어온 학생은 'need'로 그 쪽 전체(snap)를 다시 받는다.
 const LIVE = Object.assign({ url: '', key: '', site: '' }, typeof LIVE_CONFIG === 'object' && LIVE_CONFIG ? LIVE_CONFIG : {});
 const LIVE_SUPA_JS = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.min.js';   // 판을 고정한다(httpSend가 있는 판)
 const LIVE_QR_JS = 'https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js';
@@ -6481,6 +6554,15 @@ const LIVE_FORGET_MS = 120000;   // 이만큼 소식이 없으면 그 학생 값
 const LIVE_MAX = 300;         // 한 방이 기억하는 학생 수(새로 고침하면 새 sid라 반 인원보다 넉넉히)
 const LIVE_BINS = 20;         // 값이 40개를 넘는 슬라이더는 이만큼 칸으로 묶는다
 const LIVE_SKIP = '.ch-stops, .ch-yearline';   // 엔진의 단계 막대·연표 막대는 교사를 따라가는 것이라 모으지 않는다
+// 실시간 판서. 묶음 하나도 학생 수만큼 퍼지므로 학생이 많으면 간격을 늘린다(학생 수 × LIVE_INK_PER, LIVE_INK_MIN~LIVE_INK_MAX).
+const LIVE_INK_FIRST = 150;   // 판서가 바뀐 뒤 처음 보내기까지(획 첫머리를 조금 모은다)
+const LIVE_INK_MIN = 400;
+const LIVE_INK_MAX = 1500;
+const LIVE_INK_PER = 16;
+const LIVE_INK_PLAY = 350;    // 학생 화면은 받은 묶음을 이만큼에 걸쳐 그린다(선이 그어지는 대로 보이게)
+const LIVE_INK_BYTES = 180000;   // 메시지 하나의 글자 수(Supabase broadcast 한도 256KB보다 작게). 넘으면 점을 성기게 한다.
+const LIVE_NEED_WAIT = 800;   // 학생: 판이 어긋난 것을 보고 이만큼 기다렸다가(이미 오는 중일 수 있다) 다시 보내 달라고 한다
+const LIVE_ID_MAX = 2 ** 31;
 
 // 화면과 상관없는 계산. 단위 시험이 Node에서 부른다.
 const LiveCore = {
@@ -6523,6 +6605,75 @@ const LiveCore = {
     return out;
   },
 
+  // 판서 좌표 p[from…] → 보낼 정수 [dx, dy, …]. 앞 점(prev, 없으면 원점)에서 뺀 값이라 짧다.
+  // 앞 점과 가로·세로 모두 step보다 가까운 점은 건너뛴다(step 1이면 반올림해 같은 점만). last는 마지막으로 보낸 점.
+  inkEnc(p, from, prev, step) {
+    const pts = [];
+    let last = prev;
+    for (let i = from; i + 1 < p.length; i += 2) {
+      const x = Math.round(p[i]);
+      const y = Math.round(p[i + 1]);
+      if (last && Math.max(Math.abs(x - last[0]), Math.abs(y - last[1])) < step) continue;
+      pts.push(x - (last ? last[0] : 0), y - (last ? last[1] : 0));
+      last = [x, y];
+    }
+    return { pts, last };
+  },
+
+  inkDec(pts, prev) {
+    const out = [];
+    let x = prev ? prev[0] : 0;
+    let y = prev ? prev[1] : 0;
+    for (let i = 0; i + 1 < pts.length; i += 2) {
+      x += pts[i];
+      y += pts[i + 1];
+      out.push(x, y);
+    }
+    return out;
+  },
+
+  // 보낼 획 하나: [번호, 0 펜 | 1 형광펜, 색, 굵기, 좌표]
+  inkWire(id, s, pts) { return [id, s.t === 'hl' ? 1 : 0, s.c, s.w, pts]; },
+
+  // 쪽 전체. list = [{ id, s }]. sent는 다음 비교에 쓸 기록(id → { n: 보낸 좌표 수, last: 마지막으로 보낸 점 }).
+  inkSnap(list, step) {
+    const snap = [];
+    const sent = new Map();
+    for (const { id, s } of list) {
+      const e = LiveCore.inkEnc(s.p, 0, null, step);
+      if (!e.pts.length) continue;
+      snap.push(LiveCore.inkWire(id, s, e.pts));
+      sent.set(id, { n: s.p.length, last: e.last });
+    }
+    return { snap, sent };
+  },
+
+  // 지난번에 보낸 기록(sent)과 지금 쪽의 차이. put: 새 획, more: 길어진 획의 뒷부분, del: 사라진 획 번호.
+  // sent는 바꾸지 않고 다음 기록을 돌려준다(보내기로 정한 뒤에 바꾼다).
+  inkDelta(list, sent, step) {
+    const put = [];
+    const more = [];
+    const next = new Map();
+    for (const { id, s } of list) {
+      const old = sent.get(id);
+      if (!old) {
+        const e = LiveCore.inkEnc(s.p, 0, null, step);
+        if (!e.pts.length) continue;
+        put.push(LiveCore.inkWire(id, s, e.pts));
+        next.set(id, { n: s.p.length, last: e.last });
+      } else if (old.n < s.p.length) {
+        const e = LiveCore.inkEnc(s.p, old.n, old.last, step);
+        if (e.pts.length) more.push([id, e.pts]);
+        next.set(id, { n: s.p.length, last: e.last });
+      } else next.set(id, old);
+    }
+    const del = [...sent.keys()].filter((id) => !next.has(id));
+    return { put, more, del, sent: next };
+  },
+
+  // 학생이 받아 둔 판(have)이 교사가 알린 판(rev)만큼 새것인가. 판 번호는 늘기만 하고, 0은 '아무것도 안 쓴 빈 쪽'이다.
+  inkFresh(have, rev) { return have === rev || (rev > 0 && have > rev); },
+
   // 받은 메시지 검사. 모양이 맞으면 필요한 값만 담은 새 객체, 아니면 null. n은 받는 쪽 덱의 장 수.
   clean(event, p, n) {
     if (!p || typeof p !== 'object') return null;
@@ -6543,6 +6694,50 @@ const LiveCore = {
       const t = where && typeof p.t === 'string' ? LiveCore.tidy(p.t.slice(0, 1000)) : '';
       return t ? { sid: p.sid, slide: p.slide, key: p.key, t } : null;
     }
+    // 판서 쪽 이름: 's장번호' 또는 'b칠판번호'
+    const pg = (x) => {
+      const m = typeof x === 'string' && /^([sb])(0|[1-9]\d{0,2})$/.exec(x);
+      return !!m && Number(m[2]) < (m[1] === 's' ? n : 200);
+    };
+    if (event === 'need') {
+      return sid(p.sid) && pg(p.pg) && int(p.have, -1, LIVE_ID_MAX) ? { sid: p.sid, pg: p.pg, have: p.have } : null;
+    }
+    if (event === 'ink') {
+      if (!sid(p.tid) || !int(p.ep, 0, 1e6) || !pg(p.pg) || !int(p.rev, 1, LIVE_ID_MAX)) return null;
+      let budget = 400000;   // 메시지 하나에 받는 좌표 수
+      const pts = (a) => {
+        if (!Array.isArray(a) || a.length < 2 || a.length % 2 || a.length > budget || !a.every((v) => int(v, -20000, 20000))) return null;
+        budget -= a.length;
+        return a.slice();
+      };
+      const stroke = (s) => {
+        if (!Array.isArray(s) || s.length !== 5 || !int(s[0], 0, LIVE_ID_MAX) || (s[1] !== 0 && s[1] !== 1)) return null;
+        if (!InkModel.sanitizeStroke({ t: 'pen', c: s[2], w: s[3], p: [0, 0] })) return null;   // 색·굵기
+        const q = pts(s[4]);
+        return q && [s[0], s[1], s[2], s[3], q];
+      };
+      const list = (a, max, fn) => {
+        if (a == null) return [];
+        if (!Array.isArray(a) || a.length > max) return null;
+        const out = a.map(fn);
+        return out.every(Boolean) ? out : null;
+      };
+      const out = { tid: p.tid, ep: p.ep, pg: p.pg, rev: p.rev };
+      if (p.snap != null) {
+        out.snap = list(p.snap, 5000, stroke);
+        return out.snap ? out : null;
+      }
+      if (!int(p.base, 0, LIVE_ID_MAX)) return null;
+      out.base = p.base;
+      out.put = list(p.put, 5000, stroke);
+      out.more = list(p.more, 200, (m) => {
+        if (!Array.isArray(m) || m.length !== 2 || !int(m[0], 0, LIVE_ID_MAX)) return null;
+        const q = pts(m[1]);
+        return q && [m[0], q];
+      });
+      out.del = list(p.del, 5000, (id) => (int(id, 0, LIVE_ID_MAX) ? id : null));
+      return out.put && out.more && out.del ? out : null;
+    }
     if (event === 'state') {
       if (!sid(p.tid) || !int(p.slide, 0, 999) || !int(p.shown, 0, 999) || !Array.isArray(p.reach) || p.reach.length > 1000) return null;
       const steps = (a) => (Array.isArray(a) && a.length <= 50 && a.every((x) => int(x, -1, 999)) ? a.slice() : []);
@@ -6555,6 +6750,11 @@ const LiveCore = {
         reach: p.reach.map((r) => (r && typeof r === 'object' && int(r.shown, 0, 999) ? { shown: r.shown, steps: steps(r.steps) } : null)),
         lesson: { key: String(L.key || '').slice(0, 120), n: int(L.n, 1, 1000) ? L.n : 0, title: String(L.title || '').slice(0, 120) },
         site: typeof p.site === 'string' && /^[\w-]{1,60}$/.test(p.site) ? p.site : null,
+        // 실시간 판서가 켜져 있을 때만: 교사가 보는 판서 쪽과 판 번호, 칠판을 열었으면 그 칠판
+        ink: p.ink && typeof p.ink === 'object' && int(p.ink.ep, 0, 1e6) && pg(p.ink.pg) && int(p.ink.rev, 0, LIVE_ID_MAX)
+          ? { ep: p.ink.ep, pg: p.ink.pg, rev: p.ink.rev } : null,
+        board: p.board && typeof p.board === 'object' && int(p.board.i, 0, 199) && int(p.board.n, 1, 200) && p.board.i < p.board.n && BOARD_BGS.includes(p.board.bg)
+          ? { i: p.board.i, n: p.board.n, bg: p.board.bg } : null,
       };
     }
     return null;
@@ -6610,7 +6810,7 @@ const SupaLink = {
     const client = this.client;
     const ch = client.channel(topic, { config: { broadcast: { self: false } } });
     if (listen) {
-      for (const ev of ['state', 'val', 'pick', 'text', 'hi', 'end']) ch.on('broadcast', { event: ev }, (m) => onMsg(ev, m && m.payload));
+      for (const ev of ['state', 'val', 'pick', 'text', 'hi', 'end', 'ink', 'need']) ch.on('broadcast', { event: ev }, (m) => onMsg(ev, m && m.payload));
       try {
         await new Promise((resolve, reject) => {
           const timer = setTimeout(() => reject(new Error('TIMED_OUT')), 10000);
@@ -6663,6 +6863,23 @@ const Live = {
   distHold: null,      // 분포 막대를 누르고 있는 포인터
   distLate: false,
   distHoldTimer: 0,
+  // 실시간 판서(교사)
+  inkRec: new WeakMap(),   // 쪽(획 배열) → { pg, rev, sent }: 그 쪽을 마지막으로 보낸 기록
+  inkIds: new WeakMap(),   // 획 → 번호
+  inkNext: 1,
+  inkSeq: 0,               // 판 번호. 한 번 켠 동안 늘기만 한다(빈 쪽만 0)
+  inkEp: 0,                // 판서 문서 번호: 반을 바꾸면 는다. 학생은 번호가 바뀌면 받아 둔 판서를 모두 버린다
+  inkTimer: 0,
+  inkSentAt: 0,
+  inkSnapAt: 0,
+  inkWanted: false,        // 학생이 쪽 전체를 다시 달라고 했다
+  // 실시간 판서(학생)
+  inkOn: false,
+  inkPages: new Map(),     // 쪽 이름 → { rev, arr, ids: Map(번호 → 획) }
+  inkPlay: new Map(),      // 그리는 중인 획 → { q: 남은 좌표, arr, until, at }
+  inkRaf: 0,
+  needTimer: 0,
+  needAt: 0,
   // 학생
   sid: '',
   teacher: null,       // 마지막으로 받은 교사 상태(clean을 거친 것)
@@ -6684,6 +6901,10 @@ const Live = {
     }
     Toolbar.slots.misc.prepend(Toolbar.btn('live', '실시간', () => (this.role ? this.showPanel(true) : this.startTeacher())));
     on('nav', () => this.onNav());
+    on('ink-dirty', () => this.inkDirty());
+    on('session', () => { this.inkEp++; this.sendState(); });   // 반을 바꿨다: 학생은 받아 둔 판서를 버리고 새로 받는다
+    on('board-mode', () => this.sendState());   // 칠판을 열고 닫거나 칠판 쪽·바탕을 바꾸면 학생 화면도 맞춘다
+    on('features', () => this.onFeatures());
     // 점검(D)·인쇄는 단계 막대를 잠깐 모두 연다. 그 상태가 학생에게 가거나 연 범위로 남지 않게 한다.
     on('print-before', () => { this.frozen = true; });
     on('print-after', () => { this.frozen = false; this.sendState(); });
@@ -6780,11 +7001,19 @@ const Live = {
   stateNow() {
     const { slide, shown } = Nav.state;
     const steps = this.track();
-    return {
+    const s = {
       tid: this.tid, slide, shown, steps, reach: this.reach,
       lesson: { key: Session.deck, n: Stage.slides.length, title: document.title.slice(0, 120) },
       site: this.siteName(),
     };
+    const cur = this.inkLive() && this.inkCur();
+    if (cur) {
+      const rec = this.inkRec.get(cur.arr);
+      s.ink = { ep: this.inkEp, pg: cur.pg, rev: rec && rec.pg === cur.pg ? rec.rev : 0 };
+      const d = Session.doc;
+      s.board = Board.active ? { i: d.board, n: d.boards.length, bg: d.boards[d.board].bg } : null;
+    }
+    return s;
   },
 
   // 배포 사이트(또는 이 PC의 미리보기)의 …/lessons/이름.html이면 그 이름. 사이트 첫 화면이 학생을 이 수업으로 보낸다.
@@ -6811,7 +7040,106 @@ const Live = {
     clearTimeout(this.stateTimer);
     this.stateTimer = 0;
     this.sentAt = now;
+    if (this.inkLive()) this.inkFlush();   // 판서를 먼저 보내야 상태에 적힌 판 번호가 학생에게 있는 판과 맞는다
     this.main.send('state', this.stateNow());
+  },
+
+  // ---- 실시간 판서(교사) ----
+  inkLive() { return this.role === 'teacher' && !!this.main && !this.frozen && Settings.enabled('liveInk'); },
+  inkGap() { return clamp(this.count() * LIVE_INK_PER, LIVE_INK_MIN, LIVE_INK_MAX); },
+
+  inkId(s) {
+    if (!this.inkIds.has(s)) this.inkIds.set(s, this.inkNext++);
+    return this.inkIds.get(s);
+  },
+
+  // 교사가 지금 보는 쪽: 이름(pg), 획 배열(arr), 보낼 획(쓰는 중인 획 포함)
+  inkCur() {
+    const ref = Ink.ref;
+    const arr = Ink.page;
+    if (!ref || !arr) return null;
+    let pg;
+    if (ref.kind === 'board') pg = `b${ref.index}`;
+    else {
+      const i = Stage.slides.findIndex((s) => s.dataset.key === ref.key);
+      if (i < 0) return null;
+      pg = `s${i}`;
+    }
+    const strokes = arr.slice();
+    const g = Ink.gesture;
+    if (g && g.stroke && g.page === arr) strokes.push(g.stroke);
+    return { pg, arr, strokes };
+  },
+
+  // 판서가 바뀌었다: 잠깐 모아서 보낸다
+  inkDirty() {
+    if (!this.inkLive() || this.inkTimer) return;
+    const now = Date.now();
+    const at = Math.max(now + LIVE_INK_FIRST, this.inkSentAt + this.inkGap());
+    this.inkTimer = setTimeout(() => { this.inkTimer = 0; this.inkFlush(); }, at - now);
+  },
+
+  // 지금 쪽을 보낸다. 처음 보내는 쪽이나 다시 달라는 학생이 있으면 쪽 전체(LIVE_JOIN_MS에 한 번), 아니면 바뀐 것만.
+  inkFlush() {
+    clearTimeout(this.inkTimer);
+    this.inkTimer = 0;
+    if (!this.inkLive()) return;
+    const cur = this.inkCur();
+    if (!cur) return;
+    const now = Date.now();
+    const list = cur.strokes.map((s) => ({ id: this.inkId(s), s }));
+    let rec = this.inkRec.get(cur.arr);
+    if (rec && rec.pg !== cur.pg) rec = null;   // 칠판을 지워 번호가 당겨진 쪽
+    if (!rec && !list.length) {   // 처음 보는 빈 쪽은 판 0: 학생이 모르는 쪽도 빈 판 0으로 보므로 보낼 것이 없다
+      rec = { pg: cur.pg, rev: 0, sent: new Map() };
+      this.inkRec.set(cur.arr, rec);
+    }
+    if (!rec || (this.inkWanted && now - this.inkSnapAt >= LIVE_JOIN_MS)) {
+      const { r, body } = this.inkFit((step) => LiveCore.inkSnap(list, step), (x) => ({ snap: x.snap }));
+      rec = { pg: cur.pg, rev: ++this.inkSeq, sent: r.sent };
+      this.inkRec.set(cur.arr, rec);
+      this.inkSnapAt = now;
+      this.inkWanted = false;
+      this.inkSend(cur.pg, rec.rev, body);
+    } else {
+      const { r, body } = this.inkFit((step) => LiveCore.inkDelta(list, rec.sent, step), (x) => {
+        const b = { base: rec.rev };
+        if (x.put.length) b.put = x.put;
+        if (x.more.length) b.more = x.more;
+        if (x.del.length) b.del = x.del;
+        return b;
+      });
+      if (r.put.length || r.more.length || r.del.length) {
+        rec.rev = ++this.inkSeq;
+        rec.sent = r.sent;
+        this.inkSend(cur.pg, rec.rev, body);
+      }
+    }
+    if (this.inkWanted) this.inkTimer = setTimeout(() => { this.inkTimer = 0; this.inkFlush(); }, Math.max(0, this.inkSnapAt + LIVE_JOIN_MS - now));
+  },
+
+  // 메시지가 너무 크면(획이 아주 많은 쪽) 점을 성기게 해서 다시 만든다
+  inkFit(make, pick) {
+    let r;
+    let body;
+    for (const step of [1, 2, 4, 8, 16]) {
+      r = make(step);
+      body = pick(r);
+      if (JSON.stringify(body).length <= LIVE_INK_BYTES) break;
+    }
+    return { r, body };
+  },
+
+  inkSend(pg, rev, body) {
+    this.main.send('ink', Object.assign({ tid: this.tid, ep: this.inkEp, pg, rev }, body));
+    this.inkSentAt = Date.now();
+  },
+
+  // ⚙ 설정에서 기능을 켜고 껐다
+  onFeatures() {
+    if (this.role !== 'teacher') return;
+    if (!Settings.enabled('live')) { this.endTeacher(); return; }
+    this.sendState();   // 「학생 화면에 판서 보이기」를 켜고 끄면 학생 화면도 바로 맞춘다
   },
 
   onNav() {
@@ -6829,6 +7157,15 @@ const Live = {
     if (fresh && this.prune() >= LIVE_MAX) return;   // 코드를 아는 누군가가 가짜 학생을 쏟아내도 메모리가 무한히 늘지 않게
     this.seen.set(p.sid, Date.now());
     if (fresh) this.sendState(LIVE_JOIN_MS);   // 새로 들어온 학생이 다음 상태(5초)를 기다리지 않게
+    if (event === 'need') {
+      // 이미 최신 판을 가진 학생(상태가 엇갈려 온 것)이면 다시 보내지 않는다
+      const cur = this.inkLive() && this.inkCur();
+      const rec = cur && this.inkRec.get(cur.arr);
+      if (cur && p.pg === cur.pg && !(rec && rec.pg === cur.pg && rec.rev === p.have)) {
+        this.inkWanted = true;
+        this.inkDirty();
+      }
+    }
     if (event === 'val') {
       const input = this.rangeOf(p.slide, p.key);
       if (input) {
@@ -6903,8 +7240,9 @@ const Live = {
     const U = this.ui;
     this.panel = h('aside', { class: 'ch-live ch-live-ui', 'data-no-ink': '', 'aria-label': '실시간 수업', hidden: true },
       h('div', { class: 'ch-live-head' }, h('h2', { text: '실시간 수업' }), btn('×', () => this.showPanel(false), 'ch-live-x', '창 닫기(수업은 계속)')),
-      U.status, U.code, U.qr, U.how, U.count,
+      U.status, U.code, U.qr, U.how, U.count, Settings.row('liveInk'),
       h('div', { class: 'ch-live-btns' }, U.distBtn, U.fileBtn, U.endBtn));
+    Settings.sync(this.panel);
     document.body.append(this.panel);
   },
 
@@ -7132,6 +7470,10 @@ const Live = {
     this.hidden.clear();
     this.seen.clear();
     this.reach = [];
+    clearTimeout(this.inkTimer);
+    this.inkTimer = 0;
+    this.inkRec = new WeakMap();
+    this.inkWanted = false;
     this.toggleDist(false);
     this.renderPanel();
     this.say('끝냈어요. 「실시간」을 다시 누르면 새 코드로 시작해요');
@@ -7142,6 +7484,9 @@ const Live = {
     this.role = 'student';
     this.sid = LiveCore.sid();
     document.documentElement.classList.add('ch-live-student');
+    // 학생 화면은 이 기기의 기능 설정과 상관없다. 판서층에는 이 기기의 판서 대신 교사에게서 받은 판서만 그린다(저장하지 않는다).
+    document.documentElement.classList.remove('ch-off-ink', 'ch-off-board', 'ch-off-live');
+    Ink.mirror = this.inkMirror();
     emit('live-role');   // 투표는 학생 화면에서 '세기'가 아니라 '고르기'가 된다
     Nav.override = { next: () => this.move(1), prev: () => this.move(-1), close() {} };
     Nav.revealTo = () => false;   // 정답 상자 ✓ 등이 교사보다 먼저 단계를 열지 않게
@@ -7253,6 +7598,7 @@ const Live = {
     const p = LiveCore.clean(event, raw, Stage.slides.length);
     if (!p || (this.teacher && p.tid !== this.teacher.tid)) return;
     if (event === 'end') { if (this.teacher) this.ended(); return; }
+    if (event === 'ink') { if (this.teacher) this.onInk(p); return; }
     if (event !== 'state') return;
     const same = p.reach.length === Stage.slides.length && p.slide < Stage.slides.length
       && p.lesson.key === Session.deck && p.lesson.n === Stage.slides.length;
@@ -7269,9 +7615,13 @@ const Live = {
     }
     this.teacher = p;
     this.heard = Date.now();
+    this.inkState(p);
     // 교사가 학생이 보던 장으로 오면 다시 따라간다
     if (this.follow || p.slide === Nav.state.slide) this.showSlide(p.slide);
-    else this.renderBar();
+    else {
+      this.renderBar();
+      this.inkShow();
+    }
   },
 
   // 학생 화면에 장 i를 연다. 교사가 있는 장이면 교사의 지금 단계, 지난 장이면 교사가 연 가장 먼 단계까지.
@@ -7284,6 +7634,7 @@ const Live = {
     (Stepper.bySlide[i] || []).forEach((st, k) => { if (r.steps[k] >= 0) st.set(r.steps[k], 'live'); });
     this.follow = i === t.slide;
     this.renderBar();
+    this.inkShow();
   },
 
   move(dir) {
@@ -7299,7 +7650,8 @@ const Live = {
     const t = this.teacher;
     const waiting = !!t && Date.now() - this.heard > LIVE_WAIT_MS;
     const behind = !!t && !this.follow;
-    const key = waiting ? 'wait' : behind ? `at${t.slide}` : '';
+    const onBoard = behind && this.inkOn && !!t.board;
+    const key = waiting ? 'wait' : onBoard ? 'board' : behind ? `at${t.slide}` : '';
     if (key === this.barKey) return;
     this.barKey = key;
     this.bar.hidden = !key;
@@ -7309,7 +7661,7 @@ const Live = {
       this.bar.replaceChildren(h('span', { text: '선생님 연결을 기다리는 중' }),
         h('button', { type: 'button', text: '코드 다시 넣기', onclick: () => this.rejoin() }));
     } else {
-      this.bar.replaceChildren(h('span', { text: `선생님은 ${t.slide + 1}장` }),
+      this.bar.replaceChildren(h('span', { text: onBoard ? '선생님은 칠판 화면' : `선생님은 ${t.slide + 1}장` }),
         h('button', { type: 'button', text: '선생님 화면으로', onclick: (e) => { this.showSlide(this.teacher.slide); e.currentTarget.blur(); } }));
     }
   },
@@ -7358,6 +7710,213 @@ const Live = {
     this.barKey = '';
     this.bar.hidden = true;
     this.join.hidden = false;
+    clearTimeout(this.needTimer);
+    this.needTimer = 0;
+    this.inkOn = false;
+    this.inkReset(0);
+    this.inkShow();
+  },
+
+  // ---- 실시간 판서(학생) ----
+  inkMirror() {
+    const doc = InkModel.emptyDoc();
+    doc.boards = [];   // 교사 칠판 번호대로 받을 때 만든다
+    return doc;
+  },
+
+  // 반이 바뀌었거나 새 수업: 받아 둔 판서를 모두 버린다
+  inkReset(ep) {
+    this.inkEp = ep;
+    this.inkPages.clear();
+    this.inkPlay.clear();
+    Ink.mirror = this.inkMirror();
+    if (Ink.ref) Ink.redraw();
+  },
+
+  inkState(t) {
+    this.inkOn = !!t.ink;
+    if (!t.ink) return;
+    if (t.ink.ep !== this.inkEp) this.inkReset(t.ink.ep);
+    this.inkCheck();
+  },
+
+  inkHave(pg) {
+    const e = this.inkPages.get(pg);
+    return e ? e.rev : 0;
+  },
+
+  // 교사가 알린 판보다 받아 둔 판이 오래됐으면(묶음을 놓쳤거나 늦게 들어옴) 잠깐 기다렸다가 쪽 전체를 다시 달라고 한다
+  inkCheck() {
+    const k = this.teacher && this.teacher.ink;
+    if (!k || LiveCore.inkFresh(this.inkHave(k.pg), k.rev) || this.needTimer) return;
+    this.needTimer = setTimeout(() => {
+      this.needTimer = 0;
+      const k2 = this.teacher && this.teacher.ink;
+      if (!k2 || !this.inbox || LiveCore.inkFresh(this.inkHave(k2.pg), k2.rev)) return;
+      if (Date.now() - this.needAt < LIVE_JOIN_MS) { this.inkCheck(); return; }
+      this.needAt = Date.now();
+      this.inbox.send('need', { sid: this.sid, pg: k2.pg, have: this.inkHave(k2.pg) });
+    }, LIVE_NEED_WAIT);
+  },
+
+  // 쪽 이름 → 받아 둔 쪽. 획 배열은 Ink.mirror 안의 것이라 판서층이 그대로 그린다.
+  inkPage(pg) {
+    let e = this.inkPages.get(pg);
+    if (e) return e;
+    const i = Number(pg.slice(1));
+    let arr = null;
+    if (pg[0] === 's') {
+      const slide = Stage.slides[i];
+      if (slide) arr = InkModel.page(Ink.mirror, { kind: 'slide', key: slide.dataset.key });
+    } else {
+      const boards = Ink.mirror.boards;
+      while (boards.length <= i) boards.push({ bg: 'white', strokes: [] });
+      arr = boards[i].strokes;
+    }
+    if (!arr) return null;
+    e = { rev: 0, arr, ids: new Map() };
+    this.inkPages.set(pg, e);
+    return e;
+  },
+
+  onInk(p) {
+    if (p.ep !== this.inkEp) this.inkReset(p.ep);
+    const page = this.inkPage(p.pg);
+    if (!page) return;
+    const shown = () => Ink.page === page.arr && document.documentElement.classList.contains('ch-live-ink');
+    if (p.snap) {
+      for (const s of page.arr) this.inkPlay.delete(s);
+      page.arr.length = 0;
+      page.ids.clear();
+      for (const w of p.snap) this.inkAdd(page, w, false);
+      page.rev = p.rev;
+      if (shown()) Ink.redraw();
+      return;
+    }
+    if (page.rev !== p.base) {   // 앞 묶음을 놓쳤다: 쪽 전체를 다시 받을 때까지 이어 그리지 않는다
+      page.rev = -1;
+      this.inkCheck();
+      return;
+    }
+    page.rev = p.rev;
+    if (p.del.length) {
+      for (const id of p.del) {
+        const s = page.ids.get(id);
+        if (!s) continue;
+        page.ids.delete(id);
+        this.inkPlay.delete(s);
+        const at = page.arr.indexOf(s);
+        if (at >= 0) page.arr.splice(at, 1);
+      }
+      if (shown()) Ink.redraw();
+    }
+    for (const w of p.put) this.inkAdd(page, w, true);
+    for (const [id, pts] of p.more) {
+      const s = page.ids.get(id);
+      if (s) this.inkQueue(s, LiveCore.inkDec(pts, this.inkLast(s)), page.arr, true);
+    }
+  },
+
+  inkAdd(page, wire, animate) {
+    const [id, t, c, w, pts] = wire;
+    const old = page.ids.get(id);
+    if (old) {   // 같은 번호가 다시 오면 새것으로 바꾼다
+      this.inkPlay.delete(old);
+      page.arr.splice(page.arr.indexOf(old), 1);
+    }
+    const s = { t: t ? 'hl' : 'pen', c, w, p: [] };
+    page.arr.push(s);
+    page.ids.set(id, s);
+    this.inkQueue(s, LiveCore.inkDec(pts, null), page.arr, animate);
+  },
+
+  // 획의 마지막 받은 점(아직 그리지 않은 것 포함). 이어 받는 좌표는 여기서 뺀 값이다.
+  inkLast(s) {
+    const e = this.inkPlay.get(s);
+    const a = e && e.q.length ? e.q : s.p;
+    return a.length >= 2 ? [a[a.length - 2], a[a.length - 1]] : null;
+  },
+
+  // 받은 좌표를 획에 잇는다. animate면 LIVE_INK_PLAY에 걸쳐 조금씩 그린다(가려진 탭은 돌아왔을 때 한 번에).
+  inkQueue(s, coords, arr, animate) {
+    if (!coords.length) return;
+    let e = this.inkPlay.get(s);
+    if (!animate && !e) {
+      for (const v of coords) s.p.push(v);   // 쪽 전체: 다시 그릴 때 함께 그려진다
+      return;
+    }
+    const now = performance.now();
+    if (!e) {
+      e = { q: [], arr, until: 0, at: now };
+      this.inkPlay.set(s, e);
+    }
+    for (const v of coords) e.q.push(v);
+    e.until = now + LIVE_INK_PLAY;
+    if (!this.inkRaf) this.inkRaf = requestAnimationFrame(() => this.inkTick());
+  },
+
+  inkTick() {
+    this.inkRaf = 0;
+    const now = performance.now();
+    const shownArr = document.documentElement.classList.contains('ch-live-ink') ? Ink.page : null;
+    for (const [s, e] of this.inkPlay) {
+      const left = e.q.length / 2;
+      const dt = Math.max(1, now - e.at);
+      e.at = now;
+      // 남은 점을 남은 시간에 고르게 나눈다
+      const k = now >= e.until ? left : Math.min(left, Math.max(1, Math.ceil((left * dt) / (e.until - now + dt))));
+      const take = e.q.splice(0, k * 2);
+      for (let i = 0; i < take.length; i += 2) this.inkDraw(s, take[i], take[i + 1], e.arr === shownArr);
+      if (!e.q.length) this.inkPlay.delete(s);
+    }
+    if (this.inkPlay.size) this.inkRaf = requestAnimationFrame(() => this.inkTick());
+  },
+
+  // 획에 점 하나를 더하고, 보이는 쪽이면 새 마디만 그린다(교사 화면의 Ink.extend와 같은 방식)
+  inkDraw(s, x, y, shown) {
+    const p = s.p;
+    if (shown) {
+      const ctx = Ink.ctx[s.t === 'hl' ? 'hl' : 'pen'];
+      ctx.strokeStyle = s.c;
+      ctx.fillStyle = s.c;
+      ctx.lineWidth = s.w;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.beginPath();
+      if (p.length) {
+        ctx.moveTo(p[p.length - 2], p[p.length - 1]);
+        ctx.lineTo(x, y);
+        ctx.stroke();
+      } else {
+        ctx.arc(x, y, s.w / 2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+    p.push(x, y);
+  },
+
+  // 학생 화면에 판서층과 교사 칠판을 맞춘다. 칠판은 교사를 따라가는 중일 때만 보인다.
+  inkShow() {
+    if (this.role !== 'student') return;
+    const t = this.teacher;
+    const on = this.inkOn && !!t;
+    const root = document.documentElement.classList;
+    const was = root.contains('ch-live-ink');
+    root.toggle('ch-live-ink', on);
+    const b = on && this.follow && t.board ? t.board : null;
+    Board.el.hidden = !b;
+    document.body.classList.toggle('ch-board-on', !!b);
+    if (b) {
+      Board.el.dataset.bg = b.bg;
+      Board.label.textContent = `칠판 ${b.i + 1} / ${b.n}`;
+    }
+    Board.setDark(b ? b.bg === 'green' : document.body.dataset.theme === 'chalk');
+    if (!on) return;
+    const ref = b ? { kind: 'board', index: b.i } : { kind: 'slide', key: Stage.slides[Nav.state.slide].dataset.key };
+    if (b) this.inkPage(`b${b.i}`);   // 칠판 쪽 배열을 만든다
+    const r = Ink.ref;
+    if (!r || r.kind !== ref.kind || r.key !== ref.key || r.index !== ref.index) Ink.setPage(ref);
+    else if (!was) Ink.redraw();   // 꺼져 있는 동안 받은 판서는 그리지 않았다
   },
 };
 

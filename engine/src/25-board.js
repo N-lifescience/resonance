@@ -10,7 +10,7 @@ const Board = {
   boardBtn: null,
 
   init() {
-    this.label = h('div', { class: 'ch-board-label', role: 'status', 'aria-live': 'polite' });
+    this.label = h('div', { class: 'ch-board-label', role: 'status', 'aria-live': 'polite', 'data-no-keep': '' });   // 엔진 글: 어절 보정 안 함
     this.el = h('div', { class: 'ch-board', 'data-bg': 'white', 'aria-label': '칠판', hidden: true }, this.label);
     Stage.deck.append(this.el);
     // 지금 보는 쪽에 불이 들어오는 두 칸 전환(누르면 그쪽으로 간다). 한 단추가 글자를 바꾸면 지금 상태인지 갈 곳인지 헷갈린다.
@@ -42,7 +42,7 @@ const Board = {
   toggle() { if (this.active) this.close(); else this.open(); },
 
   open() {
-    if (this.active) return;
+    if (this.active || !Settings.enabled('board')) return;
     this.active = true;
     Nav.override = this;
     document.body.classList.add('ch-board-on');

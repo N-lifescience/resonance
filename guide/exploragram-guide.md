@@ -4,7 +4,7 @@
 > **AI에게**: 이 파일 하나가 Exploragram 지침 전체다. 선생님이 수업 PPT를 주면 이 지침대로 수업용 HTML을 만든다.
 > **반드시**: `<head>`에 아래 엔진 css·js 두 줄을 넣는다(지금 환경에서 안 열려도 그대로 둔다). 넘기기·툴바를 직접 짜지 않고, PPT 장을 통째로 그림으로 넣지 않는다(1절 기준 8·9).
 > 본문의 `references/…`는 이 파일의 해당 절을, `scripts/…`는 저장소 https://github.com/N-lifescience/exploragram 의 `skills/exploragram/scripts/`를 가리킨다.
-> 엔진: `https://cdn.jsdelivr.net/gh/N-lifescience/exploragram@2/engine/exploragram.css`·`.js` (v2.1.0)
+> 엔진: `https://cdn.jsdelivr.net/gh/N-lifescience/exploragram@2/engine/exploragram.css`·`.js` (v2.2.0)
 > 레퍼런스 완성본(`references/examples/`): https://cdn.jsdelivr.net/gh/N-lifescience/exploragram@2/skills/exploragram/references/examples/elem-shadow.html · https://cdn.jsdelivr.net/gh/N-lifescience/exploragram@2/skills/exploragram/references/examples/eth-exploragram.html · https://cdn.jsdelivr.net/gh/N-lifescience/exploragram@2/skills/exploragram/references/examples/mid-linear.html · https://cdn.jsdelivr.net/gh/N-lifescience/exploragram@2/skills/exploragram/references/examples/sci-diffusion.html · https://cdn.jsdelivr.net/gh/N-lifescience/exploragram@2/skills/exploragram/references/examples/soc-supply-demand.html
 
 ## 차례
@@ -33,7 +33,7 @@ PPT를 HTML로 옮기는 일이 아니다. PPT로는 못 하는 수업을 만든
 
 ### 엔진이 하는 일
 
-판서(펜·형광펜·지우개·레이저), 칠판, 반별 저장, 넘기기, 인쇄, 자동 점검, 편집 모드(교사가 툴바 「편집」에서 글·상자·그림·도형을 골라 고치고 HTML로 저장)는 엔진이 한다. 이 기능을 직접 만들지 않는다. 펜을 든 채로 익스플로라그램의 단추나 슬라이더를 눌러도 엔진이 조작으로 처리한다. 교사가 펜 모드와 조작 모드를 오갈 필요가 없다. 다만 엔진은 초점이 입력란에 있으면 → 키를 무시하므로, 직접 짠 슬라이더는 손을 떼면 초점을 풀어야 한다(`exploragram.md`의 '직접 짜야 할 때').
+판서(펜·형광펜·지우개·레이저), 칠판, 반별 저장, 넘기기, 인쇄, 자동 점검, 실시간 수업, 편집 모드(교사가 툴바 「편집」에서 글·상자·그림·도형을 골라 고치고 HTML로 저장)는 엔진이 한다. 실시간 수업에서는 학생 기기가 교사 화면을 따라오고 학생 답이 교사 화면에 모인다. 교사 판서도 학생 화면에 보인다. 이 기능을 직접 만들지 않는다. 엔진은 이 기능을 수업 파일마다 늘 넣어 둔다. 선생님은 ⚙ 설정의 「기능 켜고 끄기」에서 판서, 칠판, 실시간 수업, 학생 화면 판서를 기기마다 켜고 끈다. 학교 전자칠판의 펜을 쓰는 교실이면 판서를 끈다. 편집은 끌 수 없다. 기능을 빼려고 엔진 줄을 지우거나 스위치를 따로 만들지 않는다. 펜을 든 채로 익스플로라그램의 단추나 슬라이더를 눌러도 엔진이 조작으로 처리한다. 교사가 펜 모드와 조작 모드를 오갈 필요가 없다. 다만 엔진은 초점이 입력란에 있으면 → 키를 무시하므로, 직접 짠 슬라이더는 손을 떼면 초점을 풀어야 한다(`exploragram.md`의 '직접 짜야 할 때').
 
 - 뼈대는 `assets/template.html`이다. `<head>`에 엔진 css·js 두 줄(`@2`)을 넣는다. 판서 저장 열쇠인 `<html data-deck="…">`는 영문 소문자·숫자·하이픈으로 덱마다 다르게 쓴다(예: `sci-diffusion-1`). 몸체는 `<body data-theme="ppt">`로 연다.
 - 장 하나는 `<section class="slide" id="고정-id" data-title="…">` 하나다. 무대는 1280×720이고 엔진이 화면에 맞춰 키운다.
@@ -71,7 +71,7 @@ PPT를 HTML로 옮기는 일이 아니다. PPT로는 못 하는 수업을 만든
 6. **전달**
    - 사용법, 확인 부탁, 저작권 안내는 채팅 답변에 쓴다. 장에는 넣지 않는다.
    - `python3 scripts/bundle.py 수업.html`을 실행하면 그림을 파일 안에 넣은 `수업-바로보기.html`이 생긴다. 인터넷이 없는 교실이면 `--offline`을 붙여 엔진도 넣는다. 수식이 있으면 수식 도구(KaTeX)도 함께 들어간다.
-   - 사용법을 쓴다: ① 더블클릭해 연다 ② 툴바에서 펜을 고르고 ◀ ▶로 넘긴다. 그림 자리(`img[data-ppt]`)가 남아 있으면 ③ 원본 PPT를 화면에 끌어다 놓고 ⚙ 「그림 넣어 저장」을 덧붙인다. 글자·색·위치를 고칠 곳이 있으면 툴바 「편집」에서 바로 고치고 「HTML 저장」으로 받은 파일로 원래 파일을 바꾸면 된다는 것도 알린다.
+   - 사용법을 쓴다: ① 더블클릭해 연다 ② 툴바에서 펜을 고르고 ◀ ▶로 넘긴다. 그림 자리(`img[data-ppt]`)가 남아 있으면 ③ 원본 PPT를 화면에 끌어다 놓고 ⚙ 「그림 넣어 저장」을 덧붙인다. 글자·색·위치를 고칠 곳이 있으면 툴바 「편집」에서 바로 고치고 「HTML 저장」으로 받은 파일로 원래 파일을 바꾸면 된다는 것도 알린다. 학교 전자칠판의 펜이 더 편하면 ⚙ 설정의 「기능 켜고 끄기」에서 판서를 끌 수 있다는 것도 알린다.
    - AI가 푼 정답, 흐린 그림에서 읽은 글, 모형 수치, 스스로 정한 인터뷰 답은 따로 적어 선생님께 확인을 부탁한다.
    - "교과서 그림이 들어 있으니 수업용으로만 쓰고 인터넷에 공개하지 마세요."를 덧붙인다.
 

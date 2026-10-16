@@ -429,6 +429,7 @@ const Toolbar = {
   },
 
   onKey(e) {
+    if (!Settings.enabled('ink')) return;   // 판서를 끈 기기: 도구 단축키·되돌리기 없음
     const k = keyName(e);
     if ((e.ctrlKey || e.metaKey) && k === 'z') { e.preventDefault(); Ink.undo(); return; }
     if (e.ctrlKey || e.metaKey || e.altKey) return;
