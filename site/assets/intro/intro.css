@@ -27,6 +27,8 @@
 /* 1~2막 자막 */
 .ri-cap { position: absolute; margin: 0; font-weight: 700; letter-spacing: -.02em; line-height: 1.25; text-wrap: balance; }
 .ri-cap .ri-dim { color: var(--ri-mute); }
+.ri-step { text-align: center; font-weight: 700; color: var(--ri-paper); }
+.ri-step .ri-dim { color: var(--ri-clay); }
 
 /* 기능 넷: 넓은 화면은 Planhat식 세로 탭 */
 .ri-list { position: absolute; margin: 0; padding: 0 0 0 1.1em; }

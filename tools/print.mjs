@@ -27,10 +27,10 @@ const DOCUMENTS = [
   { name: '사용방법', hook: '만들기', position: 'section-end', figure: 'comparison' },
 ];
 const FEATURES = [
-  ['create', 'HTML 자동 생성 및 편집'],
-  ['explore', '익스플로라그램 탑재'],
+  ['create', 'HTML 생성 및 편집'],
+  ['explore', '익스플로라그램'],
   ['live', '실시간 수업'],
-  ['board', '전자칠판 기능 탑재'],
+  ['board', '전자칠판 기능'],
 ];
 const ASSETS = [
   ...FEATURES.map(([slug]) => `site/assets/video/feature-${slug}-poster.webp`),

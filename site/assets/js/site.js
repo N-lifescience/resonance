@@ -12,9 +12,13 @@
     try { const url = new URL(value); return /^https?:$/.test(url.protocol) ? url.href : null; } catch { return null; }
   };
   function localFile(value, extension, fallbackDirectory = '') {
-    if (typeof value !== 'string' || !value || !/^[\w./-]+$/.test(value) || value.startsWith('/') || value.split('/').some((s) => s === '..' || s === '.')) return null;
-    if (!extension.test(value)) return null;
-    return !value.includes('/') && fallbackDirectory ? fallbackDirectory + value : value;
+    // 같은 사이트 안의 파일만 연다. 끝에 장 번호(#5)는 붙일 수 있다.
+    if (typeof value !== 'string' || !value) return null;
+    const [path, hash = ''] = value.split('#');
+    if (!/^[\w./-]+$/.test(path) || path.startsWith('/') || path.split('/').some((s) => s === '..' || s === '.')) return null;
+    if (hash && !/^\d{1,3}$/.test(hash)) return null;
+    if (!extension.test(path)) return null;
+    return (!path.includes('/') && fallbackDirectory ? fallbackDirectory + path : path) + (hash ? `#${hash}` : '');
   }
   async function request(url, options = {}) {
     const controller = new AbortController();
@@ -121,15 +125,17 @@
       intro?.skip();
     });
     // 수업 코드 팝오버는 헤더에서 독립적으로 열며 재생을 방해하지 않는다.
-    if (!isJoining) play(storage.get('gm-motion-paused') === '1' ||
-      (query.get('intro') !== '1' && !!storage.get('gm-intro-seen')));
+    if (!isJoining) play(query.get('intro') !== '1' && !!storage.get('gm-intro-seen'));
   }
 
   // ARIA 탭: 좌우 화살표, Home/End. 탭을 떠나면 영상과 체험을 멈춘다.
   $$('.demo-box').forEach((box) => {
     const tabs = $$('[role="tab"]', box);
+    const panel = box.closest('.feature-panel');
     function closeDemo() {
       $('iframe', box)?.remove();
+      // 체험을 닫으면 구역을 원래 두 칸 배치로 돌린다.
+      panel?.classList.remove('is-trying');
       const cover = $('[data-demo-cover]', box);
       if (cover) cover.hidden = false;
       const controls = $('[data-demo-controls]', box);
@@ -162,12 +168,21 @@
       if (!url) return;
       const frame = document.createElement('iframe');
       frame.src = url;
+      // 수업 화면을 1280×720 교실 화면 크기로 띄우고 상자 너비에 맞춰 통째로 줄인다(툴바까지 같은 비율).
+      frame.className = 'demo-frame';
       frame.title = open.dataset.title;
       frame.allow = 'fullscreen';
       frame.setAttribute('allowfullscreen', '');
       // 수업 엔진이 필요로 하는 같은 출처 실행과 저장은 유지한다.
       frame.setAttribute('referrerpolicy', 'same-origin');
-      $('[data-demo-view]', box).append(frame);
+      const view = $('[data-demo-view]', box);
+      // 체험하는 동안에는 구역 전체 폭을 써서 툴바가 너무 작아지지 않게 한다.
+      panel?.classList.add('is-trying');
+      view.append(frame);
+      requestAnimationFrame(() => box.scrollIntoView({ block: 'nearest', behavior: 'smooth' }));
+      const fit = () => view.style.setProperty('--demo-scale', String(view.clientWidth / 1280));
+      fit();
+      if (window.ResizeObserver) { box._fit?.disconnect(); box._fit = new ResizeObserver(fit); box._fit.observe(view); }
       $('[data-demo-cover]', box).hidden = true;
       $('[data-demo-controls]', box).hidden = false;
       $('[data-demo-close]', box).focus();
@@ -381,17 +396,17 @@
   $$('[data-ai]').forEach((card) => {
     const info = AI[card.dataset.ai];
     if (!info) return;
-    const failed = `복사하지 못했어요. 2단계의 문장을 직접 복사해 ${info.name}에 붙여 넣어 주세요.`;
+    const failed = `${info.name}를 여는 중이에요. 1단계에서 복사한 문장을 붙여 넣어 주세요.`;
     $('[data-ai-web]', card)?.addEventListener('click', () => {
       // 새 탭으로 넘어가기 전에 복사를 시작한다(링크 이동은 막지 않는다).
-      copyPrompt().then((ok) => say([ok ? `문장을 복사했어요. 새 탭의 ${info.name}에 PPT를 올리고 붙여 넣으세요.` : failed]));
+      copyPrompt().then((ok) => say([ok ? `문장을 복사해 두었어요. 새 탭의 ${info.name}에 수업 자료를 올리고 붙여 넣으세요.` : failed]));
     });
     const app = $('[data-ai-app]', card);
     app?.addEventListener('click', async (event) => {
       if (app.tagName === 'A') {
         // 앱 주소로 이동한다. 1.5초 뒤에도 이 창에 머물러 있으면 앱이 없는 것으로 보고 내려받기를 안내한다.
         copyPrompt().then((ok) => {
-          say([ok ? `문장을 복사했어요. ${info.name} 앱에서 PPT를 올리고 붙여 넣으세요.` : failed]);
+          say([ok ? `문장을 복사해 두었어요. ${info.name} 앱에서 수업 자료를 올리고 붙여 넣으세요.` : failed]);
           setTimeout(() => {
             if (document.visibilityState === 'visible' && document.hasFocus()) say([`${info.name} 앱이 열리지 않았다면 `, { href: info.download, text: '앱 내려받기' }, '를 이용하거나 웹에서 열어 주세요.']);
           }, 1500);
@@ -401,8 +416,8 @@
       event.preventDefault();
       const ok = await copyPrompt();
       say(ok
-        ? [`문장을 복사했어요. ${info.name} 앱을 열고 PPT를 올린 뒤 붙여 넣으세요. 앱이 없다면 `, { href: info.download, text: '앱 내려받기' }, '를 이용해 주세요.']
-        : [failed]);
+        ? [`문장을 복사해 두었어요. ${info.name} 앱을 열고 수업 자료를 올린 뒤 붙여 넣으세요. 앱이 없다면 `, { href: info.download, text: '앱 내려받기' }, '를 이용해 주세요.']
+        : [`1단계에서 복사한 문장을 ${info.name} 앱에 붙여 넣어 주세요. 앱이 없다면 `, { href: info.download, text: '앱 내려받기' }, '를 이용해 주세요.']);
     });
   });
 

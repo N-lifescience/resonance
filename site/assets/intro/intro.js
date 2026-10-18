@@ -1,29 +1,43 @@
-/*! 공명 인트로 — 15초 시간표를 0.5배 속도(30초)로 재생하는 모션그래픽 (Canvas 2D + DOM, 외부 라이브러리 없음)
+/*! 공명 인트로 — 15초 시간표를 구간별 속도로 재생하는 모션그래픽(약 30초) (Canvas 2D + DOM, 외부 라이브러리 없음)
  *  ResonanceIntro.mount(el, { onEnd, safeTop = 72, startAt = 0, autoplay = true, controls = true })
  *    → { skip(), destroy(), play(), pause(), replay(), seek(t), time(), ctaTop, ready }
  *  그림은 시간의 순수 함수 render(t)다. 같은 t면 같은 그림이 나온다(프레임 캡처용 window.__intro.seek).
  *  시간표는 128 BPM 한 박(15/32초)에 맞췄다: 1막 0~4박, 2막 4~8박, 기능 넷 각 4박, 끝 장면 8박.
- *  재생은 SPEED배로 한다. 끝난 뒤에는 끝 장면 파동만 천천히 계속 흐른다(움직임 멈춤이면 멈춘다). */
+ *  재생 속도: 1막(학생마다 다른 진동수)은 1배, 기능 1(HTML 생성 및 편집)은 0.3배, 나머지는 0.5배(speedAt).
+ *  끝난 뒤에는 끝 장면 파동이 같은 빠르기로 이어서 흐른다(움직임 멈춤이면 멈춘다). */
 (function () {
   'use strict';
   if (window.ResonanceIntro) return;
 
-  var DUR = 15, BEAT = DUR / 32, SPEED = 0.5, IDLE_W = Math.PI * 2 * 0.22;
+  var DUR = 15, BEAT = DUR / 32, SPEED = 0.5, SPEED_F1 = 0.3, IDLE_W = Math.PI * 2 * 0.22;
   var T = { a2: 4 * BEAT, f1: 8 * BEAT, f2: 12 * BEAT, f3: 16 * BEAT, f4: 20 * BEAT, end: 24 * BEAT };
   var FSTART = [T.f1, T.f2, T.f3, T.f4, T.end];
+  // 시간표 1초를 실제 몇 배 빠르기로 재생할지. 구간 사이는 부드럽게 바꾼다.
+  function speedAt(t) {
+    function sm(a, b) { var p = Math.max(0, Math.min(1, (t - a) / (b - a))); return p * p * (3 - 2 * p); }
+    var v = 1 + (SPEED - 1) * sm(1.9, 2.5);
+    v += (SPEED_F1 - SPEED) * sm(T.f1 - 0.25, T.f1 + 0.05) * (1 - sm(T.f2 - 0.2, T.f2 + 0.1));
+    return v;
+  }
 
   var FONT = '"Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif';
   var MONO = 'ui-monospace, "SF Mono", Menlo, Consolas, "D2Coding", monospace';
   var FONT_CSS = 'https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css';
 
   var TXT = {
-    features: ['HTML 자동 생성 및 편집', '익스플로라그램 탑재', '실시간 수업', '전자칠판 기능 탑재'],
+    features: ['HTML 생성 및 편집', '익스플로라그램', '실시간 수업', '전자칠판 기능'],
+    // 기능 1 장면의 세 단계 자막(장면 시각 u 기준 [시작, 끝])
+    steps: [
+      { at: [0.04, 0.5], words: [['①', 1], ['PPT', 0], ['한', 0], ['장을', 0], ['AI에', 0], ['건네면', 0]] },
+      { at: [0.62, 1.08], words: [['②', 1], ['AI가', 0], ['수업', 0], ['HTML로', 0], ['바꾸고', 0]] },
+      { at: [1.2, 1.82], words: [['③', 1], ['「편집」으로', 0], ['바로', 0], ['고쳐요', 0]] }
+    ],
     cap1: [['학생마다', 1], ['다른', 0], ['진동수', 0]],
     cap2: [['하나로', 1], ['맞춰지는', 0], ['순간', 0]],
     name: '공명',
     en: 'resonance',
     tag: [['교실의', 1], ['진동수를', 0], ['맞추다', 0]],
-    summary: '공명, 교실의 진동수를 맞추다. 핵심 기능 넷은 HTML 자동 생성 및 편집, 익스플로라그램 탑재, 실시간 수업, 전자칠판 기능 탑재입니다.',
+    summary: '공명, 교실의 진동수를 맞추다. 핵심 기능 넷은 HTML 생성 및 편집, 익스플로라그램, 실시간 수업, 전자칠판 기능입니다.',
     skip: '건너뛰기', pause: '멈춤', play: '재생'
   };
   // 캔버스에 쓰는 글자(글꼴 부분 집합을 미리 받아 두려고 모은다)
@@ -89,7 +103,8 @@
   }
   var PHI = integral(function (t) { return TAU * VS * fAt(t); }, DUR + 1, 1 / 240);
   // 끝 장면 파동: 점점 느려져 15초에 멈춘다
-  var PHI_E = integral(function (t) { var s = t - T.end; return s < 0 ? 0 : TAU * 0.7 * (1 - E.ioC(seg(s, 1.3, 3.75))); }, DUR + 1, 1 / 240);
+  // 끝 장면 파동: 점점 느려져 끝난 뒤의 파동(IDLE_W, 실제 초당)과 같은 빠르기에 닿는다. 끝 구간은 SPEED배로 재생된다.
+  var PHI_E = integral(function (t) { var s = t - T.end, idle = IDLE_W / SPEED; return s < 0 ? 0 : idle + (TAU * 0.7 - idle) * (1 - E.ioC(seg(s, 1.3, 3.75))); }, DUR + 1, 1 / 240);
   var OM = TAU * 0.85, SY0 = 1.95, SY1 = 2.85;
 
   /* ── 그리기 도구 ── */
@@ -1197,6 +1212,8 @@
     var grain = mk('div', 'ri-grain', stage);
     var cap1 = mk('p', 'ri-cap', stage), cap2 = mk('p', 'ri-cap', stage);
     var cap1W = words(cap1, TXT.cap1), cap2W = words(cap2, TXT.cap2);
+    var stepEls = TXT.steps.map(function () { return mk('p', 'ri-cap ri-step', stage); });
+    var stepW = TXT.steps.map(function (st, i) { return words(stepEls[i], st.words); });
     var list = mk('div', 'ri-list', stage), mark = mk('span', 'ri-mark', list), lis = [], liW = [];
     TXT.features.forEach(function (f, i) {
       var li = mk('div', 'ri-li', list), num = mk('span', 'ri-num', li), numIn = words(num, ['0' + (i + 1)]);
@@ -1270,6 +1287,12 @@
         var mh = 0; pti.forEach(function (it2) { mh = Math.max(mh, it2.offsetHeight); });
         prog4.style.top = (mh + 16) + 'px';
       }
+      // 기능 1 단계 자막: 넓은 화면은 장면 아래, 세로 화면은 기능 제목과 진행 막대 아래
+      var sfs = L.land ? clamp(L.capFs * 0.62, 18, 44) : clamp(L.W * 0.05, 17, 26);
+      var sTop = L.land ? L.S.y + L.S.h + Math.max(14, sfs * 0.7) : L.pt.y + prog4.offsetTop + 3 + Math.max(16, sfs * 0.8);
+      stepEls.forEach(function (c) {
+        c.style.fontSize = sfs + 'px'; c.style.left = L.S.x + 'px'; c.style.width = L.S.w + 'px'; c.style.maxWidth = 'none'; c.style.top = sTop + 'px';
+      });
       // 끝 화면 로고 묶음
       var nfs = L.land ? Math.min(L.C.h * 0.27, L.W * 0.15) : Math.min(L.W * 0.3, L.C.h * 0.19);
       nfs = clamp(nfs, 64, 560);
@@ -1304,6 +1327,11 @@
       setO(cap1, t < 2.3 ? 1 : 0); setO(cap2, t > 1.6 && t < 4 ? 1 : 0);
       wordAnim(cap1W, t, 0.5, 0.07, 0.5, 1.68, 1);
       wordAnim(cap2W, t, 2.0, 0.08, 0.5, 3.38, 1);
+      TXT.steps.forEach(function (st, i) {
+        var a0 = T.f1 + st.at[0], a1 = T.f1 + st.at[1];
+        setO(stepEls[i], t > a0 - 0.05 && t < a1 + 0.12 ? 1 : 0);
+        wordAnim(stepW[i], t, a0, 0.035, 0.32, a1, -1);
+      });
       var s = t - T.end;
       if (L.land) {
         lis.forEach(function (li, i) { wordAnim(liW[i], t, T.f1 + 0.06 + i * 0.07, 0.035, 0.55, T.end - 0.05 + i * 0.04, -1); });
@@ -1362,7 +1390,7 @@
       raf = 0;
       if (!playing || dead) return;
       var dt = (now - last) / 1000; last = now;
-      t += clamp(dt, 0, 0.1) * SPEED;
+      t += clamp(dt, 0, 0.1) * speedAt(t);
       if (t >= DUR) { t = DUR; render(t); finish(); return; }
       render(t);
       raf = requestAnimationFrame(frame);
