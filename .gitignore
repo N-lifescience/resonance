@@ -5,3 +5,6 @@ Thumbs.db
 # 교과서·출판사 자료와 변환 결과는 저장소에 넣지 않는다
 private/
 _site/
+
+# v3 에셋 원본(기계가 만든 고해상 원본·녹화·내려받은 원본)은 SSD에만
+site/assets/_src/
