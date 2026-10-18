@@ -234,7 +234,7 @@ h3 { font-size:clamp(1.4rem,2.2vw,1.9rem); }
 .ba-card figcaption span { font-size:16px; }
 .ba-before .ba-card { background:var(--paper-2); }
 .ba-before img { filter:grayscale(.55) contrast(.92); opacity:.9; }
-.ba-before .ba-tag { background:var(--white); color:var(--mute); box-shadow:0 1px 0 var(--line); }
+.ba-before .ba-tag { background:#57564F; color:var(--white); }
 .ba-before figcaption span { color:var(--mute); }
 .ba-after .ba-card { background:var(--char); color:var(--paper); box-shadow:0 0 0 3px var(--clay),var(--shadow); }
 .ba-after .ba-tag { background:var(--clay); color:var(--char); }
