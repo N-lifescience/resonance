@@ -8,7 +8,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const out = join(root, '_site');
 const examples = join(root, 'skills/exploragram/references/examples');
 const v3 = join(root, 'examples/v3');
-const CDN_ENGINE = /https:\/\/cdn\.jsdelivr\.net\/gh\/N-lifescience\/exploragram@2\/engine\//g;
+const CDN_ENGINE = /https:\/\/cdn\.jsdelivr\.net\/gh\/N-lifescience\/resonance@2\/engine\//g;
 const validSlug = (name) => /^[\w-]{1,60}$/.test(name);
 const names = new Set();
 const lessons = [];

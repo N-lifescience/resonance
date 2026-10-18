@@ -3,9 +3,9 @@
 
 > **AI에게**: 이 파일 하나가 Exploragram 지침 전체다. 선생님이 수업 PPT를 주면 이 지침대로 수업용 HTML을 만든다.
 > **반드시**: `<head>`에 아래 엔진 css·js 두 줄을 넣는다(지금 환경에서 안 열려도 그대로 둔다). 넘기기·툴바를 직접 짜지 않고, PPT 장을 통째로 그림으로 넣지 않는다(1절 기준 8·9).
-> 본문의 `references/…`는 이 파일의 해당 절을, `scripts/…`는 저장소 https://github.com/N-lifescience/exploragram 의 `skills/exploragram/scripts/`를 가리킨다.
-> 엔진: `https://cdn.jsdelivr.net/gh/N-lifescience/exploragram@2/engine/exploragram.css`·`.js` (v2.2.0)
-> 레퍼런스 완성본(`references/examples/`): https://cdn.jsdelivr.net/gh/N-lifescience/exploragram@2/skills/exploragram/references/examples/elem-shadow.html · https://cdn.jsdelivr.net/gh/N-lifescience/exploragram@2/skills/exploragram/references/examples/eth-exploragram.html · https://cdn.jsdelivr.net/gh/N-lifescience/exploragram@2/skills/exploragram/references/examples/mid-linear.html · https://cdn.jsdelivr.net/gh/N-lifescience/exploragram@2/skills/exploragram/references/examples/sci-diffusion.html · https://cdn.jsdelivr.net/gh/N-lifescience/exploragram@2/skills/exploragram/references/examples/soc-supply-demand.html
+> 본문의 `references/…`는 이 파일의 해당 절을, `scripts/…`는 저장소 https://github.com/N-lifescience/resonance 의 `skills/exploragram/scripts/`를 가리킨다.
+> 엔진: `https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/engine/exploragram.css`·`.js` (v2.2.0)
+> 레퍼런스 완성본(`references/examples/`): https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/skills/exploragram/references/examples/elem-shadow.html · https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/skills/exploragram/references/examples/eth-exploragram.html · https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/skills/exploragram/references/examples/mid-linear.html · https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/skills/exploragram/references/examples/sci-diffusion.html · https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/skills/exploragram/references/examples/soc-supply-demand.html
 
 ## 차례
 
@@ -772,8 +772,8 @@ Ctrl+P로 장마다 한 쪽씩 인쇄된다. 엔진이 단계를 모두 펼치�
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>자유주의와 민족주의</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/N-lifescience/exploragram@2/engine/exploragram.css">
-<script defer src="https://cdn.jsdelivr.net/gh/N-lifescience/exploragram@2/engine/exploragram.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/engine/exploragram.css">
+<script defer src="https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/engine/exploragram.js"></script>
 <style>/* 이 수업만의 모양 */</style>
 </head>
 <body data-theme="ppt" style="--accent:#C04F15">
@@ -1152,7 +1152,7 @@ document.addEventListener('DOMContentLoaded', () => {
 ```
 
 ```html
-<a class="link-card" href="https://n-lifescience.github.io/exploragram/" data-qr>예시 수업 모음<small>QR을 찍으면 학생 기기에서 열린다</small></a>
+<a class="link-card" href="https://n-lifescience.github.io/resonance/" data-qr>예시 수업 모음<small>QR을 찍으면 학생 기기에서 열린다</small></a>
 ```
 
 - 주소는 선생님이 준 것만 쓴다. 기억이나 짐작으로 영상이나 사이트 주소를 만들지 않는다(위 예시의 주소도 그대로 쓰지 않는다). 주소를 받지 못했으면 카드를 넣지 말고 파일을 전달할 때 넣을 주소를 묻는다.

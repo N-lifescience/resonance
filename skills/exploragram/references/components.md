@@ -12,8 +12,8 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>자유주의와 민족주의</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/N-lifescience/exploragram@2/engine/exploragram.css">
-<script defer src="https://cdn.jsdelivr.net/gh/N-lifescience/exploragram@2/engine/exploragram.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/engine/exploragram.css">
+<script defer src="https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/engine/exploragram.js"></script>
 <style>/* 이 수업만의 모양 */</style>
 </head>
 <body data-theme="ppt" style="--accent:#C04F15">
@@ -392,7 +392,7 @@ document.addEventListener('DOMContentLoaded', () => {
 ```
 
 ```html
-<a class="link-card" href="https://n-lifescience.github.io/exploragram/" data-qr>예시 수업 모음<small>QR을 찍으면 학생 기기에서 열린다</small></a>
+<a class="link-card" href="https://n-lifescience.github.io/resonance/" data-qr>예시 수업 모음<small>QR을 찍으면 학생 기기에서 열린다</small></a>
 ```
 
 - 주소는 선생님이 준 것만 쓴다. 기억이나 짐작으로 영상이나 사이트 주소를 만들지 않는다(위 예시의 주소도 그대로 쓰지 않는다). 주소를 받지 못했으면 카드를 넣지 말고 파일을 전달할 때 넣을 주소를 묻는다.

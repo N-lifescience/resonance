@@ -1,7 +1,7 @@
 # Exploragram · 학생이 직접 움직이며 원리를 찾아내는 수업 그림
 
 > **AI에게**: 선생님이 이 저장소 주소와 수업 PPT를 주면 합본 지침 하나를 읽고 그대로 따른다.
-> 지침: https://raw.githubusercontent.com/N-lifescience/exploragram/main/guide/exploragram-guide.md
+> 지침: https://raw.githubusercontent.com/N-lifescience/resonance/main/guide/exploragram-guide.md
 > 만들기 전에 선생님에게 먼저 묻고(인터뷰), 설계표를 확인받은 뒤 HTML 파일 하나를 만든다.
 
 선생님이 자기 AI(ChatGPT·Gemini·Claude)에게 수업 PPT를 주면, 판서와 활동이 들어간 수업용 HTML이 나온다. 판서·칠판·반별 저장·넘기기·인쇄·자동 점검은 이 저장소의 엔진이 맡고, AI는 수업 내용과 활동만 쓴다.
@@ -20,7 +20,7 @@
 ## 선생님: 3단계로 쓰기
 
 1. AI에게 수업 PPT를 올리고 이렇게 쓴다.
-   `https://github.com/N-lifescience/exploragram 지침대로 이 PPT를 수업 HTML로 바꿔줘`
+   `https://github.com/N-lifescience/resonance 지침대로 이 PPT를 수업 HTML로 바꿔줘`
    (주소를 못 읽는 AI는 `guide/exploragram-guide.md` 파일을 받아 PPT와 함께 올린다.)
 2. AI가 묻는 질문(교과·차시, 수업 장면, 헷갈리는 지점, 넣고 싶은 활동, 지킬 것)에 답하고, 설계표를 확인한다.
 3. 받은 `.html` 파일을 더블클릭해서 수업한다. 그림 자리가 비어 있으면 원본 PPT를 화면에 끌어다 놓고, ⚙ 설정의 「그림 넣어 저장」을 누른다.
@@ -31,7 +31,7 @@
 ## 실시간 수업: 학생이 자기 기기에서 함께 만진다
 
 1. 교사: 툴바 「실시간」을 누르면 방 코드 6자리와 QR이 나온다.
-2. 학생: 웨일북·휴대폰에서 QR을 찍거나 사이트(`https://n-lifescience.github.io/exploragram/`)에 코드를 넣는다. 교사 PC에 있는 수업 파일이면 「학생용 파일 저장」으로 받은 파일을 웨일 클래스에 올리고, 학생은 그 파일을 열어 코드를 넣는다.
+2. 학생: 웨일북·휴대폰에서 QR을 찍거나 사이트(`https://n-lifescience.github.io/resonance/`)에 코드를 넣는다. 교사 PC에 있는 수업 파일이면 「학생용 파일 저장」으로 받은 파일을 웨일 클래스에 올리고, 학생은 그 파일을 열어 코드를 넣는다.
 3. 학생 화면은 교사 장을 따라가고, 교사가 연 범위 안에서는 지난 장으로 돌아가 볼 수 있다(「선생님 화면으로」로 복귀). 익스플로라그램(Exploragram) 슬라이더는 학생이 직접 움직인다.
 4. 교사 「학생 보기」: 슬라이더마다 학생 값이 막대로 모인다. 막대를 누르면 그 값이 칠판 익스플로라그램에 들어가고(누가 맞췄는지는 모른다), 「내 값으로」로 되돌린다.
 5. 학생 화면에 판서 보이기: 교사가 쓰는 판서와 칠판이 1초쯤 늦게 학생 화면에 그려진다. 학생은 보기만 하고 쓰거나 지우지 못한다. 실시간 창의 스위치나 ⚙ 설정에서 끈다. 판서를 끄고 학교 전자칠판의 펜으로 쓴 판서는 다른 프로그램의 화면이라 학생 화면에 보낼 수 없다.

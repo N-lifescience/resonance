@@ -14,7 +14,7 @@ function concat(dir, ext) {
     .join('\n');
 }
 
-const banner = `/*! exploragram engine v${VERSION} | © N-lifescience | https://github.com/N-lifescience/exploragram */`;
+const banner = `/*! exploragram engine v${VERSION} | © N-lifescience | https://github.com/N-lifescience/resonance */`;
 // 실시간 수업 설정(Supabase 주소·공개 키, 사이트 주소). 브라우저에 넣으라고 만든 공개 키만 둔다.
 const live = JSON.parse(readFileSync(join(root, 'live.config.json'), 'utf8'));
 writeFileSync(join(root, 'engine/exploragram.js'),
@@ -36,15 +36,15 @@ const parts = [
   ['한국어 문장', 'references/korean.md'],
 ];
 // 레퍼런스 완성본(HTML)은 합본에 넣지 않고 주소로 알린다
-const EXAMPLES = 'https://cdn.jsdelivr.net/gh/N-lifescience/exploragram@2/skills/exploragram/references/examples/';
+const EXAMPLES = 'https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/skills/exploragram/references/examples/';
 const examples = readdirSync(join(skill, 'references/examples')).filter((f) => f.endsWith('.html')).sort();
 const guide = [
   '# exploragram 합본 지침',
   '',
   '> **AI에게**: 이 파일 하나가 Exploragram 지침 전체다. 선생님이 수업 PPT를 주면 이 지침대로 수업용 HTML을 만든다.',
   '> **반드시**: `<head>`에 아래 엔진 css·js 두 줄을 넣는다(지금 환경에서 안 열려도 그대로 둔다). 넘기기·툴바를 직접 짜지 않고, PPT 장을 통째로 그림으로 넣지 않는다(1절 기준 8·9).',
-  '> 본문의 `references/…`는 이 파일의 해당 절을, `scripts/…`는 저장소 https://github.com/N-lifescience/exploragram 의 `skills/exploragram/scripts/`를 가리킨다.',
-  `> 엔진: \`https://cdn.jsdelivr.net/gh/N-lifescience/exploragram@2/engine/exploragram.css\`·\`.js\` (v${VERSION})`,
+  '> 본문의 `references/…`는 이 파일의 해당 절을, `scripts/…`는 저장소 https://github.com/N-lifescience/resonance 의 `skills/exploragram/scripts/`를 가리킨다.',
+  `> 엔진: \`https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/engine/exploragram.css\`·\`.js\` (v${VERSION})`,
   `> 레퍼런스 완성본(\`references/examples/\`): ${examples.map((f) => `${EXAMPLES}${f}`).join(' · ')}`,
   '',
   '## 차례',

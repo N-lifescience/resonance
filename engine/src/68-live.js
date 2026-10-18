@@ -901,7 +901,7 @@ const Live = {
   studentHtml() {
     const doc = PptFill.buildDoc();
     doc.documentElement.setAttribute('data-live', 'student');
-    const cdn = 'https://cdn.jsdelivr.net/gh/N-lifescience/exploragram@2/engine/';
+    const cdn = 'https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/engine/';
     for (const [sel, attr] of [['link[rel~="stylesheet"][href]', 'href'], ['script[src]', 'src']]) {
       for (const el of qsa(sel, doc)) {
         const m = /^(?![a-z]+:|\/\/)(?:[^?#]*\/)?(exploragram\.(?:css|js))(?:[?#].*)?$/i.exec(el.getAttribute(attr));

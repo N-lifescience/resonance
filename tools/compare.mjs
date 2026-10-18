@@ -7,7 +7,7 @@ import { basename, dirname, isAbsolute, join, relative, resolve, sep } from 'nod
 import { pathToFileURL } from 'node:url';
 import { ROOT, run, temporary } from './rec-lib.mjs';
 
-const ENGINE_BASE = 'https://cdn.jsdelivr.net/gh/N-lifescience/exploragram@2/engine/';
+const ENGINE_BASE = 'https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/engine/';
 // Exploratory components from references/components.md. Quizzes, answer blanks,
 // sorting exercises and classroom tools do not themselves count as exploragrams.
 const EXPLORATORY = new Set(['calc', 'particles', 'plot', 'map-reveal', 'yearline', 'reveal', 'switch']);

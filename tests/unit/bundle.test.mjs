@@ -22,8 +22,8 @@ test('bundle.py: 그림 넣기, 엔진 넣기, 큰 그림 줄이기 또는 알�
     writeFileSync(join(dir, 'media', 'photo.png'), noisyPng(400, 300));   // 약 360KB, 투명 없음
     writeFileSync(join(dir, 'media', 'f.woff2'), Buffer.from('wOF2-fake'));
     writeFileSync(join(dir, 'lesson.html'), `<!doctype html><html><head>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/N-lifescience/exploragram@2/engine/exploragram.css">
-<script defer src="https://cdn.jsdelivr.net/gh/N-lifescience/exploragram@2/engine/exploragram.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/engine/exploragram.css">
+<script defer src="https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/engine/exploragram.js"></script>
 <style>@font-face { font-family: F; src: url('media/f.woff2') format('woff2'); } .g { background: url("data:image/svg+xml,%3Csvg%3E") }</style>
 </head><body><section class="slide"><img src="media/1-1.png" alt="빨강"><img alt="큰" src='media/big.png'><img src="data:image/png;base64,AAAA" alt="그대로"><img src="media/없음.png" alt="없음"><img src="media/photo.png" alt="사진"></section></body></html>`);
     const log = execFileSync(python[0], [...python.slice(1), script, join(dir, 'lesson.html'), '--offline', '--engine', engine], { encoding: 'utf8' });
@@ -52,8 +52,8 @@ test('bundle.py: 그림 넣기, 엔진 넣기, 큰 그림 줄이기 또는 알�
 
 // 수식이 있는 수업: --katex로 가짜 KaTeX 폴더를 줘서 인터넷 없이 시험한다
 const head = `<!doctype html><html><head>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/N-lifescience/exploragram@2/engine/exploragram.css">
-<script defer src="https://cdn.jsdelivr.net/gh/N-lifescience/exploragram@2/engine/exploragram.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/engine/exploragram.css">
+<script defer src="https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/engine/exploragram.js"></script>
 </head><body>`;
 const lessons = {
   dollar: '<section class="slide"><p>원의 넓이는 $\\pi r^2$이다.</p></section>',

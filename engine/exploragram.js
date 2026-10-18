@@ -1,8 +1,8 @@
-/*! exploragram engine v2.2.0 | © N-lifescience | https://github.com/N-lifescience/exploragram */
+/*! exploragram engine v2.2.0 | © N-lifescience | https://github.com/N-lifescience/resonance */
 (function () {
 'use strict';
 const VERSION = '2.2.0';
-const LIVE_CONFIG = {"url":"https://qtwigpxinccudhprrdnb.supabase.co","key":"sb_publishable_-3KCWch7Q7sBQbcdVzxR4g_imovkZv5","site":"https://n-lifescience.github.io/exploragram/"};
+const LIVE_CONFIG = {"url":"https://qtwigpxinccudhprrdnb.supabase.co","key":"sb_publishable_-3KCWch7Q7sBQbcdVzxR4g_imovkZv5","site":"https://n-lifescience.github.io/resonance/"};
 /* ---- 00-core.js ---- */
 // 공통 상수, 작은 DOM 도우미, 이벤트 훅, 공개 객체 Exploragram.
 const STAGE_W = 1280;
@@ -7436,7 +7436,7 @@ const Live = {
   studentHtml() {
     const doc = PptFill.buildDoc();
     doc.documentElement.setAttribute('data-live', 'student');
-    const cdn = 'https://cdn.jsdelivr.net/gh/N-lifescience/exploragram@2/engine/';
+    const cdn = 'https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/engine/';
     for (const [sel, attr] of [['link[rel~="stylesheet"][href]', 'href'], ['script[src]', 'src']]) {
       for (const el of qsa(sel, doc)) {
         const m = /^(?![a-z]+:|\/\/)(?:[^?#]*\/)?(exploragram\.(?:css|js))(?:[?#].*)?$/i.exec(el.getAttribute(attr));
