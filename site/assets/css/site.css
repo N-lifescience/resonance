@@ -151,6 +151,14 @@ h3 { font-size:clamp(1.4rem,2.2vw,1.9rem); }
 .feature-index strong { color:var(--clay-deep); font-size:1.5em; font-weight:850; margin-inline-end:2px; }
 .feature-copy h2 { font-size:clamp(1.9rem,3.4vw,3rem); }
 .feature-copy .lead { font-size:clamp(1.05rem,1.4vw,1.2rem); color:var(--mute); }
+.ex-a { color:var(--clay); }
+.etym { display:flex; flex-wrap:wrap; align-items:center; gap:10px 14px; margin:22px 0 0; }
+.etym-term { display:inline-grid; gap:2px; padding:10px 16px; border-radius:14px; background:#ffffff10; border:1px solid #ffffff24; line-height:1.3; }
+.etym-term b { font-size:18px; font-weight:800; }
+.etym-term small { font-size:16px; font-weight:600; letter-spacing:.02em; color:#D6D2CA; }
+.etym-term small.ex-a { color:var(--clay); }
+.etym-op { font-size:22px; font-weight:800; color:var(--night-mute); }
+.etym-result { display:inline-flex; align-items:center; gap:14px; }
 .check-list { display:grid; gap:10px; padding:0; margin:26px 0 0; list-style:none; }
 .check-list li { position:relative; padding-inline-start:30px; font-weight:600; }
 .check-list li::before { content:""; position:absolute; left:2px; top:.42em; width:16px; height:9px; border-left:2.5px solid var(--tide); border-bottom:2.5px solid var(--tide); transform:rotate(-45deg); }
@@ -176,11 +184,9 @@ h3 { font-size:clamp(1.4rem,2.2vw,1.9rem); }
 .demo-help { margin:12px 8px 4px; font-size:16px; opacity:.75; }
 .demo-hint { opacity:1; font-weight:600; }
 .demo-hint::before { content:"해 보기"; display:inline-block; margin-inline-end:8px; padding:1px 9px; border-radius:999px; background:var(--clay); color:var(--char); font-size:15px; font-weight:750; vertical-align:1px; }
-.term-box { margin-top:28px; padding:20px 22px; border-radius:16px; background:#ffffff0f; border:1px solid #ffffff22; }
-.term-box .term-title { margin:0 0 8px; color:var(--clay); font-weight:800; }
-.term-box p:last-child { margin:0; color:#D6D2CA; font-size:16px; line-height:1.7; }
 .demo-controls { display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between; margin:12px 8px 4px; }
 .demo-controls button { min-height:44px; border-radius:999px; padding:10px 20px; background:var(--char); color:var(--white); }
+.is-dark .demo-controls button { background:var(--paper); color:var(--char); }
 
 /* 마지막 기능에서 제작하기로 이어지는 띠 */
 .next-step { display:grid; grid-template-columns:auto minmax(0,1fr) auto; grid-template-areas:"label title go" "label desc go"; align-items:center; column-gap:clamp(16px,3vw,40px); row-gap:4px; padding:clamp(24px,3.5vw,40px) clamp(24px,4.5vw,64px); border-radius:var(--panel-radius); background:var(--clay); color:var(--char); text-decoration:none; transition:background .2s; }
@@ -197,9 +203,18 @@ h3 { font-size:clamp(1.4rem,2.2vw,1.9rem); }
 .step-num { display:grid; place-items:center; width:48px; height:48px; border-radius:50%; background:var(--char); color:var(--white); font-weight:800; font-size:20px; font-variant-numeric:tabular-nums; }
 .step-head h3 { margin:6px 0 10px; }
 .step-head p { margin:0; color:var(--mute); max-inline-size:40em; font-size:18px; }
+.hl { color:#A84D2D; font-weight:750; }
 .ai-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; margin-top:28px; }
 .ai-card { display:flex; flex-direction:column; gap:16px; padding:22px; border-radius:var(--radius); background:var(--paper); }
-.ai-card h4 { font-size:1.35rem; }
+.ai-card h4 { display:flex; align-items:center; gap:10px; font-size:1.35rem; }
+.ai-logo { width:28px; height:28px; flex:none; }
+.ai-card[data-ai="chatgpt"] { --ai:#0D0D0D; --ai-ink:#FFFFFF; --ai-text:#0D0D0D; --ai-bg:linear-gradient(#0D0D0D,#0D0D0D); }
+.ai-card[data-ai="gemini"] { --ai:#1B66C9; --ai-ink:#FFFFFF; --ai-text:#1B5FBF; --ai-bg:linear-gradient(90deg,#1B66C9,#7E57C2); }
+.ai-card[data-ai="claude"] { --ai:#D97757; --ai-ink:#141413; --ai-text:#A84D2D; --ai-bg:linear-gradient(#D97757,#D97757); }
+.ai-card .ai-web { background:var(--ai-bg); color:var(--ai-ink); }
+.ai-card .ai-web:hover { filter:brightness(1.08); background:var(--ai-bg); }
+.ai-card .ai-app { background:var(--white); color:var(--ai-text); box-shadow:inset 0 0 0 1.5px var(--ai); }
+.ai-card .ai-app:hover { background:var(--white); box-shadow:inset 0 0 0 2.5px var(--ai); }
 .ai-actions { display:grid; gap:10px; }
 .ai-actions .button { width:100%; }
 .ai-status { min-height:1.7em; margin:18px 0 0; color:var(--tide); font-weight:600; }
@@ -210,17 +225,18 @@ h3 { font-size:clamp(1.4rem,2.2vw,1.9rem); }
 .copy-count { font-size:16px; color:var(--mute); margin:12px 0 0; font-variant-numeric:tabular-nums; }
 .copy-status { min-height:1.7em; margin:8px 0 0; color:var(--tide); font-weight:600; }
 .before-after { display:grid; grid-template-columns:minmax(0,1fr) auto minmax(0,1fr); align-items:center; gap:16px; margin-top:28px; }
+.ba-item { display:grid; gap:10px; min-inline-size:0; }
 .ba-card { position:relative; margin:0; border-radius:var(--radius); overflow:clip; }
 .ba-card img { width:100%; aspect-ratio:16/10; object-fit:cover; object-position:top; }
-.ba-tag { position:absolute; top:12px; left:12px; z-index:1; padding:5px 12px; border-radius:999px; font-size:16px; font-weight:750; }
+.ba-tag { justify-self:start; padding:5px 14px; border-radius:999px; font-size:16px; font-weight:750; }
 .ba-card figcaption { display:grid; gap:4px; padding:16px 20px 18px; }
 .ba-card figcaption strong { font-size:18px; }
 .ba-card figcaption span { font-size:16px; }
-.ba-before { background:var(--paper-2); }
+.ba-before .ba-card { background:var(--paper-2); }
 .ba-before img { filter:grayscale(.55) contrast(.92); opacity:.9; }
 .ba-before .ba-tag { background:var(--white); color:var(--mute); box-shadow:0 1px 0 var(--line); }
 .ba-before figcaption span { color:var(--mute); }
-.ba-after { background:var(--char); color:var(--paper); box-shadow:0 0 0 3px var(--clay),var(--shadow); }
+.ba-after .ba-card { background:var(--char); color:var(--paper); box-shadow:0 0 0 3px var(--clay),var(--shadow); }
 .ba-after .ba-tag { background:var(--clay); color:var(--char); }
 .ba-after figcaption span { color:#D6D2CA; }
 .ba-arrow { display:grid; place-items:center; width:48px; height:48px; border-radius:50%; background:var(--clay); color:var(--char); }
