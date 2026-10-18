@@ -20,7 +20,7 @@
 ## 선생님: 3단계로 쓰기
 
 1. AI에게 수업 PPT를 올리고 이렇게 쓴다.
-   `https://github.com/N-lifescience/resonance 지침대로 이 PPT를 수업 HTML로 바꿔줘`
+   `https://github.com/N-lifescience/resonance 지침대로 이 자료를 수업 HTML로 바꿔줘`
    (주소를 못 읽는 AI는 `guide/exploragram-guide.md` 파일을 받아 PPT와 함께 올린다.)
 2. AI가 묻는 질문(교과·차시, 수업 장면, 헷갈리는 지점, 넣고 싶은 활동, 지킬 것)에 답하고, 설계표를 확인한다.
 3. 받은 `.html` 파일을 더블클릭해서 수업한다. 그림 자리가 비어 있으면 원본 PPT를 화면에 끌어다 놓고, ⚙ 설정의 「그림 넣어 저장」을 누른다.

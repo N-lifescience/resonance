@@ -110,7 +110,7 @@ async function board(browser, input, scenes, classroomSelector, poster) {
 
 async function create(browser, input, poster) {
   const evaluate = browser.evaluate;
-  await input.type('https://github.com/N-lifescience/resonance 지침대로 이 PPT를 수업 HTML로 바꿔줘', 9);
+  await input.type('https://github.com/N-lifescience/resonance 지침대로 이 자료를 수업 HTML로 바꿔줘', 9);
   await input.click('#send'); await sleep(250);
   await evaluate('window.interview.reply("features", 7)');
   await sleep(450);
