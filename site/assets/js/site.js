@@ -57,18 +57,20 @@
     if (githubURL) $('[data-github-link]', dialog).href = githubURL;
   }
 
-  // 인트로는 모듈이 준비됐을 때만 엔딩을 잠시 가린다. 실패 시 기본 HTML이 남는다.
+  // 마운트 영역을 먼저 배치한다. 마지막 장면과 CTA는 같은 영역에 남긴다.
   const mount = $('#intro-mount');
   if (mount) {
     const ending = $('#intro-ending');
+    const replay = $('[data-intro-replay]', ending);
+    const query = new URLSearchParams(location.search);
+    const isJoining = query.has('join') || location.hash === '#join-h';
     let intro = null;
-    let watchdog = 0;
     let loadPromise = null;
     let run = 0;
+    let showStill = false;
     const finish = () => {
-      clearTimeout(watchdog);
       ending.hidden = false;
-      mount.hidden = true;
+      ending.classList.add('is-visible');
       storage.set('gm-intro-seen', '1');
     };
     function loadIntro() {
@@ -84,37 +86,43 @@
       }).catch((error) => { loadPromise = null; throw error; });
       return loadPromise;
     }
-    async function play() {
-      if (window.GongmyeongMotion?.paused) { finish(); return; }
+    async function play(still = false) {
       const token = ++run;
+      showStill = still;
       try {
         await loadIntro();
         if (token !== run) return;
         if (!window.ResonanceIntro?.mount) throw new Error('intro missing mount');
-        intro?.destroy?.();
-        mount.replaceChildren();
-        ending.hidden = true;
+        ending.hidden = false;
+        ending.classList.remove('is-visible');
         mount.hidden = false;
-        intro = window.ResonanceIntro.mount(mount, { onEnd: finish });
-        watchdog = setTimeout(() => { intro?.skip?.(); finish(); }, 18000);
+        mount.classList.add('intro-active');
+        // hidden을 해제한 프레임의 레이아웃이 확정된 뒤 크기를 읽게 한다.
+        // 백그라운드 탭에서는 rAF가 멈추므로 짧은 시간 제한을 함께 둔다(검은 화면으로 멈추지 않게)
+        await new Promise((resolve) => { requestAnimationFrame(() => resolve()); setTimeout(resolve, 80); });
+        if (token !== run) return;
+        if (intro) intro.replay();
+        else intro = window.ResonanceIntro.mount(mount, { autoplay: !showStill, onEnd: finish });
+        // skip은 최종 시각을 유지하고, ready에서 글꼴과 레이아웃을 다시 맞춘다.
+        // 창 크기 변화는 모듈의 ResizeObserver(미지원 시 resize)가 처리한다.
+        if (showStill) intro.skip();
       } catch {
         if (token !== run) return;
-        mount.replaceChildren();
-        mount.hidden = true;
-        ending.hidden = false;
-        storage.set('gm-intro-seen', '1');
+        intro?.destroy();
+        intro = null;
+        mount.classList.remove('intro-active');
+        finish();
       }
     }
-    function skip() {
-      ++run;
-      try { intro?.skip?.(); } finally { finish(); }
-    }
-    $('[data-intro-replay]').addEventListener('click', play);
-    document.addEventListener('gm:join-open', skip);
-    document.addEventListener('gm:motion-change', (event) => { if (event.detail.paused) skip(); });
-    const query = new URLSearchParams(location.search);
-    const isJoining = query.has('join') || location.hash === '#join-h';
-    if (!isJoining && storage.get('gm-motion-paused') !== '1' && (query.get('intro') === '1' || !storage.get('gm-intro-seen'))) play();
+    replay.addEventListener('click', () => play());
+    document.addEventListener('gm:motion-change', (event) => {
+      if (!event.detail.paused) return;
+      showStill = true;
+      intro?.skip();
+    });
+    // 수업 코드 팝오버는 헤더에서 독립적으로 열며 재생을 방해하지 않는다.
+    if (!isJoining) play(storage.get('gm-motion-paused') === '1' ||
+      (query.get('intro') !== '1' && !!storage.get('gm-intro-seen')));
   }
 
   // ARIA 탭: 좌우 화살표, Home/End. 탭을 떠나면 영상과 체험을 멈춘다.
