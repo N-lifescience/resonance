@@ -1,0 +1,46 @@
+[
+  {
+    "slug": "v3-elem-korean",
+    "level": "초등",
+    "subject": "국어",
+    "title": "이야기 속 인물의 마음 변화",
+    "question": "장면이 바뀌면 까슬이의 마음은 어떻게 달라질까?",
+    "exploragrams": ["장면을 넘기면 바뀌는 표정과 마음 그래프", "넷째 장면을 바꿔 다시 재생하는 이야기"],
+    "slides": 12,
+    "model": "Claude Opus 5.5 · xhigh",
+    "made": "2026-10-18"
+  },
+  {
+    "slug": "v3-elem-pe",
+    "level": "초등",
+    "subject": "체육",
+    "title": "운동 강도와 심박수",
+    "question": "운동하면 심장은 얼마나 빨리 뛸까?",
+    "exploragrams": ["운동을 고르고 재생하는 심박수 그래프와 뛰는 심장", "나이와 맥박 수로 찾는 건강 구간 계기판"],
+    "slides": 11,
+    "model": "Claude Opus 5.5 · xhigh",
+    "made": "2026-10-18"
+  },
+  {
+    "slug": "v3-elem-music",
+    "level": "초등",
+    "subject": "음악",
+    "title": "장단과 빠르기",
+    "question": "빠르게 치면 장단의 무엇이 바뀔까?",
+    "exploragrams": ["빠르기에 따라 울리는 세마치장단과 한 장단의 길이", "같은 빠르기로 나란히 재생하는 세마치와 굿거리"],
+    "slides": 11,
+    "model": "Claude Opus 5.5 · xhigh",
+    "made": "2026-10-18"
+  },
+  {
+    "slug": "v3-elem-art",
+    "level": "초등",
+    "subject": "미술",
+    "title": "색의 혼합과 명도, 채도",
+    "question": "물감을 섞으면 어떤 색이 될까?",
+    "exploragrams": ["세 물감의 양으로 바뀌는 섞인 색과 색상환 자리", "흰색과 검은색을 섞으면 옮겨 가는 명도와 채도 지도"],
+    "slides": 11,
+    "model": "Claude Opus 5.5 · xhigh",
+    "made": "2026-10-18"
+  }
+]

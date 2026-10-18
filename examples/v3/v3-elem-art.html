@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="ko" data-deck="v3-elem-art">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>물감을 섞으면 어떤 색이 될까? 색의 혼합, 명도와 채도</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/engine/exploragram.css">
+<script defer src="https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/engine/exploragram.js"></script>
+<style>
+body[data-theme="ppt"] {
+  --ink: #2E2A4F; --red: #D7263D; --yellow: #F2B705; --blue: #2A6FB0; --paper: #FFFDF7; --gray: #6A6578; --line: #E4DCCB;
+  --accent: #2E2A4F; --tab: #2E2A4F; --tab-ink: #FFFFFF; --ch-paper: #FFFDF7;
+}
+
+/* ── 이 수업의 얼굴: 먹빛 붓 자국 머리 띠(끝에 물감 세 방울) + 물감 튜브 배지 ── */
+body[data-theme="ppt"] section.slide {
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1280' height='112' viewBox='0 0 1280 112'%3E%3Cpath d='M0 0H1160C1196 8 1222 26 1212 48C1203 66 1226 80 1196 94C1128 108 930 98 720 104C520 110 300 98 0 106Z' fill='%232E2A4F'/%3E%3Cpath d='M30 28C380 20 760 34 1150 24M60 58C420 52 800 64 1180 56M40 86C360 80 700 92 1120 84' fill='none' stroke='%23FFFFFF' stroke-opacity='.07' stroke-width='7' stroke-linecap='round'/%3E%3Ccircle cx='1236' cy='26' r='9' fill='%23D7263D'/%3E%3Ccircle cx='1252' cy='52' r='7' fill='%23F2B705'/%3E%3Ccircle cx='1234' cy='76' r='8' fill='%232A6FB0'/%3E%3C/svg%3E") top / 1280px 112px no-repeat, var(--paper);
+  color: var(--ink);
+}
+body[data-theme="ppt"] section.slide[data-sec]::before {
+  left: auto; right: 64px; top: 22px; height: 54px; min-width: 196px; padding: 0 46px 0 22px; box-sizing: border-box; justify-content: center;
+  border-radius: 27px 8px 8px 27px; color: var(--ink); font-size: 24px; letter-spacing: 0;
+  background: linear-gradient(90deg, var(--yellow) 0 calc(100% - 30px), #8C93A1 calc(100% - 30px) calc(100% - 26px), #B7BDC8 calc(100% - 26px));
+}
+body[data-theme="ppt"] section.slide > h2:first-child {
+  position: absolute; top: 0; left: 64px; right: 290px; height: 96px; margin: 0; padding: 0; width: auto;
+  display: flex; align-items: center; color: #FFFFFF; font-size: 42px; line-height: 1.2; border: 0; background: none; text-wrap: balance;
+}
+.key { color: var(--red); font-weight: 800; }
+
+/* 표지 */
+body[data-theme="ppt"] section.slide#cover { background: var(--paper); padding: 0; }
+.cv { position: relative; height: 100%; }
+.cv-text { position: absolute; left: 80px; top: 110px; width: 600px; }
+.cv-text p, .cv-text h1 { margin: 0; }
+.cv-k { display: inline-block; padding: 8px 22px; border-radius: 26px 6px 6px 26px; background: var(--yellow); color: var(--ink); font-size: 26px; font-weight: 800; }
+.cv-text h1 { margin: 26px 0 22px; font-size: 68px; line-height: 1.2; color: var(--ink); text-wrap: balance; }
+.cv-s { font-size: 31px; font-weight: 600; color: var(--gray); }
+.cv svg { position: absolute; }
+
+/* 학습 목표 */
+.goals { margin: 40px 0 0; padding: 0; list-style: none; counter-reset: g; }
+.goals li { counter-increment: g; position: relative; padding: 0 0 0 70px; margin: 0 0 30px; font-size: 34px; line-height: 1.45; }
+.goals li::before { content: counter(g); position: absolute; left: 0; top: -2px; width: 50px; height: 50px; border-radius: 50% 50% 50% 8px; background: var(--ink); color: #FFFFFF; font-weight: 800; font-size: 28px; text-align: center; line-height: 50px; }
+
+/* 생각 열기 */
+.open { display: grid; grid-template-columns: 1fr 470px; gap: 40px; align-items: start; margin-top: 10px; }
+.open p { margin: 0 0 20px; font-size: 31px; line-height: 1.5; }
+.open .ask { color: var(--blue); font-weight: 800; }
+.poll p { font-size: 28px; }
+
+/* 색 칩 */
+.chip { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.chip i { display: block; border-radius: 14px 14px 14px 4px; box-shadow: inset 0 0 0 2px rgba(0,0,0,.08); }
+.chip span { font-size: 24px; font-weight: 800; }
+.chip small { font-size: 21px; color: var(--gray); }
+.eqs { display: flex; flex-direction: column; gap: 12px; margin-top: 8px; }
+.eqrow { display: flex; align-items: center; gap: 18px; }
+.eqrow b { font-size: 40px; font-weight: 900; color: var(--gray); }
+.lead { margin: 0 0 6px; font-size: 29px; line-height: 1.45; }
+.three { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 40px; }
+
+/* 색의 3요소 */
+.elems { display: flex; flex-direction: column; gap: 14px; margin-top: 4px; }
+.elem { display: grid; grid-template-columns: 300px 1fr; gap: 20px; align-items: center; padding: 10px 18px; border-radius: 18px; background: #FFFFFF; border: 3px solid var(--line); }
+.elem h3 { margin: 0; font-size: 32px; }
+.elem p { margin: 4px 0 0; font-size: 25px; line-height: 1.35; color: var(--gray); }
+.elem .row { display: flex; gap: 14px; }
+
+/* ── 익스플로라그램 공통 ── */
+.ax { display: grid; grid-template-columns: 680px 1fr; gap: 30px; align-items: start; }
+.ax svg { display: block; }
+.ax-view { position: relative; }
+.ax-top { display: flex; gap: 6px; align-items: start; }
+.ax-veil { position: absolute; inset: 0; z-index: 3; display: grid; place-items: center; text-align: center; padding: 20px;
+  background: #F3EEE3; border: 3px dashed #CFC4AE; border-radius: 18px; color: var(--gray); font-size: 28px; font-weight: 700; line-height: 1.5; }
+.ax-ctrl { display: flex; flex-direction: column; gap: 2px; }
+.lab { margin: 6px 0 0; font-size: 25px; font-weight: 800; }
+.lab .dot { display: inline-block; width: 20px; height: 20px; margin-right: 8px; border-radius: 50%; vertical-align: -2px; }
+.lab b { font-weight: 900; }
+.ratio { margin: 10px 0 0; padding: 10px 16px; border-radius: 14px; background: #FFFFFF; border: 3px solid var(--line); font-size: 25px; line-height: 1.45; }
+.ratio b { font-size: 30px; }
+.say { margin: 8px 0 0; font-size: 25px; font-weight: 800; line-height: 1.4; color: var(--blue); }
+.model { font-size: 21px; color: var(--gray); font-weight: 500; }
+.base { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+section.slide .base button[data-set] { min-height: 56px; margin: 0; padding: 0 6px; border: 3px solid var(--line); border-radius: 12px; background: #FFFFFF; color: var(--ink); font-size: 22px; font-weight: 800; }
+section.slide .base button[data-set] i { display: inline-block; width: 16px; height: 16px; margin-right: 6px; border-radius: 50%; vertical-align: -1px; }
+section.slide .base button[data-set][aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #FFFFFF; }
+.bx { display: grid; grid-template-columns: 440px 1fr; gap: 16px; align-items: start; }
+.swatch { display: flex; flex-direction: column; align-items: center; gap: 6px; padding-top: 16px; }
+.swatch .sw { width: 190px; border-radius: 18px 18px 18px 6px; box-shadow: inset 0 0 0 2px rgba(0,0,0,.08); }
+.swatch span { font-size: 23px; font-weight: 800; }
+.swatch .arrow { font-size: 34px; color: var(--gray); line-height: 1; }
+.swatch .num { margin: 8px 0 0; font-size: 24px; line-height: 1.5; text-align: center; }
+.swatch .num b { font-size: 28px; }
+
+/* 확인·정리 */
+.q-lead { margin: 0 0 14px; font-size: 27px; color: var(--gray); }
+.cc { display: inline-block; width: 46px; height: 32px; margin-right: 12px; border-radius: 8px; vertical-align: -8px; box-shadow: inset 0 0 0 2px rgba(0,0,0,.1); }
+.sum { margin: 22px 0 0; padding: 0; list-style: none; }
+.sum li { position: relative; padding-left: 40px; margin: 0 0 18px; font-size: 31px; line-height: 1.45; }
+.sum li::before { content: ""; position: absolute; left: 4px; top: 13px; width: 20px; height: 20px; border-radius: 50% 50% 50% 4px; background: var(--red); }
+.sum li:nth-child(2)::before { background: var(--yellow); } .sum li:nth-child(3)::before { background: var(--blue); }
+.short .ask { font-size: 28px; }
+</style>
+</head>
+<body data-theme="ppt">
+
+<!-- 1 표지 -->
+<section class="slide" id="cover" data-title="표지">
+  <div class="cv" data-enter="off">
+    <svg width="1280" height="720" viewBox="0 0 1280 720" style="left:0;top:0;max-width:none" aria-label="팔레트 위 빨강·노랑·파랑 물감과 붓 자국, 12색상환">
+      <path d="M-20 640 C200 600 420 660 640 620 S1000 600 1300 650" fill="none" stroke="#D7263D" stroke-width="46" stroke-linecap="round" opacity=".9"/>
+      <path d="M-20 690 C240 660 480 700 760 668 S1080 650 1300 690" fill="none" stroke="#F2B705" stroke-width="40" stroke-linecap="round" opacity=".9"/>
+      <path d="M-20 735 C260 712 520 742 820 716 S1120 700 1300 730" fill="none" stroke="#2A6FB0" stroke-width="40" stroke-linecap="round" opacity=".9"/>
+      <g transform="translate(830 120)">
+        <path d="M112.2 9.0 A146 146 0 0 1 187.8 9.0 L173.3 63.1 A90 90 0 0 0 126.7 63.1Z" fill="rgb(255,0,0)" stroke="#FFFDF7" stroke-width="2"/>
+        <text x="150.0" y="39.2" font-size="20" font-weight="800" fill="#FFFFFF" text-anchor="middle">빨강</text>
+        <path d="M187.8 9.0 A146 146 0 0 1 253.2 46.8 L213.6 86.4 A90 90 0 0 0 173.3 63.1Z" fill="rgb(255,64,0)" stroke="#FFFDF7" stroke-width="2"/>
+        <text x="209.0" y="55.0" font-size="20" font-weight="800" fill="#FFFFFF" text-anchor="middle">다홍</text>
+        <path d="M253.2 46.8 A146 146 0 0 1 291.0 112.2 L236.9 126.7 A90 90 0 0 0 213.6 86.4Z" fill="rgb(255,128,0)" stroke="#FFFDF7" stroke-width="2"/>
+        <text x="252.2" y="98.2" font-size="20" font-weight="800" fill="#2E2A4F" text-anchor="middle">주황</text>
+        <path d="M291.0 112.2 A146 146 0 0 1 291.0 187.8 L236.9 173.3 A90 90 0 0 0 236.9 126.7Z" fill="rgb(255,191,0)" stroke="#FFFDF7" stroke-width="2"/>
+        <text x="268.0" y="157.2" font-size="20" font-weight="800" fill="#2E2A4F" text-anchor="middle">귤색</text>
+        <path d="M291.0 187.8 A146 146 0 0 1 253.2 253.2 L213.6 213.6 A90 90 0 0 0 236.9 173.3Z" fill="rgb(255,255,0)" stroke="#FFFDF7" stroke-width="2"/>
+        <text x="252.2" y="216.2" font-size="20" font-weight="800" fill="#2E2A4F" text-anchor="middle">노랑</text>
+        <path d="M253.2 253.2 A146 146 0 0 1 187.8 291.0 L173.3 236.9 A90 90 0 0 0 213.6 213.6Z" fill="rgb(128,212,26)" stroke="#FFFDF7" stroke-width="2"/>
+        <text x="209.0" y="259.4" font-size="20" font-weight="800" fill="#2E2A4F" text-anchor="middle">연두</text>
+        <path d="M187.8 291.0 A146 146 0 0 1 112.2 291.0 L126.7 236.9 A90 90 0 0 0 173.3 236.9Z" fill="rgb(0,168,51)" stroke="#FFFDF7" stroke-width="2"/>
+        <text x="150.0" y="275.2" font-size="20" font-weight="800" fill="#FFFFFF" text-anchor="middle">초록</text>
+        <path d="M112.2 291.0 A146 146 0 0 1 46.8 253.2 L86.4 213.6 A90 90 0 0 0 126.7 236.9Z" fill="rgb(21,132,102)" stroke="#FFFDF7" stroke-width="2"/>
+        <text x="91.0" y="259.4" font-size="20" font-weight="800" fill="#FFFFFF" text-anchor="middle">청록</text>
+        <path d="M46.8 253.2 A146 146 0 0 1 9.0 187.8 L63.1 173.3 A90 90 0 0 0 86.4 213.6Z" fill="rgb(42,95,153)" stroke="#FFFDF7" stroke-width="2"/>
+        <text x="47.8" y="216.2" font-size="20" font-weight="800" fill="#FFFFFF" text-anchor="middle">파랑</text>
+        <path d="M9.0 187.8 A146 146 0 0 1 9.0 112.2 L63.1 126.7 A90 90 0 0 0 63.1 173.3Z" fill="rgb(85,48,140)" stroke="#FFFDF7" stroke-width="2"/>
+        <text x="32.0" y="157.2" font-size="20" font-weight="800" fill="#FFFFFF" text-anchor="middle">남색</text>
+        <path d="M9.0 112.2 A146 146 0 0 1 46.8 46.8 L86.4 86.4 A90 90 0 0 0 63.1 126.7Z" fill="rgb(128,0,128)" stroke="#FFFDF7" stroke-width="2"/>
+        <text x="47.8" y="98.2" font-size="20" font-weight="800" fill="#FFFFFF" text-anchor="middle">보라</text>
+        <path d="M46.8 46.8 A146 146 0 0 1 112.2 9.0 L126.7 63.1 A90 90 0 0 0 86.4 86.4Z" fill="rgb(191,0,64)" stroke="#FFFDF7" stroke-width="2"/>
+        <text x="91.0" y="55.0" font-size="20" font-weight="800" fill="#FFFFFF" text-anchor="middle">자주</text>
+        <circle cx="150" cy="150" r="72" fill="#FFFDF7"/>
+        <circle cx="150" cy="150" r="46" fill="rgb(51,24,0)" opacity=".85"/>
+      </g>
+    </svg>
+    <div class="cv-text" data-anim="fade-up">
+      <p class="cv-k">초등학교 미술 5~6학년 · 색</p>
+      <h1>물감을 섞으면<br>어떤 색이 될까?</h1>
+      <p class="cv-s">색의 혼합, 명도와 채도</p>
+    </div>
+  </div>
+</section>
+
+<!-- 2 학습 목표 -->
+<section class="slide" id="goal" data-sec="학습 목표" data-title="학습 목표">
+  <h2>오늘 배울 것</h2>
+  <ol class="goals">
+    <li>색의 삼원색을 섞어 여러 가지 색을 만들 수 있다.</li>
+    <li>섞는 <span class="key">비율</span>에 따라 색이 어떻게 달라지는지<br>말할 수 있다.</li>
+    <li>흰색과 검은색을 섞으면 <span class="key">명도와 채도</span>가<br>어떻게 바뀌는지 설명할 수 있다.</li>
+  </ol>
+</section>
+
+<!-- 3 생각 열기 -->
+<section class="slide" id="think" data-sec="생각 열기" data-title="세 물감으로 만들 수 있는 색">
+  <h2>물감 세 가지로 몇 가지 색을 만들까?</h2>
+  <div class="open">
+    <div>
+      <p>빨강, 노랑, 파랑 물감만 있다.<br>다른 물감은 하나도 없다.</p>
+      <p class="ask">이 세 물감을 섞어서<br>몇 가지 색을 만들 수 있을까?</p>
+      <p class="step">섞는 양을 조금씩 바꾸면<br>셀 수 없이 많은 색을 만들 수 있다.</p>
+    </div>
+    <div class="poll" data-options="3가지|7가지쯤|20가지쯤|셀 수 없이 많다" data-ai="생각 열기 투표">
+      <p>내 생각은?</p>
+    </div>
+  </div>
+</section>
+
+<!-- 4 색의 삼원색 -->
+<section class="slide" id="primary" data-sec="색의 삼원색" data-title="색의 삼원색과 두 색 섞기">
+  <h2>빨강, 노랑, 파랑을 둘씩 섞으면?</h2>
+  <p class="lead">빨강, 노랑, 파랑은 다른 색을 섞어서는 만들 수 없다. 이 세 색을 <span class="key">물감의 삼원색</span>이라고 한다.</p>
+  <div class="three" data-ai="두 색 섞기 칩(모형 색)">
+    <div class="eqs">
+      <div class="eqrow"><div class="chip"><i style="background:rgb(255,0,0);width:118px;height:78px"></i><span>빨강</span></div><b>+</b><div class="chip"><i style="background:rgb(255,255,0);width:118px;height:78px"></i><span>노랑</span></div><b>=</b><span class="step"><div class="chip"><i style="background:rgb(255,128,0);width:118px;height:78px"></i><span>주황</span></div></span></div>
+      <div class="eqrow"><div class="chip"><i style="background:rgb(255,255,0);width:118px;height:78px"></i><span>노랑</span></div><b>+</b><div class="chip"><i style="background:rgb(42,95,153);width:118px;height:78px"></i><span>파랑</span></div><b>=</b><span class="step"><div class="chip"><i style="background:rgb(0,168,51);width:118px;height:78px"></i><span>초록</span></div></span></div>
+    </div>
+    <div class="eqs">
+      <div class="eqrow"><div class="chip"><i style="background:rgb(42,95,153);width:118px;height:78px"></i><span>파랑</span></div><b>+</b><div class="chip"><i style="background:rgb(255,0,0);width:118px;height:78px"></i><span>빨강</span></div><b>=</b><span class="step"><div class="chip"><i style="background:rgb(128,0,128);width:118px;height:78px"></i><span>보라</span></div></span></div>
+      <div class="eqrow"><span style="font-size:26px;font-weight:800">세 색 모두</span><b>=</b><span class="step"><div class="chip"><i style="background:rgb(51,24,0);width:118px;height:78px"></i><span>어두운 갈색</span></div></span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 5 익스플로라그램: 섞는 비율과 색 -->
+<section class="slide" id="mix" data-sec="색의 삼원색" data-title="물감 양을 바꾸면 섞인 색은?">
+  <h2>물감 양을 바꾸면 섞인 색은 어디로 갈까?</h2>
+  <div class="calc ax" data-ai="RYB 물감 섞기 모형(Gossett·Chen 보간)"
+       data-let="S = R + Y + U; m = max(R, max(Y, U)); r = m > 0 ? R / m : 0; y = m > 0 ? Y / m : 0; b = m > 0 ? U / m : 0;
+                 w0 = (1 - r) * (1 - y) * (1 - b); w1 = r * (1 - y) * (1 - b); w2 = (1 - r) * y * (1 - b); w3 = (1 - r) * (1 - y) * b;
+                 w4 = r * y * (1 - b); w5 = r * (1 - y) * b; w6 = (1 - r) * y * b; w7 = r * y * b;
+                 cr = w0 + w1 + w2 + 0.163 * w3 + w4 + 0.5 * w5 + 0.2 * w7;
+                 cg = w0 + w2 + 0.373 * w3 + 0.5 * w4 + 0.66 * w6 + 0.094 * w7;
+                 cb = w0 + 0.6 * w3 + 0.5 * w5 + 0.2 * w6;
+                 col = 'rgb(' + round(255 * cr) + ',' + round(255 * cg) + ',' + round(255 * cb) + ')';
+                 V = 10 * (0.299 * cr + 0.587 * cg + 0.114 * cb); Ch = 10 * (max(cr, max(cg, cb)) - min(cr, min(cg, cb)));
+                 hx = r - 0.5 * y - 0.5 * b; hy = 0.866 * (y - b); sat = sqrt(hx * hx + hy * hy);
+                 a0 = deg(atan(hy / (abs(hx) + 0.00001))); ang = hx >= 0 ? a0 : 180 - a0; A = ang < 0 ? ang + 360 : ang;
+                 i = round(A / 30) % 12;
+                 nm = sat < 0.22 ? '어두운 갈색' : i == 0 ? '빨강' : i == 1 ? '다홍' : i == 2 ? '주황' : i == 3 ? '귤색' : i == 4 ? '노랑' : i == 5 ? '연두' : i == 6 ? '초록' : i == 7 ? '청록' : i == 8 ? '파랑' : i == 9 ? '남색' : i == 10 ? '보라' : '자주';
+                 nz = (R > 0 ? 1 : 0) + (Y > 0 ? 1 : 0) + (U > 0 ? 1 : 0);
+                 mx = 145 + 109 * sat * cos(rad(A - 90)); my = 145 + 109 * sat * sin(rad(A - 90))">
+    <div class="ax-view">
+      <div class="ax-top">
+        <svg width="380" height="300" viewBox="0 0 380 300" aria-label="팔레트 위 세 물감과 가운데에서 섞인 색">
+          <ellipse cx="190" cy="150" rx="182" ry="140" fill="#EBD5AF" stroke="#B8956A" stroke-width="4"/>
+          <circle cx="66" cy="222" r="24" fill="#FFFDF7" stroke="#B8956A" stroke-width="4"/>
+          <circle cx="78" cy="96" fill="#D7263D" r="10" opacity=".25" data-attr="r: R > 0 ? 12 + 7 * sqrt(R) : 10; opacity: R > 0 ? 1 : 0.25"/>
+          <circle cx="190" cy="56" fill="#F2B705" r="10" opacity=".25" data-attr="r: Y > 0 ? 12 + 7 * sqrt(Y) : 10; opacity: Y > 0 ? 1 : 0.25"/>
+          <circle cx="302" cy="96" fill="#2A6FB0" r="10" opacity=".25" data-attr="r: U > 0 ? 12 + 7 * sqrt(U) : 10; opacity: U > 0 ? 1 : 0.25"/>
+          <circle cx="196" cy="186" r="74" fill="rgb(255,255,255)" stroke="#8C6A40" stroke-width="3" data-attr="fill: col"/>
+          <g data-attr="transform: 'rotate(' + (R * 40 + Y * 25 + U * 15) + ' 196 186)'">
+            <path d="M196 136 A50 50 0 0 1 243 169 M239.3 211 A50 50 0 0 1 187.3 235.2 M152.7 211 A50 50 0 0 1 157.7 153.9 M196 160 A26 26 0 0 1 218.5 173 M196 212 A26 26 0 0 1 173.5 199" fill="none" stroke="#FFFFFF" stroke-width="7" stroke-linecap="round" opacity=".45"/>
+          </g>
+        </svg>
+        <svg width="290" height="300" viewBox="0 0 290 300" aria-label="12색상환과 섞인 색의 자리(바깥은 맑고 가운데는 탁하다)">
+        <path d="M109.8 13.6 A136 136 0 0 1 180.2 13.6 L166.2 65.8 A82 82 0 0 0 123.8 65.8Z" fill="rgb(255,0,0)" stroke="#FFFDF7" stroke-width="2"/>
+        <text x="145.0" y="43.2" font-size="20" font-weight="800" fill="#FFFFFF" text-anchor="middle">빨강</text>
+        <path d="M180.2 13.6 A136 136 0 0 1 241.2 48.8 L203.0 87.0 A82 82 0 0 0 166.2 65.8Z" fill="rgb(255,64,0)" stroke="#FFFDF7" stroke-width="2"/>
+        <text x="199.5" y="57.8" font-size="20" font-weight="800" fill="#FFFFFF" text-anchor="middle">다홍</text>
+        <path d="M241.2 48.8 A136 136 0 0 1 276.4 109.8 L224.2 123.8 A82 82 0 0 0 203.0 87.0Z" fill="rgb(255,128,0)" stroke="#FFFDF7" stroke-width="2"/>
+        <text x="239.4" y="97.7" font-size="20" font-weight="800" fill="#2E2A4F" text-anchor="middle">주황</text>
+        <path d="M276.4 109.8 A136 136 0 0 1 276.4 180.2 L224.2 166.2 A82 82 0 0 0 224.2 123.8Z" fill="rgb(255,191,0)" stroke="#FFFDF7" stroke-width="2"/>
+        <text x="254.0" y="152.2" font-size="20" font-weight="800" fill="#2E2A4F" text-anchor="middle">귤색</text>
+        <path d="M276.4 180.2 A136 136 0 0 1 241.2 241.2 L203.0 203.0 A82 82 0 0 0 224.2 166.2Z" fill="rgb(255,255,0)" stroke="#FFFDF7" stroke-width="2"/>
+        <text x="239.4" y="206.7" font-size="20" font-weight="800" fill="#2E2A4F" text-anchor="middle">노랑</text>
+        <path d="M241.2 241.2 A136 136 0 0 1 180.2 276.4 L166.2 224.2 A82 82 0 0 0 203.0 203.0Z" fill="rgb(128,212,26)" stroke="#FFFDF7" stroke-width="2"/>
+        <text x="199.5" y="246.6" font-size="20" font-weight="800" fill="#2E2A4F" text-anchor="middle">연두</text>
+        <path d="M180.2 276.4 A136 136 0 0 1 109.8 276.4 L123.8 224.2 A82 82 0 0 0 166.2 224.2Z" fill="rgb(0,168,51)" stroke="#FFFDF7" stroke-width="2"/>
+        <text x="145.0" y="261.2" font-size="20" font-weight="800" fill="#FFFFFF" text-anchor="middle">초록</text>
+        <path d="M109.8 276.4 A136 136 0 0 1 48.8 241.2 L87.0 203.0 A82 82 0 0 0 123.8 224.2Z" fill="rgb(21,132,102)" stroke="#FFFDF7" stroke-width="2"/>
+        <text x="90.5" y="246.6" font-size="20" font-weight="800" fill="#FFFFFF" text-anchor="middle">청록</text>
+        <path d="M48.8 241.2 A136 136 0 0 1 13.6 180.2 L65.8 166.2 A82 82 0 0 0 87.0 203.0Z" fill="rgb(42,95,153)" stroke="#FFFDF7" stroke-width="2"/>
+        <text x="50.6" y="206.7" font-size="20" font-weight="800" fill="#FFFFFF" text-anchor="middle">파랑</text>
+        <path d="M13.6 180.2 A136 136 0 0 1 13.6 109.8 L65.8 123.8 A82 82 0 0 0 65.8 166.2Z" fill="rgb(85,48,140)" stroke="#FFFDF7" stroke-width="2"/>
+        <text x="36.0" y="152.2" font-size="20" font-weight="800" fill="#FFFFFF" text-anchor="middle">남색</text>
+        <path d="M13.6 109.8 A136 136 0 0 1 48.8 48.8 L87.0 87.0 A82 82 0 0 0 65.8 123.8Z" fill="rgb(128,0,128)" stroke="#FFFDF7" stroke-width="2"/>
+        <text x="50.6" y="97.7" font-size="20" font-weight="800" fill="#FFFFFF" text-anchor="middle">보라</text>
+        <path d="M48.8 48.8 A136 136 0 0 1 109.8 13.6 L123.8 65.8 A82 82 0 0 0 87.0 87.0Z" fill="rgb(191,0,64)" stroke="#FFFDF7" stroke-width="2"/>
+        <text x="90.5" y="57.8" font-size="20" font-weight="800" fill="#FFFFFF" text-anchor="middle">자주</text>
+          <circle cx="145" cy="145" r="80" fill="#F3EEE3"/>
+          <text x="145" y="140" font-size="20" font-weight="700" fill="#6A6578" text-anchor="middle">가운데로 갈수록</text>
+          <text x="145" y="166" font-size="20" font-weight="700" fill="#6A6578" text-anchor="middle">탁하다</text>
+          <circle r="17" fill="rgb(255,255,255)" stroke="#2E2A4F" stroke-width="5" cx="145" cy="145" data-attr="cx: mx; cy: my; fill: col"/>
+          <text x="145" y="296" font-size="20" font-weight="700" fill="#6A6578" text-anchor="middle">12색상환 (모형)</text>
+        </svg>
+      </div>
+      <svg width="680" height="110" viewBox="0 0 680 110" aria-label="명도와 채도 막대" data-ai="모형 수치">
+        <text x="0" y="38" font-size="25" font-weight="900" fill="#2E2A4F">명도</text>
+        <rect x="76" y="16" width="440" height="28" rx="14" fill="#EEE7DA"/>
+        <rect x="76" y="16" height="28" rx="14" fill="#6A6578" width="0" data-attr="width: max(V * 44, 0)"/>
+        <text x="530" y="39" font-size="24" font-weight="800" fill="#2E2A4F" data-expr="round(V, 1)"></text>
+        <text x="0" y="90" font-size="25" font-weight="900" fill="#2E2A4F">채도</text>
+        <rect x="76" y="68" width="440" height="28" rx="14" fill="#EEE7DA"/>
+        <rect x="76" y="68" height="28" rx="14" fill="rgb(255,255,255)" width="0" data-attr="width: max(Ch * 44, 0); fill: col"/>
+        <text x="530" y="91" font-size="24" font-weight="800" fill="#2E2A4F" data-expr="round(Ch, 1)"></text>
+        <text x="584" y="66" font-size="21" fill="#6A6578">(모형)</text>
+      </svg>
+      <div class="ax-veil" data-show="S == 0"><span>오른쪽 막대를 밀어<br>물감을 짜 보자</span></div>
+    </div>
+    <div class="ax-ctrl">
+      <p class="lab"><span class="dot" style="background:#D7263D"></span>빨강 <b><output data-expr="R" data-unit="방울"></output></b></p>
+      <input type="range" name="R" min="0" max="10" step="1" value="0" style="--stop-c:#D7263D" aria-label="빨강 물감 양">
+      <p class="lab"><span class="dot" style="background:#F2B705"></span>노랑 <b><output data-expr="Y" data-unit="방울"></output></b></p>
+      <input type="range" name="Y" min="0" max="10" step="1" value="0" style="--stop-c:#E0A800" aria-label="노랑 물감 양">
+      <p class="lab"><span class="dot" style="background:#2A6FB0"></span>파랑 <b><output data-expr="U" data-unit="방울"></output></b></p>
+      <input type="range" name="U" min="0" max="10" step="1" value="0" style="--stop-c:#2A6FB0" aria-label="파랑 물감 양">
+      <div class="ratio" data-show="S > 0">빨강 : 노랑 : 파랑 = <output data-expr="R"></output> : <output data-expr="Y"></output> : <output data-expr="U"></output><br>섞인 색 <b><output data-expr="nm"></output></b> <span class="model">(어림)</span></div>
+      <p class="say" data-show="nz == 1">한 가지만 짰다. 섞이지 않은 처음 색이다.</p>
+      <p class="say" data-show="nz == 2">두 색을 섞었다. 많이 넣은 색 쪽으로 기운다.</p>
+      <p class="say" data-show="nz == 3">세 색을 모두 섞었다. 명도와 채도가 낮아졌다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 6 확인: 비율 -->
+<section class="slide" id="ratio" data-sec="색의 삼원색" data-title="섞는 비율 문제">
+  <h2>노랑 4방울, 파랑 2방울을 섞으면?</h2>
+  <p class="q-lead">노랑을 파랑보다 두 배 많이 넣었다. 어떤 색에 가장 가까울까?</p>
+  <div class="quiz" data-cols="2" data-ai="문항과 풀이">
+    <button class="opt" data-why="주황은 빨강과 노랑을 섞을 때 나온다.">주황</button>
+    <button class="opt" data-ok data-why="맞다. 노랑과 파랑을 섞으면 초록이 된다. 노랑을 더 넣어 노랑에 가까운 연두가 된다.">연두</button>
+    <button class="opt" data-why="청록은 파랑을 더 많이 넣을 때 나온다.">청록</button>
+    <button class="opt" data-why="보라는 빨강과 파랑을 섞을 때 나온다.">보라</button>
+  </div>
+</section>
+
+<!-- 7 색의 3요소 -->
+<section class="slide" id="elements" data-sec="색의 3요소" data-title="색상, 명도, 채도">
+  <h2>색상, 명도, 채도는 무엇일까?</h2>
+  <div class="elems" data-ai="색의 3요소 칩(모형 색)">
+    <div class="elem"><div><h3>색상</h3><p>빨강, 노랑처럼<br>색을 구별하는 이름</p></div><div class="row"><div class="chip"><i style="background:rgb(255,0,0);width:104px;height:70px"></i><span>빨강</span></div><div class="chip"><i style="background:rgb(255,128,0);width:104px;height:70px"></i><span>주황</span></div><div class="chip"><i style="background:rgb(255,255,0);width:104px;height:70px"></i><span>노랑</span></div><div class="chip"><i style="background:rgb(0,168,51);width:104px;height:70px"></i><span>초록</span></div><div class="chip"><i style="background:rgb(42,95,153);width:104px;height:70px"></i><span>파랑</span></div><div class="chip"><i style="background:rgb(128,0,128);width:104px;height:70px"></i><span>보라</span></div></div></div>
+    <div class="elem step"><div><h3>명도</h3><p>색의 밝고<br>어두운 정도</p></div><div class="row"><div class="chip"><i style="background:rgb(255,128,128);width:104px;height:70px"></i><span>아주 밝다</span></div><div class="chip"><i style="background:rgb(255,59,59);width:104px;height:70px"></i><span>밝다</span></div><div class="chip"><i style="background:rgb(255,0,0);width:104px;height:70px"></i><span>빨강</span></div><div class="chip"><i style="background:rgb(196,0,0);width:104px;height:70px"></i><span>어둡다</span></div><div class="chip"><i style="background:rgb(116,0,0);width:104px;height:70px"></i><span>아주 어둡다</span></div></div></div>
+    <div class="elem step"><div><h3>채도</h3><p>색의 맑고<br>탁한 정도</p></div><div class="row"><div class="chip"><i style="background:rgb(255,0,0);width:104px;height:70px"></i><span>아주 맑다</span></div><div class="chip"><i style="background:rgb(219,36,36);width:104px;height:70px"></i><span>맑다</span></div><div class="chip"><i style="background:rgb(191,64,64);width:104px;height:70px"></i><span>탁하다</span></div><div class="chip"><i style="background:rgb(164,91,91);width:104px;height:70px"></i><span>아주 탁하다</span></div></div></div>
+  </div>
+</section>
+
+<!-- 8 익스플로라그램: 흰색·검은색과 명도·채도 -->
+<section class="slide" id="tint" data-sec="색의 3요소" data-title="흰색과 검은색을 섞으면">
+  <h2>흰색이나 검은색을 섞으면 어디로 갈까?</h2>
+  <div class="calc ax" data-ai="흰색·검은색 섞기와 명도·채도 지도 모형"
+       data-let="br = c == 1 ? 1 : c == 2 ? 1 : c == 3 ? 1 : c == 4 ? 0 : c == 5 ? 0.163 : 0.5;
+                 bg = c == 1 ? 0 : c == 2 ? 0.5 : c == 3 ? 1 : c == 4 ? 0.66 : c == 5 ? 0.373 : 0;
+                 bb = c == 1 ? 0 : c == 2 ? 0 : c == 3 ? 0 : c == 4 ? 0.2 : c == 5 ? 0.6 : 0.5;
+                 tot = 10 + W + 3 * K; fc = 10 / tot; fw = W / tot;
+                 mr = fc * br + fw; mg = fc * bg + fw; mb = fc * bb + fw;
+                 col = 'rgb(' + round(255 * mr) + ',' + round(255 * mg) + ',' + round(255 * mb) + ')';
+                 base = 'rgb(' + round(255 * br) + ',' + round(255 * bg) + ',' + round(255 * bb) + ')';
+                 V = 10 * (0.299 * mr + 0.587 * mg + 0.114 * mb); Ch = 10 * (max(mr, max(mg, mb)) - min(mr, min(mg, mb)));
+                 V0 = 10 * (0.299 * br + 0.587 * bg + 0.114 * bb); C0 = 10 * (max(br, max(bg, bb)) - min(br, min(bg, bb)));
+                 px = 70 + 34 * Ch; py = 370 - 34 * V; qx = 70 + 34 * C0; qy = 370 - 34 * V0">
+    <div class="bx">
+      <svg width="440" height="440" viewBox="0 0 440 440" aria-label="명도·채도 지도: 위로 갈수록 밝고, 오른쪽으로 갈수록 맑다">
+        <rect x="70" y="30" width="340" height="340" fill="#FFFFFF" stroke="#E4DCCB" stroke-width="3"/>
+        <g stroke="#EFE8DA" stroke-width="2"><path d="M138 30V370M206 30V370M274 30V370M342 30V370M70 98H410M70 166H410M70 234H410M70 302H410"/></g>
+        <path d="M70 30V370H410" fill="none" stroke="#6A6578" stroke-width="3"/>
+        <g font-size="21" font-weight="700" fill="#6A6578">
+          <text x="62" y="44" text-anchor="end">밝다</text><text x="62" y="374" text-anchor="end">어둡다</text>
+          <text x="26" y="210" font-weight="900" fill="#2E2A4F" text-anchor="middle">명도</text>
+          <text x="70" y="400">탁하다</text><text x="410" y="400" text-anchor="end">맑다</text>
+          <text x="240" y="428" font-weight="900" fill="#2E2A4F" text-anchor="middle">채도</text>
+        </g>
+        <circle r="26" fill="none" stroke="#2E2A4F" stroke-width="3" stroke-dasharray="6 5" cx="410" cy="268" data-attr="cx: qx; cy: qy"/>
+        <text font-size="20" font-weight="800" fill="#2E2A4F" text-anchor="middle" x="410" y="230" data-attr="x: min(max(qx, 100), 380); y: qy > 80 ? qy - 34 : qy + 50">처음</text>
+        <line stroke="#2E2A4F" stroke-width="3" stroke-dasharray="7 6" x1="410" y1="268" x2="410" y2="268" data-attr="x1: qx; y1: qy; x2: px; y2: py"/>
+        <circle r="24" stroke="#2E2A4F" stroke-width="5" fill="rgb(255,0,0)" cx="410" cy="268" data-attr="cx: px; cy: py; fill: col"/>
+      </svg>
+      <div class="swatch">
+        <span>처음 색</span>
+        <div class="sw" style="height:90px;background:rgb(255,0,0)" data-style="background: base"></div>
+        <div class="arrow" aria-hidden="true">↓</div>
+        <span>섞은 색</span>
+        <div class="sw" style="height:130px;background:rgb(255,0,0)" data-style="background: col"></div>
+        <p class="num" data-ai="모형 수치">명도 <b><output data-expr="round(V, 1)"></output></b> <span class="model">(처음 <output data-expr="round(V0, 1)"></output>)</span><br>채도 <b><output data-expr="round(Ch, 1)"></output></b> <span class="model">(처음 <output data-expr="round(C0, 1)"></output>)</span><br><span class="model">(모형)</span></p>
+      </div>
+    </div>
+    <div class="ax-ctrl">
+      <p class="lab">처음 색</p>
+      <div class="base">
+        <button data-set="c" data-value="1" aria-pressed="true"><i style="background:#FF0000"></i>빨강</button>
+        <button data-set="c" data-value="2"><i style="background:#FF8000"></i>주황</button>
+        <button data-set="c" data-value="3"><i style="background:#FFFF00;box-shadow:inset 0 0 0 1px #999"></i>노랑</button>
+        <button data-set="c" data-value="4"><i style="background:#00A833"></i>초록</button>
+        <button data-set="c" data-value="5"><i style="background:#2A5F99"></i>파랑</button>
+        <button data-set="c" data-value="6"><i style="background:#800080"></i>보라</button>
+      </div>
+      <p class="lab">흰색 <b><output data-expr="W" data-unit="방울"></output></b></p>
+      <input type="range" name="W" min="0" max="10" step="1" value="0" style="--stop-c:#A8A196" aria-label="흰색 물감 양">
+      <p class="lab">검은색 <b><output data-expr="K" data-unit="방울"></output></b></p>
+      <input type="range" name="K" min="0" max="10" step="1" value="0" style="--stop-c:#2B2B2B" aria-label="검은색 물감 양">
+      <p class="say" data-show="W == 0 && K == 0">흰색이나 검은색을 섞어 보자.</p>
+      <p class="say" data-show="W > 0 && K == 0">흰색을 섞으니 명도는 높아지고 채도는 낮아졌다.</p>
+      <p class="say" data-show="K > 0 && W == 0">검은색을 섞으니 명도와 채도가 모두 낮아졌다.</p>
+      <p class="say" data-show="W > 0 && K > 0">둘 다 섞으면 회색빛이 되어 채도가 크게 낮아진다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 9 확인: 명도 순서 -->
+<section class="slide" id="order" data-sec="확인" data-title="명도 순서 배열">
+  <h2>밝은 색부터 차례로 놓아 보자</h2>
+  <p class="q-lead">모두 파랑에 흰색이나 검은색을 섞은 색이다. 명도가 높은 색부터 차례로 누르자.</p>
+  <ol class="order" data-ai="순서 배열과 풀이(모형 색)">
+    <li data-why="흰색을 가장 많이 섞어 명도가 가장 높다."><span class="cc" style="background:rgb(148,175,204)"></span>파랑 + 흰색 많이</li>
+    <li data-why="흰색을 조금 섞어 처음 파랑보다 밝다."><span class="cc" style="background:rgb(91,132,177)"></span>파랑 + 흰색 조금</li>
+    <li data-why="아무것도 섞지 않은 처음 파랑이다."><span class="cc" style="background:rgb(42,95,153)"></span>파랑 그대로</li>
+    <li data-why="검은색을 조금 섞어 처음 파랑보다 어둡다."><span class="cc" style="background:rgb(32,73,118)"></span>파랑 + 검은색 조금</li>
+    <li data-why="검은색을 가장 많이 섞어 명도가 가장 낮다."><span class="cc" style="background:rgb(19,43,70)"></span>파랑 + 검은색 많이</li>
+  </ol>
+</section>
+
+<!-- 10 확인: 채도 -->
+<section class="slide" id="chroma" data-sec="확인" data-title="채도가 가장 높은 색">
+  <h2>채도가 가장 높은 초록은?</h2>
+  <p class="q-lead">채도는 색의 맑은 정도다. 다른 색을 섞지 않을수록 맑다.</p>
+  <div class="quiz" data-cols="2" data-ai="문항과 풀이(모형 색)">
+    <button class="opt" data-why="회색을 섞으면 탁해져 채도가 낮아진다."><span class="cc" style="background:rgb(64,148,89)"></span>회색을 섞은 초록</button>
+    <button class="opt" data-why="흰색을 섞으면 밝아지지만 채도는 낮아진다."><span class="cc" style="background:rgb(128,212,153)"></span>흰색을 섞은 초록</button>
+    <button class="opt" data-ok data-why="맞다. 아무것도 섞지 않은 처음 색이 가장 맑다."><span class="cc" style="background:rgb(0,168,51)"></span>물감 그대로의 초록</button>
+    <button class="opt" data-why="검은색을 섞으면 명도와 채도가 모두 낮아진다."><span class="cc" style="background:rgb(0,105,32)"></span>검은색을 섞은 초록</button>
+  </div>
+</section>
+
+<!-- 11 정리 -->
+<section class="slide" id="summary" data-sec="정리" data-title="정리">
+  <h2>오늘 배운 것</h2>
+  <ul class="sum">
+    <li>물감은 섞을수록 색이 <span class="blank">어두워지고</span> 탁해진다.</li>
+    <li>많이 넣은 물감 쪽으로 섞인 색이 <span class="blank">기운다</span>.</li>
+    <li>흰색을 섞으면 명도는 <span class="blank">높아지고</span> 채도는 <span class="blank">낮아진다</span>.</li>
+  </ul>
+  <div class="short" data-ph="예: 연두를 만들려고 노랑 4방울, 파랑 2방울을 섞는다." data-ai="정리 물음">
+    <p class="ask">만들고 싶은 색을 하나 정하자.<br>어떤 물감을 몇 방울씩 섞을지 한 문장으로 써 보자.</p>
+  </div>
+</section>
+
+</body>
+</html>

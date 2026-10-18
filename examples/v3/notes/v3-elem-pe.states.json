@@ -1,0 +1,161 @@
+[
+ {
+  "slide": 1,
+  "name": "view"
+ },
+ {
+  "slide": 2,
+  "name": "view"
+ },
+ {
+  "slide": 3,
+  "name": "view"
+ },
+ {
+  "slide": 4,
+  "name": "view"
+ },
+ {
+  "slide": 5,
+  "name": "view"
+ },
+ {
+  "slide": 5,
+  "name": "start",
+  "js": "const r = document.querySelector('#pe-t'); r.value = 0; r.dispatchEvent(new Event('input', { bubbles: true }));"
+ },
+ {
+  "slide": 5,
+  "name": "g1-t2",
+  "js": "document.querySelector('#pe-a [data-set=g][data-value=\"1\"]').click();const r = document.querySelector('#pe-t'); r.value = 2; r.dispatchEvent(new Event('input', { bubbles: true }));"
+ },
+ {
+  "slide": 5,
+  "name": "g1-t5",
+  "js": "document.querySelector('#pe-a [data-set=g][data-value=\"1\"]').click();const r = document.querySelector('#pe-t'); r.value = 5; r.dispatchEvent(new Event('input', { bubbles: true }));"
+ },
+ {
+  "slide": 5,
+  "name": "g1-t8",
+  "js": "document.querySelector('#pe-a [data-set=g][data-value=\"1\"]').click();const r = document.querySelector('#pe-t'); r.value = 8; r.dispatchEvent(new Event('input', { bubbles: true }));"
+ },
+ {
+  "slide": 5,
+  "name": "g2-t2",
+  "js": "document.querySelector('#pe-a [data-set=g][data-value=\"2\"]').click();const r = document.querySelector('#pe-t'); r.value = 2; r.dispatchEvent(new Event('input', { bubbles: true }));"
+ },
+ {
+  "slide": 5,
+  "name": "g2-t5",
+  "js": "document.querySelector('#pe-a [data-set=g][data-value=\"2\"]').click();const r = document.querySelector('#pe-t'); r.value = 5; r.dispatchEvent(new Event('input', { bubbles: true }));"
+ },
+ {
+  "slide": 5,
+  "name": "g2-t8",
+  "js": "document.querySelector('#pe-a [data-set=g][data-value=\"2\"]').click();const r = document.querySelector('#pe-t'); r.value = 8; r.dispatchEvent(new Event('input', { bubbles: true }));"
+ },
+ {
+  "slide": 5,
+  "name": "g3-t2",
+  "js": "document.querySelector('#pe-a [data-set=g][data-value=\"3\"]').click();const r = document.querySelector('#pe-t'); r.value = 2; r.dispatchEvent(new Event('input', { bubbles: true }));"
+ },
+ {
+  "slide": 5,
+  "name": "g3-t5",
+  "js": "document.querySelector('#pe-a [data-set=g][data-value=\"3\"]').click();const r = document.querySelector('#pe-t'); r.value = 5; r.dispatchEvent(new Event('input', { bubbles: true }));"
+ },
+ {
+  "slide": 5,
+  "name": "g3-t8",
+  "js": "document.querySelector('#pe-a [data-set=g][data-value=\"3\"]').click();const r = document.querySelector('#pe-t'); r.value = 8; r.dispatchEvent(new Event('input', { bubbles: true }));"
+ },
+ {
+  "slide": 5,
+  "name": "g4-t2",
+  "js": "document.querySelector('#pe-a [data-set=g][data-value=\"4\"]').click();const r = document.querySelector('#pe-t'); r.value = 2; r.dispatchEvent(new Event('input', { bubbles: true }));"
+ },
+ {
+  "slide": 5,
+  "name": "g4-t5",
+  "js": "document.querySelector('#pe-a [data-set=g][data-value=\"4\"]').click();const r = document.querySelector('#pe-t'); r.value = 5; r.dispatchEvent(new Event('input', { bubbles: true }));"
+ },
+ {
+  "slide": 5,
+  "name": "g4-t8",
+  "js": "document.querySelector('#pe-a [data-set=g][data-value=\"4\"]').click();const r = document.querySelector('#pe-t'); r.value = 8; r.dispatchEvent(new Event('input', { bubbles: true }));"
+ },
+ {
+  "slide": 5,
+  "name": "back",
+  "js": "document.querySelector('#pe-a [data-set=g][data-value=\"1\"]').click();const r = document.querySelector('#pe-t'); r.value = 0; r.dispatchEvent(new Event('input', { bubbles: true }));"
+ },
+ {
+  "slide": 6,
+  "name": "view"
+ },
+ {
+  "slide": 7,
+  "name": "view"
+ },
+ {
+  "slide": 7,
+  "name": "a10-n10",
+  "js": "const a = document.querySelector('#gauge input[name=a]'); a.value = 10; a.dispatchEvent(new Event('input', { bubbles: true })); const n = document.querySelector('#gauge input[name=n]'); n.value = 10; n.dispatchEvent(new Event('input', { bubbles: true }));"
+ },
+ {
+  "slide": 7,
+  "name": "a12-n14",
+  "js": "const a = document.querySelector('#gauge input[name=a]'); a.value = 12; a.dispatchEvent(new Event('input', { bubbles: true })); const n = document.querySelector('#gauge input[name=n]'); n.value = 14; n.dispatchEvent(new Event('input', { bubbles: true }));"
+ },
+ {
+  "slide": 7,
+  "name": "a12-n21",
+  "js": "const a = document.querySelector('#gauge input[name=a]'); a.value = 12; a.dispatchEvent(new Event('input', { bubbles: true })); const n = document.querySelector('#gauge input[name=n]'); n.value = 21; n.dispatchEvent(new Event('input', { bubbles: true }));"
+ },
+ {
+  "slide": 7,
+  "name": "a12-n26",
+  "js": "const a = document.querySelector('#gauge input[name=a]'); a.value = 12; a.dispatchEvent(new Event('input', { bubbles: true })); const n = document.querySelector('#gauge input[name=n]'); n.value = 26; n.dispatchEvent(new Event('input', { bubbles: true }));"
+ },
+ {
+  "slide": 7,
+  "name": "a12-n36",
+  "js": "const a = document.querySelector('#gauge input[name=a]'); a.value = 12; a.dispatchEvent(new Event('input', { bubbles: true })); const n = document.querySelector('#gauge input[name=n]'); n.value = 36; n.dispatchEvent(new Event('input', { bubbles: true }));"
+ },
+ {
+  "slide": 7,
+  "name": "a40-n22",
+  "js": "const a = document.querySelector('#gauge input[name=a]'); a.value = 40; a.dispatchEvent(new Event('input', { bubbles: true })); const n = document.querySelector('#gauge input[name=n]'); n.value = 22; n.dispatchEvent(new Event('input', { bubbles: true }));"
+ },
+ {
+  "slide": 7,
+  "name": "a70-n10",
+  "js": "const a = document.querySelector('#gauge input[name=a]'); a.value = 70; a.dispatchEvent(new Event('input', { bubbles: true })); const n = document.querySelector('#gauge input[name=n]'); n.value = 10; n.dispatchEvent(new Event('input', { bubbles: true }));"
+ },
+ {
+  "slide": 7,
+  "name": "a70-n25",
+  "js": "const a = document.querySelector('#gauge input[name=a]'); a.value = 70; a.dispatchEvent(new Event('input', { bubbles: true })); const n = document.querySelector('#gauge input[name=n]'); n.value = 25; n.dispatchEvent(new Event('input', { bubbles: true }));"
+ },
+ {
+  "slide": 7,
+  "name": "a70-n36",
+  "js": "const a = document.querySelector('#gauge input[name=a]'); a.value = 70; a.dispatchEvent(new Event('input', { bubbles: true })); const n = document.querySelector('#gauge input[name=n]'); n.value = 36; n.dispatchEvent(new Event('input', { bubbles: true }));"
+ },
+ {
+  "slide": 8,
+  "name": "view"
+ },
+ {
+  "slide": 9,
+  "name": "view"
+ },
+ {
+  "slide": 10,
+  "name": "view"
+ },
+ {
+  "slide": 11,
+  "name": "view"
+ }
+]

@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="ko" data-deck="v3-elem-korean">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>까슬이의 마음은 어떻게 바뀌었을까? 이야기 속 인물의 마음</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/engine/exploragram.css">
+<script defer src="https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/engine/exploragram.js"></script>
+<style>
+body[data-theme="ppt"] {
+  --forest: #2F6B45; --forest-2: #3F8558; --leaf: #E3EFE2; --coral: #DD6648; --coral-deep: #B4442A;
+  --cream: #FFF8EC; --ink: #33291F; --gray: #6B5E52; --sun: #F4C35A; --spike: #7A5A3E; --face: #F4DDBA;
+  --accent: #2F6B45; --tab: #2F6B45; --tab-ink: #FFFFFF; --ch-paper: #FFF8EC;
+}
+
+/* ── 이 수업의 얼굴: 숲빛 머리 띠(아래가 언덕처럼 굽이침) + 오른쪽에 매달린 책갈피 리본 ── */
+body[data-theme="ppt"] section.slide {
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1280' height='120' viewBox='0 0 1280 120'%3E%3Cpath d='M0 0H1280V90Q1200 116 1110 96T930 98T750 94T570 100T390 95T210 99T0 94Z' fill='%232F6B45'/%3E%3Cpath d='M0 94Q105 102 210 99T390 95T570 100T750 94T930 98T1110 96T1280 90V98Q1200 122 1110 104T930 106T750 102T570 108T390 103T210 107T0 102Z' fill='%23A8CFA0'/%3E%3C/svg%3E") top / 1280px 120px no-repeat,
+    var(--cream);
+  color: var(--ink);
+}
+body[data-theme="ppt"] section.slide[data-sec]::before {
+  left: auto; right: 44px; top: 0; width: 196px; height: 118px; padding: 0 0 22px; box-sizing: border-box;
+  justify-content: center; border-radius: 0; background: var(--coral); color: #FFFFFF; font-size: 25px; letter-spacing: 0;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 80%, 0 100%);
+}
+body[data-theme="ppt"] section.slide > h2:first-child {
+  position: absolute; top: 0; left: 64px; right: 270px; height: 94px; margin: 0; padding: 0; width: auto;
+  display: flex; align-items: center; color: #FFFFFF; font-size: 42px; line-height: 1.2; border: 0; background: none;
+  text-wrap: balance;
+}
+.key { color: var(--coral-deep); font-weight: 800; }
+
+/* 표지: 숲 속 소풍 길 */
+body[data-theme="ppt"] section.slide#cover { background: linear-gradient(#DCEFD8, #FFF8EC 70%); padding: 0; }
+.cv { position: relative; height: 100%; }
+.cv-text { position: absolute; left: 80px; top: 96px; width: 600px; }
+.cv-text p, .cv-text h1 { margin: 0; color: var(--ink); }
+.cv-k { display: inline-block; padding: 8px 20px; border-radius: 26px; background: var(--forest); color: #FFFFFF !important; font-size: 26px; font-weight: 700; }
+.cv-text h1 { margin: 26px 0 22px; font-size: 68px; line-height: 1.2; text-wrap: balance; }
+.cv-s { font-size: 32px; color: var(--gray) !important; font-weight: 600; }
+.cv svg { position: absolute; right: 40px; bottom: 0; }
+
+/* 학습 목표 */
+.goals { margin: 40px 0 0; padding: 0; list-style: none; counter-reset: g; }
+.goals li { counter-increment: g; position: relative; padding: 0 0 0 66px; margin: 0 0 32px; font-size: 34px; line-height: 1.45; }
+.goals li::before { content: counter(g); position: absolute; left: 0; top: 0; width: 48px; height: 48px; border-radius: 50%; background: var(--forest); color: #FFFFFF; font-weight: 800; font-size: 28px; text-align: center; line-height: 48px; }
+
+/* 생각 열기 */
+.open { display: grid; grid-template-columns: 1fr 470px; gap: 40px; align-items: start; margin-top: 8px; }
+.open p { margin: 0 0 20px; font-size: 31px; line-height: 1.5; }
+.open .ask { color: var(--forest); font-weight: 800; }
+.poll p { font-size: 28px; }
+
+/* 이야기 장면 */
+.story { display: flex; flex-direction: column; gap: 18px; margin-top: 2px; }
+.scene { display: grid; grid-template-columns: 120px 1fr; gap: 22px; align-items: center; padding: 12px 20px; border-radius: 20px; background: #FFFFFF; border: 3px solid #EADFCB; }
+.scene svg { display: block; }
+.scene p { margin: 0; font-size: 30px; line-height: 1.5; text-wrap: pretty; }
+.scene b.no { display: inline-block; margin-right: 10px; padding: 2px 14px; border-radius: 14px; background: var(--leaf); color: var(--forest); font-size: 24px; }
+.say { color: var(--coral-deep); font-weight: 700; }
+
+/* 단서 셋 */
+.clues { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 10px; }
+.clues > div { padding: 18px 20px 22px; border-radius: 24px; background: #FFFFFF; border: 4px solid var(--leaf); text-align: center; }
+.clues svg { display: block; margin: 0 auto 4px; }
+.clues b { display: block; font-size: 36px; color: var(--forest); }
+.clues span { display: block; margin-top: 6px; font-size: 26px; line-height: 1.4; }
+.clues em { display: block; margin-top: 12px; padding: 8px 10px; border-radius: 14px; background: var(--cream); font-style: normal; font-size: 26px; color: var(--coral-deep); font-weight: 700; }
+.tip { margin-top: 26px; padding: 16px 26px; border-radius: 18px; background: var(--leaf); font-size: 30px; line-height: 1.45; font-weight: 700; text-wrap: pretty; }
+
+/* ── 익스플로라그램 공통 ── */
+.mx { display: grid; grid-template-columns: 720px 1fr; gap: 28px; align-items: start; }
+.mx svg { display: block; }
+.mx-card { padding: 16px 20px; border-radius: 20px; background: #FFFFFF; border: 3px solid #EADFCB; }
+.mx-card h3 { margin: 0 0 8px; font-size: 27px; color: var(--forest); }
+.mx-card p { margin: 0 0 8px; font-size: 25px; line-height: 1.45; }
+.tag { display: inline-block; min-width: 54px; margin-right: 6px; padding: 1px 10px; border-radius: 10px; background: var(--leaf); color: var(--forest); font-size: 22px; font-weight: 800; text-align: center; }
+.feel { margin: 14px 0 0; font-size: 28px; font-weight: 800; }
+.feel .blank { color: var(--coral-deep); }
+.delta { margin: 12px 0 0; font-size: 25px; font-weight: 700; color: var(--gray); }
+.model { font-size: 21px; color: var(--gray); font-weight: 500; }
+.mx .reveal { display: block; }
+.mx-veil { min-height: 330px; }
+.calc .ch-stops { margin-top: 4px; }
+
+/* 사건 바꾸기 */
+.mb { display: grid; grid-template-columns: 720px 1fr; gap: 28px; align-items: start; }
+.mb-ctrl { display: flex; flex-direction: column; gap: 10px; }
+.mb-ctrl .lab { margin: 0; font-size: 25px; font-weight: 800; }
+section.slide .mb-ctrl button[data-set] { width: 100%; min-height: 60px; margin: 0; padding: 6px 16px; border: 3px solid #D9CDB6; border-radius: 16px; background: #FFFFFF; color: var(--ink); font-size: 23px; font-weight: 700; line-height: 1.3; text-align: left; }
+section.slide .mb-ctrl button[data-set][aria-pressed="true"] { background: var(--forest); border-color: var(--forest); color: #FFFFFF; }
+.mb-ctrl .now { margin: 4px 0 0; font-size: 24px; font-weight: 700; color: var(--gray); }
+.mb-text { margin: 10px 0 0; min-height: 84px; font-size: 26px; line-height: 1.5; }
+.mb-text p { margin: 0; }
+.mb-text .end { font-weight: 800; color: var(--coral-deep); }
+.strip text { font-size: 21px; font-weight: 700; }
+.strip rect { transition: fill .3s; }
+.strip .on rect { fill: var(--forest); }
+.strip .on text { fill: #FFFFFF; }
+
+/* 확인 */
+.q-lead { margin: 0 0 14px; font-size: 26px; color: var(--gray); }
+.sort .bin { min-height: 104px; }
+.sort .bin h3 { font-size: 28px; }
+
+/* 정리 */
+.sum { margin: 26px 0 0; padding: 0; list-style: none; }
+.sum li { position: relative; padding-left: 40px; margin: 0 0 24px; font-size: 32px; line-height: 1.45; }
+.sum li::before { content: ""; position: absolute; left: 6px; top: 16px; width: 16px; height: 16px; border-radius: 50%; background: var(--coral); }
+.short .ask { font-size: 28px; }
+</style>
+</head>
+<body data-theme="ppt">
+
+<!-- 1 표지 -->
+<section class="slide" id="cover" data-title="표지">
+  <div class="cv" data-enter="off">
+    <div class="cv-text" data-anim="fade-up">
+      <p class="cv-k">초등학교 국어 3~4학년 · 인물의 마음</p>
+      <h1>까슬이의 마음은<br>어떻게 바뀌었을까?</h1>
+      <p class="cv-s">이야기 「까슬이의 소풍」을 읽고<br>인물의 마음을 따라가 보자</p>
+    </div>
+    <svg width="520" height="560" viewBox="0 0 520 560" aria-label="밤나무 아래에서 도시락 바구니를 든 아기 고슴도치">
+      <path d="M0 470 Q160 430 300 452 T520 440 V560 H0Z" fill="#A8CFA0"/>
+      <rect x="350" y="150" width="34" height="320" rx="10" fill="#8A6444"/>
+      <circle cx="367" cy="130" r="120" fill="#5E9E64"/>
+      <circle cx="290" cy="170" r="80" fill="#6FAE73"/>
+      <circle cx="450" cy="180" r="78" fill="#6FAE73"/>
+      <g fill="#9C7442"><circle cx="300" cy="130" r="14"/><circle cx="420" cy="100" r="14"/><circle cx="380" cy="210" r="14"/></g>
+      <g stroke="#6E8B3D" stroke-width="3"><path d="M286 130 h28 M300 116 v28 M406 100 h28 M420 86 v28 M366 210 h28 M380 196 v28"/></g>
+      <g transform="translate(60 200)">
+        <polygon points="10,158 36,151 16,134 43,132 28,111 55,114 43,92 69,99 63,75 87,86 86,62 107,77 110,53 128,71 137,48 150,69 163,48 172,71 190,53 193,77 214,62 213,86 237,75 231,99 257,92 245,114 272,111 257,132 284,134 264,151 290,158 268,171 292,182 267,192 289,206 262,212 280,230 253,230 267,251 241,247 250,270 225,262 230,286 207,273 206,298 186,281 181,305 165,286 154,309 143,286 128,307 121,283 102,301 100,276 78,290 81,266 56,276 64,252 38,258 50,236 23,237" fill="#7A5A3E"/>
+        <ellipse cx="150" cy="190" rx="96" ry="82" fill="#F4DDBA"/>
+        <ellipse cx="115" cy="178" rx="9" ry="12" fill="#33291F"/><ellipse cx="185" cy="178" rx="9" ry="12" fill="#33291F"/>
+        <circle cx="118" cy="174" r="3" fill="#FFFFFF"/><circle cx="188" cy="174" r="3" fill="#FFFFFF"/>
+        <circle cx="150" cy="204" r="9" fill="#33291F"/>
+        <path d="M128 222 Q150 246 172 222" fill="none" stroke="#33291F" stroke-width="5" stroke-linecap="round"/>
+        <ellipse cx="98" cy="210" rx="15" ry="9" fill="#F29C8A" opacity=".6"/><ellipse cx="202" cy="210" rx="15" ry="9" fill="#F29C8A" opacity=".6"/>
+        <path d="M232 236 h70 l-10 48 h-50 z" fill="#E9B65C" stroke="#A97B2C" stroke-width="4"/>
+        <path d="M240 236 q27 -40 54 0" fill="none" stroke="#A97B2C" stroke-width="5"/>
+      </g>
+    </svg>
+  </div>
+</section>
+
+<!-- 2 학습 목표 -->
+<section class="slide" id="goal" data-sec="학습 목표" data-title="학습 목표">
+  <h2>오늘 배울 것</h2>
+  <ol class="goals">
+    <li>인물의 <span class="key">말, 행동, 표정</span>을 보고<br>마음을 짐작할 수 있다.</li>
+    <li>사건에 따라 인물의 마음이<br>어떻게 바뀌는지 말할 수 있다.</li>
+  </ol>
+</section>
+
+<!-- 3 생각 열기 -->
+<section class="slide" id="think" data-sec="생각 열기" data-title="오늘 아침 내 마음">
+  <h2>오늘 아침, 내 마음은 어땠을까?</h2>
+  <div class="open">
+    <div>
+      <p>학교에 오던 길을 떠올려 보자.</p>
+      <p class="ask">그때 내 마음과 지금 내 마음은<br>똑같을까, 달라졌을까?</p>
+      <p class="step">하루에도 마음은 여러 번 바뀐다.<br>이야기 속 인물의 마음도 그렇다.</p>
+    </div>
+    <div class="poll" data-options="설렜다|졸렸다|걱정됐다|그냥 그랬다" data-ai="생각 열기 투표">
+      <p>오늘 아침 학교에 올 때 내 마음은?</p>
+    </div>
+  </div>
+</section>
+
+<!-- 4 이야기 앞부분 -->
+<section class="slide" id="story-1" data-sec="이야기 읽기" data-title="이야기 1~3장면">
+  <h2>「까슬이의 소풍」 ①</h2>
+  <div class="story" data-ai="새로 쓴 이야기">
+    <div class="scene">
+      <svg width="120" height="100" viewBox="0 0 120 100" aria-hidden="true"><circle cx="34" cy="34" r="20" fill="#F4C35A"/><path d="M50 82 h56 l-8 -40 h-40 z" fill="#E9B65C" stroke="#A97B2C" stroke-width="4"/><path d="M60 42 q18 -26 36 0" fill="none" stroke="#A97B2C" stroke-width="4"/></svg>
+      <p><b class="no">1. 아침</b>오늘은 숲속 친구들과 소풍 가는 날이다. 아기 고슴도치 까슬이는 해가 뜨기도 전에 일어나 도시락을 쌌다. <span class="say">"빨리 가고 싶다!"</span> 까슬이는 콧노래를 불렀다.</p>
+    </div>
+    <div class="scene step">
+      <svg width="120" height="100" viewBox="0 0 120 100" aria-hidden="true"><g stroke="#DD6648" stroke-width="5" stroke-linecap="round"><path d="M60 14 v14 M60 72 v14 M14 50 h14 M92 50 h14 M28 20 l10 10 M82 70 l10 10 M28 80 l10 -10 M82 30 l10 -10"/></g><circle cx="60" cy="50" r="14" fill="#DD6648"/></svg>
+      <p><b class="no">2. 풍선</b>토끼 폴짝이가 빨간 풍선을 들고 달려왔다. "까슬아, 같이 놀자!" 폴짝이가 까슬이를 꼭 껴안는 순간 "펑!" 풍선이 터졌다. 까슬이는 깜짝 놀라 몸을 동그랗게 말았다.</p>
+    </div>
+    <div class="scene step">
+      <svg width="120" height="100" viewBox="0 0 120 100" aria-hidden="true"><rect x="70" y="30" width="18" height="66" rx="6" fill="#8A6444"/><circle cx="79" cy="30" r="28" fill="#6FAE73"/><g transform="translate(18 60) scale(.3)"><polygon points="10,158 43,132 43,92 86,62 137,48 190,53 237,75 272,111 290,158 267,192 230,230 150,250 70,230 23,190" fill="#7A5A3E"/></g></svg>
+      <p><b class="no">3. 웃음</b>친구들이 그 모습을 보고 깔깔 웃었다. "까슬이 옆에 가면 다 터지겠다!" 까슬이는 얼굴이 빨개져 나무 뒤에 숨었다. <span class="say">"나는 왜 가시가 이렇게 많을까?"</span></p>
+    </div>
+  </div>
+</section>
+
+<!-- 5 이야기 뒷부분 -->
+<section class="slide" id="story-2" data-sec="이야기 읽기" data-title="이야기 4~5장면">
+  <h2>「까슬이의 소풍」 ②</h2>
+  <div class="story" data-ai="새로 쓴 이야기">
+    <div class="scene">
+      <svg width="120" height="100" viewBox="0 0 120 100" aria-hidden="true"><circle cx="60" cy="52" r="34" fill="#9C7442"/><g stroke="#6E8B3D" stroke-width="4" stroke-linecap="round"><path d="M22 52 h-12 M98 52 h12 M60 14 v-10 M60 90 v10 M33 25 l-8 -8 M87 79 l8 8 M33 79 l-8 8 M87 25 l8 -8"/></g></svg>
+      <p><b class="no">4. 토리의 말</b>다람쥐 토리가 나무 뒤로 찾아왔다. "까슬아, 저 밤나무 좀 봐. 밤송이가 너무 따가워서 아무도 못 줍고 있어." 까슬이는 고개를 살짝 들었다. 눈이 반짝 빛났다.</p>
+    </div>
+    <div class="scene step">
+      <svg width="120" height="100" viewBox="0 0 120 100" aria-hidden="true"><g transform="translate(6 18) scale(.36)"><polygon points="10,158 43,132 43,92 86,62 137,48 190,53 237,75 272,111 290,158 267,192 230,230 150,250 70,230 23,190" fill="#7A5A3E"/></g><g fill="#9C7442"><circle cx="34" cy="34" r="9"/><circle cx="60" cy="24" r="9"/><circle cx="86" cy="36" r="9"/></g></svg>
+      <p><b class="no">5. 밤 줍기</b>까슬이는 밤송이 위를 데굴데굴 굴렀다. 등에 알밤이 주렁주렁 꽂혔다. "와, 까슬이 최고!" 친구들이 손뼉을 쳤다. 까슬이는 활짝 웃으며 말했다. <span class="say">"내 가시가 이렇게 쓸모 있을 줄 몰랐어!"</span></p>
+    </div>
+  </div>
+</section>
+
+<!-- 6 마음을 알려 주는 단서 -->
+<section class="slide" id="clue" data-sec="단서 알기" data-title="마음을 알려 주는 단서">
+  <h2>인물의 마음은 무엇을 보고 알까?</h2>
+  <div class="clues">
+    <div>
+      <svg width="110" height="84" viewBox="0 0 110 84" aria-hidden="true"><path d="M10 10 h90 a8 8 0 0 1 8 8 v36 a8 8 0 0 1 -8 8 h-56 l-20 18 v-18 h-14 a8 8 0 0 1 -8 -8 v-36 a8 8 0 0 1 8 -8z" fill="#E3EFE2" stroke="#2F6B45" stroke-width="4"/><circle cx="36" cy="36" r="5" fill="#2F6B45"/><circle cx="56" cy="36" r="5" fill="#2F6B45"/><circle cx="76" cy="36" r="5" fill="#2F6B45"/></svg>
+      <b>말</b><span>인물이 한 말</span><em>"빨리 가고 싶다!"</em>
+    </div>
+    <div>
+      <svg width="110" height="84" viewBox="0 0 110 84" aria-hidden="true"><ellipse cx="40" cy="52" rx="18" ry="26" fill="#E3EFE2" stroke="#2F6B45" stroke-width="4"/><ellipse cx="74" cy="38" rx="18" ry="26" fill="#E3EFE2" stroke="#2F6B45" stroke-width="4"/></svg>
+      <b>행동</b><span>인물이 한 일</span><em>콧노래를 불렀다.</em>
+    </div>
+    <div>
+      <svg width="110" height="84" viewBox="0 0 110 84" aria-hidden="true"><circle cx="55" cy="42" r="36" fill="#E3EFE2" stroke="#2F6B45" stroke-width="4"/><circle cx="42" cy="36" r="5" fill="#2F6B45"/><circle cx="68" cy="36" r="5" fill="#2F6B45"/><ellipse cx="32" cy="52" rx="8" ry="5" fill="#DD6648" opacity=".7"/><ellipse cx="78" cy="52" rx="8" ry="5" fill="#DD6648" opacity=".7"/><path d="M44 56 q11 8 22 0" fill="none" stroke="#2F6B45" stroke-width="4" stroke-linecap="round"/></svg>
+      <b>표정</b><span>얼굴에 드러난 모습</span><em>얼굴이 빨개졌다.</em>
+    </div>
+  </div>
+  <p class="tip step">단서를 모아 보면 인물의 마음을 짐작할 수 있다.<br>마음은 '설렌다', '부끄럽다'처럼 알맞은 낱말로 말한다.</p>
+</section>
+
+<!-- 7 익스플로라그램: 장면마다 바뀌는 마음 -->
+<section class="slide" id="mood" data-sec="마음 따라가기" data-title="장면마다 바뀌는 까슬이의 마음">
+  <h2>장면마다 까슬이의 마음은 어땠을까?</h2>
+  <div class="calc" data-ai="장면별 표정과 마음 그래프 모형"
+       data-let="m1 = 3; m2 = -1; m3 = -4; m4 = 1; m5 = 4;
+                 m = k == 1 ? m1 : k == 2 ? m2 : k == 3 ? m3 : k == 4 ? m4 : k == 5 ? m5 : 0;
+                 p = k == 2 ? m1 : k == 3 ? m2 : k == 4 ? m3 : k == 5 ? m4 : m;
+                 d = m - p; j = max(k, 1);
+                 x1 = 330; x2 = 330 + 90 * (min(2, j) - 1); x3 = 330 + 90 * (min(3, j) - 1); x4 = 330 + 90 * (min(4, j) - 1); x5 = 330 + 90 * (min(5, j) - 1);
+                 y1 = 165 - 26 * (k >= 1 ? m1 : m); y2 = 165 - 26 * (k >= 2 ? m2 : m); y3 = 165 - 26 * (k >= 3 ? m3 : m); y4 = 165 - 26 * (k >= 4 ? m4 : m); y5 = 165 - 26 * (k >= 5 ? m5 : m);
+                 pts = x1 + ',' + y1 + ' ' + x2 + ',' + y2 + ' ' + x3 + ',' + y3 + ' ' + x4 + ',' + y4 + ' ' + x5 + ',' + y5">
+    <div class="reveal" data-name="k" data-stops="시작|1. 아침|2. 풍선|3. 웃음|4. 토리의 말|5. 밤 줍기" data-veil="아래 막대를 밀어 장면을 하나씩 넘겨 보자">
+      <div class="mx">
+        <div class="veil mx-veil">
+          <svg width="720" height="330" viewBox="0 0 720 330" aria-label="까슬이의 얼굴과 장면별 마음 그래프">
+            <!-- 얼굴 -->
+            <g id="fx-head" data-attr="transform: 'rotate(' + (k == 3 ? 7 : 0) + ' 140 300)'">
+              <g id="fx-spikes" data-attr="transform: 'translate(140 170) scale(' + (k == 2 ? 1.13 : k == 3 ? 0.95 : 1) + ') translate(-150 -178)'">
+                <polygon points="10,158 36,151 16,134 43,132 28,111 55,114 43,92 69,99 63,75 87,86 86,62 107,77 110,53 128,71 137,48 150,69 163,48 172,71 190,53 193,77 214,62 213,86 237,75 231,99 257,92 245,114 272,111 257,132 284,134 264,151 290,158 268,171 292,182 267,192 289,206 262,212 280,230 253,230 267,251 241,247 250,270 225,262 230,286 207,273 206,298 186,281 181,305 165,286 154,309 143,286 128,307 121,283 102,301 100,276 78,290 81,266 56,276 64,252 38,258 50,236 23,237" fill="#7A5A3E"/>
+              </g>
+              <ellipse cx="140" cy="182" rx="96" ry="84" fill="#F4DDBA"/>
+              <ellipse id="fx-cheekl" cx="88" cy="204" ry="10" fill="#EE7F6A" data-attr="rx: k == 3 ? 26 : 16; opacity: k == 3 ? 0.95 : k == 5 ? 0.55 : 0.2"/>
+              <ellipse id="fx-cheekr" cx="192" cy="204" ry="10" fill="#EE7F6A" data-attr="rx: k == 3 ? 26 : 16; opacity: k == 3 ? 0.95 : k == 5 ? 0.55 : 0.2"/>
+              <ellipse id="fx-eyel" cx="106" cy="168" rx="10" fill="#33291F" data-attr="ry: k == 2 ? 16 : k == 5 ? 4 : k == 3 ? 6 : 11"/>
+              <ellipse id="fx-eyer" cx="174" cy="168" rx="10" fill="#33291F" data-attr="ry: k == 2 ? 16 : k == 5 ? 4 : k == 3 ? 6 : 11"/>
+              <line id="fx-browl" x1="92" y1="140" x2="120" y2="140" stroke="#5A4230" stroke-width="6" stroke-linecap="round" data-attr="transform: 'rotate(' + (m < 0 ? 4 * m : 0) + ' 106 140) translate(0 ' + (k == 2 ? -9 : -2 * max(m, 0)) + ')'"/>
+              <line id="fx-browr" x1="160" y1="140" x2="188" y2="140" stroke="#5A4230" stroke-width="6" stroke-linecap="round" data-attr="transform: 'rotate(' + (m < 0 ? -4 * m : 0) + ' 174 140) translate(0 ' + (k == 2 ? -9 : -2 * max(m, 0)) + ')'"/>
+              <circle cx="140" cy="196" r="9" fill="#33291F"/>
+              <path id="fx-mouth" fill="none" stroke="#33291F" stroke-width="6" stroke-linecap="round" d="M110 226 Q140 226 170 226" data-attr="d: 'M110 226 Q140 ' + (226 + 8 * m) + ' 170 226'; opacity: k == 2 ? 0 : 1"/>
+              <ellipse id="fx-o" cx="140" cy="230" rx="11" ry="14" fill="#33291F" opacity="0" data-attr="opacity: k == 2 ? 1 : 0"/>
+            </g>
+            <!-- 마음 그래프 -->
+            <rect x="300" y="30" width="410" height="270" rx="14" fill="#FFFFFF" stroke="#EADFCB" stroke-width="3"/>
+            <line x1="310" y1="165" x2="700" y2="165" stroke="#C9BBA2" stroke-width="2" stroke-dasharray="8 6"/>
+            <text x="314" y="56" font-size="21" fill="#6B5E52" font-weight="700">좋다</text>
+            <text x="314" y="290" font-size="21" fill="#6B5E52" font-weight="700">속상하다</text>
+            <text x="640" y="157" font-size="21" fill="#6B5E52">보통</text>
+            <g font-size="21" fill="#6B5E52" text-anchor="middle" font-weight="700"><text x="330" y="322">1</text><text x="420" y="322">2</text><text x="510" y="322">3</text><text x="600" y="322">4</text><text x="690" y="322">5</text></g>
+            <polyline fill="none" stroke="#DD6648" stroke-width="6" stroke-linejoin="round" stroke-linecap="round" points="330,165 330,165 330,165 330,165 330,165" data-attr="points: pts"/>
+            <circle r="9" fill="#DD6648" data-attr="cx: x1; cy: y1"/>
+            <circle r="9" fill="#DD6648" data-attr="cx: x2; cy: y2; opacity: k >= 2 ? 1 : 0"/>
+            <circle r="9" fill="#DD6648" data-attr="cx: x3; cy: y3; opacity: k >= 3 ? 1 : 0"/>
+            <circle r="9" fill="#DD6648" data-attr="cx: x4; cy: y4; opacity: k >= 4 ? 1 : 0"/>
+            <circle r="9" fill="#DD6648" data-attr="cx: x5; cy: y5; opacity: k >= 5 ? 1 : 0"/>
+            <circle r="15" fill="none" stroke="#2F6B45" stroke-width="5" data-attr="cx: 330 + 90 * (j - 1); cy: 165 - 26 * m"/>
+          </svg>
+        </div>
+        <div data-at="1">
+          <div class="mx-card" data-only="1"><h3>1. 아침</h3>
+            <p><span class="tag">말</span>"빨리 가고 싶다!"</p><p><span class="tag">행동</span>콧노래를 불렀다.</p>
+            <p class="feel">마음: <span class="blank">설렌다</span></p></div>
+          <div class="mx-card" data-only="2"><h3>2. 풍선</h3>
+            <p><span class="tag">행동</span>깜짝 놀라 몸을 동그랗게 말았다.</p>
+            <p class="feel">마음: <span class="blank">깜짝 놀랐다</span></p></div>
+          <div class="mx-card" data-only="3"><h3>3. 웃음</h3>
+            <p><span class="tag">표정</span>얼굴이 빨개졌다.</p><p><span class="tag">말</span>"나는 왜 가시가 이렇게 많을까?"</p>
+            <p class="feel">마음: <span class="blank">부끄럽고 속상하다</span></p></div>
+          <div class="mx-card" data-only="4"><h3>4. 토리의 말</h3>
+            <p><span class="tag">행동</span>고개를 살짝 들었다.</p><p><span class="tag">표정</span>눈이 반짝 빛났다.</p>
+            <p class="feel">마음: <span class="blank">궁금하고 기대된다</span></p></div>
+          <div class="mx-card" data-only="5"><h3>5. 밤 줍기</h3>
+            <p><span class="tag">표정</span>활짝 웃었다.</p><p><span class="tag">말</span>"내 가시가 이렇게 쓸모 있을 줄 몰랐어!"</p>
+            <p class="feel">마음: <span class="blank">뿌듯하다</span></p></div>
+          <p class="delta" data-ai="모형 수치">
+            <span data-show="k == 1">마음 그래프의 첫 점이다.</span>
+            <span data-show="k > 1 && d > 0">앞 장면보다 마음이 <output data-expr="abs(d)" data-unit="칸"></output> 올라갔다.</span>
+            <span data-show="k > 1 && d < 0">앞 장면보다 마음이 <output data-expr="abs(d)" data-unit="칸"></output> 내려갔다.</span>
+            <span class="model">(모형)</span></p>
+        </div>
+      </div>
+      <div class="ch-stops"></div>
+    </div>
+  </div>
+</section>
+
+<!-- 8 확인: 마음을 나타내는 낱말 -->
+<section class="slide" id="word" data-sec="마음 따라가기" data-title="알맞은 마음 낱말 고르기">
+  <h2>셋째 장면, 까슬이의 마음에 알맞은 낱말은?</h2>
+  <p class="q-lead">까슬이는 얼굴이 빨개져 나무 뒤에 숨었다. "나는 왜 가시가 이렇게 많을까?"</p>
+  <div class="quiz" data-cols="2" data-ai="문항과 풀이">
+    <button class="opt" data-why="설레는 마음은 첫째 장면처럼 기다려질 때 든다.">설렌다</button>
+    <button class="opt" data-ok data-why="맞다. 얼굴이 빨개지고 숨은 모습에서 부끄러운 마음을 알 수 있다.">부끄럽다</button>
+    <button class="opt" data-why="뿌듯한 마음은 다섯째 장면처럼 해낸 일이 자랑스러울 때 든다.">뿌듯하다</button>
+    <button class="opt" data-why="심심하면 숨지 않고 놀 거리를 찾을 것이다.">심심하다</button>
+  </div>
+</section>
+
+<!-- 9 익스플로라그램: 사건을 바꾸면 -->
+<section class="slide" id="change" data-sec="사건 바꾸기" data-title="넷째 장면을 바꾸면">
+  <h2>넷째 장면이 바뀌면 끝 마음도 바뀔까?</h2>
+  <div class="calc mb" data-ai="사건을 바꾼 이야기와 마음 그래프 모형"
+       data-let="m1 = 3; m2 = -1; m3 = -4;
+                 m4 = c == 1 ? 1 : c == 2 ? -2 : -5;
+                 m5 = c == 1 ? 4 : c == 2 ? 1 : -5;
+                 mt = t <= 1 ? m1 * t : t <= 2 ? m1 + (m2 - m1) * (t - 1) : t <= 3 ? m2 + (m3 - m2) * (t - 2) : t <= 4 ? m3 + (m4 - m3) * (t - 3) : m4 + (m5 - m4) * (t - 4);
+                 s = ceil(t);
+                 X0 = 296; U = 78; Y0 = 175; V = 25;
+                 x0 = X0; x1 = X0 + U * min(1, t); x2 = X0 + U * min(2, t); x3 = X0 + U * min(3, t); x4 = X0 + U * min(4, t); x5 = X0 + U * min(5, t);
+                 y0 = Y0; y1 = Y0 - V * (t >= 1 ? m1 : mt); y2 = Y0 - V * (t >= 2 ? m2 : mt); y3 = Y0 - V * (t >= 3 ? m3 : mt); y4 = Y0 - V * (t >= 4 ? m4 : mt); y5 = Y0 - V * (t >= 5 ? m5 : mt);
+                 pts = x0 + ',' + y0 + ' ' + x1 + ',' + y1 + ' ' + x2 + ',' + y2 + ' ' + x3 + ',' + y3 + ' ' + x4 + ',' + y4 + ' ' + x5 + ',' + y5">
+    <div>
+      <svg width="720" height="330" viewBox="0 0 720 330" aria-label="이야기를 재생하면 그려지는 까슬이의 마음 그래프와 얼굴">
+        <g transform="translate(-6 34) scale(.86)">
+          <g data-attr="transform: 'translate(150 178) scale(' + (1 + 0.025 * max(0, -mt - 2)) + ') translate(-150 -178)'">
+            <polygon points="10,158 36,151 16,134 43,132 28,111 55,114 43,92 69,99 63,75 87,86 86,62 107,77 110,53 128,71 137,48 150,69 163,48 172,71 190,53 193,77 214,62 213,86 237,75 231,99 257,92 245,114 272,111 257,132 284,134 264,151 290,158 268,171 292,182 267,192 289,206 262,212 280,230 253,230 267,251 241,247 250,270 225,262 230,286 207,273 206,298 186,281 181,305 165,286 154,309 143,286 128,307 121,283 102,301 100,276 78,290 81,266 56,276 64,252 38,258 50,236 23,237" fill="#7A5A3E"/>
+          </g>
+          <ellipse cx="150" cy="190" rx="96" ry="84" fill="#F4DDBA"/>
+          <ellipse cx="98" cy="212" rx="16" ry="10" fill="#EE7F6A" data-attr="opacity: 0.2 + 0.08 * abs(mt)"/>
+          <ellipse cx="202" cy="212" rx="16" ry="10" fill="#EE7F6A" data-attr="opacity: 0.2 + 0.08 * abs(mt)"/>
+          <ellipse cx="116" cy="176" rx="10" fill="#33291F" data-attr="ry: mt > 2.5 ? 11 - 4 * (mt - 2.5) : mt < -3 ? 7 : 11"/>
+          <ellipse cx="184" cy="176" rx="10" fill="#33291F" data-attr="ry: mt > 2.5 ? 11 - 4 * (mt - 2.5) : mt < -3 ? 7 : 11"/>
+          <line x1="102" y1="148" x2="130" y2="148" stroke="#5A4230" stroke-width="6" stroke-linecap="round" data-attr="transform: 'rotate(' + (mt < 0 ? 4 * mt : 0) + ' 116 148) translate(0 ' + (-2 * max(mt, 0)) + ')'"/>
+          <line x1="170" y1="148" x2="198" y2="148" stroke="#5A4230" stroke-width="6" stroke-linecap="round" data-attr="transform: 'rotate(' + (mt < 0 ? -4 * mt : 0) + ' 184 148) translate(0 ' + (-2 * max(mt, 0)) + ')'"/>
+          <circle cx="150" cy="204" r="9" fill="#33291F"/>
+          <path fill="none" stroke="#33291F" stroke-width="6" stroke-linecap="round" d="M120 234 Q150 234 180 234" data-attr="d: 'M120 234 Q150 ' + (234 + 8 * mt) + ' 180 234'"/>
+          <path d="M206 186 q8 16 0 22 q-8 -6 0 -22z" fill="#6FB2E0" data-attr="opacity: clamp(-mt - 4, 0, 1)"/>
+        </g>
+        <!-- 장면 칸 -->
+        <g class="strip">
+          <g data-class="on: s == 1"><rect x="354" y="6" width="40" height="38" rx="12" fill="#E3EFE2"/><text x="374" y="33" text-anchor="middle" fill="#2F6B45">1</text></g>
+          <g data-class="on: s == 2"><rect x="432" y="6" width="40" height="38" rx="12" fill="#E3EFE2"/><text x="452" y="33" text-anchor="middle" fill="#2F6B45">2</text></g>
+          <g data-class="on: s == 3"><rect x="510" y="6" width="40" height="38" rx="12" fill="#E3EFE2"/><text x="530" y="33" text-anchor="middle" fill="#2F6B45">3</text></g>
+          <g data-class="on: s == 4"><rect x="588" y="6" width="40" height="38" rx="12" fill="#E3EFE2"/><text x="608" y="33" text-anchor="middle" fill="#2F6B45">4</text></g>
+          <g data-class="on: s == 5"><rect x="666" y="6" width="40" height="38" rx="12" fill="#E3EFE2"/><text x="686" y="33" text-anchor="middle" fill="#2F6B45">5</text></g>
+        </g>
+        <rect x="290" y="50" width="428" height="262" rx="14" fill="#FFFFFF" stroke="#EADFCB" stroke-width="3"/>
+        <line x1="300" y1="175" x2="710" y2="175" stroke="#C9BBA2" stroke-width="2" stroke-dasharray="8 6"/>
+        <text x="300" y="76" font-size="21" fill="#6B5E52" font-weight="700">좋다</text>
+        <text x="300" y="302" font-size="21" fill="#6B5E52" font-weight="700">속상하다</text>
+        <polyline fill="none" stroke="#DD6648" stroke-width="6" stroke-linejoin="round" stroke-linecap="round" points="296,175 296,175 296,175 296,175 296,175 296,175" data-attr="points: pts"/>
+        <circle r="10" fill="#2F6B45" data-attr="cx: X0 + U * t; cy: Y0 - V * mt; opacity: t > 0 ? 1 : 0"/>
+      </svg>
+      <div class="mb-text" data-ai="바뀐 이야기 장면">
+        <p data-show="t == 0">「▶ 재생」을 누르고 이야기를 따라가 보자.</p>
+        <p data-show="s == 1">1. 소풍 가는 아침, 콧노래를 불렀다.</p>
+        <p data-show="s == 2">2. 풍선이 "펑!" 터졌다. 깜짝 놀랐다.</p>
+        <p data-show="s == 3">3. 친구들이 웃었다. 나무 뒤에 숨었다.</p>
+        <p data-show="s == 4 && c == 1">4. 토리가 밤나무를 가리키며 말을 걸었다.</p>
+        <p data-show="s == 4 && c == 2">4. 토리가 말없이 옆에 앉아 주었다.</p>
+        <p data-show="s == 4 && c == 3">4. 아무도 찾아오지 않았다.</p>
+        <p data-show="s == 5 && t < 5 && c == 1">5. 밤송이 위를 굴러 알밤을 잔뜩 주웠다.</p>
+        <p data-show="s == 5 && t < 5 && c == 2">5. 토리와 도시락을 나눠 먹었다.</p>
+        <p data-show="s == 5 && t < 5 && c == 3">5. 혼자 집으로 돌아갔다.</p>
+        <p class="end" data-show="t == 5 && c == 1">끝 마음: 뿌듯하다 (마음 점수 <output data-expr="m5"></output>, 모형)</p>
+        <p class="end" data-show="t == 5 && c == 2">끝 마음: 편안하다 (마음 점수 <output data-expr="m5"></output>, 모형)</p>
+        <p class="end" data-show="t == 5 && c == 3">끝 마음: 쓸쓸하다 (마음 점수 <output data-expr="m5"></output>, 모형)</p>
+      </div>
+    </div>
+    <div class="mb-ctrl">
+      <p class="lab">넷째 장면에서 일어난 일</p>
+      <button data-set="c" data-value="1" aria-pressed="true">1. 토리가 밤나무를 가리킨다</button>
+      <button data-set="c" data-value="2">2. 토리가 옆에 앉아 준다</button>
+      <button data-set="c" data-value="3">3. 아무도 찾아오지 않는다</button>
+      <p class="now">지금 <output data-expr="t == 0 ? '시작 전' : s + '번째 장면'"></output></p>
+      <input type="range" name="t" min="0" max="5" step="0.1" value="0" data-play="10" aria-label="이야기 시간">
+    </div>
+  </div>
+</section>
+
+<!-- 10 확인: 단서 나누기 -->
+<section class="slide" id="sort" data-sec="확인" data-title="단서 나누기">
+  <h2>이 단서는 말일까, 행동일까, 표정일까?</h2>
+  <div class="sort" data-ai="분류 카드와 풀이">
+    <div class="bin" data-bin="say"><h3>말</h3></div>
+    <div class="bin" data-bin="act"><h3>행동</h3></div>
+    <div class="bin" data-bin="face"><h3>표정</h3></div>
+    <span data-bin="act" data-why="몸을 움직여 한 일이니 행동이다." data-hint="까슬이가 무엇을 했는지 떠올려 보자.">몸을 동그랗게 말았다</span>
+    <span data-bin="say" data-why="까슬이가 소리 내어 한 말이다." data-hint="큰따옴표 안에 있는 글이다.">"나는 왜 가시가 이렇게 많을까?"</span>
+    <span data-bin="face" data-why="얼굴에 드러난 모습이니 표정이다." data-hint="얼굴의 어디가 어떻게 되었나?">눈이 반짝 빛났다</span>
+    <span data-bin="act" data-why="자리를 옮겨 한 일이니 행동이다." data-hint="까슬이가 어디로 갔나?">나무 뒤에 숨었다</span>
+    <span data-bin="face" data-why="웃는 얼굴은 표정이다." data-hint="얼굴에 무엇이 나타났나?">활짝 웃었다</span>
+    <span data-bin="say" data-why="이것도 까슬이가 한 말이다." data-hint="누가 소리 내어 말했나?">"내 가시가 이렇게 쓸모 있을 줄 몰랐어!"</span>
+  </div>
+</section>
+
+<!-- 11 확인: 마음이 가장 크게 바뀐 곳 -->
+<section class="slide" id="turn" data-sec="확인" data-title="마음이 가장 크게 바뀐 사건">
+  <h2>까슬이의 마음을 가장 크게 바꾼 일은?</h2>
+  <p class="q-lead">7쪽의 마음 그래프에서 가장 가파르게 오르거나 내린 곳을 찾아보자.</p>
+  <div class="quiz" data-ai="문항과 풀이(모형 점수에서 나온 답)">
+    <button class="opt" data-why="풍선이 터질 때는 4칸 내려갔다.">풍선이 "펑!" 터졌다.</button>
+    <button class="opt" data-why="친구들이 웃을 때는 3칸 내려갔다.">친구들이 깔깔 웃었다.</button>
+    <button class="opt" data-ok data-why="맞다. 토리의 말을 듣고 5칸이나 올라갔다. 부끄러움이 기대로 바뀌었다.">토리가 밤나무 이야기를 했다.</button>
+    <button class="opt" data-why="알밤을 주울 때는 3칸 올라갔다.">알밤을 잔뜩 주웠다.</button>
+  </div>
+</section>
+
+<!-- 12 정리 -->
+<section class="slide" id="summary" data-sec="정리" data-title="정리">
+  <h2>오늘 배운 것</h2>
+  <ul class="sum">
+    <li>인물의 마음은 <span class="blank">말</span>, <span class="blank">행동</span>, <span class="blank">표정</span>을 보고 짐작한다.</li>
+    <li>이야기에서 <span class="blank">사건</span>이 일어나면 인물의 마음이 바뀐다.</li>
+  </ul>
+  <div class="short" data-ph="예: 나라면 ○○해서 ○○했을 것이다." data-ai="정리 물음">
+    <p class="ask">내가 까슬이라면 마지막 장면에서 어떤 마음이 들었을까?<br>마음을 나타내는 낱말을 넣어 한 문장으로 써 보자.</p>
+  </div>
+</section>
+
+</body>
+</html>

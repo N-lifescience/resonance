@@ -1,0 +1,150 @@
+[
+ {
+  "slide": 1,
+  "name": "view"
+ },
+ {
+  "slide": 2,
+  "name": "view"
+ },
+ {
+  "slide": 3,
+  "name": "view"
+ },
+ {
+  "slide": 4,
+  "name": "view"
+ },
+ {
+  "slide": 5,
+  "name": "view"
+ },
+ {
+  "slide": 6,
+  "name": "view"
+ },
+ {
+  "slide": 7,
+  "name": "view"
+ },
+ {
+  "slide": 7,
+  "name": "k0",
+  "js": "const r = document.querySelector('#mood .ch-stops input'); r.value = 0; r.dispatchEvent(new Event('input', { bubbles: true }))"
+ },
+ {
+  "slide": 7,
+  "name": "k1",
+  "js": "const r = document.querySelector('#mood .ch-stops input'); r.value = 1; r.dispatchEvent(new Event('input', { bubbles: true }))"
+ },
+ {
+  "slide": 7,
+  "name": "k2",
+  "js": "const r = document.querySelector('#mood .ch-stops input'); r.value = 2; r.dispatchEvent(new Event('input', { bubbles: true }))"
+ },
+ {
+  "slide": 7,
+  "name": "k3",
+  "js": "const r = document.querySelector('#mood .ch-stops input'); r.value = 3; r.dispatchEvent(new Event('input', { bubbles: true }))"
+ },
+ {
+  "slide": 7,
+  "name": "k4",
+  "js": "const r = document.querySelector('#mood .ch-stops input'); r.value = 4; r.dispatchEvent(new Event('input', { bubbles: true }))"
+ },
+ {
+  "slide": 7,
+  "name": "k5",
+  "js": "const r = document.querySelector('#mood .ch-stops input'); r.value = 5; r.dispatchEvent(new Event('input', { bubbles: true }))"
+ },
+ {
+  "slide": 8,
+  "name": "view"
+ },
+ {
+  "slide": 9,
+  "name": "view"
+ },
+ {
+  "slide": 9,
+  "name": "start",
+  "js": "const r = document.querySelector('#change input[name=t]'); r.value = 0; r.dispatchEvent(new Event('input', { bubbles: true }));"
+ },
+ {
+  "slide": 9,
+  "name": "c1-t1.5",
+  "js": "document.querySelector('#change [data-set=c][data-value=\"1\"]').click();const r = document.querySelector('#change input[name=t]'); r.value = 1.5; r.dispatchEvent(new Event('input', { bubbles: true }));"
+ },
+ {
+  "slide": 9,
+  "name": "c1-t3.5",
+  "js": "document.querySelector('#change [data-set=c][data-value=\"1\"]').click();const r = document.querySelector('#change input[name=t]'); r.value = 3.5; r.dispatchEvent(new Event('input', { bubbles: true }));"
+ },
+ {
+  "slide": 9,
+  "name": "c1-t4.5",
+  "js": "document.querySelector('#change [data-set=c][data-value=\"1\"]').click();const r = document.querySelector('#change input[name=t]'); r.value = 4.5; r.dispatchEvent(new Event('input', { bubbles: true }));"
+ },
+ {
+  "slide": 9,
+  "name": "c1-t5",
+  "js": "document.querySelector('#change [data-set=c][data-value=\"1\"]').click();const r = document.querySelector('#change input[name=t]'); r.value = 5; r.dispatchEvent(new Event('input', { bubbles: true }));"
+ },
+ {
+  "slide": 9,
+  "name": "c2-t1.5",
+  "js": "document.querySelector('#change [data-set=c][data-value=\"2\"]').click();const r = document.querySelector('#change input[name=t]'); r.value = 1.5; r.dispatchEvent(new Event('input', { bubbles: true }));"
+ },
+ {
+  "slide": 9,
+  "name": "c2-t3.5",
+  "js": "document.querySelector('#change [data-set=c][data-value=\"2\"]').click();const r = document.querySelector('#change input[name=t]'); r.value = 3.5; r.dispatchEvent(new Event('input', { bubbles: true }));"
+ },
+ {
+  "slide": 9,
+  "name": "c2-t4.5",
+  "js": "document.querySelector('#change [data-set=c][data-value=\"2\"]').click();const r = document.querySelector('#change input[name=t]'); r.value = 4.5; r.dispatchEvent(new Event('input', { bubbles: true }));"
+ },
+ {
+  "slide": 9,
+  "name": "c2-t5",
+  "js": "document.querySelector('#change [data-set=c][data-value=\"2\"]').click();const r = document.querySelector('#change input[name=t]'); r.value = 5; r.dispatchEvent(new Event('input', { bubbles: true }));"
+ },
+ {
+  "slide": 9,
+  "name": "c3-t1.5",
+  "js": "document.querySelector('#change [data-set=c][data-value=\"3\"]').click();const r = document.querySelector('#change input[name=t]'); r.value = 1.5; r.dispatchEvent(new Event('input', { bubbles: true }));"
+ },
+ {
+  "slide": 9,
+  "name": "c3-t3.5",
+  "js": "document.querySelector('#change [data-set=c][data-value=\"3\"]').click();const r = document.querySelector('#change input[name=t]'); r.value = 3.5; r.dispatchEvent(new Event('input', { bubbles: true }));"
+ },
+ {
+  "slide": 9,
+  "name": "c3-t4.5",
+  "js": "document.querySelector('#change [data-set=c][data-value=\"3\"]').click();const r = document.querySelector('#change input[name=t]'); r.value = 4.5; r.dispatchEvent(new Event('input', { bubbles: true }));"
+ },
+ {
+  "slide": 9,
+  "name": "c3-t5",
+  "js": "document.querySelector('#change [data-set=c][data-value=\"3\"]').click();const r = document.querySelector('#change input[name=t]'); r.value = 5; r.dispatchEvent(new Event('input', { bubbles: true }));"
+ },
+ {
+  "slide": 9,
+  "name": "back",
+  "js": "document.querySelector('#change [data-set=c][data-value=\"1\"]').click();const r = document.querySelector('#change input[name=t]'); r.value = 0; r.dispatchEvent(new Event('input', { bubbles: true }));"
+ },
+ {
+  "slide": 10,
+  "name": "view"
+ },
+ {
+  "slide": 11,
+  "name": "view"
+ },
+ {
+  "slide": 12,
+  "name": "view"
+ }
+]

@@ -1,0 +1,161 @@
+[
+ {
+  "slide": 1,
+  "name": "view"
+ },
+ {
+  "slide": 2,
+  "name": "view"
+ },
+ {
+  "slide": 3,
+  "name": "view"
+ },
+ {
+  "slide": 4,
+  "name": "view"
+ },
+ {
+  "slide": 5,
+  "name": "view"
+ },
+ {
+  "slide": 5,
+  "name": "r5",
+  "js": "{ const r = document.querySelector('#mix input[name=R]'); r.value = 5; r.dispatchEvent(new Event('input', { bubbles: true })); }{ const r = document.querySelector('#mix input[name=Y]'); r.value = 0; r.dispatchEvent(new Event('input', { bubbles: true })); }{ const r = document.querySelector('#mix input[name=U]'); r.value = 0; r.dispatchEvent(new Event('input', { bubbles: true })); }"
+ },
+ {
+  "slide": 5,
+  "name": "ry",
+  "js": "{ const r = document.querySelector('#mix input[name=R]'); r.value = 5; r.dispatchEvent(new Event('input', { bubbles: true })); }{ const r = document.querySelector('#mix input[name=Y]'); r.value = 5; r.dispatchEvent(new Event('input', { bubbles: true })); }{ const r = document.querySelector('#mix input[name=U]'); r.value = 0; r.dispatchEvent(new Event('input', { bubbles: true })); }"
+ },
+ {
+  "slide": 5,
+  "name": "r2y1",
+  "js": "{ const r = document.querySelector('#mix input[name=R]'); r.value = 2; r.dispatchEvent(new Event('input', { bubbles: true })); }{ const r = document.querySelector('#mix input[name=Y]'); r.value = 1; r.dispatchEvent(new Event('input', { bubbles: true })); }{ const r = document.querySelector('#mix input[name=U]'); r.value = 0; r.dispatchEvent(new Event('input', { bubbles: true })); }"
+ },
+ {
+  "slide": 5,
+  "name": "y4b2",
+  "js": "{ const r = document.querySelector('#mix input[name=R]'); r.value = 0; r.dispatchEvent(new Event('input', { bubbles: true })); }{ const r = document.querySelector('#mix input[name=Y]'); r.value = 4; r.dispatchEvent(new Event('input', { bubbles: true })); }{ const r = document.querySelector('#mix input[name=U]'); r.value = 2; r.dispatchEvent(new Event('input', { bubbles: true })); }"
+ },
+ {
+  "slide": 5,
+  "name": "y2b4",
+  "js": "{ const r = document.querySelector('#mix input[name=R]'); r.value = 0; r.dispatchEvent(new Event('input', { bubbles: true })); }{ const r = document.querySelector('#mix input[name=Y]'); r.value = 2; r.dispatchEvent(new Event('input', { bubbles: true })); }{ const r = document.querySelector('#mix input[name=U]'); r.value = 4; r.dispatchEvent(new Event('input', { bubbles: true })); }"
+ },
+ {
+  "slide": 5,
+  "name": "rb",
+  "js": "{ const r = document.querySelector('#mix input[name=R]'); r.value = 5; r.dispatchEvent(new Event('input', { bubbles: true })); }{ const r = document.querySelector('#mix input[name=Y]'); r.value = 0; r.dispatchEvent(new Event('input', { bubbles: true })); }{ const r = document.querySelector('#mix input[name=U]'); r.value = 5; r.dispatchEvent(new Event('input', { bubbles: true })); }"
+ },
+ {
+  "slide": 5,
+  "name": "all",
+  "js": "{ const r = document.querySelector('#mix input[name=R]'); r.value = 5; r.dispatchEvent(new Event('input', { bubbles: true })); }{ const r = document.querySelector('#mix input[name=Y]'); r.value = 5; r.dispatchEvent(new Event('input', { bubbles: true })); }{ const r = document.querySelector('#mix input[name=U]'); r.value = 5; r.dispatchEvent(new Event('input', { bubbles: true })); }"
+ },
+ {
+  "slide": 5,
+  "name": "all-r",
+  "js": "{ const r = document.querySelector('#mix input[name=R]'); r.value = 10; r.dispatchEvent(new Event('input', { bubbles: true })); }{ const r = document.querySelector('#mix input[name=Y]'); r.value = 3; r.dispatchEvent(new Event('input', { bubbles: true })); }{ const r = document.querySelector('#mix input[name=U]'); r.value = 2; r.dispatchEvent(new Event('input', { bubbles: true })); }"
+ },
+ {
+  "slide": 5,
+  "name": "max",
+  "js": "{ const r = document.querySelector('#mix input[name=R]'); r.value = 10; r.dispatchEvent(new Event('input', { bubbles: true })); }{ const r = document.querySelector('#mix input[name=Y]'); r.value = 10; r.dispatchEvent(new Event('input', { bubbles: true })); }{ const r = document.querySelector('#mix input[name=U]'); r.value = 10; r.dispatchEvent(new Event('input', { bubbles: true })); }"
+ },
+ {
+  "slide": 5,
+  "name": "zero",
+  "js": "{ const r = document.querySelector('#mix input[name=R]'); r.value = 0; r.dispatchEvent(new Event('input', { bubbles: true })); }{ const r = document.querySelector('#mix input[name=Y]'); r.value = 0; r.dispatchEvent(new Event('input', { bubbles: true })); }{ const r = document.querySelector('#mix input[name=U]'); r.value = 0; r.dispatchEvent(new Event('input', { bubbles: true })); }"
+ },
+ {
+  "slide": 6,
+  "name": "view"
+ },
+ {
+  "slide": 7,
+  "name": "view"
+ },
+ {
+  "slide": 8,
+  "name": "view"
+ },
+ {
+  "slide": 8,
+  "name": "c1-w0-k0",
+  "js": "document.querySelector('#tint [data-set=c][data-value=\"1\"]').click();{ const r = document.querySelector('#tint input[name=W]'); r.value = 0; r.dispatchEvent(new Event('input', { bubbles: true })); }{ const r = document.querySelector('#tint input[name=K]'); r.value = 0; r.dispatchEvent(new Event('input', { bubbles: true })); }"
+ },
+ {
+  "slide": 8,
+  "name": "c1-w10-k0",
+  "js": "document.querySelector('#tint [data-set=c][data-value=\"1\"]').click();{ const r = document.querySelector('#tint input[name=W]'); r.value = 10; r.dispatchEvent(new Event('input', { bubbles: true })); }{ const r = document.querySelector('#tint input[name=K]'); r.value = 0; r.dispatchEvent(new Event('input', { bubbles: true })); }"
+ },
+ {
+  "slide": 8,
+  "name": "c1-w0-k10",
+  "js": "document.querySelector('#tint [data-set=c][data-value=\"1\"]').click();{ const r = document.querySelector('#tint input[name=W]'); r.value = 0; r.dispatchEvent(new Event('input', { bubbles: true })); }{ const r = document.querySelector('#tint input[name=K]'); r.value = 10; r.dispatchEvent(new Event('input', { bubbles: true })); }"
+ },
+ {
+  "slide": 8,
+  "name": "c1-w10-k10",
+  "js": "document.querySelector('#tint [data-set=c][data-value=\"1\"]').click();{ const r = document.querySelector('#tint input[name=W]'); r.value = 10; r.dispatchEvent(new Event('input', { bubbles: true })); }{ const r = document.querySelector('#tint input[name=K]'); r.value = 10; r.dispatchEvent(new Event('input', { bubbles: true })); }"
+ },
+ {
+  "slide": 8,
+  "name": "c3-w0-k0",
+  "js": "document.querySelector('#tint [data-set=c][data-value=\"3\"]').click();{ const r = document.querySelector('#tint input[name=W]'); r.value = 0; r.dispatchEvent(new Event('input', { bubbles: true })); }{ const r = document.querySelector('#tint input[name=K]'); r.value = 0; r.dispatchEvent(new Event('input', { bubbles: true })); }"
+ },
+ {
+  "slide": 8,
+  "name": "c3-w10-k0",
+  "js": "document.querySelector('#tint [data-set=c][data-value=\"3\"]').click();{ const r = document.querySelector('#tint input[name=W]'); r.value = 10; r.dispatchEvent(new Event('input', { bubbles: true })); }{ const r = document.querySelector('#tint input[name=K]'); r.value = 0; r.dispatchEvent(new Event('input', { bubbles: true })); }"
+ },
+ {
+  "slide": 8,
+  "name": "c3-w0-k10",
+  "js": "document.querySelector('#tint [data-set=c][data-value=\"3\"]').click();{ const r = document.querySelector('#tint input[name=W]'); r.value = 0; r.dispatchEvent(new Event('input', { bubbles: true })); }{ const r = document.querySelector('#tint input[name=K]'); r.value = 10; r.dispatchEvent(new Event('input', { bubbles: true })); }"
+ },
+ {
+  "slide": 8,
+  "name": "c3-w10-k10",
+  "js": "document.querySelector('#tint [data-set=c][data-value=\"3\"]').click();{ const r = document.querySelector('#tint input[name=W]'); r.value = 10; r.dispatchEvent(new Event('input', { bubbles: true })); }{ const r = document.querySelector('#tint input[name=K]'); r.value = 10; r.dispatchEvent(new Event('input', { bubbles: true })); }"
+ },
+ {
+  "slide": 8,
+  "name": "c5-w0-k0",
+  "js": "document.querySelector('#tint [data-set=c][data-value=\"5\"]').click();{ const r = document.querySelector('#tint input[name=W]'); r.value = 0; r.dispatchEvent(new Event('input', { bubbles: true })); }{ const r = document.querySelector('#tint input[name=K]'); r.value = 0; r.dispatchEvent(new Event('input', { bubbles: true })); }"
+ },
+ {
+  "slide": 8,
+  "name": "c5-w10-k0",
+  "js": "document.querySelector('#tint [data-set=c][data-value=\"5\"]').click();{ const r = document.querySelector('#tint input[name=W]'); r.value = 10; r.dispatchEvent(new Event('input', { bubbles: true })); }{ const r = document.querySelector('#tint input[name=K]'); r.value = 0; r.dispatchEvent(new Event('input', { bubbles: true })); }"
+ },
+ {
+  "slide": 8,
+  "name": "c5-w0-k10",
+  "js": "document.querySelector('#tint [data-set=c][data-value=\"5\"]').click();{ const r = document.querySelector('#tint input[name=W]'); r.value = 0; r.dispatchEvent(new Event('input', { bubbles: true })); }{ const r = document.querySelector('#tint input[name=K]'); r.value = 10; r.dispatchEvent(new Event('input', { bubbles: true })); }"
+ },
+ {
+  "slide": 8,
+  "name": "c5-w10-k10",
+  "js": "document.querySelector('#tint [data-set=c][data-value=\"5\"]').click();{ const r = document.querySelector('#tint input[name=W]'); r.value = 10; r.dispatchEvent(new Event('input', { bubbles: true })); }{ const r = document.querySelector('#tint input[name=K]'); r.value = 10; r.dispatchEvent(new Event('input', { bubbles: true })); }"
+ },
+ {
+  "slide": 8,
+  "name": "c6-w4",
+  "js": "document.querySelector('#tint [data-set=c][data-value=\"6\"]').click();{ const r = document.querySelector('#tint input[name=W]'); r.value = 4; r.dispatchEvent(new Event('input', { bubbles: true })); }{ const r = document.querySelector('#tint input[name=K]'); r.value = 0; r.dispatchEvent(new Event('input', { bubbles: true })); }"
+ },
+ {
+  "slide": 9,
+  "name": "view"
+ },
+ {
+  "slide": 10,
+  "name": "view"
+ },
+ {
+  "slide": 11,
+  "name": "view"
+ }
+]

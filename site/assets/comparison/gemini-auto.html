@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>중학교 과학 · 입자의 운동 - 냄새는 어떻게 퍼질까?</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+            user-select: none;
+        }
+        .slide {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+        .slide.active {
+            display: flex;
+            opacity: 1;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between overflow-x-hidden">
+
+    <!-- Top Header -->
+    <header class="bg-slate-800/80 backdrop-blur border-b border-slate-700 px-6 py-3 flex justify-between items-center z-50">
+        <div class="flex items-center gap-3">
+            <span class="bg-indigo-600 text-xs font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">중학교 과학</span>
+            <h1 class="text-lg font-bold text-slate-100 hidden md:block">단원: 입자의 운동 · 냄새는 어떻게 퍼질까?</h1>
+        </div>
+        <div class="flex items-center gap-4">
+            <span id="slide-indicator" class="text-sm font-semibold text-indigo-400 bg-slate-900/60 px-3 py-1 rounded-lg border border-slate-700">
+                1 / 10
+            </span>
+            <button id="btn-fullscreen" class="p-2 hover:bg-slate-700 rounded-lg text-slate-300 transition" title="전체화면">
+                <i class="fa-solid fa-expand"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Presentation Container -->
+    <main class="flex-1 flex justify-center items-center p-4 md:p-6 relative max-w-7xl mx-auto w-full">
+
+        <!-- SLIDE 1: Cover & Learning Objectives -->
+        <section id="slide-1" class="slide active flex-col w-full bg-slate-800 border border-slate-700 rounded-2xl p-6 md:p-10 shadow-2xl space-y-6">
+            <div class="text-center space-y-2">
+                <span class="text-indigo-400 font-semibold text-lg">단원 III. 입자의 운동</span>
+                <h2 class="text-3xl md:text-5xl font-extrabold text-white tracking-tight">냄새는 어떻게 퍼질까?</h2>
+                <p class="text-slate-400 text-lg">확산과 입자의 운동</p>
+            </div>
+
+            <div class="bg-slate-900/70 border border-indigo-500/30 rounded-xl p-6 md:p-8 space-y-4 max-w-3xl mx-auto w-full shadow-inner">
+                <h3 class="text-xl font-bold text-indigo-300 flex items-center gap-2 border-b border-slate-700 pb-3">
+                    <i class="fa-solid fa-bullseye text-indigo-400"></i> 오늘의 학습 목표
+                </h3>
+                <ul class="space-y-4 text-slate-200 text-base md:text-lg">
+                    <li class="flex items-start gap-3">
+                        <span class="flex items-center justify-center bg-indigo-600 text-white font-bold rounded-full w-7 h-7 text-sm flex-shrink-0 mt-0.5">1</span>
+                        <span><strong>확산 현상</strong>을 입자의 운동으로 설명할 수 있다.</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="flex items-center justify-center bg-indigo-600 text-white font-bold rounded-full w-7 h-7 text-sm flex-shrink-0 mt-0.5">2</span>
+                        <span><strong>온도에 따라 확산 빠르기가 달라지는 까닭</strong>을 입자의 운동으로 설명할 수 있다.</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="flex justify-center pt-4">
+                <button onclick="goToSlide(2)" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-8 py-3 rounded-xl transition flex items-center gap-2 text-lg shadow-lg shadow-indigo-600/30">
+                    수업 시작하기 <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- SLIDE 2: Thought Opening & Canvas Sim -->
+        <section id="slide-2" class="slide flex-col w-full bg-slate-800 border border-slate-700 rounded-2xl p-6 md:p-8 shadow-2xl space-y-4">
+            <div class="border-b border-slate-700 pb-3">
+                <span class="text-xs font-bold text-indigo-400 uppercase tracking-widest">생각 열기</span>
+                <h2 class="text-2xl md:text-3xl font-bold text-white">교실 앞에서 향수 뚜껑을 열면?</h2>
+            </div>
+
+            <p class="text-slate-300 text-base md:text-lg">
+                교탁에서 향수병 뚜껑을 열면 잠시 뒤 맨 뒷자리 학생도 냄새를 맡을 수 있습니다. <br class="hidden md:block">
+                <span class="text-indigo-300 font-semibold">창문을 모두 닫아 바람이 없는데도 냄새가 퍼지는 이유는 무엇일까요?</span>
+            </p>
+
+            <div class="relative bg-slate-950 border border-slate-700 rounded-xl overflow-hidden h-72 md:h-80 w-full flex flex-col justify-between p-4">
+                <canvas id="perfumeCanvas" class="absolute inset-0 w-full h-full"></canvas>
+                
+                <div class="relative z-10 flex justify-between items-start pointer-events-none">
+                    <span class="bg-slate-900/80 backdrop-blur px-3 py-1 rounded-md text-xs text-slate-300 border border-slate-700">
+                        <i class="fa-solid fa-flask text-indigo-400"></i> 교탁 (교실 앞)
+                    </span>
+                    <span class="bg-slate-900/80 backdrop-blur px-3 py-1 rounded-md text-xs text-slate-300 border border-slate-700">
+                        <i class="fa-solid fa-user text-emerald-400"></i> 학생 (교실 뒤)
+                    </span>
+                </div>
+
+                <div class="relative z-10 flex justify-center items-center gap-4">
+                    <button id="btn-perfume-open" onclick="openPerfumeBottle()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition shadow-md flex items-center gap-2">
+                        <i class="fa-solid fa-wine-bottle"></i> 향수 뚜껑 열기
+                    </button>
+                    <button onclick="resetPerfumeSim()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-sm font-semibold px-4 py-2.5 rounded-lg transition">
+                        <i class="fa-solid fa-rotate-left"></i> 초기화
+                    </button>
+                </div>
+            </div>
+            
+            <div id="perfume-status" class="bg-slate-900/60 p-3 rounded-lg border border-slate-700 text-center text-sm text-slate-400">
+                버튼을 눌러 향수 입자가 스스로 어떻게 움직이는지 관찰해 보세요.
+            </div>
+        </section>
+
+        <!-- SLIDE 3: Concept 1 - Diffusion Definition -->
+        <section id="slide-3" class="slide flex-col w-full bg-slate-800 border border-slate-700 rounded-2xl p-6 md:p-8 shadow-2xl space-y-6">
+            <div class="border-b border-slate-700 pb-3">
+                <span class="text-xs font-bold text-indigo-400 uppercase tracking-widest">개념 학습</span>
+                <h2 class="text-2xl md:text-3xl font-bold text-white">확산(Diffusion)이란?</h2>
+            </div>
+
+            <div class="bg-indigo-950/40 border-l-4 border-indigo-500 p-5 rounded-r-xl space-y-2">
+                <h3 class="text-xl font-bold text-indigo-300">정의</h3>
+                <p class="text-slate-200 text-lg leading-relaxed">
+                    물질을 이루는 <span class="text-amber-300 font-bold underline decoration-amber-400">입자가 스스로 움직여</span> 다른 물질 속으로 퍼져 나가는 현상
+                </p>
+                <p class="text-sm text-slate-400 mt-1">
+                    <i class="fa-solid fa-circle-info text-indigo-400"></i> 외부에서 바람을 불어주지 않아도, 입자 자체의 **끊임없는 운동** 때문에 일어납니다.
+                </p>
+            </div>
+
+            <div class="space-y-3">
+                <h3 class="text-lg font-bold text-slate-200">일상 생활 속 확산의 예</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 flex flex-col items-center text-center space-y-2 hover:border-indigo-500 transition">
+                        <div class="w-12 h-12 bg-indigo-900/50 text-indigo-400 rounded-full flex items-center justify-center text-2xl">
+                            <i class="fa-solid fa-spray-can"></i>
+                        </div>
+                        <h4 class="font-bold text-slate-100">향수 냄새 퍼짐</h4>
+                        <p class="text-xs text-slate-400">향수 입자가 공기 속으로 스스로 퍼져나갑니다.</p>
+                    </div>
+
+                    <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 flex flex-col items-center text-center space-y-2 hover:border-indigo-500 transition">
+                        <div class="w-12 h-12 bg-indigo-900/50 text-indigo-400 rounded-full flex items-center justify-center text-2xl">
+                            <i class="fa-solid fa-droplet"></i>
+                        </div>
+                        <h4 class="font-bold text-slate-100">물속 잉크 확산</h4>
+                        <p class="text-xs text-slate-400">물이 가만히 있어도 잉크가 물 전체로 고르게 퍼집니다.</p>
+                    </div>
+
+                    <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 flex flex-col items-center text-center space-y-2 hover:border-indigo-500 transition">
+                        <div class="w-12 h-12 bg-indigo-900/50 text-indigo-400 rounded-full flex items-center justify-center text-2xl">
+                            <i class="fa-solid fa-mug-hot"></i>
+                        </div>
+                        <h4 class="font-bold text-slate-100">차(Tea) 퍼짐</h4>
+                        <p class="text-xs text-slate-400">티백을 물에 넣으면 저어주지 않아도 물색이 진해집니다.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 4: Concept 2 - Ink Particle View -->
+        <section id="slide-4" class="slide flex-col w-full bg-slate-800 border border-slate-700 rounded-2xl p-6 md:p-8 shadow-2xl space-y-4">
+            <div class="border-b border-slate-700 pb-3">
+                <span class="text-xs font-bold text-indigo-400 uppercase tracking-widest">개념 시각화</span>
+                <h2 class="text-2xl md:text-3xl font-bold text-white">잉크가 퍼지는 모습을 입자로 나타내면</h2>
+            </div>
+
+            <p class="text-slate-300 text-sm md:text-base">
+                잉크 입자(빨간색)와 물 입자(파란색)가 모두 스스로 끊임없이 움직이기 때문에 시간이 지나면 고르게 섞이게 됩니다.
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- Time step 1 -->
+                <div class="bg-slate-900 p-3 rounded-xl border border-slate-700 flex flex-col items-center space-y-2">
+                    <span class="text-xs font-bold bg-slate-800 text-indigo-300 px-3 py-1 rounded-full border border-slate-700">처음</span>
+                    <canvas id="canvas-step-1" width="200" height="180" class="bg-slate-950 rounded-lg border border-slate-800 w-full h-40"></canvas>
+                    <p class="text-xs text-slate-400 text-center">잉크 입자가 한곳에 뭉쳐 있음</p>
+                </div>
+
+                <!-- Time step 2 -->
+                <div class="bg-slate-900 p-3 rounded-xl border border-slate-700 flex flex-col items-center space-y-2">
+                    <span class="text-xs font-bold bg-slate-800 text-indigo-300 px-3 py-1 rounded-full border border-slate-700">1분 뒤</span>
+                    <canvas id="canvas-step-2" width="200" height="180" class="bg-slate-950 rounded-lg border border-slate-800 w-full h-40"></canvas>
+                    <p class="text-xs text-slate-400 text-center">잉크 입자가 주변으로 퍼지기 시작</p>
+                </div>
+
+                <!-- Time step 3 -->
+                <div class="bg-slate-900 p-3 rounded-xl border border-slate-700 flex flex-col items-center space-y-2">
+                    <span class="text-xs font-bold bg-slate-800 text-indigo-300 px-3 py-1 rounded-full border border-slate-700">5분 뒤</span>
+                    <canvas id="canvas-step-3" width="200" height="180" class="bg-slate-950 rounded-lg border border-slate-800 w-full h-40"></canvas>
+                    <p class="text-xs text-slate-400 text-center">잉크 입자가 전체에 고르게 퍼짐</p>
+                </div>
+            </div>
+
+            <div class="bg-slate-900/60 p-3 rounded-lg border border-slate-700 text-center text-sm text-indigo-300">
+                <i class="fa-solid fa-lightbulb text-amber-400"></i> 핵심: 입자들이 **스스로 정해진 방향 없이 무작위로 움직이기 때문**에 전체로 퍼집니다.
+            </div>
+        </section>
+
+        <!-- SLIDE 5: Experiment Setup & Virtual Lab -->
+        <section id="slide-5" class="slide flex-col w-full bg-slate-800 border border-slate-700 rounded-2xl p-6 md:p-8 shadow-2xl space-y-4">
+            <div class="border-b border-slate-700 pb-3 flex justify-between items-center">
+                <div>
+                    <span class="text-xs font-bold text-emerald-400 uppercase tracking-widest">탐구 실험</span>
+                    <h2 class="text-2xl md:text-3xl font-bold text-white">가상 실험: 물의 온도와 확산</h2>
+                </div>
+                <div class="text-right">
+                    <span class="text-xs text-slate-400">실험 타이머</span>
+                    <div id="exp-timer" class="text-xl font-mono font-bold text-emerald-400">00:00 초</div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Cold Water Beaker -->
+                <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 flex flex-col items-center space-y-3 relative">
+                    <div class="flex justify-between w-full items-center">
+                        <span class="text-sm font-bold text-cyan-400"><i class="fa-solid fa-snowflake"></i> 찬물 (10 ℃)</span>
+                        <span id="status-cold" class="text-xs text-slate-400 bg-slate-800 px-2 py-1 rounded">대기 중</span>
+                    </div>
+                    <canvas id="canvas-cold" width="260" height="200" class="bg-slate-950 rounded-lg border border-cyan-900/50 w-full h-48"></canvas>
+                </div>
+
+                <!-- Warm Water Beaker -->
+                <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 flex flex-col items-center space-y-3 relative">
+                    <div class="flex justify-between w-full items-center">
+                        <span class="text-sm font-bold text-rose-400"><i class="fa-solid fa-fire"></i> 따뜻한 물 (60 ℃)</span>
+                        <span id="status-warm" class="text-xs text-slate-400 bg-slate-800 px-2 py-1 rounded">대기 중</span>
+                    </div>
+                    <canvas id="canvas-warm" width="260" height="200" class="bg-slate-950 rounded-lg border border-rose-900/50 w-full h-48"></canvas>
+                </div>
+            </div>
+
+            <!-- Experiment Control Buttons -->
+            <div class="flex justify-center gap-4 pt-2">
+                <button id="btn-start-exp" onclick="startDiffusionExperiment()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-6 py-2.5 rounded-lg transition flex items-center gap-2 shadow-lg shadow-emerald-600/30">
+                    <i class="fa-solid fa-play"></i> 잉크 동시에 떨어뜨리기
+                </button>
+                <button onclick="resetDiffusionExperiment()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 font-semibold px-5 py-2.5 rounded-lg transition">
+                    <i class="fa-solid fa-rotate-left"></i> 실험 재설정
+                </button>
+            </div>
+        </section>
+
+        <!-- SLIDE 6: Experiment Data & Graph -->
+        <section id="slide-6" class="slide flex-col w-full bg-slate-800 border border-slate-700 rounded-2xl p-6 md:p-8 shadow-2xl space-y-4">
+            <div class="border-b border-slate-700 pb-3">
+                <span class="text-xs font-bold text-emerald-400 uppercase tracking-widest">실험 결과 분석</span>
+                <h2 class="text-2xl md:text-3xl font-bold text-white">온도에 따른 확산 시간 측정 그래프</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                <!-- Data Table -->
+                <div class="space-y-3">
+                    <h3 class="text-sm font-bold text-slate-300">실험 결과 데이터 표</h3>
+                    <div class="overflow-x-auto rounded-xl border border-slate-700">
+                        <table class="w-full text-sm text-center text-slate-200">
+                            <thead class="bg-slate-900 text-indigo-300 border-b border-slate-700">
+                                <tr>
+                                    <th class="py-2.5 px-3">물의 온도 (℃)</th>
+                                    <th class="py-2.5 px-3">잉크가 고르게 퍼진 시간 (초)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-700/50 bg-slate-900/40">
+                                <tr class="hover:bg-slate-800/50">
+                                    <td class="py-2 px-3 font-semibold text-cyan-300">10 ℃</td>
+                                    <td class="py-2 px-3 font-mono">360 초</td>
+                                </tr>
+                                <tr class="hover:bg-slate-800/50">
+                                    <td class="py-2 px-3 font-semibold text-teal-300">20 ℃</td>
+                                    <td class="py-2 px-3 font-mono">260 초</td>
+                                </tr>
+                                <tr class="hover:bg-slate-800/50">
+                                    <td class="py-2 px-3 font-semibold text-amber-300">40 ℃</td>
+                                    <td class="py-2 px-3 font-mono">160 초</td>
+                                </tr>
+                                <tr class="hover:bg-slate-800/50">
+                                    <td class="py-2 px-3 font-semibold text-rose-300">60 ℃</td>
+                                    <td class="py-2 px-3 font-mono">110 초</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="text-xs text-slate-400">※ 실제 측정값은 용기의 크기 및 잉크의 양에 따라 차이가 날 수 있습니다.</p>
+                </div>
+
+                <!-- Graph Chart Container -->
+                <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 h-64 flex justify-center items-center">
+                    <canvas id="tempChart"></canvas>
+                </div>
+            </div>
+
+            <div class="bg-emerald-950/40 border border-emerald-500/40 p-4 rounded-xl text-emerald-200 font-semibold text-center text-base">
+                <i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i> 결론: 물의 온도가 높을수록 잉크가 전체로 퍼지는 데 걸리는 시간이 <span class="text-amber-300 underline font-bold">짧아집니다(확산이 빨라집니다)</span>.
+            </div>
+        </section>
+
+        <!-- SLIDE 7: Scientific Explanation & Speed Comparison -->
+        <section id="slide-7" class="slide flex-col w-full bg-slate-800 border border-slate-700 rounded-2xl p-6 md:p-8 shadow-2xl space-y-5">
+            <div class="border-b border-slate-700 pb-3">
+                <span class="text-xs font-bold text-indigo-400 uppercase tracking-widest">원리 정리</span>
+                <h2 class="text-2xl md:text-3xl font-bold text-white">왜 따뜻한 물에서 더 빨리 퍼질까?</h2>
+            </div>
+
+            <!-- Cause -> Effect chain -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-center">
+                <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 space-y-1">
+                    <span class="text-xs text-indigo-400 font-bold uppercase">원인 1</span>
+                    <h4 class="text-lg font-bold text-white">온도가 높다</h4>
+                    <p class="text-xs text-slate-400">열에너지를 얻어 가열됨</p>
+                </div>
+                <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 space-y-1">
+                    <span class="text-xs text-indigo-400 font-bold uppercase">원인 2</span>
+                    <h4 class="text-lg font-bold text-amber-300">입자 운동이 활발</h4>
+                    <p class="text-xs text-slate-400">입자가 빠르게 움직임</p>
+                </div>
+                <div class="bg-slate-900 p-4 rounded-xl border border-indigo-500/50 space-y-1 bg-indigo-950/20">
+                    <span class="text-xs text-indigo-400 font-bold uppercase">결과</span>
+                    <h4 class="text-lg font-bold text-emerald-300">확산 속도가 빠르다</h4>
+                    <p class="text-xs text-slate-400">더 빨리 넓게 퍼져나감</p>
+                </div>
+            </div>
+
+            <div class="space-y-3 pt-2">
+                <h3 class="text-lg font-bold text-slate-200">상태 및 환경에 따른 확산 빠르기 비교</h3>
+                
+                <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 flex flex-col md:flex-row items-center justify-between gap-4">
+                    <div class="flex items-center gap-3 w-full md:w-auto">
+                        <span class="bg-purple-900/60 text-purple-300 border border-purple-500/30 font-bold px-3 py-1 rounded-lg text-sm">진공</span>
+                        <i class="fa-solid fa-chevron-right text-slate-500"></i>
+                        <span class="bg-blue-900/60 text-blue-300 border border-blue-500/30 font-bold px-3 py-1 rounded-lg text-sm">기체</span>
+                        <i class="fa-solid fa-chevron-right text-slate-500"></i>
+                        <span class="bg-teal-900/60 text-teal-300 border border-teal-500/30 font-bold px-3 py-1 rounded-lg text-sm">액체</span>
+                    </div>
+
+                    <div class="text-sm text-slate-300 font-bold text-emerald-400">
+                        진공 속 &gt; 기체 속 &gt; 액체 속
+                    </div>
+                </div>
+
+                <div class="bg-slate-900/60 p-3.5 rounded-lg border border-slate-700 text-xs md:text-sm text-slate-300">
+                    <i class="fa-solid fa-shield-halved text-indigo-400 mr-1"></i> <strong>이유:</strong> 진공 속에는 입자의 운동을 방해하는 다른 입자가 없기 때문에 확산이 가장 빠르게 일어납니다!
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 8: Quiz 1 -->
+        <section id="slide-8" class="slide flex-col w-full bg-slate-800 border border-slate-700 rounded-2xl p-6 md:p-8 shadow-2xl space-y-5">
+            <div class="border-b border-slate-700 pb-3 flex justify-between items-center">
+                <div>
+                    <span class="text-xs font-bold text-amber-400 uppercase tracking-widest">확인 문제 1</span>
+                    <h2 class="text-2xl md:text-3xl font-bold text-white">확산 현상 구분하기</h2>
+                </div>
+                <span class="text-xs bg-amber-500/20 text-amber-300 border border-amber-500/30 px-3 py-1 rounded-full">객관식</span>
+            </div>
+
+            <p class="text-slate-200 text-base md:text-lg font-medium">
+                Q1. 다음 중 <span class="text-indigo-400 font-bold">확산</span>으로 설명할 수 있는 현상이 <span class="text-rose-400 font-bold underline">아닌</span> 것은?
+            </p>
+
+            <div class="space-y-2.5">
+                <button onclick="checkQuiz1(1, false)" class="quiz1-option w-full text-left bg-slate-900 hover:bg-slate-700/70 p-3.5 rounded-xl border border-slate-700 transition text-slate-200 text-sm md:text-base flex items-center justify-between">
+                    <span>① 빵 굽는 냄새가 집 안에 퍼진다.</span>
+                    <i class="fa-regular fa-circle text-slate-500"></i>
+                </button>
+                <button onclick="checkQuiz1(2, false)" class="quiz1-option w-full text-left bg-slate-900 hover:bg-slate-700/70 p-3.5 rounded-xl border border-slate-700 transition text-slate-200 text-sm md:text-base flex items-center justify-between">
+                    <span>② 물에 떨어뜨린 잉크가 퍼진다.</span>
+                    <i class="fa-regular fa-circle text-slate-500"></i>
+                </button>
+                <button onclick="checkQuiz1(3, true)" class="quiz1-option w-full text-left bg-slate-900 hover:bg-slate-700/70 p-3.5 rounded-xl border border-slate-700 transition text-slate-200 text-sm md:text-base flex items-center justify-between">
+                    <span>③ 젖은 빨래가 햇볕에 마른다.</span>
+                    <i class="fa-regular fa-circle text-slate-500"></i>
+                </button>
+                <button onclick="checkQuiz1(4, false)" class="quiz1-option w-full text-left bg-slate-900 hover:bg-slate-700/70 p-3.5 rounded-xl border border-slate-700 transition text-slate-200 text-sm md:text-base flex items-center justify-between">
+                    <span>④ 방향제 냄새가 방 안에 퍼진다.</span>
+                    <i class="fa-regular fa-circle text-slate-500"></i>
+                </button>
+                <button onclick="checkQuiz1(5, false)" class="quiz1-option w-full text-left bg-slate-900 hover:bg-slate-700/70 p-3.5 rounded-xl border border-slate-700 transition text-slate-200 text-sm md:text-base flex items-center justify-between">
+                    <span>⑤ 홍차 티백을 넣은 물의 색이 점점 진해진다.</span>
+                    <i class="fa-regular fa-circle text-slate-500"></i>
+                </button>
+            </div>
+
+            <!-- Quiz 1 Feedback Box -->
+            <div id="quiz1-feedback" class="hidden p-4 rounded-xl text-sm font-medium border"></div>
+        </section>
+
+        <!-- SLIDE 9: Quiz 2 - Categorization -->
+        <section id="slide-9" class="slide flex-col w-full bg-slate-800 border border-slate-700 rounded-2xl p-6 md:p-8 shadow-2xl space-y-4">
+            <div class="border-b border-slate-700 pb-3 flex justify-between items-center">
+                <div>
+                    <span class="text-xs font-bold text-amber-400 uppercase tracking-widest">확인 문제 2</span>
+                    <h2 class="text-2xl md:text-3xl font-bold text-white">확산 vs 증발 분류하기</h2>
+                </div>
+                <span class="text-xs bg-amber-500/20 text-amber-300 border border-amber-500/30 px-3 py-1 rounded-full">분류 활동</span>
+            </div>
+
+            <p class="text-slate-300 text-sm">
+                각 보기 카드를 읽고 <span class="text-indigo-300 font-bold">'확산'</span>인지 <span class="text-emerald-300 font-bold">'증발'</span>인지 클릭하여 분류해 보세요.
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Items list -->
+                <div id="quiz2-items" class="space-y-2">
+                    <div data-id="a" data-answer="diffusion" class="quiz2-card bg-slate-900 p-3 rounded-lg border border-slate-700 flex justify-between items-center text-xs md:text-sm">
+                        <span>ㄱ. 꽃향기가 정원 전체에 퍼진다.</span>
+                        <div class="flex gap-1">
+                            <button onclick="classifyItem('a', 'diffusion')" class="btn-diff bg-slate-800 hover:bg-indigo-600 px-2 py-1 rounded text-xs transition">확산</button>
+                            <button onclick="classifyItem('a', 'evaporation')" class="btn-evap bg-slate-800 hover:bg-emerald-600 px-2 py-1 rounded text-xs transition">증발</button>
+                        </div>
+                    </div>
+
+                    <div data-id="b" data-answer="evaporation" class="quiz2-card bg-slate-900 p-3 rounded-lg border border-slate-700 flex justify-between items-center text-xs md:text-sm">
+                        <span>ㄴ. 어항의 물이 조금씩 줄어든다.</span>
+                        <div class="flex gap-1">
+                            <button onclick="classifyItem('b', 'diffusion')" class="btn-diff bg-slate-800 hover:bg-indigo-600 px-2 py-1 rounded text-xs transition">확산</button>
+                            <button onclick="classifyItem('b', 'evaporation')" class="btn-evap bg-slate-800 hover:bg-emerald-600 px-2 py-1 rounded text-xs transition">증발</button>
+                        </div>
+                    </div>
+
+                    <div data-id="c" data-answer="diffusion" class="quiz2-card bg-slate-900 p-3 rounded-lg border border-slate-700 flex justify-between items-center text-xs md:text-sm">
+                        <span>ㄷ. 물에 설탕을 넣으면 안 저어도 달아진다.</span>
+                        <div class="flex gap-1">
+                            <button onclick="classifyItem('c', 'diffusion')" class="btn-diff bg-slate-800 hover:bg-indigo-600 px-2 py-1 rounded text-xs transition">확산</button>
+                            <button onclick="classifyItem('c', 'evaporation')" class="btn-evap bg-slate-800 hover:bg-emerald-600 px-2 py-1 rounded text-xs transition">증발</button>
+                        </div>
+                    </div>
+
+                    <div data-id="d" data-answer="evaporation" class="quiz2-card bg-slate-900 p-3 rounded-lg border border-slate-700 flex justify-between items-center text-xs md:text-sm">
+                        <span>ㄹ. 손등에 바른 알코올이 금방 마른다.</span>
+                        <div class="flex gap-1">
+                            <button onclick="classifyItem('d', 'diffusion')" class="btn-diff bg-slate-800 hover:bg-indigo-600 px-2 py-1 rounded text-xs transition">확산</button>
+                            <button onclick="classifyItem('d', 'evaporation')" class="btn-evap bg-slate-800 hover:bg-emerald-600 px-2 py-1 rounded text-xs transition">증발</button>
+                        </div>
+                    </div>
+
+                    <div data-id="e" data-answer="diffusion" class="quiz2-card bg-slate-900 p-3 rounded-lg border border-slate-700 flex justify-between items-center text-xs md:text-sm">
+                        <span>ㅁ. 모기향 냄새가 방 안에 퍼진다.</span>
+                        <div class="flex gap-1">
+                            <button onclick="classifyItem('e', 'diffusion')" class="btn-diff bg-slate-800 hover:bg-indigo-600 px-2 py-1 rounded text-xs transition">확산</button>
+                            <button onclick="classifyItem('e', 'evaporation')" class="btn-evap bg-slate-800 hover:bg-emerald-600 px-2 py-1 rounded text-xs transition">증발</button>
+                        </div>
+                    </div>
+
+                    <div data-id="f" data-answer="evaporation" class="quiz2-card bg-slate-900 p-3 rounded-lg border border-slate-700 flex justify-between items-center text-xs md:text-sm">
+                        <span>ㅂ. 마당에 뿌린 물이 마른다.</span>
+                        <div class="flex gap-1">
+                            <button onclick="classifyItem('f', 'diffusion')" class="btn-diff bg-slate-800 hover:bg-indigo-600 px-2 py-1 rounded text-xs transition">확산</button>
+                            <button onclick="classifyItem('f', 'evaporation')" class="btn-evap bg-slate-800 hover:bg-emerald-600 px-2 py-1 rounded text-xs transition">증발</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Classification Categories Output Box -->
+                <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 flex flex-col justify-between space-y-3">
+                    <div>
+                        <h4 class="text-sm font-bold text-indigo-400 mb-2"><i class="fa-solid fa-wind"></i> 확산 (다른 물질 속으로 퍼짐)</h4>
+                        <div id="diff-box" class="bg-slate-950 p-2.5 rounded-lg border border-indigo-900/40 min-h-[70px] text-xs text-slate-300 flex flex-wrap gap-1">
+                            <!-- Items appear here -->
+                        </div>
+                    </div>
+
+                    <div>
+                        <h4 class="text-sm font-bold text-emerald-400 mb-2"><i class="fa-solid fa-temperature-arrow-up"></i> 증발 (표면에서 기체로 날아감)</h4>
+                        <div id="evap-box" class="bg-slate-950 p-2.5 rounded-lg border border-emerald-900/40 min-h-[70px] text-xs text-slate-300 flex flex-wrap gap-1">
+                            <!-- Items appear here -->
+                        </div>
+                    </div>
+
+                    <button onclick="checkQuiz2()" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-semibold py-2 rounded-lg text-xs transition">
+                        정답 확인하기
+                    </button>
+                </div>
+            </div>
+
+            <div id="quiz2-feedback" class="hidden p-3 rounded-xl text-xs md:text-sm border text-center font-medium"></div>
+        </section>
+
+        <!-- SLIDE 10: Lesson Summary -->
+        <section id="slide-10" class="slide flex-col w-full bg-slate-800 border border-slate-700 rounded-2xl p-6 md:p-8 shadow-2xl space-y-6">
+            <div class="border-b border-slate-700 pb-3">
+                <span class="text-xs font-bold text-indigo-400 uppercase tracking-widest">학습 마무리</span>
+                <h2 class="text-2xl md:text-3xl font-bold text-white">오늘의 핵심 내용 정리</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-slate-900 p-5 rounded-xl border border-slate-700 space-y-3">
+                    <div class="w-10 h-10 bg-indigo-900/60 text-indigo-400 rounded-lg flex items-center justify-center font-bold text-lg">1</div>
+                    <h3 class="font-bold text-white text-lg">확산의 개념</h3>
+                    <p class="text-sm text-slate-300 leading-relaxed">
+                        물질을 이루는 입자가 <strong class="text-amber-300">스스로 끊임없이 움직여</strong> 다른 물질 속으로 퍼져 나가는 현상입니다.
+                    </p>
+                </div>
+
+                <div class="bg-slate-900 p-5 rounded-xl border border-slate-700 space-y-3">
+                    <div class="w-10 h-10 bg-rose-900/60 text-rose-400 rounded-lg flex items-center justify-center font-bold text-lg">2</div>
+                    <h3 class="font-bold text-white text-lg">온도와 확산</h3>
+                    <p class="text-sm text-slate-300 leading-relaxed">
+                        온도가 높을수록 입자의 운동이 더 활발해지므로 <strong class="text-rose-300">확산 속도가 빨라집니다</strong>.
+                    </p>
+                </div>
+
+                <div class="bg-slate-900 p-5 rounded-xl border border-slate-700 space-y-3">
+                    <div class="w-10 h-10 bg-emerald-900/60 text-emerald-400 rounded-lg flex items-center justify-center font-bold text-lg">3</div>
+                    <h3 class="font-bold text-white text-lg">확산 빠르기</h3>
+                    <p class="text-sm text-slate-300 leading-relaxed">
+                        방해하는 입자가 없는 <strong class="text-emerald-300">진공 속</strong>에서 가장 빠르며, 그 다음 기체 &gt; 액체 순입니다.
+                    </p>
+                </div>
+            </div>
+
+            <div class="bg-indigo-950/40 border border-indigo-500/30 p-6 rounded-xl text-center space-y-3">
+                <h4 class="text-xl font-bold text-indigo-200">수고하셨습니다! 👏</h4>
+                <p class="text-sm text-slate-300">다음 시간: 입자의 운동 두 번째 이야기, '증발'에 대해 알아봅시다.</p>
+                <div class="pt-2">
+                    <button onclick="goToSlide(1)" class="bg-slate-700 hover:bg-slate-600 text-slate-200 font-semibold px-5 py-2 rounded-lg text-sm transition">
+                        <i class="fa-solid fa-rotate-left"></i> 첫 슬라이드로 돌아가기
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Navigation Footer -->
+    <footer class="bg-slate-800/80 backdrop-blur border-t border-slate-700 px-6 py-3 flex justify-between items-center z-50">
+        <button id="btn-prev" onclick="prevSlide()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2">
+            <i class="fa-solid fa-chevron-left"></i> 이전
+        </button>
+
+        <!-- Quick Slide Select Dots / Buttons -->
+        <div id="slide-dots" class="hidden md:flex items-center gap-1.5">
+            <!-- Dynamically generated buttons -->
+        </div>
+
+        <button id="btn-next" onclick="nextSlide()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2">
+            다음 <i class="fa-solid fa-chevron-right"></i>
+        </button>
+    </footer>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // State variables
+        let currentSlide = 1;
+        const totalSlides = 10;
+
+        // Slide Navigation Logic
+        function updateSlideUI() {
+            document.querySelectorAll('.slide').forEach((slide, index) => {
+                if (index + 1 === currentSlide) {
+                    slide.classList.add('active');
+                } else {
+                    slide.classList.remove('active');
+                }
+            });
+
+            // Update Header Indicator
+            document.getElementById('slide-indicator').innerText = `${currentSlide} / ${totalSlides}`;
+
+            // Button Enable/Disable
+            document.getElementById('btn-prev').disabled = currentSlide === 1;
+            document.getElementById('btn-prev').style.opacity = currentSlide === 1 ? '0.5' : '1';
+
+            document.getElementById('btn-next').disabled = currentSlide === totalSlides;
+            document.getElementById('btn-next').style.opacity = currentSlide === totalSlides ? '0.5' : '1';
+
+            // Dot updates
+            updateDots();
+
+            // Trigger Canvas resets or renders if required on specific slides
+            if (currentSlide === 2) initPerfumeSim();
+            if (currentSlide === 4) renderStepCanvases();
+            if (currentSlide === 5) initExperimentCanvases();
+            if (currentSlide === 6) renderChart();
+        }
+
+        function goToSlide(n) {
+            if (n >= 1 && n <= totalSlides) {
+                currentSlide = n;
+                updateSlideUI();
+            }
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides) {
+                currentSlide++;
+                updateSlideUI();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 1) {
+                currentSlide--;
+                updateSlideUI();
+            }
+        }
+
+        // Generate Navigation Dots
+        const dotsContainer = document.getElementById('slide-dots');
+        for (let i = 1; i <= totalSlides; i++) {
+            const btn = document.createElement('button');
+            btn.className = `w-7 h-7 rounded-lg text-xs font-bold transition flex items-center justify-center`;
+            btn.innerText = i;
+            btn.onclick = () => goToSlide(i);
+            btn.id = `dot-${i}`;
+            dotsContainer.appendChild(btn);
+        }
+
+        function updateDots() {
+            for (let i = 1; i <= totalSlides; i++) {
+                const dot = document.getElementById(`dot-${i}`);
+                if (i === currentSlide) {
+                    dot.className = "w-7 h-7 rounded-lg text-xs font-bold bg-indigo-600 text-white shadow";
+                } else {
+                    dot.className = "w-7 h-7 rounded-lg text-xs font-bold bg-slate-700 text-slate-300 hover:bg-slate-600";
+                }
+            }
+        }
+
+        // Keyboard Shortcut Navigation
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === 'Space') {
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                prevSlide();
+            }
+        });
+
+        // Fullscreen Toggle
+        document.getElementById('btn-fullscreen').addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(() => {});
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        });
+
+
+        // ==========================================
+        // SLIDE 2: PERFUME SIMULATION (HTML5 Canvas)
+        // ==========================================
+        let perfumeAnimId = null;
+        let perfumeParticles = [];
+        let perfumeOpened = false;
+
+        function initPerfumeSim() {
+            const canvas = document.getElementById('perfumeCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+
+            perfumeParticles = [];
+            perfumeOpened = false;
+            document.getElementById('perfume-status').innerText = "버튼을 눌러 향수 입자가 스스로 어떻게 움직이는지 관찰해 보세요.";
+
+            // Create initial trapped particles in perfume bottle
+            const startX = 60;
+            const startY = canvas.height - 70;
+
+            for (let i = 0; i < 70; i++) {
+                perfumeParticles.push({
+                    x: startX + (Math.random() - 0.5) * 20,
+                    y: startY + (Math.random() - 0.5) * 20,
+                    vx: (Math.random() - 0.5) * 0.5,
+                    vy: (Math.random() - 0.5) * 0.5,
+                    radius: 3.5,
+                    color: '#c084fc', // Light purple particle
+                    escaped: false
+                });
+            }
+
+            drawPerfumeFrame(ctx, canvas);
+        }
+
+        function drawPerfumeFrame(ctx, canvas) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw Bottle on left
+            const bX = 40, bY = canvas.height - 100, bW = 40, bH = 60;
+            ctx.fillStyle = '#38bdf8';
+            ctx.fillRect(bX, bY, bW, bH); // Bottle body
+            ctx.fillStyle = '#0284c7';
+            ctx.fillRect(bX + 12, bY - 15, 16, 15); // Bottle Neck
+
+            if (!perfumeOpened) {
+                ctx.fillStyle = '#e11d48'; // Cap
+                ctx.fillRect(bX + 8, bY - 25, 24, 10);
+            }
+
+            // Draw Student Avatar on right
+            const sX = canvas.width - 70, sY = canvas.height - 90;
+            ctx.fillStyle = '#fde047';
+            ctx.beginPath();
+            ctx.arc(sX, sY - 20, 18, 0, Math.PI * 2); // Head
+            ctx.fill();
+            ctx.fillStyle = '#10b981';
+            ctx.beginPath();
+            ctx.arc(sX, sY + 25, 25, Math.PI, 0); // Body
+            ctx.fill();
+
+            // Update & Render Particles
+            let studentReached = false;
+
+            perfumeParticles.forEach(p => {
+                if (perfumeOpened) {
+                    p.x += p.vx + (Math.random() - 0.5) * 1.5;
+                    p.y += p.vy + (Math.random() - 0.5) * 1.5;
+
+                    // Boundary checks
+                    if (p.x < 5) p.x = 5;
+                    if (p.x > canvas.width - 5) p.x = canvas.width - 5;
+                    if (p.y < 5) p.y = 5;
+                    if (p.y > canvas.height - 5) p.y = canvas.height - 5;
+
+                    // Distance check to student
+                    const dx = p.x - sX;
+                    const dy = p.y - (sY - 20);
+                    if (Math.sqrt(dx * dx + dy * dy) < 30) {
+                        studentReached = true;
+                    }
+                }
+
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            if (studentReached) {
+                document.getElementById('perfume-status').innerText = "🎉 학생이 향수 냄새 입자에 도달하여 냄새를 맡았습니다!";
+                document.getElementById('perfume-status').className = "bg-emerald-950/80 p-3 rounded-lg border border-emerald-500 text-center text-sm font-bold text-emerald-300";
+            }
+
+            if (perfumeOpened) {
+                perfumeAnimId = requestAnimationFrame(() => drawPerfumeFrame(ctx, canvas));
+            }
+        }
+
+        function openPerfumeBottle() {
+            if (perfumeOpened) return;
+            perfumeOpened = true;
+            document.getElementById('perfume-status').innerText = "향수 뚜껑이 열렸습니다. 입자들이 끊임없이 움직여 퍼져나갑니다.";
+
+            // Give particles upward and rightward momentum
+            perfumeParticles.forEach(p => {
+                p.vx = Math.random() * 2 + 0.5;
+                p.vy = (Math.random() - 0.5) * 2;
+            });
+
+            const canvas = document.getElementById('perfumeCanvas');
+            const ctx = canvas.getContext('2d');
+            drawPerfumeFrame(ctx, canvas);
+        }
+
+        function resetPerfumeSim() {
+            if (perfumeAnimId) cancelAnimationFrame(perfumeAnimId);
+            initPerfumeSim();
+            document.getElementById('perfume-status').className = "bg-slate-900/60 p-3 rounded-lg border border-slate-700 text-center text-sm text-slate-400";
+        }
+
+
+        // ==========================================
+        // SLIDE 4: STATIC TIME STEP CANVASES
+        // ==========================================
+        function renderStepCanvases() {
+            renderTimeStep('canvas-step-1', 0);
+            renderTimeStep('canvas-step-2', 0.4);
+            renderTimeStep('canvas-step-3', 0.95);
+        }
+
+        function renderTimeStep(canvasId, spreadFactor) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const totalWater = 45;
+            const totalInk = 20;
+
+            // Seeded deterministic placement for visualization
+            let seed = 123;
+            function random() {
+                let x = Math.sin(seed++) * 10000;
+                return x - Math.floor(x);
+            }
+
+            // Draw Water Particles (Light Blue)
+            for (let i = 0; i < totalWater; i++) {
+                const x = random() * (canvas.width - 20) + 10;
+                const y = random() * (canvas.height - 20) + 10;
+                ctx.fillStyle = '#38bdf8';
+                ctx.beginPath();
+                ctx.arc(x, y, 4, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Draw Ink Particles (Red/Pink)
+            const centerX = canvas.width / 3;
+            const centerY = canvas.height / 3;
+
+            for (let i = 0; i < totalInk; i++) {
+                let x, y;
+                if (spreadFactor === 0) {
+                    x = centerX + (random() - 0.5) * 30;
+                    y = centerY + (random() - 0.5) * 30;
+                } else {
+                    x = centerX + (random() - 0.5) * (canvas.width * spreadFactor);
+                    y = centerY + (random() - 0.5) * (canvas.height * spreadFactor);
+                    // clamp inside
+                    x = Math.max(10, Math.min(canvas.width - 10, x));
+                    y = Math.max(10, Math.min(canvas.height - 10, y));
+                }
+
+                ctx.fillStyle = '#f43f5e';
+                ctx.beginPath();
+                ctx.arc(x, y, 4.5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+
+        // ==========================================
+        // SLIDE 5: VIRTUAL EXPERIMENT SIMULATION
+        // ==========================================
+        let expAnimId = null;
+        let expRunning = false;
+        let expTime = 0;
+        let coldParticles = [], warmParticles = [];
+
+        function initExperimentCanvases() {
+            resetDiffusionExperiment();
+        }
+
+        function setupBeakerParticles(canvasId, speedMultiplier) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return [];
+            const particles = [];
+
+            // 40 Water particles (cyan)
+            for (let i = 0; i < 40; i++) {
+                particles.push({
+                    x: Math.random() * (canvas.width - 20) + 10,
+                    y: Math.random() * (canvas.height - 20) + 10,
+                    vx: (Math.random() - 0.5) * speedMultiplier,
+                    vy: (Math.random() - 0.5) * speedMultiplier,
+                    type: 'water',
+                    radius: 3.5,
+                    color: '#38bdf8'
+                });
+            }
+            return particles;
+        }
+
+        function resetDiffusionExperiment() {
+            if (expAnimId) cancelAnimationFrame(expAnimId);
+            expRunning = false;
+            expTime = 0;
+            document.getElementById('exp-timer').innerText = "00:00 초";
+            document.getElementById('status-cold').innerText = "대기 중";
+            document.getElementById('status-warm').innerText = "대기 중";
+
+            coldParticles = setupBeakerParticles('canvas-cold', 0.8);
+            warmParticles = setupBeakerParticles('canvas-warm', 2.8);
+
+            renderBeakerFrame('canvas-cold', coldParticles);
+            renderBeakerFrame('canvas-warm', warmParticles);
+        }
+
+        function startDiffusionExperiment() {
+            if (expRunning) return;
+            expRunning = true;
+            document.getElementById('status-cold').innerText = "확산 진행 중...";
+            document.getElementById('status-warm').innerText = "확산 진행 중...";
+
+            // Drop ink into center top
+            const coldCanvas = document.getElementById('canvas-cold');
+            const warmCanvas = document.getElementById('canvas-warm');
+
+            for (let i = 0; i < 25; i++) {
+                coldParticles.push({
+                    x: coldCanvas.width / 2 + (Math.random() - 0.5) * 15,
+                    y: 30 + (Math.random() - 0.5) * 15,
+                    vx: (Math.random() - 0.5) * 0.8,
+                    vy: (Math.random() - 0.5) * 0.8,
+                    type: 'ink',
+                    radius: 4,
+                    color: '#e11d48'
+                });
+
+                warmParticles.push({
+                    x: warmCanvas.width / 2 + (Math.random() - 0.5) * 15,
+                    y: 30 + (Math.random() - 0.5) * 15,
+                    vx: (Math.random() - 0.5) * 3.2,
+                    vy: (Math.random() - 0.5) * 3.2,
+                    type: 'ink',
+                    radius: 4,
+                    color: '#e11d48'
+                });
+            }
+
+            runExpLoop();
+        }
+
+        function runExpLoop() {
+            if (!expRunning) return;
+
+            expTime += 1;
+            const displaySec = Math.floor(expTime / 5);
+            document.getElementById('exp-timer').innerText = `${String(displaySec).padStart(2, '0')} 초`;
+
+            updateBeakerParticles('canvas-cold', coldParticles, 0.8);
+            updateBeakerParticles('canvas-warm', warmParticles, 3.0);
+
+            renderBeakerFrame('canvas-cold', coldParticles);
+            renderBeakerFrame('canvas-warm', warmParticles);
+
+            if (expTime > 550) {
+                expRunning = false;
+                document.getElementById('status-cold').innerText = "완료 (360초 소요)";
+                document.getElementById('status-warm').innerText = "완료 (110초 소요)";
+            } else {
+                expAnimId = requestAnimationFrame(runExpLoop);
+            }
+        }
+
+        function updateBeakerParticles(canvasId, particles, speedFactor) {
+            const canvas = document.getElementById(canvasId);
+            particles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+
+                // Add thermal jitter
+                p.vx += (Math.random() - 0.5) * (speedFactor * 0.3);
+                p.vy += (Math.random() - 0.5) * (speedFactor * 0.3);
+
+                // Speed limit
+                const speed = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
+                if (speed > speedFactor * 1.5) {
+                    p.vx = (p.vx / speed) * speedFactor * 1.5;
+                    p.vy = (p.vy / speed) * speedFactor * 1.5;
+                }
+
+                // Bounce walls
+                if (p.x < 10 || p.x > canvas.width - 10) p.vx *= -1;
+                if (p.y < 10 || p.y > canvas.height - 10) p.vy *= -1;
+            });
+        }
+
+        function renderBeakerFrame(canvasId, particles) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            particles.forEach(p => {
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fill();
+            });
+        }
+
+
+        // ==========================================
+        // SLIDE 6: CHART.JS GRAPH RENDER
+        // ==========================================
+        let chartInstance = null;
+
+        function renderChart() {
+            const ctx = document.getElementById('tempChart');
+            if (!ctx) return;
+
+            if (chartInstance) chartInstance.destroy();
+
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['10 ℃ (찬물)', '20 ℃', '40 ℃', '60 ℃ (따뜻한 물)'],
+                    datasets: [{
+                        label: '확산 완료 시간 (초)',
+                        data: [360, 260, 160, 110],
+                        backgroundColor: [
+                            'rgba(56, 189, 248, 0.7)',
+                            'rgba(45, 212, 191, 0.7)',
+                            'rgba(251, 191, 36, 0.7)',
+                            'rgba(244, 63, 94, 0.7)'
+                        ],
+                        borderColor: [
+                            '#38bdf8',
+                            '#2dd4bf',
+                            '#fbbf24',
+                            '#f43f5e'
+                        ],
+                        borderWidth: 2,
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#f8fafc', font: { family: 'Pretendard' } }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: '#cbd5e1' },
+                            grid: { color: '#334155' }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            ticks: { color: '#cbd5e1' },
+                            grid: { color: '#334155' },
+                            title: {
+                                display: true,
+                                text: '시간 (초)',
+                                color: '#94a3b8'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+
+        // ==========================================
+        // SLIDE 8: QUIZ 1 LOGIC
+        // ==========================================
+        function checkQuiz1(optionNum, isCorrect) {
+            const options = document.querySelectorAll('.quiz1-option');
+            const feedback = document.getElementById('quiz1-feedback');
+
+            options.forEach((opt, idx) => {
+                opt.className = "quiz1-option w-full text-left bg-slate-900 p-3.5 rounded-xl border border-slate-700 transition text-slate-200 text-sm md:text-base flex items-center justify-between opacity-60";
+            });
+
+            const selectedOpt = options[optionNum - 1];
+
+            if (isCorrect) {
+                selectedOpt.className = "quiz1-option w-full text-left bg-emerald-950/60 p-3.5 rounded-xl border-2 border-emerald-500 transition text-emerald-200 text-sm md:text-base flex items-center justify-between font-bold";
+                feedback.className = "p-4 rounded-xl text-sm font-medium border bg-emerald-950/80 text-emerald-200 border-emerald-500/50";
+                feedback.innerHTML = `<i class="fa-solid fa-circle-check text-lg mr-2"></i> <strong>정답입니다!</strong> ③번 '젖은 빨래가 마르는 현상'은 확산이 아니라 액체 표면에서 입자가 날아가는 <strong>증발</strong> 현상입니다.`;
+            } else {
+                selectedOpt.className = "quiz1-option w-full text-left bg-rose-950/60 p-3.5 rounded-xl border-2 border-rose-500 transition text-rose-200 text-sm md:text-base flex items-center justify-between font-bold";
+                feedback.className = "p-4 rounded-xl text-sm font-medium border bg-rose-950/80 text-rose-200 border-rose-500/50";
+                feedback.innerHTML = `<i class="fa-solid fa-circle-xmark text-lg mr-2"></i> <strong>오답입니다.</strong> 다시 생각해 보세요! (힌트: 액체가 기체로 변해 말라가는 현상은 무엇일까요?)`;
+            }
+
+            feedback.classList.remove('hidden');
+        }
+
+
+        // ==========================================
+        // SLIDE 9: QUIZ 2 CATEGORIZATION LOGIC
+        // ==========================================
+        const userClassifications = {};
+
+        function classifyItem(id, type) {
+            userClassifications[id] = type;
+
+            const card = document.querySelector(`.quiz2-card[data-id="${id}"]`);
+            const text = card.querySelector('span').innerText;
+
+            const btnDiff = card.querySelector('.btn-diff');
+            const btnEvap = card.querySelector('.btn-evap');
+
+            if (type === 'diffusion') {
+                btnDiff.className = "btn-diff bg-indigo-600 text-white px-2 py-1 rounded text-xs font-bold";
+                btnEvap.className = "btn-evap bg-slate-800 text-slate-400 px-2 py-1 rounded text-xs";
+            } else {
+                btnEvap.className = "btn-evap bg-emerald-600 text-white px-2 py-1 rounded text-xs font-bold";
+                btnDiff.className = "btn-diff bg-slate-800 text-slate-400 px-2 py-1 rounded text-xs";
+            }
+
+            renderQuiz2Boxes();
+        }
+
+        function renderQuiz2Boxes() {
+            const diffBox = document.getElementById('diff-box');
+            const evapBox = document.getElementById('evap-box');
+
+            diffBox.innerHTML = '';
+            evapBox.innerHTML = '';
+
+            const itemLabels = {
+                'a': 'ㄱ. 꽃향기', 'b': 'ㄴ. 어항 물 줄어듦',
+                'c': 'ㄷ. 설탕물 퍼짐', 'd': 'ㄹ. 손등 알코올',
+                'e': 'ㅁ. 모기향 냄새', 'f': 'ㅂ. 마당 물 마름'
+            };
+
+            for (const [id, type] of Object.entries(userClassifications)) {
+                const tag = document.createElement('span');
+                tag.className = "bg-slate-800 border border-slate-700 px-2 py-1 rounded font-mono";
+                tag.innerText = itemLabels[id];
+
+                if (type === 'diffusion') {
+                    diffBox.appendChild(tag);
+                } else if (type === 'evaporation') {
+                    evapBox.appendChild(tag);
+                }
+            }
+        }
+
+        function checkQuiz2() {
+            const feedback = document.getElementById('quiz2-feedback');
+            const cards = document.querySelectorAll('.quiz2-card');
+            let correctCount = 0;
+            let total = cards.length;
+
+            cards.forEach(card => {
+                const id = card.getAttribute('data-id');
+                const correctAnswer = card.getAttribute('data-answer');
+                const userAns = userClassifications[id];
+
+                if (userAns === correctAnswer) {
+                    correctCount++;
+                    card.classList.add('border-emerald-500/80');
+                    card.classList.remove('border-rose-500/80');
+                } else {
+                    card.classList.add('border-rose-500/80');
+                    card.classList.remove('border-emerald-500/80');
+                }
+            });
+
+            if (correctCount === total) {
+                feedback.className = "p-3 rounded-xl text-xs md:text-sm border text-center font-medium bg-emerald-950/80 text-emerald-200 border-emerald-500/50";
+                feedback.innerHTML = `🎉 <strong>완벽합니다! (6/6)</strong> 모든 항목을 정확히 분류했습니다.<br>• <strong>확산:</strong> ㄱ, ㄷ, ㅁ | • <strong>증발:</strong> ㄴ, ㄹ, ㅂ`;
+            } else {
+                feedback.className = "p-3 rounded-xl text-xs md:text-sm border text-center font-medium bg-rose-950/80 text-rose-200 border-rose-500/50";
+                feedback.innerHTML = `⚠️ <strong>${correctCount} / ${total} 개 정답</strong>입니다. 빨간 테두리의 보기를 다시 확인해 보세요!`;
+            }
+
+            feedback.classList.remove('hidden');
+        }
+
+        // Initialize First Slide
+        window.onload = function() {
+            updateSlideUI();
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,144 @@
+[
+ {
+  "slide": 1,
+  "name": "view"
+ },
+ {
+  "slide": 2,
+  "name": "view"
+ },
+ {
+  "slide": 3,
+  "name": "view"
+ },
+ {
+  "slide": 3,
+  "name": "deong",
+  "js": "document.querySelector('#pad-btns [data-hit=\"덩\"]').click()"
+ },
+ {
+  "slide": 3,
+  "name": "roll",
+  "js": "document.querySelector('#pad-btns [data-hit=\"더러러러\"]').click()"
+ },
+ {
+  "slide": 4,
+  "name": "view"
+ },
+ {
+  "slide": 4,
+  "name": "play",
+  "js": "document.querySelector('#sema-play').click()",
+  "wait": 1300
+ },
+ {
+  "slide": 4,
+  "name": "stop",
+  "js": "document.querySelector('#sema-play').click()"
+ },
+ {
+  "slide": 5,
+  "name": "view"
+ },
+ {
+  "slide": 5,
+  "name": "B40",
+  "js": "const r = document.querySelector('#mu-a input[name=B]'); r.value = 40; r.dispatchEvent(new Event('input', { bubbles: true }));"
+ },
+ {
+  "slide": 5,
+  "name": "B60",
+  "js": "const r = document.querySelector('#mu-a input[name=B]'); r.value = 60; r.dispatchEvent(new Event('input', { bubbles: true }));"
+ },
+ {
+  "slide": 5,
+  "name": "B90",
+  "js": "const r = document.querySelector('#mu-a input[name=B]'); r.value = 90; r.dispatchEvent(new Event('input', { bubbles: true }));"
+ },
+ {
+  "slide": 5,
+  "name": "B140",
+  "js": "const r = document.querySelector('#mu-a input[name=B]'); r.value = 140; r.dispatchEvent(new Event('input', { bubbles: true }));"
+ },
+ {
+  "slide": 5,
+  "name": "play",
+  "js": "document.querySelector('#mu-a-play').click()",
+  "wait": 1500
+ },
+ {
+  "slide": 5,
+  "name": "stop",
+  "js": "document.querySelector('#mu-a-play').click()"
+ },
+ {
+  "slide": 6,
+  "name": "view"
+ },
+ {
+  "slide": 7,
+  "name": "view"
+ },
+ {
+  "slide": 7,
+  "name": "play",
+  "js": "document.querySelector('#gut-play').click()",
+  "wait": 1300
+ },
+ {
+  "slide": 7,
+  "name": "stop",
+  "js": "document.querySelector('#gut-play').click()"
+ },
+ {
+  "slide": 8,
+  "name": "view"
+ },
+ {
+  "slide": 8,
+  "name": "play",
+  "js": "document.querySelector('#mu-b-play').click()",
+  "wait": 2200
+ },
+ {
+  "slide": 8,
+  "name": "B60-h1",
+  "js": "document.querySelector('#mu-b [data-set=h][data-value=\"1\"]').click();const r = document.querySelector('#mu-b input[name=B]'); r.value = 60; r.dispatchEvent(new Event('input', { bubbles: true }));",
+  "wait": 900
+ },
+ {
+  "slide": 8,
+  "name": "B90-h2",
+  "js": "document.querySelector('#mu-b [data-set=h][data-value=\"2\"]').click();const r = document.querySelector('#mu-b input[name=B]'); r.value = 90; r.dispatchEvent(new Event('input', { bubbles: true }));",
+  "wait": 900
+ },
+ {
+  "slide": 8,
+  "name": "B120-h3",
+  "js": "document.querySelector('#mu-b [data-set=h][data-value=\"3\"]').click();const r = document.querySelector('#mu-b input[name=B]'); r.value = 120; r.dispatchEvent(new Event('input', { bubbles: true }));",
+  "wait": 900
+ },
+ {
+  "slide": 8,
+  "name": "B140-h3",
+  "js": "document.querySelector('#mu-b [data-set=h][data-value=\"3\"]').click();const r = document.querySelector('#mu-b input[name=B]'); r.value = 140; r.dispatchEvent(new Event('input', { bubbles: true }));",
+  "wait": 900
+ },
+ {
+  "slide": 8,
+  "name": "stop",
+  "js": "document.querySelector('#mu-b-play').click()"
+ },
+ {
+  "slide": 9,
+  "name": "view"
+ },
+ {
+  "slide": 10,
+  "name": "view"
+ },
+ {
+  "slide": 11,
+  "name": "view"
+ }
+]

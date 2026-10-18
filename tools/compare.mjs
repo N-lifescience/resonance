@@ -51,9 +51,13 @@ function inspect(html) {
     }
     if (closing) continue;
     const active = stack.at(-1);
-    if (active && (attrs.has('data-activity') || attrs.has('data-ai') || attrs.has('data-play') || (attrs.get('class') || '').split(/\s+/).some((name) => EXPLORATORY.has(name)))) active.exploragram = true;
+    // data-ai는 'AI가 쓴 글' 표시라 세지 않는다. 직접 짠 장면도 값을 바꾸는 슬라이더가 있으면 익스플로라그램으로 센다.
+    const range = tag === 'input' && (attrs.get('type') || '').toLowerCase() === 'range';
+    if (active && (range || attrs.has('data-activity') || attrs.has('data-play') || (attrs.get('class') || '').split(/\s+/).some((name) => EXPLORATORY.has(name)))) active.exploragram = true;
   }
-  return { engine: css && js, slides: slides.length, exploragrams: slides.filter((slide) => slide.exploragram).length, first: slides.findIndex((slide) => slide.exploragram) + 1 };
+  // bundle.py --offline처럼 엔진을 파일 안에 넣은 판도 엔진을 쓴 것으로 본다
+  const inline = /window\.Exploragram\s*=/.test(html);
+  return { engine: (css && js) || inline, slides: slides.length, exploragrams: slides.filter((slide) => slide.exploragram).length, first: slides.findIndex((slide) => slide.exploragram) + 1 };
 }
 
 function parseAudit(output, stateName) {
@@ -154,7 +158,14 @@ async function main() {
         notes.push(`자동 점검 실패${audit.code == null ? ` (${audit.signal || '중단'})` : ` (종료 코드 ${audit.code})`}`);
         console.error(`[${id}] ${log.trim().slice(-2000)}`);
       }
-      const png = join(screenshots, `${String(state.slide).padStart(2, '0')}-${stateName}.png`);
+      let png = join(screenshots, `${String(state.slide).padStart(2, '0')}-${stateName}.png`);
+      if (!existsSync(png)) {
+        // 엔진을 안 쓴 결과는 states.mjs가 못 찍는다. 첫 화면만 크롬으로 찍는다.
+        const chrome = [process.env.CHROME_PATH, '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', '/usr/bin/google-chrome'].filter(Boolean).find((p) => existsSync(p));
+        const plain = join(temp, `${id}-plain.png`);
+        if (chrome) await run(chrome, ['--headless=new', '--disable-gpu', '--hide-scrollbars', `--user-data-dir=${join(temp, 'chrome')}`, '--window-size=1280,720', '--virtual-time-budget=4000', `--screenshot=${plain}`, pathToFileURL(resolve(file)).href], { timeout: 60000, allowFailure: true });
+        if (existsSync(plain)) { png = plain; notes.push('미리보기는 첫 화면'); }
+      }
       if (existsSync(png)) {
         const target = join(config.out, `${id}.webp`);
         await run('cwebp', ['-quiet', '-q', '85', '-resize', '960', '0', png, '-o', target]);   // ffmpeg에 libwebp가 없는 판이 많다

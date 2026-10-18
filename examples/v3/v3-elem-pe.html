@@ -1,0 +1,453 @@
+<!doctype html>
+<html lang="ko" data-deck="v3-elem-pe">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>운동하면 심장은 얼마나 빨리 뛸까? 운동 강도와 심박수</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/engine/exploragram.css">
+<script defer src="https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/engine/exploragram.js"></script>
+<style>
+body[data-theme="ppt"] {
+  --track: #C8553D; --track-2: #E07A5F; --grass: #2E9E6A; --navy: #1D2B3A; --sky: #F4F7FA; --gray: #5F6B77;
+  --easy: #4C8DD6; --good: #2E9E6A; --hard: #D9443A; --over: #AEB7C1;
+  --accent: #1D4E89; --tab: #C8553D; --tab-ink: #FFFFFF; --ch-paper: #F7F9FB; --table-head: #1D4E89;
+}
+
+/* ── 이 수업의 얼굴: 육상 트랙 머리 띠(흰 레인 두 줄 + 잔디 가장자리) + 번호표 배지 ── */
+body[data-theme="ppt"] section.slide {
+  background:
+    linear-gradient(#FFFFFF, #FFFFFF) 0 78px / 100% 3px no-repeat,
+    linear-gradient(#FFFFFF, #FFFFFF) 0 87px / 100% 3px no-repeat,
+    linear-gradient(var(--track), var(--track)) 0 0 / 100% 96px no-repeat,
+    linear-gradient(var(--grass), var(--grass)) 0 96px / 100% 7px no-repeat,
+    var(--ch-paper);
+  color: var(--navy);
+}
+body[data-theme="ppt"] section.slide[data-sec]::before {
+  left: auto; right: 46px; top: 8px; width: 204px; height: 80px; padding: 8px 0 0; box-sizing: border-box; justify-content: center;
+  border: 3px solid var(--navy); border-radius: 10px; color: var(--navy); font-size: 25px; letter-spacing: 0; transform: rotate(-2deg);
+  background:
+    radial-gradient(circle at 14px 14px, #8C98A5 5px, transparent 6px),
+    radial-gradient(circle at calc(100% - 14px) 14px, #8C98A5 5px, transparent 6px),
+    linear-gradient(var(--track-2), var(--track-2)) 0 0 / 100% 8px no-repeat,
+    #FFFFFF;
+}
+body[data-theme="ppt"] section.slide > h2:first-child {
+  position: absolute; top: 0; left: 64px; right: 280px; height: 76px; margin: 0; padding: 0; width: auto;
+  display: flex; align-items: center; color: #FFFFFF; font-size: 42px; line-height: 1.2; border: 0; background: none; text-wrap: balance;
+}
+.key { color: var(--track); font-weight: 800; }
+
+/* 표지 */
+body[data-theme="ppt"] section.slide#cover { background: linear-gradient(160deg, #1D2B3A 0 55%, #23384D 55%); padding: 0; color: #FFFFFF; }
+.cv { position: relative; height: 100%; }
+.cv-text { position: absolute; left: 80px; top: 92px; width: 640px; }
+.cv-text p, .cv-text h1 { margin: 0; color: #FFFFFF; }
+.cv-k { display: inline-block; padding: 8px 20px; border-radius: 10px; background: var(--track); font-size: 26px; font-weight: 700; }
+.cv-text h1 { margin: 26px 0 22px; font-size: 68px; line-height: 1.2; text-wrap: balance; }
+.cv-s { font-size: 31px; font-weight: 600; color: #C9D6E3 !important; }
+.cv svg { position: absolute; left: 0; bottom: 0; }
+
+/* 학습 목표 */
+.goals { margin: 40px 0 0; padding: 0; list-style: none; counter-reset: g; }
+.goals li { counter-increment: g; position: relative; padding: 0 0 0 72px; margin: 0 0 30px; font-size: 34px; line-height: 1.45; }
+.goals li::before { content: counter(g); position: absolute; left: 0; top: -2px; width: 52px; height: 52px; border-radius: 10px; background: var(--navy); color: #FFFFFF; font-weight: 800; font-size: 28px; text-align: center; line-height: 52px; }
+
+/* 생각 열기 */
+.open { display: grid; grid-template-columns: 1fr 480px; gap: 40px; align-items: start; margin-top: 10px; }
+.open p { margin: 0 0 20px; font-size: 31px; line-height: 1.5; }
+.open .ask { color: var(--accent); font-weight: 800; }
+.poll p { font-size: 28px; }
+
+/* 맥박 재기 */
+.pulse { display: grid; grid-template-columns: 330px 1fr; gap: 36px; align-items: start; margin-top: 4px; }
+.pulse ol { margin: 0; padding: 0; list-style: none; counter-reset: s; }
+.pulse li { counter-increment: s; position: relative; padding-left: 58px; margin: 0 0 16px; font-size: 29px; line-height: 1.45; }
+.pulse li::before { content: counter(s); position: absolute; left: 0; top: 2px; width: 42px; height: 42px; border-radius: 50%; background: var(--track); color: #FFFFFF; font-size: 24px; font-weight: 800; text-align: center; line-height: 42px; }
+.pulse .def { margin: 0 0 16px; padding: 12px 20px; border-radius: 14px; background: #FFFFFF; border: 3px solid #DCE3EA; font-size: 28px; line-height: 1.45; }
+.pulse .ex { margin: 6px 0 0; font-size: 28px; font-weight: 700; }
+.pulse .timer { margin-top: 10px; }
+
+/* ── 익스플로라그램 공통 ── */
+.pa { display: grid; grid-template-columns: 680px 1fr; gap: 30px; align-items: start; }
+.pa svg { display: block; }
+.pa-ctrl { display: flex; flex-direction: column; gap: 8px; }
+.lab { margin: 0; font-size: 25px; font-weight: 800; }
+.pick { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+section.slide .pick button[data-set] { min-height: 60px; margin: 0; padding: 4px 10px; border: 3px solid #CBD5DF; border-radius: 14px; background: #FFFFFF; color: var(--navy); font-size: 23px; font-weight: 700; line-height: 1.2; }
+section.slide .pick button[data-set][aria-pressed="true"] { background: var(--navy); border-color: var(--navy); color: #FFFFFF; }
+.now { margin: 8px 0 0; font-size: 24px; font-weight: 700; color: var(--gray); }
+.read { margin: 6px 0 0; padding: 10px 16px; border-radius: 14px; background: #FFFFFF; border: 3px solid #DCE3EA; font-size: 26px; line-height: 1.4; }
+.read b { font-size: 36px; }
+.say { margin: 4px 0 0; font-size: 25px; font-weight: 800; line-height: 1.4; }
+.say.easy { color: #2F6CB0; } .say.good { color: #23794F; } .say.hard { color: #B9352B; }
+.model { font-size: 21px; color: var(--gray); font-weight: 500; }
+.pa .plot { margin: 4px 0 0; }
+
+/* 강도 세 구간 */
+.zones { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; margin-top: 6px; }
+.zones > div { padding: 16px 18px 20px; border-radius: 20px; background: #FFFFFF; border-top: 14px solid; box-shadow: 0 2px 0 #DCE3EA; }
+.zones .z1 { border-color: var(--easy); } .zones .z2 { border-color: var(--good); } .zones .z3 { border-color: var(--hard); }
+.zones b { display: block; font-size: 32px; }
+.zones .pct { display: block; margin: 4px 0 10px; font-size: 23px; color: var(--gray); font-weight: 700; }
+.zones svg { display: block; margin: 0 auto 6px; }
+.zones p { margin: 0; font-size: 27px; line-height: 1.45; }
+.zone-tip { margin-top: 22px; padding: 14px 24px; border-radius: 16px; background: #E6F4EC; font-size: 29px; font-weight: 700; line-height: 1.45; }
+
+/* 계기판 */
+.gb { display: grid; grid-template-columns: 600px 1fr; gap: 34px; align-items: start; }
+.gb svg { display: block; }
+.gb-ctrl { display: flex; flex-direction: column; gap: 4px; }
+.gb-ctrl .lab b { color: var(--accent); }
+.eq { margin: 4px 0 0; font-size: 25px; line-height: 1.5; }
+.eq b { font-size: 28px; }
+
+/* 확인·정리 */
+.q-lead { margin: 0 0 14px; font-size: 27px; color: var(--gray); }
+.sort .bin { min-height: 100px; }
+.sort .bin h3 { font-size: 27px; }
+.sum { margin: 22px 0 0; padding: 0; list-style: none; }
+.sum li { position: relative; padding-left: 40px; margin: 0 0 20px; font-size: 31px; line-height: 1.45; }
+.sum li::before { content: ""; position: absolute; left: 4px; top: 14px; width: 20px; height: 20px; border-radius: 4px; background: var(--track); }
+.short .ask { font-size: 28px; }
+</style>
+</head>
+<body data-theme="ppt">
+
+<!-- 1 표지 -->
+<section class="slide" id="cover" data-title="표지">
+  <div class="cv" data-enter="off">
+    <svg width="1280" height="720" viewBox="0 0 1280 720" aria-label="트랙을 달리는 사람과 크게 뛰는 심장">
+      <path d="M0 610 Q640 470 1280 560 V720 H0Z" fill="#C8553D"/>
+      <path d="M0 640 Q640 505 1280 594" fill="none" stroke="#FFFFFF" stroke-width="5"/>
+      <path d="M0 676 Q640 545 1280 632" fill="none" stroke="#FFFFFF" stroke-width="5"/>
+      <path d="M0 610 Q640 470 1280 560" fill="none" stroke="#2E9E6A" stroke-width="10"/>
+      <g transform="translate(1010 250)">
+        <path d="M0,60 C-80,10 -90,-50 -44,-70 C-20,-80 0,-60 0,-40 C0,-60 20,-80 44,-70 C90,-50 80,10 0,60Z" transform="scale(1.9)" fill="#E2674F"/>
+        <path d="M-210 0 H-120 L-96 -46 L-66 64 L-36 -20 L-18 0 H150" fill="none" stroke="#FFFFFF" stroke-width="10" stroke-linejoin="round" stroke-linecap="round"/>
+      </g>
+      <g transform="translate(760 520)" stroke="#FFFFFF" stroke-width="14" stroke-linecap="round" fill="none">
+        <circle cx="26" cy="-150" r="22" fill="#FFFFFF" stroke="none"/>
+        <path d="M14 -120 L-6 -60"/><path d="M-6 -60 L30 -18 L14 30"/><path d="M-6 -60 L-40 -20 L-76 -2"/>
+        <path d="M10 -110 L50 -82 L76 -104"/><path d="M10 -110 L-24 -92 L-44 -60"/>
+      </g>
+    </svg>
+    <div class="cv-text" data-anim="fade-up">
+      <p class="cv-k">초등학교 체육 5~6학년 · 건강</p>
+      <h1>운동하면 심장은<br>얼마나 빨리 뛸까?</h1>
+      <p class="cv-s">운동 강도와 심박수</p>
+    </div>
+  </div>
+</section>
+
+<!-- 2 학습 목표 -->
+<section class="slide" id="goal" data-sec="학습 목표" data-title="학습 목표">
+  <h2>오늘 배울 것</h2>
+  <ol class="goals">
+    <li>맥박을 재어 <span class="key">1분 동안의 심박수</span>를 구할 수 있다.</li>
+    <li>운동 강도에 따라 심박수가 어떻게 바뀌는지<br>설명할 수 있다.</li>
+    <li>나에게 알맞은 운동 강도를 찾을 수 있다.</li>
+  </ol>
+</section>
+
+<!-- 3 생각 열기 -->
+<section class="slide" id="think" data-sec="생각 열기" data-title="줄넘기 뒤 심박수 예상">
+  <h2>줄넘기를 하고 나면 심장은?</h2>
+  <div class="open">
+    <div>
+      <p>줄넘기를 3분 동안 쉬지 않고 했다.<br>가슴에 손을 대 보니 쿵쾅쿵쾅 뛴다.</p>
+      <p class="ask">이때 심장은 1분에<br>몇 번쯤 뛰고 있을까?</p>
+      <p class="step">오늘 수업에서 직접 재고 그래프로 확인해 보자.</p>
+    </div>
+    <div class="poll" data-options="80번쯤|120번쯤|160번쯤|200번쯤" data-ai="예상 투표">
+      <p>내 예상은?</p>
+    </div>
+  </div>
+</section>
+
+<!-- 4 맥박 재기 -->
+<section class="slide" id="pulse" data-sec="맥박 재기" data-title="맥박 재기">
+  <h2>심박수는 어떻게 잴까?</h2>
+  <div class="pulse">
+    <div>
+      <svg width="330" height="260" viewBox="0 0 330 260" aria-label="손바닥이 위를 보게 한 손목의 엄지 쪽에 다른 손의 검지와 중지를 대고 맥박을 재는 모습">
+        <g fill="#F2C9A5">
+          <path d="M108 260 L116 132 Q118 120 130 120 H206 Q218 120 220 132 L228 260Z"/>
+          <path d="M116 132 Q104 76 124 46 Q168 26 210 46 Q230 76 220 132Z"/>
+          <rect x="122" y="6" width="22" height="58" rx="11"/><rect x="148" y="0" width="22" height="62" rx="11"/>
+          <rect x="174" y="2" width="22" height="60" rx="11"/><rect x="198" y="12" width="20" height="52" rx="10"/>
+          <rect x="214" y="62" width="28" height="64" rx="14" transform="rotate(-28 228 94)"/>
+        </g>
+        <path d="M120 136 H216" stroke="#D99B74" stroke-width="3"/>
+        <circle cx="198" cy="162" r="7" fill="#C9473A"/>
+        <circle cx="198" cy="162" r="15" fill="none" stroke="#C9473A" stroke-width="3" stroke-dasharray="5 5"/>
+        <g fill="#F7D7B9" stroke="#C99772" stroke-width="3">
+          <rect x="194" y="146" width="136" height="22" rx="11"/>
+          <rect x="198" y="172" width="132" height="22" rx="11"/>
+        </g>
+        <text x="256" y="58" font-size="22" fill="#5F6B77" font-weight="700">엄지</text>
+        <path d="M86 214 L186 170" stroke="#C9473A" stroke-width="3"/>
+        <text x="4" y="236" font-size="22" fill="#C9473A" font-weight="800">맥박을 재는 곳</text>
+      </svg>
+    </div>
+    <div>
+      <p class="def"><b class="key">심박수</b>는 1분 동안 심장이 뛰는 횟수다. 심장이 뛸 때마다 손목과 목에서 맥박이 느껴진다.</p>
+      <ol>
+        <li>검지와 중지를 손목의 엄지 쪽에 살짝 댄다. 엄지로는 누르지 않는다.</li>
+        <li>타이머를 켜고 10초 동안 맥박을 센다.</li>
+        <li>센 수에 6을 곱한다. 10초의 6배가 1분이다.</li>
+      </ol>
+      <div class="timer" data-sec="10" data-label="10초 맥박 재기"></div>
+      <p class="ex step">예: 10초 동안 14번 → 14 × 6 = 1분에 84번</p>
+    </div>
+  </div>
+</section>
+
+<!-- 5 익스플로라그램: 운동 강도와 심박수 -->
+<section class="slide" id="intensity" data-sec="강도와 심박수" data-title="운동 강도에 따른 심박수 변화">
+  <h2>어떤 운동을 하면 심박수가 얼마나 오를까?</h2>
+  <div class="calc pa" id="pe-a" data-ai="운동 강도와 심박수 변화 모형(12살 가정)"
+       data-let="r = 80; T = g == 1 ? 100 : g == 2 ? 120 : g == 3 ? 150 : 185;
+                 h5 = r + (T - r) * (1 - exp(-5 / 0.8));
+                 h = t <= 5 ? r + (T - r) * (1 - exp(-t / 0.8)) : r + (h5 - r) * exp(-(t - 5) / 1.2);
+                 M = 208; lo = 0.6 * M; hi = 0.8 * M">
+    <div>
+      <svg width="680" height="150" viewBox="0 0 680 150" aria-label="고른 운동을 하는 사람과 뛰는 심장">
+        <rect x="0" y="112" width="460" height="34" fill="#D8705A"/>
+        <line x1="0" y1="113" x2="460" y2="113" stroke="#FFFFFF" stroke-width="3"/>
+        <line x1="0" y1="145" x2="460" y2="145" stroke="#FFFFFF" stroke-width="3"/>
+        <line id="pa-dash" x1="0" y1="129" x2="460" y2="129" stroke="#FFFFFF" stroke-width="4" stroke-dasharray="26 22" opacity=".7"/>
+        <g id="pa-runner" transform="translate(180 113) scale(.8)" stroke="#1D2B3A" stroke-width="9" stroke-linecap="round" fill="none">
+          <line id="pa-leg2a"/><line id="pa-leg2b"/><line id="pa-arm2a"/><line id="pa-arm2b"/>
+          <line id="pa-body"/>
+          <line id="pa-leg1a"/><line id="pa-leg1b"/><line id="pa-arm1a"/><line id="pa-arm1b"/>
+          <circle id="pa-head" r="14" fill="#1D2B3A" stroke="none"/>
+        </g>
+        <g font-size="23" font-weight="800" fill="#1D2B3A">
+          <text x="300" y="40" data-show="g == 1">천천히 걷기</text>
+          <text x="300" y="40" data-show="g == 2">빠르게 걷기</text>
+          <text x="300" y="40" data-show="g == 3">가볍게 달리기</text>
+          <text x="300" y="40" data-show="g == 4">빠르게 달리기</text>
+          <text x="300" y="76" font-size="21" fill="#5F6B77" font-weight="700" data-show="t > 5">지금은 쉬는 중</text>
+        </g>
+        <g id="pa-heart" transform="translate(575 72)">
+          <path d="M0,30 C-40,5 -45,-25 -22,-35 C-10,-40 0,-30 0,-20 C0,-30 10,-40 22,-35 C45,-25 40,5 0,30Z" fill="#E2674F" transform="scale(1.45)"/>
+        </g>
+      </svg>
+      <figure class="plot" data-x="0, 8" data-y="60, 210" data-xstep="1" data-ystep="30" data-height="300" data-xlabel="시간(분) · 5분에 멈추고 쉰다" data-ylabel="심박수(번/분)" aria-label="시간에 따른 심박수 그래프와 운동 강도 구간">
+        <i data-path="0, 60; 8, 60; 8, lo; 0, lo" data-close data-fill data-color="#4C8DD6" data-label="가벼움"></i>
+        <i data-path="0, lo; 8, lo; 8, hi; 0, hi" data-close data-fill data-color="#2E9E6A" data-label="건강 구간"></i>
+        <i data-path="0, hi; 8, hi; 8, 210; 0, 210" data-close data-fill data-color="#D9443A" data-label="힘듦"></i>
+        <i data-vline="5" data-dash data-color="#5F6B77"></i>
+        <i data-line="x <= 5 ? r + (T - r) * (1 - exp(-x / 0.8)) : r + (h5 - r) * exp(-(x - 5) / 1.2)" data-x="0, max(t, 0.01)" data-color="#1D2B3A"></i>
+        <i data-point="t, h" data-color="#C8553D"></i>
+      </figure>
+    </div>
+    <div class="pa-ctrl">
+      <p class="lab">어떤 운동을 할까?</p>
+      <div class="pick">
+        <button data-set="g" data-value="1" aria-pressed="true">천천히 걷기</button>
+        <button data-set="g" data-value="2">빠르게 걷기</button>
+        <button data-set="g" data-value="3">가볍게 달리기</button>
+        <button data-set="g" data-value="4">빠르게 달리기</button>
+      </div>
+      <p class="now">시간 <output data-expr="t" data-digits="1" data-unit="분"></output>
+        <span data-show="t > 0 && t <= 5">(운동 중)</span><span data-show="t > 5">(쉬는 중)</span></p>
+      <input type="range" id="pe-t" name="t" min="0" max="8" step="0.1" value="0" data-play="12" aria-label="운동을 시작하고 지난 시간">
+      <div class="read" data-ai="모형 수치">심박수 1분에 <b><output data-expr="h" data-digits="0" data-unit="번"></output></b> <span class="model">(모형)</span></div>
+      <p class="say" data-show="t == 0">「▶ 재생」을 누르고 그래프를 지켜보자.</p>
+      <p class="say" data-show="t > 5">쉬는 중이다. 심박수가 천천히 내려온다.</p>
+      <p class="say easy" data-show="t > 0 && t <= 5 && h < lo">가벼운 운동 구간이다.</p>
+      <p class="say good" data-show="t > 0 && t <= 5 && h >= lo && h < hi">건강 구간이다. 심장과 폐가 튼튼해진다.</p>
+      <p class="say hard" data-show="t > 0 && t <= 5 && h >= hi">힘든 구간이다. 오래 하기 어렵다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 6 강도 세 구간 -->
+<section class="slide" id="zones" data-sec="강도와 심박수" data-title="운동 강도 세 구간">
+  <h2>운동 강도는 말해 보면 안다</h2>
+  <div class="zones" data-ai="강도 구간 정리(구간 비율은 모형)">
+    <div class="z1">
+      <b>가벼운 운동</b><span class="pct">최대 심박수의 60% 아래</span>
+      <svg width="90" height="70" viewBox="0 0 90 70" aria-hidden="true"><path d="M30 14 v34 a10 8 0 1 1 -6 -8 V10 l30 -6 v34 a10 8 0 1 1 -6 -8 V14z" fill="#4C8DD6"/></svg>
+      <p>노래를 불러도 숨이 차지 않는다.</p>
+    </div>
+    <div class="z2">
+      <b>알맞은 운동</b><span class="pct">건강 구간(60~80%)</span>
+      <svg width="90" height="70" viewBox="0 0 90 70" aria-hidden="true"><path d="M10 10 h70 a6 6 0 0 1 6 6 v28 a6 6 0 0 1 -6 6 h-44 l-16 14 v-14 h-10 a6 6 0 0 1 -6 -6 v-28 a6 6 0 0 1 6 -6z" fill="#2E9E6A"/></svg>
+      <p>숨이 조금 차지만 짧게 말할 수 있다.</p>
+    </div>
+    <div class="z3">
+      <b>힘든 운동</b><span class="pct">최대 심박수의 80% 위</span>
+      <svg width="90" height="70" viewBox="0 0 90 70" aria-hidden="true"><circle cx="45" cy="35" r="28" fill="#D9443A"/><path d="M31 30 l8 4 M59 30 l-8 4 M34 48 q11 -8 22 0" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round" fill="none"/></svg>
+      <p>숨이 많이 차서 말하기 어렵다.</p>
+    </div>
+  </div>
+  <p class="zone-tip step">심장과 폐를 튼튼하게 하려면 건강 구간에서 꾸준히 운동한다. 힘들수록 좋은 운동은 아니다.</p>
+</section>
+
+<!-- 7 익스플로라그램: 내 건강 구간 -->
+<section class="slide" id="gauge" data-sec="내 건강 구간" data-title="내 건강 구간 찾기">
+  <h2>내 심박수는 어느 구간에 있을까?</h2>
+  <div class="calc gb" data-ai="나이별 건강 구간 계기판 모형"
+       data-let="M = 220 - a; lo = 0.6 * M; hi = 0.8 * M; v = n * 6;
+                 cx = 300; cy = 278; R = 214;
+                 A1 = 220 - lo; A2 = 220 - hi; A3 = 220 - M; th = clamp(220 - v, 0, 180);
+                 x0 = cx - R; x1 = cx + R * cos(rad(A1)); y1 = cy - R * sin(rad(A1)); x2 = cx + R * cos(rad(A2)); y2 = cy - R * sin(rad(A2)); x3 = cx + R * cos(rad(A3)); y3 = cy - R * sin(rad(A3)); x4 = cx + R;
+                 b1 = (180 + A1) / 2; b2 = (A1 + A2) / 2; b3 = (A2 + A3) / 2;
+                 zone = v < lo ? 1 : v < hi ? 2 : v < M ? 3 : 4">
+    <svg width="600" height="360" viewBox="0 0 600 360" aria-label="심박수 계기판: 가벼움, 건강 구간, 힘듦 구간과 지금 심박수 바늘">
+      <path fill="none" stroke="#9CC3EC" stroke-width="44" d="M86 278 A 214 214 0 0 1 300 64" data-attr="d: 'M' + x0 + ' ' + cy + ' A ' + R + ' ' + R + ' 0 0 1 ' + x1 + ' ' + y1"/>
+      <path fill="none" stroke="#3FA672" stroke-width="44" d="M300 64 A 214 214 0 0 1 400 90" data-attr="d: 'M' + x1 + ' ' + y1 + ' A ' + R + ' ' + R + ' 0 0 1 ' + x2 + ' ' + y2"/>
+      <path fill="none" stroke="#E2674F" stroke-width="44" d="M400 90 A 214 214 0 0 1 500 200" data-attr="d: 'M' + x2 + ' ' + y2 + ' A ' + R + ' ' + R + ' 0 0 1 ' + x3 + ' ' + y3"/>
+      <path fill="none" stroke="#C9CFD6" stroke-width="44" d="M500 200 A 214 214 0 0 1 514 278" data-attr="d: 'M' + x3 + ' ' + y3 + ' A ' + R + ' ' + R + ' 0 0 1 ' + x4 + ' ' + cy"/>
+      <g font-size="20" fill="#5F6B77" font-weight="700" text-anchor="middle">
+        <text x="58" y="312">40</text><text x="300" y="30">130</text><text x="542" y="312">220</text>
+      </g>
+      <g data-attr="transform: 'rotate(' + (-th) + ' 300 278)'">
+        <line x1="300" y1="278" x2="470" y2="278" stroke="#1D2B3A" stroke-width="9" stroke-linecap="round"/>
+      </g>
+      <circle cx="300" cy="278" r="18" fill="#1D2B3A"/>
+      <g font-size="22" font-weight="800" text-anchor="middle" stroke="#F7F9FB" stroke-width="7" paint-order="stroke" stroke-linejoin="round">
+        <text fill="#2F6CB0" data-attr="x: cx + 140 * cos(rad(b1)); y: cy - 140 * sin(rad(b1)) + 8">가벼움</text>
+        <text fill="#23794F" data-attr="x: cx + 140 * cos(rad(b2)); y: cy - 140 * sin(rad(b2)) + 8">건강 구간</text>
+        <text fill="#B9352B" data-attr="x: cx + 140 * cos(rad(b3)); y: cy - 140 * sin(rad(b3)) + 8">힘듦</text>
+      </g>
+      <text x="300" y="346" font-size="34" font-weight="900" fill="#1D2B3A" text-anchor="middle">1분에 <tspan data-expr="v" data-unit="번"></tspan></text>
+    </svg>
+    <div class="gb-ctrl">
+      <p class="lab">나이 <b><output data-expr="a" data-unit="살"></output></b></p>
+      <input type="range" name="a" min="10" max="70" step="1" value="12" aria-label="나이">
+      <p class="lab">10초 동안 센 맥박 <b><output data-expr="n" data-unit="번"></output></b></p>
+      <input type="range" name="n" min="10" max="36" step="1" value="14" aria-label="10초 동안 센 맥박 수">
+      <p class="eq">최대 심박수 = 220 − <output data-expr="a"></output> = <b><output data-expr="M" data-unit="번"></output></b> (어림)</p>
+      <p class="eq" data-ai="모형 수치">건강 구간 <b><output data-expr="round(lo)"></output>~<output data-expr="round(hi)" data-unit="번"></output></b> <span class="model">(60~80%, 모형)</span></p>
+      <p class="eq">1분 심박수 = <output data-expr="n"></output> × 6 = <b><output data-expr="v" data-unit="번"></output></b></p>
+      <p class="say easy" data-show="zone == 1">가벼운 운동이다. 조금 더 힘차게 해도 된다.</p>
+      <p class="say good" data-show="zone == 2">건강 구간이다. 이 빠르기로 꾸준히 하자.</p>
+      <p class="say hard" data-show="zone == 3">힘든 운동이다. 조금 천천히 하자.</p>
+      <p class="say hard" data-show="zone == 4">최대 심박수에 닿거나 넘었다. 멈추고 쉬자.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 8 확인: ×6 계산 -->
+<section class="slide" id="calc6" data-sec="내 건강 구간" data-title="10초 맥박을 1분 심박수로">
+  <h2>10초 동안 맥박이 25번 뛰었다면?</h2>
+  <p class="q-lead">달리기를 마치고 바로 10초 동안 맥박을 세었더니 25번이었다. 1분 심박수는 몇 번일까?</p>
+  <div class="quiz" data-cols="2" data-ai="문항과 풀이">
+    <button class="opt" data-why="25 × 5를 한 값이다. 1분은 10초의 6배다.">125번</button>
+    <button class="opt" data-ok data-why="맞다. 25 × 6 = 150이다. 12살이면 건강 구간(125~166번)에 든다.">150번</button>
+    <button class="opt" data-why="25 × 7을 한 값이다. 1분은 10초의 6배다.">175번</button>
+    <button class="opt" data-why="25 × 10을 한 값이다. 10초를 10번 모으면 100초가 된다.">250번</button>
+  </div>
+</section>
+
+<!-- 9 확인: 강도 나누기 -->
+<section class="slide" id="sort" data-sec="확인" data-title="운동 강도 나누기">
+  <h2>이 모습은 어느 강도의 운동일까?</h2>
+  <div class="sort" data-ai="분류 카드와 풀이">
+    <div class="bin" data-bin="e"><h3>가벼운 운동</h3></div>
+    <div class="bin" data-bin="g"><h3>알맞은 운동</h3></div>
+    <div class="bin" data-bin="h"><h3>힘든 운동</h3></div>
+    <span data-bin="g" data-why="숨이 차도 짧게 말할 수 있으면 알맞은 강도다." data-hint="노래까지 부를 수 있을까?">숨이 차지만 친구에게 짧게 말할 수 있다</span>
+    <span data-bin="e" data-why="노래를 불러도 숨이 차지 않으면 가벼운 운동이다." data-hint="숨이 얼마나 찰까?">노래를 부르며 천천히 걷는다</span>
+    <span data-bin="h" data-why="말을 못 할 만큼 숨이 차면 힘든 운동이다." data-hint="말을 할 수 있을까?">숨이 너무 차서 말이 안 나온다</span>
+    <span data-bin="e" data-why="몸을 천천히 늘이는 체조는 가벼운 운동이다." data-hint="심장이 많이 빨라질까?">팔다리를 천천히 쭉 늘인다</span>
+    <span data-bin="h" data-why="온 힘을 다하는 달리기는 힘든 운동이다." data-hint="이렇게 몇 분이나 달릴 수 있을까?">온 힘을 다해 짧게 달린다</span>
+    <span data-bin="g" data-why="땀이 나고 노래는 어렵지만 말은 할 수 있으면 알맞은 운동이다." data-hint="말과 노래 가운데 무엇이 어려울까?">땀이 나고 노래 부르기는 어렵다</span>
+  </div>
+</section>
+
+<!-- 10 확인: 멈춘 뒤 심박수 -->
+<section class="slide" id="rest" data-sec="확인" data-title="운동을 멈춘 뒤 심박수">
+  <h2>운동을 멈추면 심박수는 어떻게 될까?</h2>
+  <p class="q-lead">5쪽 그래프에서 5분 뒤의 곡선을 떠올려 보자.</p>
+  <div class="quiz" data-ai="문항과 풀이">
+    <button class="opt" data-why="심장은 멈추자마자 평소 빠르기로 돌아가지 않는다.">멈추자마자 평소 심박수로 돌아간다.</button>
+    <button class="opt" data-why="운동을 멈추면 몸이 쓰는 산소가 줄어 심박수도 내려간다.">한동안 계속 올라간다.</button>
+    <button class="opt" data-ok data-why="맞다. 처음에는 빨리, 갈수록 천천히 내려가 평소 심박수에 가까워진다.">천천히 내려가 평소 심박수에 가까워진다.</button>
+    <button class="opt" data-why="운동하는 동안에도 심박수는 오르다가 한 높이에 머문다.">운동하던 때와 같은 높이에 머문다.</button>
+  </div>
+</section>
+
+<!-- 11 정리 -->
+<section class="slide" id="summary" data-sec="정리" data-title="정리">
+  <h2>오늘 배운 것</h2>
+  <ul class="sum">
+    <li>10초 동안 센 맥박 수에 <span class="blank">6</span>을 곱하면 1분 심박수다.</li>
+    <li>운동을 시작하면 심박수가 오르다가 한 높이에 머물고, 멈추면 <span class="blank">천천히</span> 내려온다.</li>
+    <li>심장과 폐를 튼튼하게 하려면 <span class="blank">건강 구간</span>에서 꾸준히 운동한다.</li>
+  </ul>
+  <div class="short" data-ph="예: ○○번쯤이 되도록 ○○하게 달린다." data-ai="정리 물음">
+    <p class="ask">운동장 달리기에서 내 심박수가 건강 구간에 머물려면<br>어떻게 달려야 할까? 한 문장으로 써 보자.</p>
+  </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const $ = (s) => document.querySelector(s);
+  const still = () => document.documentElement.classList.contains('ch-motion-off');   // ⚙ 「움직임 끄기」만 본다
+
+  // ── 5쪽: 고른 운동을 하는 사람과 뛰는 심장(계산 상자와 같은 식으로 심박수를 셈한다) ──
+  const RATE = { T: [100, 120, 150, 185], cad: [1.2, 1.7, 2.4, 3.0], amp: [16, 24, 34, 44], lean: [0, 3, 9, 14], run: [0, 0, 1, 1], spd: [50, 85, 160, 240] };
+  const st = { phase: 0, beat: 0, dash: 0, last: 0, raf: 0, on: false };
+  const pick = () => { const b = $('#pe-a [data-set="g"][aria-pressed="true"]'); return b ? Number(b.dataset.value) : 1; };
+  function hrAt(t, g) {
+    const r = 80, T = RATE.T[g - 1];
+    if (t <= 5) return r + (T - r) * (1 - Math.exp(-t / 0.8));
+    const h5 = r + (T - r) * (1 - Math.exp(-5 / 0.8));
+    return r + (h5 - r) * Math.exp(-(t - 5) / 1.2);
+  }
+  const set = (id, x1, y1, x2, y2) => { const l = document.getElementById(id); l.setAttribute('x1', x1.toFixed(1)); l.setAttribute('y1', y1.toFixed(1)); l.setAttribute('x2', x2.toFixed(1)); l.setAttribute('y2', y2.toFixed(1)); };
+  const rad = (d) => d * Math.PI / 180;
+  function pose(g, moving) {
+    const i = g - 1, run = moving && RATE.run[i];
+    const A = moving ? RATE.amp[i] : 0, p = st.phase;
+    const bob = moving ? -Math.abs(Math.sin(p)) * (run ? 7 : 2) : 0;
+    const lean = moving ? RATE.lean[i] : 0;
+    const hip = { x: 0, y: -50 + bob };
+    const sh = { x: Math.sin(rad(lean)) * 44, y: hip.y - Math.cos(rad(lean)) * 44 };
+    set('pa-body', hip.x, hip.y, sh.x, sh.y);
+    const head = document.getElementById('pa-head');
+    head.setAttribute('cx', (sh.x + Math.sin(rad(lean)) * 22).toFixed(1)); head.setAttribute('cy', (sh.y - Math.cos(rad(lean)) * 22).toFixed(1));
+    [['pa-leg1', 0], ['pa-leg2', Math.PI]].forEach(([id, off]) => {
+      const th = A * Math.sin(p + off) + (moving ? 0 : (off ? -7 : 7));
+      const bend = moving ? (run ? 26 : 8) + (run ? 34 : 14) * Math.max(0, Math.sin(p + off + 1.7)) : 0;
+      const k = { x: hip.x + 25 * Math.sin(rad(th)), y: hip.y + 25 * Math.cos(rad(th)) };
+      const f = { x: k.x + 25 * Math.sin(rad(th - bend)), y: k.y + 25 * Math.cos(rad(th - bend)) };
+      set(id + 'a', hip.x, hip.y, k.x, k.y); set(id + 'b', k.x, k.y, f.x, f.y);
+    });
+    [['pa-arm1', Math.PI], ['pa-arm2', 0]].forEach(([id, off]) => {
+      const th = -0.8 * A * Math.sin(p + off) + lean + (moving ? 0 : (off ? 14 : -14));
+      const el = { x: sh.x + 22 * Math.sin(rad(th)), y: sh.y + 22 * Math.cos(rad(th)) };
+      const fold = run ? 80 : moving ? 25 : 8;
+      const hd = { x: el.x + 20 * Math.sin(rad(th + fold)), y: el.y + 20 * Math.cos(rad(th + fold)) };
+      set(id + 'a', sh.x, sh.y, el.x, el.y); set(id + 'b', el.x, el.y, hd.x, hd.y);
+    });
+  }
+  function drawA(now) {
+    const dt = st.last ? Math.min(0.05, (now - st.last) / 1000) : 0;
+    st.last = now;
+    const t = Number($('#pe-t').value), g = pick();
+    const moving = t > 0 && t < 5, hr = hrAt(t, g);
+    if (!still()) {
+      if (moving) { st.phase += dt * RATE.cad[g - 1] * Math.PI * 2; st.dash = (st.dash + dt * RATE.spd[g - 1]) % 48; }
+      st.beat = (st.beat + dt * hr / 60) % 1;
+    }
+    pose(g, moving);
+    $('#pa-dash').setAttribute('stroke-dashoffset', st.dash.toFixed(1));
+    const b = st.beat, s = still() ? 1 : 1 + 0.16 * Math.exp(-(((b - 0.05) / 0.07) ** 2)) + 0.08 * Math.exp(-(((b - 0.27) / 0.06) ** 2));
+    $('#pa-heart').setAttribute('transform', `translate(575 72) scale(${s.toFixed(3)})`);
+    if (st.on) st.raf = requestAnimationFrame(drawA);
+  }
+  const slideA = $('#intensity');
+  Exploragram.onShow((slide) => { if (slide === slideA && !st.on) { st.on = true; st.last = 0; st.raf = requestAnimationFrame(drawA); } });
+  Exploragram.onHide((slide) => { if (slide === slideA) { st.on = false; cancelAnimationFrame(st.raf); } });
+  drawA(performance.now());   // 첫 그리기는 직접 부른다
+  if (slideA.classList.contains('is-active')) { st.on = true; st.raf = requestAnimationFrame(drawA); }
+});
+</script>
+</body>
+</html>

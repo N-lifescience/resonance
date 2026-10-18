@@ -1,0 +1,647 @@
+<!doctype html>
+<html lang="ko" data-deck="v3-elem-music">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>장단을 빠르게, 느리게 (세마치장단과 굿거리장단)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/engine/exploragram.css">
+<script defer src="https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/engine/exploragram.js"></script>
+<style>
+body[data-theme="ppt"] {
+  --ink: #26324A; --red: #B8392B; --gold: #E9B53C; --jade: #3B8B5A; --blue: #2F5D9E; --pink: #E39AA8;
+  --paper: #F8F2E4; --brown: #6B5E4E; --line: #D9CBAE;
+  --accent: #B8392B; --tab: #26324A; --tab-ink: #FFFFFF; --ch-paper: #F8F2E4;
+}
+
+/* ── 이 수업의 얼굴: 먹빛 머리 띠 + 색동 네 줄 + 겹테두리 현판 배지 ── */
+body[data-theme="ppt"] section.slide {
+  background:
+    linear-gradient(var(--ink), var(--ink)) 0 0 / 100% 86px no-repeat,
+    linear-gradient(var(--red), var(--red)) 0 86px / 100% 5px no-repeat,
+    linear-gradient(var(--gold), var(--gold)) 0 91px / 100% 5px no-repeat,
+    linear-gradient(var(--jade), var(--jade)) 0 96px / 100% 5px no-repeat,
+    linear-gradient(var(--blue), var(--blue)) 0 101px / 100% 5px no-repeat,
+    var(--paper);
+  color: var(--ink);
+}
+body[data-theme="ppt"] section.slide[data-sec]::before {
+  left: auto; right: 44px; top: 14px; height: 58px; min-width: 190px; padding: 0 22px; box-sizing: border-box; justify-content: center;
+  border-radius: 4px; background: var(--red); color: #FFFFFF; font-size: 25px; letter-spacing: 0;
+  box-shadow: inset 0 0 0 4px var(--red), inset 0 0 0 6px #F8F2E4;
+}
+body[data-theme="ppt"] section.slide > h2:first-child {
+  position: absolute; top: 0; left: 64px; right: 270px; height: 86px; margin: 0; padding: 0; width: auto;
+  display: flex; align-items: center; color: #FFFFFF; font-size: 42px; line-height: 1.2; border: 0; background: none; text-wrap: balance;
+}
+.key { color: var(--red); font-weight: 800; }
+
+/* 장구 그림의 울림 */
+.jg-svg .head, .jg-svg .palm, .jg-svg .stick { transform-box: fill-box; transform-origin: center; }
+
+/* 표지 */
+body[data-theme="ppt"] section.slide#cover { background: var(--ink); padding: 0; color: #FFFFFF; }
+.cv { position: relative; height: 100%; }
+.cv-stripes { position: absolute; left: 0; right: 0; bottom: 0; height: 40px; background: linear-gradient(var(--red) 0 25%, var(--gold) 25% 50%, var(--jade) 50% 75%, var(--blue) 75%); }
+.cv-text { position: absolute; left: 80px; top: 100px; width: 620px; }
+.cv-text p, .cv-text h1 { margin: 0; color: #FFFFFF; }
+.cv-k { display: inline-block; padding: 8px 20px; border-radius: 4px; background: var(--red); font-size: 26px; font-weight: 700; box-shadow: inset 0 0 0 3px var(--red), inset 0 0 0 5px var(--ink); }
+.cv-text h1 { margin: 26px 0 22px; font-size: 72px; line-height: 1.2; text-wrap: balance; }
+.cv-s { font-size: 31px; font-weight: 600; color: #D8D0BE !important; }
+.cv-art { position: absolute; right: 60px; top: 150px; }
+.cv-grid { position: absolute; left: 80px; bottom: 90px; display: flex; gap: 10px; }
+.cv-grid span { width: 64px; height: 64px; border: 3px solid #4B5872; border-radius: 6px; display: grid; place-items: center; font-size: 30px; font-weight: 900; color: #F3E3C3; }
+
+/* 학습 목표 */
+.goals { margin: 40px 0 0; padding: 0; list-style: none; counter-reset: g; }
+.goals li { counter-increment: g; position: relative; padding: 0 0 0 70px; margin: 0 0 30px; font-size: 34px; line-height: 1.45; }
+.goals li::before { content: counter(g); position: absolute; left: 0; top: -2px; width: 50px; height: 50px; border-radius: 4px; background: var(--red); color: #FFFFFF; font-weight: 800; font-size: 28px; text-align: center; line-height: 50px; box-shadow: inset 0 0 0 3px var(--red), inset 0 0 0 5px var(--paper); }
+
+/* 장구 소리 */
+.pad { display: grid; grid-template-columns: 560px 1fr; gap: 30px; align-items: center; margin-top: 4px; }
+.pad svg { display: block; }
+.pad-btns { display: flex; flex-direction: column; gap: 12px; }
+section.slide .pad-btns button { display: grid; grid-template-columns: 150px 1fr; align-items: center; gap: 12px; width: 100%; min-height: 70px; margin: 0; padding: 6px 18px; border: 3px solid var(--line); border-radius: 14px; background: #FFFFFF; color: var(--ink); text-align: left; }
+section.slide .pad-btns button b { font-size: 34px; font-weight: 900; }
+section.slide .pad-btns button span { font-size: 24px; font-weight: 600; line-height: 1.3; color: var(--brown); }
+section.slide .pad-btns button.on { border-color: var(--red); background: #FBEDE8; }
+.side-l { font-size: 22px; font-weight: 800; fill: #7A4A22; }
+
+/* 정간보(장단 칸) */
+.jgb { display: flex; gap: 14px; justify-content: center; margin: 44px 0 0; }
+.jgb .beat { position: relative; display: flex; border: 4px solid var(--ink); border-radius: 10px; background: #FFFFFF; }
+.jgb .beat::before { content: attr(data-n); position: absolute; left: 0; right: 0; top: -36px; text-align: center; font-size: 23px; font-weight: 800; color: var(--brown); }
+.jgb .c { display: grid; place-items: center; border-right: 2px solid var(--line); transition: background .15s; }
+.jgb .c:last-child { border-right: 0; }
+.jgb .c b { font-weight: 900; line-height: 1.05; text-align: center; }
+.jgb .c.e i { width: 10px; height: 10px; border-radius: 50%; background: #D9CBAE; }
+.jgb .c.on { background: #FCE7A8; }
+.jg9 .c { width: 116px; height: 140px; } .jg9 .c b { font-size: 56px; }
+.jg12 .c { width: 86px; height: 140px; } .jg12 .c b { font-size: 40px; } .jg12 .c b.two { font-size: 34px; }
+.under { display: grid; grid-template-columns: 1fr 300px; gap: 30px; align-items: start; margin-top: 34px; }
+.under ul { margin: 0; padding: 0; list-style: none; }
+.under li { position: relative; padding-left: 36px; margin: 0 0 16px; font-size: 31px; line-height: 1.45; }
+.under li::before { content: ""; position: absolute; left: 4px; top: 14px; width: 16px; height: 16px; border-radius: 3px; background: var(--gold); }
+section.slide button.play { min-height: 64px; margin: 0; padding: 0 26px; border: 0; border-radius: 14px; background: var(--red); color: #FFFFFF; font-size: 27px; font-weight: 800; }
+section.slide button.play[aria-pressed="true"] { background: var(--ink); }
+
+/* ── 익스플로라그램 공통 ── */
+.mu { display: grid; grid-template-columns: 700px 1fr; gap: 26px; align-items: start; }
+.mu svg { display: block; }
+.mu-ctrl { display: flex; flex-direction: column; gap: 8px; }
+.lab { margin: 6px 0 0; font-size: 25px; font-weight: 800; }
+.lab b { color: var(--red); }
+.word { margin: 0; font-size: 24px; font-weight: 700; color: var(--brown); }
+.eq { margin: 2px 0 0; font-size: 25px; line-height: 1.45; }
+.eq b { font-size: 28px; }
+.say { margin: 6px 0 0; font-size: 25px; font-weight: 800; line-height: 1.4; color: var(--jade); }
+.hear { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+section.slide .hear button[data-set] { min-height: 56px; margin: 0; padding: 0 6px; border: 3px solid var(--line); border-radius: 12px; background: #FFFFFF; color: var(--ink); font-size: 22px; font-weight: 800; }
+section.slide .hear button[data-set][aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #FFFFFF; }
+.mu .cell rect { fill: #FFFFFF; stroke: #26324A; stroke-width: 2; transition: fill .12s; }
+.mu .cell.on rect { fill: #FCE7A8; }
+
+/* 확인·정리 */
+.q-lead { margin: 0 0 14px; font-size: 27px; color: var(--brown); }
+.sort .bin { min-height: 104px; }
+.sort .bin h3 { font-size: 28px; }
+.sum { margin: 22px 0 0; padding: 0; list-style: none; }
+.sum li { position: relative; padding-left: 40px; margin: 0 0 20px; font-size: 32px; line-height: 1.45; }
+.sum li::before { content: ""; position: absolute; left: 4px; top: 14px; width: 20px; height: 20px; border-radius: 4px; background: var(--gold); }
+.short .ask { font-size: 28px; }
+</style>
+</head>
+<body data-theme="ppt">
+
+<!-- 1 표지 -->
+<section class="slide" id="cover" data-title="표지">
+  <div class="cv" data-enter="off">
+    <div class="cv-text" data-anim="fade-up">
+      <p class="cv-k">초등학교 음악 3~4학년 · 우리 음악</p>
+      <h1>장단을<br>빠르게, 느리게</h1>
+      <p class="cv-s">세마치장단과 굿거리장단</p>
+    </div>
+    <svg class="cv-art" width="500" height="300" viewBox="-20 -20 380 220" aria-label="장구 그림">
+    <g class="jg-svg">
+      <path d="M62 14 Q122 32 140 80 H160 Q178 34 238 22 V158 Q178 146 160 100 H140 Q122 148 62 166 Z" fill="#B8392B"/>
+      <polyline points="70,26 230,36 70,58 230,64 70,90 230,90 70,122 230,116 70,154 230,144" fill="none" stroke="#E9B53C" stroke-width="3" opacity=".9"/>
+      <ellipse id="mu-c-hl" class="head" cx="60" cy="90" rx="30" ry="80" fill="#F3E3C3" stroke="#7A4A22" stroke-width="6"/>
+      <ellipse id="mu-c-hr" class="head" cx="240" cy="90" rx="26" ry="70" fill="#F6EAD2" stroke="#7A4A22" stroke-width="6"/>
+    </g>
+    </svg>
+    <div class="cv-grid" aria-hidden="true"><span>덩</span><span></span><span></span><span>덩</span><span></span><span>덕</span><span>쿵</span><span>덕</span><span></span></div>
+    <div class="cv-stripes"></div>
+  </div>
+</section>
+
+<!-- 2 학습 목표 -->
+<section class="slide" id="goal" data-sec="학습 목표" data-title="학습 목표">
+  <h2>오늘 배울 것</h2>
+  <ol class="goals">
+    <li>장구 소리 <span class="key">덩, 쿵, 덕, 기덕, 더러러러</span>를 구별할 수 있다.</li>
+    <li>세마치장단과 굿거리장단이<br>한 장단에 몇 박인지 말할 수 있다.</li>
+    <li>빠르기가 바뀌면 장단의 무엇이 바뀌고<br>무엇이 그대로인지 설명할 수 있다.</li>
+  </ol>
+</section>
+
+<!-- 3 장구 소리 -->
+<section class="slide" id="pad" data-sec="장구 소리" data-title="장구 소리 듣기">
+  <h2>장구의 어디를 치면 어떤 소리가 날까?</h2>
+  <div class="pad">
+    <svg width="560" height="380" viewBox="-60 -60 420 285" aria-label="장구: 왼쪽은 북편(왼손 손바닥), 오른쪽은 채편(오른손 열채)">
+    <g class="jg-svg">
+      <path d="M62 14 Q122 32 140 80 H160 Q178 34 238 22 V158 Q178 146 160 100 H140 Q122 148 62 166 Z" fill="#B8392B"/>
+      <polyline points="70,26 230,36 70,58 230,64 70,90 230,90 70,122 230,116 70,154 230,144" fill="none" stroke="#E9B53C" stroke-width="3" opacity=".9"/>
+      <ellipse id="mu-p-hl" class="head" cx="60" cy="90" rx="30" ry="80" fill="#F3E3C3" stroke="#7A4A22" stroke-width="6"/>
+      <ellipse id="mu-p-hr" class="head" cx="240" cy="90" rx="26" ry="70" fill="#F6EAD2" stroke="#7A4A22" stroke-width="6"/>
+      <g id="mu-p-palm" class="palm" fill="#E8B48C" stroke="#A8724C" stroke-width="3"><rect x="-58" y="58" width="40" height="66" rx="14"/><rect x="-26" y="60" width="30" height="13" rx="6.5"/><rect x="-26" y="76" width="34" height="13" rx="6.5"/><rect x="-26" y="92" width="32" height="13" rx="6.5"/><rect x="-26" y="108" width="26" height="13" rx="6.5"/><rect x="-50" y="118" width="14" height="30" rx="7" transform="rotate(-30 -43 133)"/></g>
+      <g id="mu-p-stick" class="stick"><line x1="330" y1="10" x2="262" y2="96" stroke="#7A4A22" stroke-width="7" stroke-linecap="round"/><circle cx="332" cy="8" r="8" fill="#7A4A22"/></g>
+    </g>
+      <text class="side-l" x="60" y="206" text-anchor="middle">북편(왼손)</text>
+      <text class="side-l" x="260" y="206" text-anchor="middle">채편(오른손 열채)</text>
+    </svg>
+    <div class="pad-btns" id="pad-btns">
+      <button type="button" data-hit="덩"><b>덩</b><span>북편과 채편을 함께 친다</span></button>
+      <button type="button" data-hit="쿵"><b>쿵</b><span>북편을 왼손으로 친다</span></button>
+      <button type="button" data-hit="덕"><b>덕</b><span>채편을 열채로 친다</span></button>
+      <button type="button" data-hit="기덕"><b>기덕</b><span>채편을 겹쳐서 친다</span></button>
+      <button type="button" data-hit="더러러러"><b>더러러러</b><span>채편을 굴려서 친다</span></button>
+    </div>
+  </div>
+</section>
+
+<!-- 4 세마치장단 -->
+<section class="slide" id="sema" data-sec="세마치장단" data-title="세마치장단 알아보기">
+  <h2>세마치장단은 몇 박일까?</h2>
+  <div class="jgb jg9" id="jg-sema"><div class="beat" data-n="1박"><div class="c"><b style="color:#26324A">덩</b></div><div class="c e"><i></i></div><div class="c e"><i></i></div></div><div class="beat" data-n="2박"><div class="c"><b style="color:#26324A">덩</b></div><div class="c e"><i></i></div><div class="c"><b style="color:#B8392B">덕</b></div></div><div class="beat" data-n="3박"><div class="c"><b style="color:#2F5D9E">쿵</b></div><div class="c"><b style="color:#B8392B">덕</b></div><div class="c e"><i></i></div></div></div>
+  <div class="under">
+    <ul>
+      <li class="step">세마치장단은 한 장단이 <span class="key">3박</span>이다.</li>
+      <li class="step">한 박은 작은 칸 3개다. 그래서 한 장단은 9칸이다.</li>
+      <li class="step">구음으로 따라 해 보자. 덩 덩 덕 쿵 덕</li>
+    </ul>
+    <button type="button" class="play" id="sema-play" aria-pressed="false">▶ 들어 보기</button>
+  </div>
+</section>
+
+<!-- 5 익스플로라그램: 빠르기와 한 장단 -->
+<section class="slide" id="tempo" data-sec="빠르기" data-title="빠르기와 한 장단의 길이">
+  <h2>빠르게 치면 장단의 무엇이 바뀔까?</h2>
+  <div class="calc mu" id="mu-a" data-ai="빠르기와 장단 길이 모형(세마치)" data-let="b = 60 / B; L = 3 * b">
+    <svg width="700" height="324" viewBox="0 0 700 324" aria-label="세마치장단 9칸과 한 장단의 길이를 나타낸 시간 자">
+          <g transform="translate(2 38) scale(.5)"><g class="jg-svg">
+      <path d="M62 14 Q122 32 140 80 H160 Q178 34 238 22 V158 Q178 146 160 100 H140 Q122 148 62 166 Z" fill="#B8392B"/>
+      <polyline points="70,26 230,36 70,58 230,64 70,90 230,90 70,122 230,116 70,154 230,144" fill="none" stroke="#E9B53C" stroke-width="3" opacity=".9"/>
+      <ellipse id="mu-a-hl" class="head" cx="60" cy="90" rx="30" ry="80" fill="#F3E3C3" stroke="#7A4A22" stroke-width="6"/>
+      <ellipse id="mu-a-hr" class="head" cx="240" cy="90" rx="26" ry="70" fill="#F6EAD2" stroke="#7A4A22" stroke-width="6"/>
+    </g></g>
+          <text x="242" y="24" font-size="21" font-weight="800" fill="#6B5E4E" text-anchor="middle">1박</text>
+          <text x="420" y="24" font-size="21" font-weight="800" fill="#6B5E4E" text-anchor="middle">2박</text>
+          <text x="598" y="24" font-size="21" font-weight="800" fill="#6B5E4E" text-anchor="middle">3박</text>
+          <g class="cell" data-i="0"><rect x="160" y="34" width="52" height="88" rx="8"/><text x="186" y="91" font-size="30" font-weight="900" text-anchor="middle" fill="#26324A">덩</text></g>
+          <g class="cell" data-i="1"><rect x="216" y="34" width="52" height="88" rx="8"/><circle cx="242" cy="78" r="4" fill="#C9BC9F"/></g>
+          <g class="cell" data-i="2"><rect x="272" y="34" width="52" height="88" rx="8"/><circle cx="298" cy="78" r="4" fill="#C9BC9F"/></g>
+          <g class="cell" data-i="3"><rect x="338" y="34" width="52" height="88" rx="8"/><text x="364" y="91" font-size="30" font-weight="900" text-anchor="middle" fill="#26324A">덩</text></g>
+          <g class="cell" data-i="4"><rect x="394" y="34" width="52" height="88" rx="8"/><circle cx="420" cy="78" r="4" fill="#C9BC9F"/></g>
+          <g class="cell" data-i="5"><rect x="450" y="34" width="52" height="88" rx="8"/><text x="476" y="91" font-size="30" font-weight="900" text-anchor="middle" fill="#B8392B">덕</text></g>
+          <g class="cell" data-i="6"><rect x="516" y="34" width="52" height="88" rx="8"/><text x="542" y="91" font-size="30" font-weight="900" text-anchor="middle" fill="#2F5D9E">쿵</text></g>
+          <g class="cell" data-i="7"><rect x="572" y="34" width="52" height="88" rx="8"/><text x="598" y="91" font-size="30" font-weight="900" text-anchor="middle" fill="#B8392B">덕</text></g>
+          <g class="cell" data-i="8"><rect x="628" y="34" width="52" height="88" rx="8"/><circle cx="654" cy="78" r="4" fill="#C9BC9F"/></g>
+          <line id="mu-a-ph1" x1="160" x2="160" y1="30" y2="126" stroke="#B8392B" stroke-width="5" stroke-linecap="round" opacity="0"/>
+          <line x1="60" y1="250" x2="590" y2="250" stroke="#6B5E4E" stroke-width="3"/>
+          <line x1="60" y1="243" x2="60" y2="257" stroke="#6B5E4E" stroke-width="3"/><text x="60" y="284" font-size="21" fill="#6B5E4E" text-anchor="middle" font-weight="700">0초</text>
+          <line x1="160" y1="243" x2="160" y2="257" stroke="#6B5E4E" stroke-width="3"/><text x="160" y="284" font-size="21" fill="#6B5E4E" text-anchor="middle" font-weight="700">1초</text>
+          <line x1="260" y1="243" x2="260" y2="257" stroke="#6B5E4E" stroke-width="3"/><text x="260" y="284" font-size="21" fill="#6B5E4E" text-anchor="middle" font-weight="700">2초</text>
+          <line x1="360" y1="243" x2="360" y2="257" stroke="#6B5E4E" stroke-width="3"/><text x="360" y="284" font-size="21" fill="#6B5E4E" text-anchor="middle" font-weight="700">3초</text>
+          <line x1="460" y1="243" x2="460" y2="257" stroke="#6B5E4E" stroke-width="3"/><text x="460" y="284" font-size="21" fill="#6B5E4E" text-anchor="middle" font-weight="700">4초</text>
+          <line x1="560" y1="243" x2="560" y2="257" stroke="#6B5E4E" stroke-width="3"/><text x="560" y="284" font-size="21" fill="#6B5E4E" text-anchor="middle" font-weight="700">5초</text>
+          <rect y="196" height="40" rx="6" fill="#E9B53C" x="60" width="96" data-attr="x: 60 + 0 * b * 100; width: b * 100 - 4"/>
+          <rect y="196" height="40" rx="6" fill="#F2CF7A" x="160" width="96" data-attr="x: 60 + 1 * b * 100; width: b * 100 - 4"/>
+          <rect y="196" height="40" rx="6" fill="#E9B53C" x="260" width="96" data-attr="x: 60 + 2 * b * 100; width: b * 100 - 4"/>
+          <circle cy="180" r="10" fill="#26324A" cx="76.7" data-attr="cx: 60 + (0 + 0.5) * b / 3 * 100"/>
+          <circle cy="180" r="10" fill="#26324A" cx="176.7" data-attr="cx: 60 + (3 + 0.5) * b / 3 * 100"/>
+          <circle cy="180" r="7" fill="#B8392B" cx="243.3" data-attr="cx: 60 + (5 + 0.5) * b / 3 * 100"/>
+          <circle cy="180" r="9" fill="#2F5D9E" cx="276.7" data-attr="cx: 60 + (6 + 0.5) * b / 3 * 100"/>
+          <circle cy="180" r="7" fill="#B8392B" cx="310.0" data-attr="cx: 60 + (7 + 0.5) * b / 3 * 100"/>
+          <line y1="150" y2="250" stroke="#26324A" stroke-width="3" stroke-dasharray="6 5" x1="360" x2="360" data-attr="x1: 60 + L * 100; x2: 60 + L * 100"/>
+          <text y="146" font-size="23" font-weight="900" fill="#26324A" text-anchor="middle" x="360" data-attr="x: min(60 + L * 100, 600)">한 장단 <tspan data-expr="round(L, 2)" data-unit="초"></tspan></text>
+          <g font-size="20" font-weight="700" fill="#6B5E4E"><circle cx="170" cy="312" r="10" fill="#26324A" transform="translate(0 -7)"/><text x="170" dx="16" y="312">덩</text><circle cx="170" cy="312" r="9" fill="#2F5D9E" transform="translate(70 -7)"/><text x="170" dx="86" y="312">쿵</text><circle cx="170" cy="312" r="7" fill="#B8392B" transform="translate(140 -7)"/><text x="170" dx="156" y="312">덕, 기덕</text><circle cx="170" cy="312" r="6" fill="#9A6B0C" transform="translate(262 -7)"/><text x="170" dx="278" y="312">더러러러</text></g>
+          <line id="mu-a-ph2" x1="60" x2="60" y1="166" y2="252" stroke="#B8392B" stroke-width="5" stroke-linecap="round" opacity="0"/>
+          <g data-show="!go"><rect x="40" y="127" width="652" height="190" rx="16" fill="#EFE7D6" stroke="#C9BC9F" stroke-width="3" stroke-dasharray="10 8"/><text x="366" y="230" font-size="27" font-weight="800" fill="#6B5E4E" text-anchor="middle">장단을 치거나 빠르기를 바꿔 보자</text></g>
+    </svg>
+    <div class="mu-ctrl">
+      <button type="button" class="play" id="mu-a-play" aria-pressed="false">▶ 장단 치기</button>
+      <p class="lab">빠르기 <b>1분에 <output data-expr="B" data-unit="박"></output></b></p>
+      <input type="range" name="B" min="40" max="140" step="5" value="60" aria-label="빠르기(1분에 치는 박 수)">
+      <input type="checkbox" name="go" hidden>
+      <p class="word" data-show="B < 60">빠르기말: 느리게 (어림)</p>
+      <p class="word" data-show="B >= 60 && B <= 100">빠르기말: 보통 빠르게 (어림)</p>
+      <p class="word" data-show="B > 100">빠르기말: 빠르게 (어림)</p>
+      <div data-show="go">
+        <p class="eq">한 박 = 60초 ÷ <output data-expr="B"></output> = <b><output data-expr="round(b, 2)" data-unit="초"></output></b></p>
+        <p class="eq">한 장단 = 3박 × <output data-expr="round(b, 2)" data-unit="초"></output> = <b><output data-expr="round(L, 2)" data-unit="초"></output></b></p>
+        <p class="say" data-show="B < 60">느리게 치면 한 장단이 길어진다.</p>
+        <p class="say" data-show="B == 60">한 박이 딱 1초다.</p>
+        <p class="say" data-show="B > 60">빠르게 치면 한 장단이 짧아진다.</p>
+        <p class="say" style="color:var(--ink)">덩 덩 덕 쿵 덕, 순서는 그대로다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 6 확인: 빠르기 두 배 -->
+<section class="slide" id="double" data-sec="빠르기" data-title="빠르기를 두 배로">
+  <h2>빠르기를 두 배로 올리면?</h2>
+  <p class="q-lead">세마치장단을 1분에 60박으로 치다가 120박으로 올렸다. 한 장단은 어떻게 될까?</p>
+  <div class="quiz" data-ai="문항과 풀이">
+    <button class="opt" data-why="빠르게 치면 한 박이 짧아지므로 한 장단은 길어지지 않는다.">3초에서 6초로 길어진다.</button>
+    <button class="opt" data-ok data-why="맞다. 한 박이 1초에서 0.5초가 되어 한 장단은 3 × 0.5 = 1.5초다.">3초에서 1.5초로 짧아진다.</button>
+    <button class="opt" data-why="빠르기가 바뀌면 한 박의 길이가 바뀌므로 한 장단의 길이도 바뀐다.">3초 그대로다.</button>
+    <button class="opt" data-why="빠르기가 바뀌어도 덩 덩 덕 쿵 덕 순서는 그대로다.">구음 순서가 바뀐다.</button>
+  </div>
+</section>
+
+<!-- 7 굿거리장단 -->
+<section class="slide" id="gut" data-sec="굿거리장단" data-title="굿거리장단 알아보기">
+  <h2>굿거리장단은 몇 박일까?</h2>
+  <div class="jgb jg12" id="jg-gut"><div class="beat" data-n="1박"><div class="c"><b style="color:#26324A">덩</b></div><div class="c e"><i></i></div><div class="c"><b style="color:#B8392B">기덕</b></div></div><div class="beat" data-n="2박"><div class="c"><b style="color:#2F5D9E">쿵</b></div><div class="c e"><i></i></div><div class="c"><b style="color:#9A6B0C" class="two">더러<br>러러</b></div></div><div class="beat" data-n="3박"><div class="c"><b style="color:#2F5D9E">쿵</b></div><div class="c e"><i></i></div><div class="c"><b style="color:#B8392B">기덕</b></div></div><div class="beat" data-n="4박"><div class="c"><b style="color:#2F5D9E">쿵</b></div><div class="c e"><i></i></div><div class="c"><b style="color:#9A6B0C" class="two">더러<br>러러</b></div></div></div>
+  <div class="under">
+    <ul>
+      <li class="step">굿거리장단은 한 장단이 <span class="key">4박</span>이다. 작은 칸은 모두 12칸이다.</li>
+      <li class="step">세마치에 없던 기덕과 더러러러가 들어 있다.</li>
+      <li class="step">구음: 덩 기덕 쿵 더러러러 쿵 기덕 쿵 더러러러</li>
+    </ul>
+    <button type="button" class="play" id="gut-play" aria-pressed="false">▶ 들어 보기</button>
+  </div>
+</section>
+
+<!-- 8 익스플로라그램: 세마치와 굿거리 견주기 -->
+<section class="slide" id="compare" data-sec="장단 견주기" data-title="세마치와 굿거리 함께 재생">
+  <h2>같은 빠르기라면 어느 장단이 더 길까?</h2>
+  <div class="calc mu" id="mu-b" data-ai="세마치와 굿거리 길이 비교 모형" data-let="b = 60 / B; s = 20 / B; L3 = 180 / B; L4 = 240 / B; meet = 720 / B">
+    <svg width="700" height="320" viewBox="0 0 700 320" aria-label="같은 빠르기에서 세마치 네 장단과 굿거리 세 장단을 나란히 놓은 시간 자">
+        <defs><clipPath id="mu-b-clip"><rect x="110" y="20" width="582" height="196"/></clipPath></defs>
+        <text x="0" y="66" font-size="25" font-weight="900" fill="#26324A">세마치</text><text x="0" y="94" font-size="21" font-weight="700" fill="#6B5E4E">3박</text>
+        <text x="0" y="166" font-size="25" font-weight="900" fill="#26324A">굿거리</text><text x="0" y="194" font-size="21" font-weight="700" fill="#6B5E4E">4박</text>
+        <g clip-path="url(#mu-b-clip)">
+        <rect y="38" height="60" rx="8" fill="#F4E2B8" x="112" width="140" data-attr="x: 110 + 0 * L3 * 48 + 2; width: L3 * 48 - 4"/>
+        <rect y="38" height="60" rx="8" fill="#EBCF95" x="256" width="140" data-attr="x: 110 + 1 * L3 * 48 + 2; width: L3 * 48 - 4"/>
+        <rect y="38" height="60" rx="8" fill="#F4E2B8" x="400" width="140" data-attr="x: 110 + 2 * L3 * 48 + 2; width: L3 * 48 - 4"/>
+        <rect y="38" height="60" rx="8" fill="#EBCF95" x="544" width="140" data-attr="x: 110 + 3 * L3 * 48 + 2; width: L3 * 48 - 4"/>
+        <rect y="38" height="60" rx="8" fill="#F4E2B8" x="688" width="140" data-attr="x: 110 + 4 * L3 * 48 + 2; width: L3 * 48 - 4"/>
+        <rect y="38" height="60" rx="8" fill="#EBCF95" x="832" width="140" data-attr="x: 110 + 5 * L3 * 48 + 2; width: L3 * 48 - 4"/>
+        <rect y="38" height="60" rx="8" fill="#F4E2B8" x="976" width="140" data-attr="x: 110 + 6 * L3 * 48 + 2; width: L3 * 48 - 4"/>
+        <rect y="38" height="60" rx="8" fill="#EBCF95" x="1120" width="140" data-attr="x: 110 + 7 * L3 * 48 + 2; width: L3 * 48 - 4"/>
+        <circle cy="68" r="10" fill="#26324A" cx="118.0" data-attr="cx: 110 + (0 + 0.5) * s * 48"/>
+        <circle cy="68" r="10" fill="#26324A" cx="166.0" data-attr="cx: 110 + (3 + 0.5) * s * 48"/>
+        <circle cy="68" r="7" fill="#B8392B" cx="198.0" data-attr="cx: 110 + (5 + 0.5) * s * 48"/>
+        <circle cy="68" r="9" fill="#2F5D9E" cx="214.0" data-attr="cx: 110 + (6 + 0.5) * s * 48"/>
+        <circle cy="68" r="7" fill="#B8392B" cx="230.0" data-attr="cx: 110 + (7 + 0.5) * s * 48"/>
+        <circle cy="68" r="10" fill="#26324A" cx="262.0" data-attr="cx: 110 + (9 + 0.5) * s * 48"/>
+        <circle cy="68" r="10" fill="#26324A" cx="310.0" data-attr="cx: 110 + (12 + 0.5) * s * 48"/>
+        <circle cy="68" r="7" fill="#B8392B" cx="342.0" data-attr="cx: 110 + (14 + 0.5) * s * 48"/>
+        <circle cy="68" r="9" fill="#2F5D9E" cx="358.0" data-attr="cx: 110 + (15 + 0.5) * s * 48"/>
+        <circle cy="68" r="7" fill="#B8392B" cx="374.0" data-attr="cx: 110 + (16 + 0.5) * s * 48"/>
+        <circle cy="68" r="10" fill="#26324A" cx="406.0" data-attr="cx: 110 + (18 + 0.5) * s * 48"/>
+        <circle cy="68" r="10" fill="#26324A" cx="454.0" data-attr="cx: 110 + (21 + 0.5) * s * 48"/>
+        <circle cy="68" r="7" fill="#B8392B" cx="486.0" data-attr="cx: 110 + (23 + 0.5) * s * 48"/>
+        <circle cy="68" r="9" fill="#2F5D9E" cx="502.0" data-attr="cx: 110 + (24 + 0.5) * s * 48"/>
+        <circle cy="68" r="7" fill="#B8392B" cx="518.0" data-attr="cx: 110 + (25 + 0.5) * s * 48"/>
+        <circle cy="68" r="10" fill="#26324A" cx="550.0" data-attr="cx: 110 + (27 + 0.5) * s * 48"/>
+        <circle cy="68" r="10" fill="#26324A" cx="598.0" data-attr="cx: 110 + (30 + 0.5) * s * 48"/>
+        <circle cy="68" r="7" fill="#B8392B" cx="630.0" data-attr="cx: 110 + (32 + 0.5) * s * 48"/>
+        <circle cy="68" r="9" fill="#2F5D9E" cx="646.0" data-attr="cx: 110 + (33 + 0.5) * s * 48"/>
+        <circle cy="68" r="7" fill="#B8392B" cx="662.0" data-attr="cx: 110 + (34 + 0.5) * s * 48"/>
+        <circle cy="68" r="10" fill="#26324A" cx="694.0" data-attr="cx: 110 + (36 + 0.5) * s * 48"/>
+        <circle cy="68" r="10" fill="#26324A" cx="742.0" data-attr="cx: 110 + (39 + 0.5) * s * 48"/>
+        <circle cy="68" r="7" fill="#B8392B" cx="774.0" data-attr="cx: 110 + (41 + 0.5) * s * 48"/>
+        <circle cy="68" r="9" fill="#2F5D9E" cx="790.0" data-attr="cx: 110 + (42 + 0.5) * s * 48"/>
+        <circle cy="68" r="7" fill="#B8392B" cx="806.0" data-attr="cx: 110 + (43 + 0.5) * s * 48"/>
+        <circle cy="68" r="10" fill="#26324A" cx="838.0" data-attr="cx: 110 + (45 + 0.5) * s * 48"/>
+        <circle cy="68" r="10" fill="#26324A" cx="886.0" data-attr="cx: 110 + (48 + 0.5) * s * 48"/>
+        <circle cy="68" r="7" fill="#B8392B" cx="918.0" data-attr="cx: 110 + (50 + 0.5) * s * 48"/>
+        <circle cy="68" r="9" fill="#2F5D9E" cx="934.0" data-attr="cx: 110 + (51 + 0.5) * s * 48"/>
+        <circle cy="68" r="7" fill="#B8392B" cx="950.0" data-attr="cx: 110 + (52 + 0.5) * s * 48"/>
+        <circle cy="68" r="10" fill="#26324A" cx="982.0" data-attr="cx: 110 + (54 + 0.5) * s * 48"/>
+        <circle cy="68" r="10" fill="#26324A" cx="1030.0" data-attr="cx: 110 + (57 + 0.5) * s * 48"/>
+        <circle cy="68" r="7" fill="#B8392B" cx="1062.0" data-attr="cx: 110 + (59 + 0.5) * s * 48"/>
+        <circle cy="68" r="9" fill="#2F5D9E" cx="1078.0" data-attr="cx: 110 + (60 + 0.5) * s * 48"/>
+        <circle cy="68" r="7" fill="#B8392B" cx="1094.0" data-attr="cx: 110 + (61 + 0.5) * s * 48"/>
+        <circle cy="68" r="10" fill="#26324A" cx="1126.0" data-attr="cx: 110 + (63 + 0.5) * s * 48"/>
+        <circle cy="68" r="10" fill="#26324A" cx="1174.0" data-attr="cx: 110 + (66 + 0.5) * s * 48"/>
+        <circle cy="68" r="7" fill="#B8392B" cx="1206.0" data-attr="cx: 110 + (68 + 0.5) * s * 48"/>
+        <circle cy="68" r="9" fill="#2F5D9E" cx="1222.0" data-attr="cx: 110 + (69 + 0.5) * s * 48"/>
+        <circle cy="68" r="7" fill="#B8392B" cx="1238.0" data-attr="cx: 110 + (70 + 0.5) * s * 48"/>
+        <rect y="138" height="60" rx="8" fill="#DCE6F2" x="112" width="188" data-attr="x: 110 + 0 * L4 * 48 + 2; width: L4 * 48 - 4"/>
+        <rect y="138" height="60" rx="8" fill="#C6D6EA" x="304" width="188" data-attr="x: 110 + 1 * L4 * 48 + 2; width: L4 * 48 - 4"/>
+        <rect y="138" height="60" rx="8" fill="#DCE6F2" x="496" width="188" data-attr="x: 110 + 2 * L4 * 48 + 2; width: L4 * 48 - 4"/>
+        <rect y="138" height="60" rx="8" fill="#C6D6EA" x="688" width="188" data-attr="x: 110 + 3 * L4 * 48 + 2; width: L4 * 48 - 4"/>
+        <rect y="138" height="60" rx="8" fill="#DCE6F2" x="880" width="188" data-attr="x: 110 + 4 * L4 * 48 + 2; width: L4 * 48 - 4"/>
+        <rect y="138" height="60" rx="8" fill="#C6D6EA" x="1072" width="188" data-attr="x: 110 + 5 * L4 * 48 + 2; width: L4 * 48 - 4"/>
+        <circle cy="168" r="10" fill="#26324A" cx="118.0" data-attr="cx: 110 + (0 + 0.5) * s * 48"/>
+        <circle cy="168" r="7" fill="#B8392B" cx="150.0" data-attr="cx: 110 + (2 + 0.5) * s * 48"/>
+        <circle cy="168" r="9" fill="#2F5D9E" cx="166.0" data-attr="cx: 110 + (3 + 0.5) * s * 48"/>
+        <circle cy="168" r="6" fill="#9A6B0C" cx="198.0" data-attr="cx: 110 + (5 + 0.5) * s * 48"/>
+        <circle cy="168" r="9" fill="#2F5D9E" cx="214.0" data-attr="cx: 110 + (6 + 0.5) * s * 48"/>
+        <circle cy="168" r="7" fill="#B8392B" cx="246.0" data-attr="cx: 110 + (8 + 0.5) * s * 48"/>
+        <circle cy="168" r="9" fill="#2F5D9E" cx="262.0" data-attr="cx: 110 + (9 + 0.5) * s * 48"/>
+        <circle cy="168" r="6" fill="#9A6B0C" cx="294.0" data-attr="cx: 110 + (11 + 0.5) * s * 48"/>
+        <circle cy="168" r="10" fill="#26324A" cx="310.0" data-attr="cx: 110 + (12 + 0.5) * s * 48"/>
+        <circle cy="168" r="7" fill="#B8392B" cx="342.0" data-attr="cx: 110 + (14 + 0.5) * s * 48"/>
+        <circle cy="168" r="9" fill="#2F5D9E" cx="358.0" data-attr="cx: 110 + (15 + 0.5) * s * 48"/>
+        <circle cy="168" r="6" fill="#9A6B0C" cx="390.0" data-attr="cx: 110 + (17 + 0.5) * s * 48"/>
+        <circle cy="168" r="9" fill="#2F5D9E" cx="406.0" data-attr="cx: 110 + (18 + 0.5) * s * 48"/>
+        <circle cy="168" r="7" fill="#B8392B" cx="438.0" data-attr="cx: 110 + (20 + 0.5) * s * 48"/>
+        <circle cy="168" r="9" fill="#2F5D9E" cx="454.0" data-attr="cx: 110 + (21 + 0.5) * s * 48"/>
+        <circle cy="168" r="6" fill="#9A6B0C" cx="486.0" data-attr="cx: 110 + (23 + 0.5) * s * 48"/>
+        <circle cy="168" r="10" fill="#26324A" cx="502.0" data-attr="cx: 110 + (24 + 0.5) * s * 48"/>
+        <circle cy="168" r="7" fill="#B8392B" cx="534.0" data-attr="cx: 110 + (26 + 0.5) * s * 48"/>
+        <circle cy="168" r="9" fill="#2F5D9E" cx="550.0" data-attr="cx: 110 + (27 + 0.5) * s * 48"/>
+        <circle cy="168" r="6" fill="#9A6B0C" cx="582.0" data-attr="cx: 110 + (29 + 0.5) * s * 48"/>
+        <circle cy="168" r="9" fill="#2F5D9E" cx="598.0" data-attr="cx: 110 + (30 + 0.5) * s * 48"/>
+        <circle cy="168" r="7" fill="#B8392B" cx="630.0" data-attr="cx: 110 + (32 + 0.5) * s * 48"/>
+        <circle cy="168" r="9" fill="#2F5D9E" cx="646.0" data-attr="cx: 110 + (33 + 0.5) * s * 48"/>
+        <circle cy="168" r="6" fill="#9A6B0C" cx="678.0" data-attr="cx: 110 + (35 + 0.5) * s * 48"/>
+        <circle cy="168" r="10" fill="#26324A" cx="694.0" data-attr="cx: 110 + (36 + 0.5) * s * 48"/>
+        <circle cy="168" r="7" fill="#B8392B" cx="726.0" data-attr="cx: 110 + (38 + 0.5) * s * 48"/>
+        <circle cy="168" r="9" fill="#2F5D9E" cx="742.0" data-attr="cx: 110 + (39 + 0.5) * s * 48"/>
+        <circle cy="168" r="6" fill="#9A6B0C" cx="774.0" data-attr="cx: 110 + (41 + 0.5) * s * 48"/>
+        <circle cy="168" r="9" fill="#2F5D9E" cx="790.0" data-attr="cx: 110 + (42 + 0.5) * s * 48"/>
+        <circle cy="168" r="7" fill="#B8392B" cx="822.0" data-attr="cx: 110 + (44 + 0.5) * s * 48"/>
+        <circle cy="168" r="9" fill="#2F5D9E" cx="838.0" data-attr="cx: 110 + (45 + 0.5) * s * 48"/>
+        <circle cy="168" r="6" fill="#9A6B0C" cx="870.0" data-attr="cx: 110 + (47 + 0.5) * s * 48"/>
+        <circle cy="168" r="10" fill="#26324A" cx="886.0" data-attr="cx: 110 + (48 + 0.5) * s * 48"/>
+        <circle cy="168" r="7" fill="#B8392B" cx="918.0" data-attr="cx: 110 + (50 + 0.5) * s * 48"/>
+        <circle cy="168" r="9" fill="#2F5D9E" cx="934.0" data-attr="cx: 110 + (51 + 0.5) * s * 48"/>
+        <circle cy="168" r="6" fill="#9A6B0C" cx="966.0" data-attr="cx: 110 + (53 + 0.5) * s * 48"/>
+        <circle cy="168" r="9" fill="#2F5D9E" cx="982.0" data-attr="cx: 110 + (54 + 0.5) * s * 48"/>
+        <circle cy="168" r="7" fill="#B8392B" cx="1014.0" data-attr="cx: 110 + (56 + 0.5) * s * 48"/>
+        <circle cy="168" r="9" fill="#2F5D9E" cx="1030.0" data-attr="cx: 110 + (57 + 0.5) * s * 48"/>
+        <circle cy="168" r="6" fill="#9A6B0C" cx="1062.0" data-attr="cx: 110 + (59 + 0.5) * s * 48"/>
+        <circle cy="168" r="10" fill="#26324A" cx="1078.0" data-attr="cx: 110 + (60 + 0.5) * s * 48"/>
+        <circle cy="168" r="7" fill="#B8392B" cx="1110.0" data-attr="cx: 110 + (62 + 0.5) * s * 48"/>
+        <circle cy="168" r="9" fill="#2F5D9E" cx="1126.0" data-attr="cx: 110 + (63 + 0.5) * s * 48"/>
+        <circle cy="168" r="6" fill="#9A6B0C" cx="1158.0" data-attr="cx: 110 + (65 + 0.5) * s * 48"/>
+        <circle cy="168" r="9" fill="#2F5D9E" cx="1174.0" data-attr="cx: 110 + (66 + 0.5) * s * 48"/>
+        <circle cy="168" r="7" fill="#B8392B" cx="1206.0" data-attr="cx: 110 + (68 + 0.5) * s * 48"/>
+        <circle cy="168" r="9" fill="#2F5D9E" cx="1222.0" data-attr="cx: 110 + (69 + 0.5) * s * 48"/>
+        <circle cy="168" r="6" fill="#9A6B0C" cx="1254.0" data-attr="cx: 110 + (71 + 0.5) * s * 48"/>
+        </g>
+        <line y1="28" y2="212" stroke="#26324A" stroke-width="3" stroke-dasharray="7 6" x1="686" x2="686" data-attr="x1: 110 + 1 * 34560 / B; x2: 110 + 1 * 34560 / B; opacity: go && 1 * 720 / B <= 12.01 ? 1 : 0" opacity="0"/>
+        <text y="22" font-size="21" font-weight="900" fill="#26324A" text-anchor="end" x="682" data-attr="x: 110 + 1 * 34560 / B - 4; opacity: go && 1 * 720 / B <= 12.01 ? 1 : 0" opacity="0">함께 덩!</text>
+        <line y1="28" y2="212" stroke="#26324A" stroke-width="3" stroke-dasharray="7 6" x1="686" x2="686" data-attr="x1: 110 + 2 * 34560 / B; x2: 110 + 2 * 34560 / B; opacity: go && 2 * 720 / B <= 12.01 ? 1 : 0" opacity="0"/>
+        <text y="22" font-size="21" font-weight="900" fill="#26324A" text-anchor="end" x="682" data-attr="x: 110 + 2 * 34560 / B - 4; opacity: go && 2 * 720 / B <= 12.01 ? 1 : 0" opacity="0">함께 덩!</text>
+        <line x1="110" y1="238" x2="690" y2="238" stroke="#6B5E4E" stroke-width="3"/>
+        <line x1="110" y1="228" x2="110" y2="248" stroke="#6B5E4E" stroke-width="3"/>
+        <text x="110" y="274" font-size="21" font-weight="700" fill="#6B5E4E" text-anchor="middle">0</text>
+        <line x1="158" y1="232" x2="158" y2="244" stroke="#6B5E4E" stroke-width="3"/>
+        <line x1="206" y1="228" x2="206" y2="248" stroke="#6B5E4E" stroke-width="3"/>
+        <text x="206" y="274" font-size="21" font-weight="700" fill="#6B5E4E" text-anchor="middle">2</text>
+        <line x1="254" y1="232" x2="254" y2="244" stroke="#6B5E4E" stroke-width="3"/>
+        <line x1="302" y1="228" x2="302" y2="248" stroke="#6B5E4E" stroke-width="3"/>
+        <text x="302" y="274" font-size="21" font-weight="700" fill="#6B5E4E" text-anchor="middle">4</text>
+        <line x1="350" y1="232" x2="350" y2="244" stroke="#6B5E4E" stroke-width="3"/>
+        <line x1="398" y1="228" x2="398" y2="248" stroke="#6B5E4E" stroke-width="3"/>
+        <text x="398" y="274" font-size="21" font-weight="700" fill="#6B5E4E" text-anchor="middle">6</text>
+        <line x1="446" y1="232" x2="446" y2="244" stroke="#6B5E4E" stroke-width="3"/>
+        <line x1="494" y1="228" x2="494" y2="248" stroke="#6B5E4E" stroke-width="3"/>
+        <text x="494" y="274" font-size="21" font-weight="700" fill="#6B5E4E" text-anchor="middle">8</text>
+        <line x1="542" y1="232" x2="542" y2="244" stroke="#6B5E4E" stroke-width="3"/>
+        <line x1="590" y1="228" x2="590" y2="248" stroke="#6B5E4E" stroke-width="3"/>
+        <text x="590" y="274" font-size="21" font-weight="700" fill="#6B5E4E" text-anchor="middle">10</text>
+        <line x1="638" y1="232" x2="638" y2="244" stroke="#6B5E4E" stroke-width="3"/>
+        <line x1="686" y1="228" x2="686" y2="248" stroke="#6B5E4E" stroke-width="3"/>
+        <text x="698" y="274" font-size="21" font-weight="700" fill="#6B5E4E" text-anchor="end">12초</text>
+        <g font-size="20" font-weight="700" fill="#6B5E4E"><circle cx="200" cy="310" r="10" fill="#26324A" transform="translate(0 -7)"/><text x="200" dx="16" y="310">덩</text><circle cx="200" cy="310" r="9" fill="#2F5D9E" transform="translate(70 -7)"/><text x="200" dx="86" y="310">쿵</text><circle cx="200" cy="310" r="7" fill="#B8392B" transform="translate(140 -7)"/><text x="200" dx="156" y="310">덕, 기덕</text><circle cx="200" cy="310" r="6" fill="#9A6B0C" transform="translate(262 -7)"/><text x="200" dx="278" y="310">더러러러</text></g>
+        <line id="mu-b-ph" x1="110" x2="110" y1="30" y2="210" stroke="#B8392B" stroke-width="5" stroke-linecap="round" opacity="0"/>
+        <g data-show="!go"><rect x="104" y="28" width="590" height="184" rx="16" fill="#EFE7D6" stroke="#C9BC9F" stroke-width="3" stroke-dasharray="10 8"/><text x="399" y="130" font-size="27" font-weight="800" fill="#6B5E4E" text-anchor="middle">「▶ 함께 재생」을 눌러 보자</text></g>
+    </svg>
+    <div class="mu-ctrl">
+      <button type="button" class="play" id="mu-b-play" aria-pressed="false">▶ 함께 재생</button>
+      <p class="lab">들을 소리</p>
+      <div class="hear">
+        <button data-set="h" data-value="1" aria-pressed="true">세마치</button>
+        <button data-set="h" data-value="2">굿거리</button>
+        <button data-set="h" data-value="3">둘 다</button>
+      </div>
+      <p class="lab">빠르기 <b>1분에 <output data-expr="B" data-unit="박"></output></b></p>
+      <input type="range" name="B" min="60" max="140" step="5" value="60" aria-label="빠르기(1분에 치는 박 수)">
+      <input type="checkbox" name="go" hidden>
+      <div data-show="go">
+        <p class="eq">세마치 한 장단 = 3박 = <b><output data-expr="round(L3, 2)" data-unit="초"></output></b></p>
+        <p class="eq">굿거리 한 장단 = 4박 = <b><output data-expr="round(L4, 2)" data-unit="초"></output></b></p>
+        <p class="say">12박마다(<output data-expr="round(meet, 1)" data-unit="초"></output>마다) 두 장단의 덩이 함께 울린다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 9 확인: 두 장단 나누기 -->
+<section class="slide" id="sort" data-sec="확인" data-title="두 장단의 특징 나누기">
+  <h2>세마치장단일까, 굿거리장단일까?</h2>
+  <div class="sort" data-ai="분류 카드와 풀이">
+    <div class="bin" data-bin="s"><h3>세마치장단</h3></div>
+    <div class="bin" data-bin="g"><h3>굿거리장단</h3></div>
+    <span data-bin="g" data-why="굿거리장단은 한 장단이 4박이다." data-hint="박을 묶은 큰 칸이 몇 개였나?">한 장단이 4박이다</span>
+    <span data-bin="s" data-why="세마치장단 구음이다." data-hint="기덕이나 더러러러가 들어 있나?">덩 덩 덕 쿵 덕</span>
+    <span data-bin="s" data-why="세마치장단은 3박 × 3칸 = 9칸이다." data-hint="3박이면 작은 칸이 몇 개일까?">작은 칸이 모두 9칸이다</span>
+    <span data-bin="g" data-why="기덕과 더러러러는 굿거리장단에 들어 있다." data-hint="세마치 구음에도 기덕이 있었나?">기덕, 더러러러가 들어 있다</span>
+    <span data-bin="s" data-why="세마치장단은 한 장단이 3박이다." data-hint="박을 묶은 큰 칸이 몇 개였나?">한 장단이 3박이다</span>
+    <span data-bin="g" data-why="굿거리장단은 4박 × 3칸 = 12칸이다. 같은 빠르기면 세마치보다 한 장단이 길다." data-hint="4박이면 작은 칸이 몇 개일까?">작은 칸이 모두 12칸이다</span>
+  </div>
+</section>
+
+<!-- 10 확인: 빠르기와 세기 -->
+<section class="slide" id="loud" data-sec="확인" data-title="빠르기와 세기 구별">
+  <h2>장단을 빠르게 치면 무엇이 바뀔까?</h2>
+  <p class="q-lead">5쪽에서 빠르기 막대를 밀어 보았던 때를 떠올려 보자.</p>
+  <div class="quiz" data-ai="문항과 풀이">
+    <button class="opt" data-why="소리의 크기는 세기다. 빠르기와 세기는 따로 바꿀 수 있다.">소리가 커진다.</button>
+    <button class="opt" data-why="빠르게 쳐도 세마치는 3박, 굿거리는 4박이다.">한 장단의 박 수가 늘어난다.</button>
+    <button class="opt" data-ok data-why="맞다. 1분에 치는 박이 많아져 한 박이 짧아진다. 그래서 한 장단도 짧아진다.">한 박이 짧아진다.</button>
+    <button class="opt" data-why="구음 순서는 장단마다 정해져 있어 빠르기가 바뀌어도 그대로다.">구음 순서가 바뀐다.</button>
+  </div>
+</section>
+
+<!-- 11 정리 -->
+<section class="slide" id="summary" data-sec="정리" data-title="정리">
+  <h2>오늘 배운 것</h2>
+  <ul class="sum">
+    <li>세마치장단은 한 장단이 <span class="blank">3박</span>, 굿거리장단은 <span class="blank">4박</span>이다.</li>
+    <li>빠르게 치면 한 장단이 <span class="blank">짧아진다</span>. 구음의 순서는 <span class="blank">그대로</span>다.</li>
+  </ul>
+  <div class="short" data-ph="예: 느리게 치면 ○○한 느낌이고, 빠르게 치면 ○○한 느낌이다." data-ai="정리 물음">
+    <p class="ask">세마치장단을 느리게 칠 때와 빠르게 칠 때<br>느낌이 어떻게 다른지 한 문장으로 써 보자.</p>
+  </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const $ = (s) => document.querySelector(s);
+  const still = () => document.documentElement.classList.contains('ch-motion-off');   // ⚙ 「움직임 끄기」만 본다
+  const SEMA = ['덩', '', '', '덩', '', '덕', '쿵', '덕', ''];
+  const GUT = ['덩', '', '기덕', '쿵', '', '더러러러', '쿵', '', '기덕', '쿵', '', '더러러러'];
+
+  // ── 장구 소리: 녹음 대신 Web Audio로 만든다. 누를 때만 소리가 난다 ──
+  const AU = { ctx: null, out: null, noise: null };
+  function au() {
+    if (!AU.ctx) {
+      const C = window.AudioContext || window.webkitAudioContext;
+      if (!C) return null;
+      AU.ctx = new C();
+      AU.out = AU.ctx.createGain(); AU.out.gain.value = 0.8;
+      const comp = AU.ctx.createDynamicsCompressor();
+      AU.out.connect(comp); comp.connect(AU.ctx.destination);
+      const len = Math.floor(AU.ctx.sampleRate * 0.4), buf = AU.ctx.createBuffer(1, len, AU.ctx.sampleRate), d = buf.getChannelData(0);
+      for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+      AU.noise = buf;
+    }
+    if (AU.ctx.state === 'suspended') AU.ctx.resume();
+    return AU.ctx;
+  }
+  function env(node, t, peak, dec) {
+    const g = AU.ctx.createGain();
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(peak, t + 0.004); g.gain.exponentialRampToValueAtTime(0.0001, t + dec);
+    node.connect(g); g.connect(AU.out);
+  }
+  function kung(t, v) {   // 북편: 낮고 둥근 소리
+    const o = AU.ctx.createOscillator(); o.type = 'sine';
+    o.frequency.setValueAtTime(140, t); o.frequency.exponentialRampToValueAtTime(66, t + 0.3);
+    env(o, t, 0.9 * v, 0.55); o.start(t); o.stop(t + 0.6);
+    const n = AU.ctx.createBufferSource(); n.buffer = AU.noise;
+    const lp = AU.ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 420;
+    n.connect(lp); env(lp, t, 0.35 * v, 0.12); n.start(t); n.stop(t + 0.15);
+  }
+  function deok(t, v) {   // 채편: 높고 딱 끊어지는 소리
+    const n = AU.ctx.createBufferSource(); n.buffer = AU.noise;
+    const bp = AU.ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 2400; bp.Q.value = 1.4;
+    n.connect(bp); env(bp, t, 0.9 * v, 0.07); n.start(t); n.stop(t + 0.1);
+    const o = AU.ctx.createOscillator(); o.type = 'triangle';
+    o.frequency.setValueAtTime(560, t); o.frequency.exponentialRampToValueAtTime(330, t + 0.05);
+    env(o, t, 0.4 * v, 0.09); o.start(t); o.stop(t + 0.12);
+  }
+  function strike(sym, t, sob, v = 1) {   // sob: 작은 칸 하나의 길이(초)
+    if (sym === '덩') { kung(t, v); deok(t, v); }
+    else if (sym === '쿵') kung(t, v);
+    else if (sym === '덕') deok(t, v);
+    else if (sym === '기덕') { deok(t - Math.min(0.06, sob * 0.3), 0.4 * v); deok(t, v); }
+    else if (sym === '더러러러') { for (let i = 0; i < 4; i++) deok(t + (i * sob) / 4, (i ? 0.42 : 0.75) * v); }
+  }
+  const sides = (sym) => ({ l: sym === '덩' || sym === '쿵', r: !!sym && sym !== '쿵' });
+
+  // 장구 그림을 울린다(⚙ 「움직임 끄기」면 울림을 생략)
+  function pulse(prefix, sym) {
+    if (!sym || still()) return;
+    const s = sides(sym);
+    const go = (id, frames, ms) => { const el = document.getElementById(id); if (el && el.animate) el.animate(frames, { duration: ms, easing: 'ease-out' }); };
+    if (s.l) { go(prefix + '-hl', [{ transform: 'scale(1.12, 1.05)' }, { transform: 'scale(1)' }], 260); go(prefix + '-palm', [{ transform: 'translate(22px, 0)' }, { transform: 'translate(0, 0)' }], 220); }
+    if (s.r) { go(prefix + '-hr', [{ transform: 'scale(1.1, 1.04)' }, { transform: 'scale(1)' }], 200); go(prefix + '-stick', [{ transform: 'rotate(-14deg)' }, { transform: 'rotate(0)' }], 180); }
+  }
+
+  // ── 재생기: 작은 칸 단위로 미리 예약해 박자가 흔들리지 않게 한다 ──
+  const players = [];
+  function player(o) {   // o: { lanes: [{ cells, audible() }], tempo(), render(pos, sob), reset(), btn, label, prefix }
+    const p = { on: false, timer: 0, k: 0, next: 0, ticks: [], raf: 0, lastK: -1 };
+    function tick() {
+      const c = AU.ctx;
+      while (p.next < c.currentTime + 0.15) {
+        const sob = 60 / o.tempo() / 3;
+        for (const l of o.lanes) { const sym = l.cells[p.k % l.cells.length]; if (sym && l.audible()) strike(sym, p.next, sob); }
+        p.ticks.push({ t: p.next, k: p.k, d: sob });
+        p.next += sob; p.k += 1;
+      }
+      while (p.ticks.length > 3 && p.ticks[1].t < c.currentTime - 0.3) p.ticks.shift();
+    }
+    function frame() {
+      if (!p.on) return;
+      const now = AU.ctx.currentTime;
+      let cur = null;
+      for (const x of p.ticks) if (x.t <= now) cur = x;
+      if (cur) {
+        if (cur.k !== p.lastK) {
+          p.lastK = cur.k;
+          if (o.prefix) for (const l of o.lanes) if (l.audible()) pulse(o.prefix, l.cells[cur.k % l.cells.length]);
+        }
+        o.render(cur.k + Math.min(1, (now - cur.t) / cur.d), 60 / o.tempo() / 3);
+      }
+      p.raf = requestAnimationFrame(frame);
+    }
+    p.start = () => {
+      if (!au()) return;
+      players.forEach((q) => q !== p && q.on && q.stop());
+      p.on = true; p.k = 0; p.lastK = -1; p.ticks = []; p.next = AU.ctx.currentTime + 0.12;
+      tick(); p.timer = setInterval(tick, 25); p.raf = requestAnimationFrame(frame);
+      o.btn.setAttribute('aria-pressed', 'true'); o.btn.textContent = '❚❚ 멈춤';
+      if (o.onStart) o.onStart();
+    };
+    p.stop = () => {
+      p.on = false; clearInterval(p.timer); cancelAnimationFrame(p.raf); p.ticks = [];
+      o.btn.setAttribute('aria-pressed', 'false'); o.btn.textContent = o.label;
+      o.reset();
+    };
+    o.btn.addEventListener('click', () => { (p.on ? p.stop : p.start)(); o.btn.blur(); });
+    players.push(p);
+    return p;
+  }
+  // 장을 넘기면 소리를 멈춘다
+  Exploragram.onHide(() => players.forEach((q) => q.on && q.stop()));
+
+  // 계산 상자의 숨은 칸 go를 켜서 가림막을 걷는다
+  const open = (box) => { const cb = box.querySelector('input[name="go"]'); if (cb && !cb.checked) { cb.checked = true; cb.dispatchEvent(new Event('input', { bubbles: true })); } };
+
+  // ── 3쪽: 장구 소리 단추 ──
+  document.querySelectorAll('#pad-btns button').forEach((b) => b.addEventListener('click', () => {
+    if (!au()) return;
+    const sym = b.dataset.hit;
+    strike(sym, AU.ctx.currentTime + 0.02, 0.18);
+    pulse('mu-p', sym);
+    document.querySelectorAll('#pad-btns button').forEach((x) => x.classList.toggle('on', x === b));
+    b.blur();
+  }));
+
+  // ── 4쪽·7쪽: 들어 보기(보통 빠르기) ──
+  for (const [id, cells, grid] of [['sema-play', SEMA, '#jg-sema'], ['gut-play', GUT, '#jg-gut']]) {
+    const cs = [...document.querySelectorAll(grid + ' .c')];
+    player({
+      lanes: [{ cells, audible: () => true }], tempo: () => 72, btn: document.getElementById(id), label: '▶ 들어 보기',
+      render: (pos) => { const i = Math.floor(pos) % cells.length; cs.forEach((c, n) => c.classList.toggle('on', n === i)); },
+      reset: () => cs.forEach((c) => c.classList.remove('on')),
+    });
+  }
+
+  // ── 5쪽 익스플로라그램 A: 빠르기와 한 장단 ──
+  const boxA = $('#mu-a'), rangeA = boxA.querySelector('input[name="B"]');
+  const cellsA = [...boxA.querySelectorAll('.cell')];
+  const cellX = (i) => 160 + i * 56 + Math.floor(i / 3) * 10;
+  const show = (el, on) => el.setAttribute('opacity', on ? '1' : '0');
+  player({
+    lanes: [{ cells: SEMA, audible: () => true }], tempo: () => Number(rangeA.value), btn: $('#mu-a-play'), label: '▶ 장단 치기', prefix: 'mu-a',
+    onStart: () => open(boxA),
+    render: (pos, sob) => {
+      const p = pos % 9, i = Math.floor(p), f = p - i;
+      cellsA.forEach((c, n) => c.classList.toggle('on', n === i));
+      const x1 = cellX(i) + f * 52, x2 = 60 + p * sob * 100;
+      for (const [id, x] of [['#mu-a-ph1', x1], ['#mu-a-ph2', x2]]) { const l = $(id); l.setAttribute('x1', x.toFixed(1)); l.setAttribute('x2', x.toFixed(1)); show(l, true); }
+    },
+    reset: () => { cellsA.forEach((c) => c.classList.remove('on')); show($('#mu-a-ph1'), false); show($('#mu-a-ph2'), false); },
+  });
+  rangeA.addEventListener('input', () => open(boxA));
+
+  // ── 8쪽 익스플로라그램 B: 세마치와 굿거리 견주기 ──
+  const boxB = $('#mu-b'), rangeB = boxB.querySelector('input[name="B"]');
+  const hear = () => { const b = boxB.querySelector('[data-set="h"][aria-pressed="true"]'); return b ? Number(b.dataset.value) : 1; };
+  player({
+    lanes: [{ cells: SEMA, audible: () => hear() !== 2 }, { cells: GUT, audible: () => hear() !== 1 }],
+    tempo: () => Number(rangeB.value), btn: $('#mu-b-play'), label: '▶ 함께 재생',
+    onStart: () => open(boxB),
+    render: (pos, sob) => {
+      const B = Number(rangeB.value), wrap = 36 * Math.max(1, Math.floor(B / 60));
+      const x = 110 + (pos % wrap) * sob * 48, l = $('#mu-b-ph');
+      l.setAttribute('x1', x.toFixed(1)); l.setAttribute('x2', x.toFixed(1)); show(l, true);
+    },
+    reset: () => show($('#mu-b-ph'), false),
+  });
+  rangeB.addEventListener('input', () => open(boxB));
+});
+</script>
+</body>
+</html>

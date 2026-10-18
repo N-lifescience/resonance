@@ -1,0 +1,502 @@
+<!doctype html>
+<html lang="ko" data-deck="sci-m1-diffusion-temperature">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>냄새는 어떻게 퍼질까? 확산과 입자의 운동</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/engine/exploragram.css">
+<script defer src="https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/engine/exploragram.js"></script>
+<style>
+body[data-theme="ppt"] { --accent: #0F766E; --tab: #0F766E; --tab-ink: #FFFFFF; --flag: #B3261E; }
+body[data-theme="ppt"] {
+  --teal: #0F766E; --teal-soft: #CCEAE6; --teal-pale: #EEF7F6; --yellow: #FBBF24; --red: #B3261E;
+  --gray: #5C6670; --ink: #222222; --ink-dot: #E0464E; --water-dot: #9DC8F5; --line: #3B4A5A;
+}
+
+/* ── 원본의 얼굴: 전폭 청록 머리 띠, 오른쪽 노란 배지 ── */
+body[data-theme="ppt"] section.slide {
+  background:
+    linear-gradient(rgba(0,0,0,.18), rgba(0,0,0,0)) 0 100px / 100% 6px no-repeat,
+    linear-gradient(var(--teal), var(--teal)) 0 0 / 100% 100px no-repeat,
+    #FFFFFF;
+  color: var(--ink);
+}
+body[data-theme="ppt"] section.slide[data-sec]::before {
+  left: auto; right: 42px; top: 26px; height: 50px; line-height: 50px; min-width: 170px;
+  padding: 0 26px; box-sizing: border-box; display: flex; align-items: center; justify-content: center;
+  border-radius: 8px; background: var(--yellow); color: var(--ink); font-size: 26px; font-weight: 800;
+  box-shadow: 0 3px 4px rgba(0,0,0,.22);
+}
+body[data-theme="ppt"] section.slide > h2:first-child {
+  position: absolute; top: 0; left: 60px; right: 250px; height: 100px; margin: 0; padding: 0;
+  display: flex; align-items: center; color: #FFFFFF; font-size: 42px; line-height: 1.2;
+  border: 0; background: none; width: auto;
+}
+.key { color: var(--teal); font-weight: 800; }
+.hot { color: var(--red); font-weight: 800; }
+.note { color: var(--gray); font-size: 24px; }
+
+/* 표지: 청록 바탕 + 왼쪽 노란 세로 막대 */
+body[data-theme="ppt"] section.slide#cover { background: var(--teal); }
+body[data-theme="ppt"] section.slide#cover::after { color: #FFFFFF; }
+.cv { margin-top: 120px; padding: 8px 0 12px 44px; border-left: 16px solid var(--yellow); }
+.cv p { margin: 0; color: #FFFFFF; }
+.cv .cv-k { font-size: 30px; }
+.cv h1 { margin: 24px 0 26px; font-size: 70px; line-height: 1.2; color: #FFFFFF; }
+.cv .cv-s { font-size: 38px; }
+
+/* 학습 목표 */
+.goals { margin: 46px 0 0; padding: 0; list-style: none; counter-reset: g; }
+.goals li { counter-increment: g; position: relative; padding-left: 64px; margin: 0 0 34px; font-size: 34px; line-height: 1.45; }
+.goals li::before { content: counter(g); position: absolute; left: 0; top: 3px; width: 46px; height: 46px; border-radius: 9px;
+  background: var(--teal); color: #fff; font-weight: 800; font-size: 28px; text-align: center; line-height: 46px; }
+
+/* 생각 열기 */
+.open { display: grid; grid-template-columns: 1fr 520px; gap: 44px; align-items: center; margin-top: 30px; }
+.open p { margin: 0 0 28px; font-size: 32px; line-height: 1.5; }
+.open .ask { color: var(--teal); font-weight: 800; }
+.pic { margin: 0; }
+.pic img { display: block; width: 100%; height: auto; border-radius: 8px; }
+
+/* 확산이란 */
+.def { margin: 18px 0 0; padding: 22px 30px; border-left: 12px solid var(--teal); background: var(--teal-pale);
+  border-radius: 0 16px 16px 0; font-size: 33px; line-height: 1.45; font-weight: 700; }
+.def b { color: var(--teal); }
+.why { margin: 26px 0 0; font-size: 31px; line-height: 1.45; }
+.egs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin: 30px 0 0; padding: 0; list-style: none; }
+.egs li { border: 3px solid var(--teal-soft); border-radius: 16px; padding: 18px 22px; font-size: 27px; line-height: 1.4; }
+.egs li b { display: block; margin-bottom: 6px; color: var(--teal); font-size: 26px; }
+
+/* ── 익스플로라그램 공통 ── */
+.dx-lab { margin: 0; font-size: 27px; font-weight: 700; line-height: 1.3; }
+.dx-lab b { color: var(--teal); }
+section.slide input.dx-range { -webkit-appearance: none; appearance: none; width: 100%; height: 56px; margin: 0; background: transparent; cursor: pointer; }
+section.slide input.dx-range::-webkit-slider-runnable-track { height: 12px; border-radius: 6px; background: #D7DEE6; }
+section.slide input.dx-range::-webkit-slider-thumb { -webkit-appearance: none; width: 44px; height: 44px; margin-top: -16px; border-radius: 50%;
+  background: var(--teal); border: 5px solid #fff; box-shadow: 0 1px 6px rgba(0,0,0,.45); }
+section.slide input.dx-range::-moz-range-track { height: 12px; border-radius: 6px; background: #D7DEE6; }
+section.slide input.dx-range::-moz-range-thumb { width: 34px; height: 34px; border-radius: 50%; background: var(--teal); border: 5px solid #fff; }
+.ticks { position: relative; height: 28px; margin-top: -6px; font-size: 20px; color: var(--gray); }
+.ticks span { position: absolute; top: 0; left: calc(22px + (100% - 44px) * var(--f)); transform: translateX(-50%); white-space: nowrap; }
+.ticks span:first-child { left: 0; transform: none; }
+.ticks span:last-child { left: auto; right: 0; transform: none; }
+.take { margin: 12px 0 0; padding: 10px 22px; background: #FFF6DA; border-radius: 14px; font-size: 27px; line-height: 1.4; font-weight: 700; }
+.model { font-size: 20px; color: var(--gray); font-weight: 500; }
+
+/* A 잉크 한 방울 */
+.ik { display: grid; grid-template-columns: 690px 400px; gap: 30px; }
+.ik-view { position: relative; }
+.ik-pics { display: flex; gap: 20px; align-items: flex-start; }
+.ik-pics svg { display: block; }
+.ik-ctrl { display: flex; flex-direction: column; gap: 8px; }
+.ik-veil { position: absolute; inset: 0 0 46px 0; z-index: 3; display: flex; align-items: center; justify-content: center; text-align: center;
+  background: #EEF2F5; border: 3px dashed #B8C4CE; border-radius: 18px; color: #5C6B78; font-size: 29px; font-weight: 600; line-height: 1.5; }
+.ik-veil[hidden] { display: none; }
+.ik-out { margin: 8px 0 0; min-height: 38px; font-size: 27px; font-weight: 700; line-height: 1.35; }
+.ik-meter { padding: 12px 16px; border-radius: 14px; background: #F1F5F4; font-size: 23px; line-height: 1.4; }
+.ik-meter .big { display: block; margin-top: 2px; font-size: 48px; font-weight: 800; color: var(--ink-dot); line-height: 1.1; }
+.ik-meter .big small { font-size: 26px; color: var(--ink); }
+.legend { display: flex; flex-direction: column; gap: 4px; font-size: 21px; line-height: 1.35; }
+.dot { display: inline-block; width: 20px; height: 20px; border-radius: 50%; vertical-align: -3px; margin-right: 8px; }
+
+/* B 온도와 확산 */
+.tm { display: grid; grid-template-columns: 400px 320px 340px; gap: 30px; align-items: start; }
+.tm .particles { margin: 0; }
+.tm-cross { margin: 10px 0 0; font-size: 23px; font-weight: 700; line-height: 1.35; }
+.tm-cross output { color: var(--ink-dot); font-size: 30px; }
+.tm .bar { --bar-c: var(--ink-dot); margin-top: 6px; }
+.tm .plot { margin: 0; }
+.tm-ctrl { display: flex; flex-direction: column; gap: 6px; }
+.tm-ctrl input[type=range] { width: 100%; height: 56px; margin: 0; }
+.chain { display: flex; flex-direction: column; margin-top: 4px; }
+.chain > div { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; padding: 6px 14px; border: 3px solid var(--teal-soft); border-radius: 14px; font-size: 22px; line-height: 1.35; }
+.chain > div b { font-size: 27px; color: var(--teal); white-space: nowrap; }
+.chain-n { margin: 2px 0 0; text-align: right; }
+.chain > span { align-self: center; font-size: 24px; line-height: 26px; color: var(--teal); font-weight: 800; }
+.tm-say { margin: 10px 0 0; font-size: 25px; font-weight: 700; line-height: 1.35; }
+
+/* 실험 */
+.exp { display: grid; grid-template-columns: 1fr 420px; gap: 36px; align-items: start; margin-top: 16px; }
+.exp .need { margin: 0 0 14px; font-size: 25px; line-height: 1.4; color: var(--gray); }
+.exp ol { margin: 0; padding: 0; list-style: none; counter-reset: e; }
+.exp ol li { counter-increment: e; position: relative; padding-left: 42px; margin: 0 0 10px; font-size: 28px; line-height: 1.4; }
+.exp ol li::before { content: counter(e) "."; position: absolute; left: 0; font-weight: 800; color: var(--teal); }
+.exp .safe { margin: 12px 0 0; font-size: 26px; color: var(--red); }
+.tip { margin-top: 8px; padding: 12px 22px; background: #FFF6DA; border-radius: 14px; font-size: 26px; line-height: 1.4; }
+
+/* 실험 결과 */
+.res table.compare { margin-top: 24px; font-size: 31px; --table-head: #CCEAE6; --table-side: #CCEAE6; }
+.res table.compare td { text-align: center; }
+.res .concl { margin: 28px 0 6px; font-size: 35px; font-weight: 800; line-height: 1.4; }
+
+/* 어디에서 더 빨리 */
+.media { display: grid; grid-template-columns: 1fr 40px 1fr 40px 1fr; align-items: center; gap: 10px; margin-top: 26px; }
+.media figure { margin: 0; text-align: center; }
+.media svg { display: block; width: 100%; height: auto; }
+.media figcaption { margin-top: 8px; font-size: 30px; font-weight: 800; }
+.media figcaption small { display: block; font-size: 22px; font-weight: 500; color: var(--gray); }
+.media .gt { font-size: 44px; font-weight: 800; color: var(--teal); text-align: center; }
+.mline { margin: 22px 0 0; font-size: 29px; line-height: 1.45; }
+
+/* 정리 */
+.sum { margin: 34px 0 0; padding: 0; list-style: none; }
+.sum li { position: relative; padding-left: 38px; margin: 0 0 28px; font-size: 33px; line-height: 1.45; }
+.sum li::before { content: ""; position: absolute; left: 6px; top: 19px; width: 13px; height: 13px; border-radius: 50%; background: var(--teal); }
+.sort .bin { min-height: 96px; }
+.next { margin-top: 36px; font-size: 26px; color: var(--gray); }
+</style>
+</head>
+<body data-theme="ppt">
+
+<!-- 1 표지 -->
+<section class="slide" id="cover" data-title="표지">
+  <div class="cv">
+    <p class="cv-k">중학교 과학 · 입자의 운동</p>
+    <h1>냄새는 어떻게 퍼질까?</h1>
+    <p class="cv-s">확산과 입자의 운동</p>
+  </div>
+</section>
+
+<!-- 2 학습 목표 -->
+<section class="slide" id="goal" data-sec="학습 목표" data-title="학습 목표">
+  <h2>학습 목표</h2>
+  <ol class="goals">
+    <li>확산 현상을 입자의 운동으로 설명할 수 있다.</li>
+    <li>온도에 따라 확산 빠르기가 달라지는 까닭을<br>설명할 수 있다.</li>
+  </ol>
+</section>
+
+<!-- 3 생각 열기 -->
+<section class="slide" id="perfume" data-sec="생각 열기" data-title="교실 앞에서 향수 뚜껑을 열면?">
+  <h2>교실 앞에서 향수 뚜껑을 열면?</h2>
+  <div class="open">
+    <div>
+      <p>교실 앞 교탁에서 향수병 뚜껑을 열면<br>잠시 뒤 맨 뒷자리 학생도<br>냄새를 맡을 수 있다.</p>
+      <p class="ask">창문을 모두 닫아 바람이 없는데도<br>냄새가 퍼지는 이유는 무엇일까?</p>
+    </div>
+    <figure class="pic">
+      <img src="data:image/png;base64,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" alt="향수병에서 냄새 입자가 퍼져 뒷자리 학생에게 닿는 모습" width="520">
+    </figure>
+  </div>
+</section>
+
+<!-- 4 확산이란 -->
+<section class="slide" id="define" data-sec="개념" data-title="확산이란?">
+  <h2>확산이란?</h2>
+  <p class="def"><b>확산</b>: 물질을 이루는 입자가 <span class="hot">스스로</span> 움직여<br>다른 물질 속으로 퍼져 나가는 현상</p>
+  <p class="why">입자는 끊임없이 스스로 움직인다.<br>그래서 확산이 일어난다.</p>
+  <ul class="egs">
+    <li><b>향수</b>향수 냄새가<br>방 안에 퍼진다.</li>
+    <li><b>잉크</b>물에 잉크를 떨어뜨리면<br>물 전체로 퍼진다.</li>
+    <li><b>티백</b>티백을 넣은 물의 색이<br>점점 진해진다.</li>
+  </ul>
+</section>
+
+<!-- 5 익스플로라그램: 잉크 한 방울 (시공간 축) -->
+<section class="slide" id="ink-drop" data-sec="개념" data-title="잉크가 퍼지는 모습을 입자로 나타내면">
+  <h2>잉크가 퍼지는 모습을 입자로 나타내면</h2>
+  <div class="ik" data-ai="잉크 한 방울 입자 모형: 무작위 걸음 모의실험(씨앗 고정)">
+    <div class="ik-view">
+      <div class="ik-pics">
+        <svg id="ik-svg" width="400" height="336" viewBox="0 0 560 470" aria-label="비커 속 잉크 입자와 물 입자가 움직이는 모습">
+          <rect x="248" y="0" width="64" height="20" rx="6" fill="#C3C8CF"/>
+          <polygon points="262,20 298,20 286,42 274,42" fill="#8A9099"/>
+          <rect x="2" y="48" width="556" height="420" fill="#EEF6FD"/>
+          <g stroke="#C9D3DC" stroke-width="2" stroke-dasharray="8 8">
+            <line x1="186.7" y1="50" x2="186.7" y2="466"/><line x1="373.3" y1="50" x2="373.3" y2="466"/>
+            <line x1="4" y1="188" x2="556" y2="188"/><line x1="4" y1="328" x2="556" y2="328"/>
+          </g>
+          <g id="ik-water"></g>
+          <polyline id="ik-trail" fill="none" stroke="#1E5FA8" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="2 7"/>
+          <g id="ik-ink"></g>
+          <circle id="ik-me" r="11" fill="#1E5FA8" stroke="#FBBF24" stroke-width="4"/>
+          <path d="M3 48 V467 H557 V48" fill="none" stroke="#3B4A5A" stroke-width="5" stroke-linejoin="round"/>
+        </svg>
+        <svg id="ik-graph" width="270" height="336" viewBox="0 0 270 336" aria-label="시간에 따라 잉크가 고르게 퍼진 정도 그래프"></svg>
+      </div>
+      <p class="ik-out" id="ik-out"></p>
+      <div class="ik-veil" id="ik-veil"><span>오른쪽 시간 막대를 밀거나<br>「재생」을 누르면<br>잉크 한 방울이 떨어진다</span></div>
+    </div>
+    <div class="ik-ctrl">
+      <p class="dx-lab">잉크를 떨어뜨린 뒤 <b id="ik-t-out">시작</b></p>
+      <input class="dx-range" type="range" id="ik-t" min="0" max="31" value="0" step="1" autocomplete="off" data-play="10" aria-label="잉크를 떨어뜨린 뒤 지난 시간">
+      <div class="ticks"><span>시작</span><span style="--f:0.2258">1분</span><span style="--f:0.6129">3분</span><span>5분</span></div>
+      <div class="ik-meter" data-ai="모형 수치">고르게 퍼진 정도 <span class="model">(모형)</span>
+        <span class="big"><span id="ik-ev">?</span><small> %</small></span>
+      </div>
+      <div class="legend">
+        <span><i class="dot" style="background:var(--ink-dot)"></i>잉크 입자 60개</span>
+        <span><i class="dot" style="background:var(--water-dot)"></i>물 입자 100개</span>
+        <span><i class="dot" style="background:#1E5FA8;box-shadow:0 0 0 4px var(--yellow)"></i>물 입자 하나가 지나온 길</span>
+      </div>
+    </div>
+  </div>
+  <p class="take step">잉크 입자와 물 입자가 모두 스스로 움직인다.<br>그래서 시간이 지나면 잉크 입자가 물 전체에 고르게 퍼진다.</p>
+</section>
+
+<!-- 6 실험 -->
+<section class="slide" id="experiment" data-sec="실험" data-title="실험: 물의 온도와 확산">
+  <h2>실험: 물의 온도와 확산</h2>
+  <div class="exp">
+    <div>
+      <p class="need">준비물: 비커 2개, 찬물(10 ℃), 따뜻한 물(60 ℃),<br>잉크, 스포이트, 초시계</p>
+      <ol>
+        <li>비커 2개에 찬물과 따뜻한 물을 200 mL씩 담는다.</li>
+        <li>물이 잔잔해질 때까지 1분 동안 기다린다.</li>
+        <li>두 비커에 잉크를 한 방울씩 동시에 떨어뜨린다.</li>
+        <li>잉크가 비커 전체에 고르게 퍼질 때까지<br>걸린 시간을 잰다.</li>
+        <li>결과를 표에 기록한다.</li>
+      </ol>
+      <p class="safe">※ 뜨거운 물에 손을 데지 않게 조심한다.</p>
+    </div>
+    <figure class="pic" style="margin-top:10px">
+      <img src="data:image/png;base64,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" alt="10 ℃ 물과 60 ℃ 물이 담긴 비커 위에서 스포이트로 잉크를 떨어뜨리는 장면" width="420">
+    </figure>
+  </div>
+  <p class="tip step">비커를 흔들거나 저으면 확산이 아니라 섞기가 된다.<br>그래서 잉크는 두 비커에 동시에 떨어뜨리고 그대로 둔다.</p>
+</section>
+
+<!-- 7 실험 결과 -->
+<section class="slide res" id="result" data-sec="실험" data-title="실험 결과 (예시)">
+  <h2>실험 결과 (예시)</h2>
+  <table class="compare">
+    <thead><tr><th>물의 온도 (℃)</th><th>10</th><th>20</th><th>40</th><th>60</th></tr></thead>
+    <tbody><tr><th>잉크가 고르게<br>퍼진 시간 (초)</th><td>360</td><td>260</td><td>160</td><td>110</td></tr></tbody>
+  </table>
+  <p class="concl step">물의 온도가 높을수록<br>잉크가 퍼지는 데 걸리는 시간이 짧다.</p>
+  <p class="note">※ 실제 실험값은 비커 크기, 잉크 양에 따라 달라질 수 있다.</p>
+</section>
+
+<!-- 8 익스플로라그램: 온도와 입자 운동 (시공간 축) -->
+<section class="slide" id="temp-model" data-sec="개념" data-title="왜 따뜻한 물에서 더 빨리 퍼질까?">
+  <h2>왜 따뜻한 물에서 더 빨리 퍼질까?</h2>
+  <div class="calc tm" id="tm-calc" data-ai="온도와 확산 모형: 입자 빠르기는 모형, 시간은 표의 값을 직선으로 이음"
+       data-let="tm = T <= 20 ? 360 - 10 * (T - 10) : (T <= 40 ? 260 - 5 * (T - 20) : 160 - 2.5 * (T - 40)); f = 360 / tm; v = sqrt(f); tab = T == 10 || T == 20 || T == 40 || T == 60">
+    <div>
+      <figure class="particles" id="tm-box" data-height="220" data-labels="잉크 쪽|맞은쪽" data-speed="0.8 * v" aria-label="잉크 입자와 물 입자가 움직이는 상자">
+        <i data-kind="잉크" data-left="24" data-right="0" data-color="#E0464E" data-size="8" data-count="il, ir"></i>
+        <i data-kind="물" data-left="40" data-right="40" data-color="#9DC8F5" data-size="7"></i>
+      </figure>
+      <p class="tm-cross">맞은쪽으로 건너간 잉크 <output data-expr="ir"></output> / 24개</p>
+      <div class="bar" data-value="ir" data-max="12"></div>
+    </div>
+    <figure class="plot" data-x="0, 70" data-y="0, 400" data-xstep="10" data-ystep="100" data-height="310"
+            data-xlabel="물의 온도(℃)" data-ylabel="고르게 퍼진 시간(초)" aria-label="물의 온도와 잉크가 고르게 퍼진 시간 그래프">
+      <i data-points="10, 360; 20, 260; 40, 160; 60, 110" data-label="실험 결과" data-color="#0F766E"></i>
+      <i data-line="x <= 20 ? 360 - 10 * (x - 10) : (x <= 40 ? 260 - 5 * (x - 20) : 160 - 2.5 * (x - 40))" data-x="10, 60" data-dash data-color="#0F766E"></i>
+      <i data-vline="T"></i>
+      <i data-point="T, tm" data-label="지금" data-color="#B3261E"></i>
+    </figure>
+    <div class="tm-ctrl">
+      <p class="dx-lab">물의 온도 <b><output data-expr="T" data-unit="℃"></output></b></p>
+      <input type="range" name="T" min="10" max="60" step="5" value="10" aria-label="물의 온도">
+      <div class="chain">
+        <div>온도가 높다<b><output data-expr="T" data-unit="℃"></output></b></div>
+        <span>↓</span>
+        <div data-ai="모형 수치">입자 운동이 활발하다<b><output data-expr="v" data-digits="1"></output>배</b></div>
+        <span>↓</span>
+        <div>확산이 빠르다<b><output data-expr="tm" data-digits="0" data-unit="초 만에"></output></b></div>
+      </div>
+      <p class="model chain-n">입자 운동: 10 ℃와 견준 빠르기(모형)<br>시간: <span data-show="tab">표의 값</span><span data-show="!tab">표 사이 값(모형)</span></p>
+      <p class="tm-say" data-show="T == 10">10 ℃가 기준이다. 온도를 높여 보자.</p>
+      <p class="tm-say" data-show="T > 10">10 ℃보다 <output data-expr="f" data-digits="1"></output>배 빨리 퍼진다.</p>
+    </div>
+  </div>
+  <p class="take step">온도가 높을수록 입자의 운동이 활발해서 확산이 빠르다.</p>
+</section>
+
+<!-- 9 어디에서 더 빨리 퍼질까 -->
+<section class="slide" id="medium" data-sec="개념" data-title="어디에서 확산이 더 빠를까?">
+  <h2>어디에서 확산이 더 빠를까?</h2>
+  <div class="media" data-ai="진공·기체·액체 입자 배치 그림">
+    <figure>
+      <svg viewBox="0 0 300 200" aria-label="진공: 다른 입자가 없는 상자">
+        <rect x="3" y="3" width="294" height="194" rx="10" fill="#F7F7FA" stroke="#3B4A5A" stroke-width="4"/>
+        <circle cx="70" cy="100" r="13" fill="#A64DC0"/>
+        <line x1="90" y1="100" x2="240" y2="100" stroke="#A64DC0" stroke-width="5" stroke-dasharray="10 8"/>
+        <polygon points="240,88 262,100 240,112" fill="#A64DC0"/>
+      </svg>
+      <figcaption>진공<small>방해하는 입자가 없다</small></figcaption>
+    </figure>
+    <div class="gt">&gt;</div>
+    <figure>
+      <svg viewBox="0 0 300 200" aria-label="기체: 입자 사이가 넓은 상자">
+        <rect x="3" y="3" width="294" height="194" rx="10" fill="#F4F9FF" stroke="#3B4A5A" stroke-width="4"/>
+        <g fill="#9DC8F5"><circle cx="50" cy="40" r="12"/><circle cx="150" cy="55" r="12"/><circle cx="250" cy="40" r="12"/><circle cx="95" cy="150" r="12"/><circle cx="205" cy="160" r="12"/><circle cx="260" cy="115" r="12"/></g>
+        <circle cx="45" cy="105" r="13" fill="#A64DC0"/>
+        <polyline points="45,105 120,95 165,120 230,95" fill="none" stroke="#A64DC0" stroke-width="5" stroke-dasharray="10 8"/>
+      </svg>
+      <figcaption>기체<small>가끔 부딪힌다</small></figcaption>
+    </figure>
+    <div class="gt">&gt;</div>
+    <figure>
+      <svg viewBox="0 0 300 200" aria-label="액체: 입자가 빽빽한 상자">
+        <rect x="3" y="3" width="294" height="194" rx="10" fill="#E4F0FC" stroke="#3B4A5A" stroke-width="4"/>
+        <g fill="#9DC8F5">
+          <circle cx="30" cy="30" r="12"/><circle cx="70" cy="28" r="12"/><circle cx="112" cy="34" r="12"/><circle cx="155" cy="27" r="12"/><circle cx="198" cy="33" r="12"/><circle cx="240" cy="28" r="12"/><circle cx="275" cy="40" r="12"/>
+          <circle cx="28" cy="72" r="12"/><circle cx="110" cy="75" r="12"/><circle cx="150" cy="68" r="12"/><circle cx="195" cy="78" r="12"/><circle cx="238" cy="70" r="12"/><circle cx="275" cy="82" r="12"/>
+          <circle cx="30" cy="160" r="12"/><circle cx="68" cy="140" r="12"/><circle cx="110" cy="128" r="12"/><circle cx="150" cy="140" r="12"/><circle cx="192" cy="122" r="12"/><circle cx="235" cy="130" r="12"/><circle cx="275" cy="125" r="12"/>
+          <circle cx="58" cy="178" r="12"/><circle cx="102" cy="172" r="12"/><circle cx="148" cy="180" r="12"/><circle cx="192" cy="168" r="12"/><circle cx="238" cy="174" r="12"/><circle cx="276" cy="168" r="12"/>
+        </g>
+        <circle cx="66" cy="96" r="13" fill="#A64DC0"/>
+        <polyline points="66,96 88,104 80,112 100,103" fill="none" stroke="#A64DC0" stroke-width="5" stroke-dasharray="8 6"/>
+      </svg>
+      <figcaption>액체<small>자꾸 부딪힌다</small></figcaption>
+    </figure>
+  </div>
+  <p class="mline step">확산은 액체보다 기체에서 더 빠르게 일어난다.</p>
+  <p class="mline step">진공 속에서는 움직임을 방해하는 다른 입자가 없어서<br>확산이 가장 빠르다.</p>
+</section>
+
+<!-- 10 확인 문제 1 -->
+<section class="slide" id="check-1" data-sec="확인 문제" data-title="확인 문제 1">
+  <h2>확인 문제 1</h2>
+  <p class="q" data-n="1">다음 중 확산으로 설명할 수 있는 현상이 아닌 것은?</p>
+  <div class="quiz">
+    <button class="opt" data-ai="풀이" data-why="빵 냄새 입자가 공기 속으로 퍼진다. 확산이다.">빵 굽는 냄새가 집 안에 퍼진다.</button>
+    <button class="opt" data-ai="풀이" data-why="잉크 입자가 물 입자 사이로 퍼진다. 확산이다.">물에 떨어뜨린 잉크가 퍼진다.</button>
+    <button class="opt" data-ok data-why="맞다. 빨래가 마르는 것은 액체 표면의 입자가 기체로 날아가는 증발이다.">젖은 빨래가 햇볕에 마른다.</button>
+    <button class="opt" data-ai="풀이" data-why="방향제 냄새 입자가 방 안 공기 속으로 퍼진다. 확산이다.">방향제 냄새가 방 안에 퍼진다.</button>
+    <button class="opt" data-ai="풀이" data-why="홍차의 색을 내는 입자가 물속으로 퍼진다. 확산이다.">홍차 티백을 넣은 물의 색이 점점 진해진다.</button>
+  </div>
+</section>
+
+<!-- 11 확인 문제 2 -->
+<section class="slide" id="check-2" data-sec="확인 문제" data-title="확인 문제 2">
+  <h2>확인 문제 2</h2>
+  <p class="q" data-n="2">다음 현상을 확산과 증발로 분류해 보자.</p>
+  <div class="sort">
+    <div class="bin" data-bin="d"><h3>확산</h3></div>
+    <div class="bin" data-bin="e"><h3>증발</h3></div>
+    <span data-bin="d" data-ai="풀이와 실마리" data-why="꽃향기 입자가 공기 속으로 퍼진다." data-hint="향기 입자는 어디로 가는가?">ㄱ. 꽃향기가 정원 전체에 퍼진다.</span>
+    <span data-bin="e" data-ai="풀이와 실마리" data-why="어항 물 표면의 입자가 기체가 되어 날아간다." data-hint="줄어든 물은 어디로 갔을까?">ㄴ. 어항의 물이 조금씩 줄어든다.</span>
+    <span data-bin="d" data-ai="풀이와 실마리" data-why="설탕 입자가 저어 주지 않아도 물속으로 퍼진다." data-hint="설탕 입자는 스스로 움직여 어디로 가는가?">ㄷ. 물에 설탕을 넣으면 저어 주지 않아도 물 전체가 달아진다.</span>
+    <span data-bin="e" data-ai="풀이와 실마리" data-why="알코올 입자가 기체가 되어 날아간다." data-hint="액체였던 알코올은 무엇이 되었을까?">ㄹ. 손등에 바른 알코올이 금방 마른다.</span>
+    <span data-bin="d" data-ai="풀이와 실마리" data-why="모기향 냄새 입자가 방 안 공기 속으로 퍼진다." data-hint="냄새 입자가 다른 물질 속으로 퍼지는가?">ㅁ. 모기향 냄새가 방 안에 퍼진다.</span>
+    <span data-bin="e" data-ai="풀이와 실마리" data-why="마당의 물 입자가 기체가 되어 공기 중으로 날아갔다." data-hint="액체가 기체로 바뀌었는가?">ㅂ. 마당에 뿌린 물이 마른다.</span>
+  </div>
+</section>
+
+<!-- 12 정리 -->
+<section class="slide" id="summary" data-sec="정리" data-title="정리">
+  <h2>정리</h2>
+  <ul class="sum">
+    <li><b>확산</b>: 입자가 <span class="blank">스스로</span> 움직여 퍼져 나가는 현상</li>
+    <li>온도가 높을수록 입자 운동이 <span class="blank">활발</span>해서<br>확산이 빠르다.</li>
+    <li>확산 빠르기: <span class="blank">진공 &gt; 기체 &gt; 액체</span></li>
+  </ul>
+  <p class="next">다음 시간: 증발</p>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const $ = (s) => document.querySelector(s);
+  const SVG = 'http://www.w3.org/2000/svg';
+  const mk = (tag, attrs, parent) => { const e = document.createElementNS(SVG, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; };
+  const still = () => document.documentElement.classList.contains('ch-motion-off');
+  // 씨앗을 고정한 난수: 누가 언제 열어도 같은 그림이 나온다
+  const rng = (a) => () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+  const refl = (v, lo, hi) => { while (v < lo || v > hi) v = v < lo ? 2 * lo - v : 2 * hi - v; return v; };
+  function tween(job, to, draw, ms) {          // 앞 값에서 새 값까지 ms 동안 이어서 그린다
+    cancelAnimationFrame(job.raf);
+    const from = job.v, t0 = performance.now();
+    const step = (now) => {
+      const p = still() || ms <= 0 ? 1 : Math.min(1, (now - t0) / ms);
+      job.v = from + (to - from) * (1 - (1 - p) ** 3);
+      draw(job.v);
+      if (p < 1) job.raf = requestAnimationFrame(step);
+    };
+    job.raf = requestAnimationFrame(step);
+  }
+
+  /* ── 잉크 한 방울: 잉크 60개·물 100개가 같은 무작위 걸음을 한다(10초마다 4걸음) ── */
+  {
+    const W = 560, H = 420, TOP = 48, R = 10, NI = 60, NW = 100, F = 31, SUB = 4, SIG = 20;
+    const r = rng(74), g = () => Math.sqrt(-2 * Math.log(r() + 1e-12)) * Math.cos(2 * Math.PI * r());
+    const ps = [];
+    for (let i = 0; i < NI; i++) ps.push([refl(280 + g() * 18, R, W - R), refl(46 + g() * 14, R, H - R)]);   // 스포이트 바로 아래에 떨어진 한 방울
+    const r2 = rng(5150), g2 = () => Math.sqrt(-2 * Math.log(r2() + 1e-12)) * Math.cos(2 * Math.PI * r2());
+    for (let i = 0; i < NW; i++) ps.push([R + r2() * (W - 2 * R), R + r2() * (H - 2 * R)]);
+    let me = NI; ps.forEach((p, i) => { if (i >= NI && Math.hypot(p[0] - 430, p[1] - 300) < Math.hypot(ps[me][0] - 430, ps[me][1] - 300)) me = i; });
+    const frames = [ps.map((p) => p.slice())];
+    for (let f = 1; f < F; f++) {
+      for (let s = 0; s < SUB; s++) for (let i = 0; i < NI; i++) { const p = ps[i]; p[0] = refl(p[0] + g() * SIG, R, W - R); p[1] = refl(p[1] + g() * SIG, R, H - R); }
+      for (let s = 0; s < SUB; s++) for (let i = NI; i < ps.length; i++) { const p = ps[i]; p[0] = refl(p[0] + g2() * SIG, R, W - R); p[1] = refl(p[1] + g2() * SIG, R, H - R); }
+      frames.push(ps.map((p) => p.slice()));
+    }
+    // 고르게 퍼진 정도: 9칸에 나뉜 잉크 개수가 고르게 섞인 상태에 얼마나 가까운가(0~100 %)
+    const D0 = 8 / 9, DU = 0.1466;
+    const even = frames.map((P) => {
+      const n = Array(9).fill(0);
+      for (let i = 0; i < NI; i++) n[Math.min(2, Math.floor(P[i][0] / (W / 3))) + 3 * Math.min(2, Math.floor(P[i][1] / (H / 3)))]++;
+      const D = n.reduce((a, c) => a + Math.abs(c - NI / 9), 0) / 2 / NI;
+      return Math.max(0, Math.min(100, 100 * (D0 - D) / (D0 - DU)));
+    });
+
+    const dots = frames[0].map((p, i) => mk('circle', { r: R, fill: i < NI ? '#E0464E' : '#9DC8F5', cx: p[0], cy: TOP + p[1] }, i < NI ? $('#ik-ink') : $('#ik-water')));
+    dots[me].setAttribute('visibility', 'hidden');
+
+    // 그래프 틀
+    const G = $('#ik-graph'), GX = (t) => 52 + t / 30 * 204, GY = (e) => 272 - e / 100 * 226;
+    mk('text', { x: 4, y: 24, 'font-size': 20, fill: '#5C6670' }, G).textContent = '고르게 퍼진 정도(%)';
+    [0, 50, 100].forEach((e) => {
+      mk('line', { x1: 52, y1: GY(e), x2: 262, y2: GY(e), stroke: e ? '#E3E8EC' : '#3B4A5A', 'stroke-width': e ? 1.5 : 2 }, G);
+      mk('text', { x: 44, y: GY(e) + 7, 'text-anchor': 'end', 'font-size': 20, fill: '#5C6670' }, G).textContent = e;
+    });
+    mk('line', { x1: 52, y1: GY(0), x2: 52, y2: GY(100) - 4, stroke: '#3B4A5A', 'stroke-width': 2 }, G);
+    [0, 1, 2, 3, 4, 5].forEach((m) => { mk('text', { x: GX(m * 6), y: 298, 'text-anchor': 'middle', 'font-size': 20, fill: '#5C6670' }, G).textContent = m; });
+    mk('text', { x: 262, y: 328, 'text-anchor': 'end', 'font-size': 20, fill: '#5C6670' }, G).textContent = '시간(분)';
+    const gLine = mk('polyline', { fill: 'none', stroke: '#E0464E', 'stroke-width': 4, 'stroke-linejoin': 'round' }, G);
+    const gPt = mk('circle', { r: 9, fill: '#E0464E', stroke: '#fff', 'stroke-width': 3, cx: GX(0), cy: GY(0) }, G);
+
+    const lerp = (a, b, u) => a + (b - a) * u;
+    const clock = (s) => s < 60 ? s + '초' : Math.floor(s / 60) + '분' + (s % 60 ? ' ' + (s % 60) + '초' : '');
+    const job = { v: 0, raf: 0 };
+    function paint(ft) {                          // ft = 0~30 사이의 연속 칸(10초 단위)
+      const f0 = Math.min(29, Math.floor(ft)), u = Math.min(1, ft - f0), A = frames[f0], B = frames[f0 + 1];
+      dots.forEach((d, i) => { d.setAttribute('cx', lerp(A[i][0], B[i][0], u).toFixed(1)); d.setAttribute('cy', (TOP + lerp(A[i][1], B[i][1], u)).toFixed(1)); });
+      const mx = lerp(A[me][0], B[me][0], u), my = TOP + lerp(A[me][1], B[me][1], u);
+      $('#ik-me').setAttribute('cx', mx.toFixed(1)); $('#ik-me').setAttribute('cy', my.toFixed(1));
+      const tr = [];
+      for (let k = Math.max(0, f0 - 5); k <= f0; k++) tr.push(frames[k][me][0].toFixed(1) + ',' + (TOP + frames[k][me][1]).toFixed(1));
+      tr.push(mx.toFixed(1) + ',' + my.toFixed(1));
+      $('#ik-trail').setAttribute('points', tr.join(' '));
+      const e = lerp(even[f0], even[f0 + 1], u);
+      const pts = []; for (let k = 0; k <= f0; k++) pts.push(GX(k) + ',' + GY(even[k]).toFixed(1));
+      pts.push(GX(ft).toFixed(1) + ',' + GY(e).toFixed(1));
+      gLine.setAttribute('points', pts.join(' '));
+      gPt.setAttribute('cx', GX(ft).toFixed(1)); gPt.setAttribute('cy', GY(e).toFixed(1));
+      $('#ik-ev').textContent = Math.round(e);
+    }
+    function drawInk(e) {
+      const k = +$('#ik-t').value;                // 0 = 시작(가림), 1 = 0초 … 31 = 5분
+      $('#ik-veil').hidden = k > 0;
+      if (!k) {
+        cancelAnimationFrame(job.raf); job.v = 0; paint(0);
+        $('#ik-t-out').textContent = '시작'; $('#ik-ev').textContent = '?'; $('#ik-out').textContent = '';
+        return;
+      }
+      const f = k - 1, ev = even[f];
+      $('#ik-t-out').textContent = clock(f * 10);
+      $('#ik-out').textContent = f === 0 ? '잉크 입자가 떨어진 자리에 모여 있다.'
+        : ev < 50 ? '잉크 입자가 물 입자 사이로 퍼져 나간다.'
+        : ev < 90 ? '잉크 입자가 바닥까지 갔지만 아직 고르지 않다.'
+        : '잉크 입자가 물 전체에 고르게 퍼졌다. 입자는 그 뒤에도 움직인다.';
+      tween(job, f, paint, e && e.chPlay != null ? Math.max(120, e.chPlay) : 700);
+    }
+    $('#ik-t').addEventListener('input', drawInk);
+    $('#ik-t').addEventListener('change', (e) => e.target.blur());   // 손을 떼면 초점을 풀어 → 키가 다시 장을 넘기게
+    paint(0);
+    drawInk();
+  }
+
+  /* ── 온도: 온도를 바꾸면 입자 상자를 처음부터 다시 놓아 같은 출발선에서 견준다 ── */
+  {
+    const T = $('#tm-calc input[name="T"]');
+    const again = () => { const b = $('#tm-box .ch-row button:last-child'); if (b) b.click(); };
+    if (T) T.addEventListener('change', again);
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,104 @@
+[
+  {
+    "id": "chatgpt-codex",
+    "platform": "ChatGPT",
+    "mode": "Codex",
+    "model": "GPT-6.1-Sol · High",
+    "date": "2026-10-19",
+    "file": "assets/comparison/chatgpt-codex.html",
+    "shot": "assets/comparison/chatgpt-codex.webp",
+    "metrics": {
+      "engine": true,
+      "exploragrams": 3,
+      "auditErrors": 0,
+      "slides": 14,
+      "minutes": 10
+    },
+    "note": "인터뷰 1번 뒤 '알아서'로 진행. 마지막 점검 중 사용 한도에 걸림 / 저장소의 확산 레퍼런스 예시와 거의 같은 화면"
+  },
+  {
+    "id": "chatgpt-chat",
+    "platform": "ChatGPT",
+    "mode": "Chat",
+    "model": "기본(Medium)",
+    "date": "2026-10-19",
+    "file": "assets/comparison/chatgpt-chat.html",
+    "shot": "assets/comparison/chatgpt-chat.webp",
+    "metrics": {
+      "engine": true,
+      "exploragrams": 3,
+      "auditErrors": 2,
+      "slides": 13,
+      "minutes": null
+    },
+    "note": "인터뷰 1번 뒤 '알아서'로 진행 / 입자 상자를 직접 짜서 단순하게 구성"
+  },
+  {
+    "id": "chatgpt-work",
+    "platform": "ChatGPT",
+    "mode": "Work",
+    "model": "GPT-6.1-Sol · Light",
+    "date": "2026-10-19",
+    "file": "assets/comparison/chatgpt-work.html",
+    "shot": "assets/comparison/chatgpt-work.webp",
+    "metrics": {
+      "engine": true,
+      "exploragrams": 3,
+      "auditErrors": 0,
+      "slides": 12,
+      "minutes": null
+    },
+    "note": "첫 요청은 사용 한도로 멈춰 한도 재설정 뒤 다시 보냄. 인터뷰 1번 뒤 '알아서'로 진행 / 저장소의 확산 레퍼런스 예시와 거의 같은 화면"
+  },
+  {
+    "id": "claude-chat",
+    "platform": "Claude",
+    "mode": "Chat",
+    "model": "Opus 5.5 · 중간",
+    "date": "2026-10-19",
+    "file": "assets/comparison/claude-chat.html",
+    "shot": "assets/comparison/claude-chat.webp",
+    "metrics": {
+      "engine": true,
+      "exploragrams": 2,
+      "auditErrors": 1,
+      "slides": 12,
+      "minutes": null
+    },
+    "note": "인터뷰 1번 뒤 '알아서'로 진행. 바로보기·오프라인 두 파일을 줌 / 스크립트 예외 1건 / 입자 상자와 고르게 퍼진 정도 그래프를 새로 설계"
+  },
+  {
+    "id": "claude-code",
+    "platform": "Claude",
+    "mode": "Claude Code",
+    "model": "Opus 5.5 · Extra High",
+    "date": "2026-10-19",
+    "file": "assets/comparison/claude-code.html",
+    "shot": "assets/comparison/claude-code.webp",
+    "metrics": {
+      "engine": true,
+      "exploragrams": 4,
+      "auditErrors": 0,
+      "slides": 13,
+      "minutes": null
+    },
+    "note": "인터뷰 1번 뒤 '알아서'로 진행. 사용 한도로 한 번 멈췄다가 이어서 만듦 / 시간 막대에 퍼짐 그래프를 붙여 새로 설계"
+  },
+  {
+    "id": "gemini-auto",
+    "platform": "Gemini",
+    "mode": "자동 모드(무료)",
+    "model": "Gemini 3 자동",
+    "date": "2026-10-19",
+    "file": "assets/comparison/gemini-auto.html",
+    "shot": "assets/comparison/gemini-auto.webp",
+    "metrics": {
+      "engine": false,
+      "exploragrams": 0,
+      "auditErrors": null,
+      "slides": 10,
+      "minutes": null
+    },
+    "note": "'만들겠다'만 두 번 답해 한 번 더 재촉한 뒤 캔버스로 만듦. 엔진을 쓰지 않음 / 엔진 없음 / 익스플로라그램 없음 / 자동 점검 실패 (종료 코드 2) / 미리보기는 첫 화면 / 엔진 없이 Tailwind·Chart.js로 만든 어두운 슬라이드"
+  }
+]

@@ -1,0 +1,803 @@
+<!doctype html>
+<html lang="ko" data-deck="mid-sci-diffusion-1">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>냄새는 어떻게 퍼질까? 확산과 입자의 운동</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/engine/exploragram.css">
+<script defer src="https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/engine/exploragram.js"></script>
+<style>
+  /* 원본 PPT의 색: 청록 머리 띠, 노란 배지, 청록 핵심어, 회색 각주, 빨강 주의 */
+  body[data-theme="ppt"] { --accent: #0F766E; --tab: #0F766E; --tab-ink: #FFFFFF; --flag: #B3261E; --badge: #FBBF24; --note: #5F646B; --warn: #B3261E; --frame: #3B4A5A; }
+
+  /* 머리 띠와 배지 */
+  section.slide > h2 {
+    position: absolute; z-index: 5; left: 0; top: 0; width: 1280px; height: 100px; margin: 0;
+    padding: 0 270px 0 48px; box-sizing: border-box; display: flex; align-items: center;
+    background: var(--tab); color: var(--tab-ink); font-size: 40px; font-weight: 800; line-height: 1.2; border: 0;
+  }
+  .badge {
+    position: absolute; z-index: 6; top: 26px; right: 44px; min-width: 184px; height: 48px; padding: 0 20px;
+    box-sizing: border-box; border-radius: 10px; display: flex; align-items: center; justify-content: center;
+    background: var(--badge); color: #222; font-size: 24px; font-weight: 800;
+  }
+
+  /* 표지: 청록 바탕, 왼쪽 노란 세로 막대 */
+  body[data-theme="ppt"] section.slide.cover { background: var(--tab); color: #fff; padding: 176px 80px 56px 125px; }
+  body[data-theme="ppt"] section.slide.cover::after { color: #fff; }
+  .cv-bar { position: absolute; left: 77px; top: 190px; width: 17px; height: 252px; background: var(--badge); }
+  .cv-kicker { margin: 0 0 22px; font-size: 30px; font-weight: 600; color: #fff; }
+  body[data-theme="ppt"] .slide.cover h1 { margin: 0 0 30px; color: #fff; font-size: 66px; font-weight: 800; line-height: 1.25; }
+  .cv-sub { margin: 0; font-size: 38px; font-weight: 500; color: #E6F4F1; }
+
+  /* 글 */
+  .key { color: var(--tab); font-weight: 800; }
+  .note { color: var(--note); font-size: 24px; }
+  .warn { color: var(--warn); font-size: 26px; font-weight: 700; }
+  .lead { margin: 0 0 18px; }
+  .sub { margin: 26px 0 14px; font-size: 28px; font-weight: 800; }
+
+  /* 학습 목표: 번호 상자 */
+  .goals { margin: 24px 0 0; padding: 0; list-style: none; display: grid; gap: 28px; }
+  .goals li { display: grid; grid-template-columns: 64px 1fr; gap: 24px; align-items: center; font-size: 32px; line-height: 1.45; }
+  .goals b { display: grid; place-items: center; width: 64px; height: 64px; border-radius: 14px; background: var(--tab); color: #fff; font-size: 32px; }
+
+  /* 생각 열기 */
+  .open { display: grid; grid-template-columns: 1fr 560px; gap: 36px; align-items: start; }
+  .open .fig img { width: 560px; height: auto; }
+  .open .short .ask { font-weight: 800; color: var(--tab); line-height: 1.45; }
+
+  /* 확산의 뜻 */
+  .def { margin: 4px 0 24px; padding: 22px 28px; border-left: 10px solid var(--tab); border-radius: 0 14px 14px 0; background: #E3F2EF; font-size: 32px; line-height: 1.5; }
+  .def b { margin-right: 14px; color: var(--tab); font-weight: 800; }
+  .ex { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .ex li { padding: 20px 22px; border: 3px solid #CDE7E2; border-radius: 16px; background: #fff; font-size: 28px; line-height: 1.45; text-wrap: pretty; }
+
+  /* 실험 */
+  .lab-q { margin: 0 0 20px; padding: 14px 22px; border-radius: 12px; background: #FFF4D6; font-size: 28px; font-weight: 700; }
+  .lab { display: grid; grid-template-columns: 1fr 440px; gap: 36px; align-items: start; }
+  .lab .fig img { width: 440px; height: auto; border: 0; }
+  .kit { margin: 0 0 18px; padding: 0; list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .kit li { margin: 0; padding: 12px 18px; border: 2px solid #CDE7E2; border-radius: 14px; background: #F3FAF8; font-size: 28px; }
+  .proc { margin: 6px 0 0; padding: 0; list-style: none; counter-reset: proc; display: grid; gap: 16px; }
+  .proc li { counter-increment: proc; display: grid; grid-template-columns: 52px 1fr; gap: 20px; align-items: center; font-size: 30px; line-height: 1.4; }
+  .proc li::before { content: counter(proc); display: grid; place-items: center; width: 52px; height: 52px; border-radius: 12px; background: var(--tab); color: #fff; font-weight: 800; }
+  .tip { margin: 26px 0 0; padding: 16px 24px; border: 3px solid var(--warn); border-radius: 14px; color: var(--ch-ink); font-size: 28px; line-height: 1.45; }
+  .tip b { color: var(--warn); }
+
+  /* 실험 결과 */
+  .res-table { margin: 0 0 12px; }
+  .res-table table.compare th, .res-table table.compare td { padding: 8px 20px; }
+  .res-table table.compare { font-size: 28px; }
+  .res-table table.compare thead th:first-child, .res-table table.compare tbody th { width: 400px; text-align: left; padding-left: 24px; }
+  .res-table table.compare td, .res-table table.compare thead th { text-align: center; }
+  .res { display: grid; grid-template-columns: 560px 1fr; gap: 32px; align-items: start; }
+  .res p { margin: 0 0 10px; font-size: 26px; line-height: 1.45; }
+  .res .note { text-wrap: balance; }
+  .read { margin: 6px 0 12px; padding: 0; list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px; }
+  .read li { margin: 0; font-size: 26px; line-height: 1.4; font-variant-numeric: tabular-nums; }
+  .read .dot { display: inline-block; width: 18px; height: 18px; margin-right: 10px; border-radius: 50%; vertical-align: -1px; }
+  .read .ok { color: var(--ch-ok); font-weight: 800; }
+
+  /* 정리 */
+  .sum { margin: 10px 0 0; padding: 0; list-style: none; display: grid; gap: 26px; }
+  .sum li { position: relative; padding-left: 36px; font-size: 34px; line-height: 1.5; }
+  .sum li::before { content: ""; position: absolute; left: 4px; top: 20px; width: 14px; height: 14px; border-radius: 50%; background: var(--tab); }
+  .next { margin-top: 40px; font-size: 26px; color: var(--note); }
+
+  /* 입자 모형(익스플로라그램) 공통 */
+  .dx { display: grid; grid-template-columns: 700px 392px; gap: 28px; align-items: start; }
+  .dx-view { position: relative; }
+  .dx-box { position: relative; width: 692px; height: 300px; border: 4px solid var(--frame); box-sizing: content-box; background: #fff; }
+  .dx-box.is-low { height: 280px; }
+  .dx-box canvas, .bk canvas { display: block; transition: opacity .3s; }
+  .dx-box canvas.is-swap, .bk canvas.is-swap { opacity: 0; }
+  .dx-tag { position: absolute; bottom: 6px; padding: 2px 10px; border-radius: 8px; background: rgba(255, 255, 255, .86); color: #3B4A5A; font-size: 20px; font-weight: 700; }
+  .dx-tag.l { left: 8px; } .dx-tag.r { right: 8px; }
+  .dx-g { display: block; margin-top: 12px; }
+  .dx-veil {
+    position: absolute; inset: 0; z-index: 3; display: grid; place-items: center; padding: 24px; text-align: center;
+    border: 3px dashed #B8C4CE; border-radius: 18px; background: #EEF2F5; color: #4F5D6A; font-size: 30px; font-weight: 700;
+    transition: opacity .3s, visibility 0s linear 0s;
+  }
+  .dx-veil.is-off { opacity: 0; visibility: hidden; transition: opacity .3s, visibility 0s linear .3s; }
+  .dx-side p { margin: 0 0 12px; font-size: 26px; line-height: 1.45; }
+  .dx-legend { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 0 0 12px; font-size: 22px; color: #3B4A5A; }
+  .dx-legend.under { margin: 6px 0 0; }
+  .dx-legend i { display: inline-block; width: 18px; height: 18px; margin-right: 8px; border-radius: 50%; vertical-align: -2px; }
+  .dx-side .dx-lab { margin-bottom: 8px; font-weight: 800; }
+  .dx-btns { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 10px; }
+  .dx-btns button { min-height: 56px; min-width: 96px; padding: 0 18px; font-size: 24px; font-weight: 700; }
+  .dx-btns button[aria-pressed="true"] { border-color: var(--accent); background: var(--accent); color: #fff; }
+  .dx-slider { position: relative; margin: 0 0 8px; padding-bottom: 34px; }
+  .dx-slider input[type="range"] { -webkit-appearance: none; appearance: none; display: block; width: 100%; height: 56px; margin: 0; background: transparent; cursor: pointer; --p: 0%; }
+  .dx-slider input[type="range"]::-webkit-slider-runnable-track { height: 12px; border-radius: 6px; background: linear-gradient(90deg, var(--accent) var(--p), #D5D9DF var(--p)); }
+  .dx-slider input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 46px; height: 46px; margin-top: -17px; border-radius: 50%; background: #fff; border: 7px solid var(--accent); box-shadow: 0 2px 8px rgba(0, 0, 0, .3); }
+  .dx-slider input[type="range"]::-moz-range-track { height: 12px; border-radius: 6px; background: #D5D9DF; }
+  .dx-slider input[type="range"]::-moz-range-progress { height: 12px; border-radius: 6px; background: var(--accent); }
+  .dx-slider input[type="range"]::-moz-range-thumb { width: 32px; height: 32px; border-radius: 50%; background: #fff; border: 7px solid var(--accent); }
+  .dx-ticks { position: absolute; left: 0; right: 0; bottom: 0; height: 30px; pointer-events: none; }
+  .dx-ticks span { position: absolute; top: 0; left: calc(23px + (100% - 46px) * var(--f)); transform: translateX(-50%); font-size: 20px; color: #4F5D6A; white-space: nowrap; }
+  .dx-ticks span:first-child { transform: none; left: 0; }
+  .dx-ticks span:last-child { transform: none; left: auto; right: 0; }
+  .dx-num { font-variant-numeric: tabular-nums; }
+  .dx-num b { font-size: 30px; color: var(--ch-ink); }
+  .dx-say { min-height: 76px; font-weight: 700; color: var(--tab); text-wrap: pretty; }
+  .dx-say:empty { min-height: 0; }
+
+  /* 비커 두 개 */
+  .bks { display: grid; grid-template-columns: 1fr 1fr; gap: 36px; }
+  .bk { position: relative; }
+  .bk-h { display: flex; justify-content: space-between; align-items: baseline; margin: 0 0 2px; font-size: 26px; font-weight: 800; }
+  .bk-h.cold { color: #1D5FB4; } .bk-h.warm { color: #B3261E; }
+  .bk-cv { position: relative; width: 320px; height: 230px; border: 6px solid var(--frame); border-top: 0; }
+  .bk-cv.cold { background: #DCECFB; } .bk-cv.warm { background: #FBE3DA; }
+  .bk-done { font-size: 24px; transition: opacity .3s; }
+  .bk-move { display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: center; margin: 0 0 6px; font-size: 20px; font-weight: 700; color: #4F5D6A; }
+  .bk-move i { display: block; height: 14px; border-radius: 7px; background: #E3E7EC; overflow: hidden; }
+  .bk-move b { display: block; height: 100%; border-radius: 7px; transition: width .7s; }
+  #dx2-a-move { background: #1D5FB4; } #dx2-b-move { background: #B3261E; }
+  .bk-done.is-off { opacity: 0; }
+  .chain { display: grid; grid-template-columns: 1fr 34px 1fr 34px 1fr; align-items: center; margin-top: 8px; }
+  .chain p { margin: 0; padding: 7px 12px; border: 3px solid var(--tab); border-radius: 12px; background: #E3F2EF; font-size: 24px; font-weight: 800; text-align: center; line-height: 1.3; }
+  .chain i { justify-self: center; width: 0; height: 0; border-top: 12px solid transparent; border-bottom: 12px solid transparent; border-left: 16px solid var(--tab); }
+</style>
+</head>
+<body data-theme="ppt">
+
+<!-- 1. 표지 -->
+<section class="slide cover" id="cover" data-title="표지">
+  <i class="cv-bar" aria-hidden="true"></i>
+  <p class="cv-kicker">중학교 과학 · 입자의 운동</p>
+  <h1>냄새는 어떻게 퍼질까?</h1>
+  <p class="cv-sub">확산과 입자의 운동</p>
+</section>
+
+<!-- 2. 학습 목표 -->
+<section class="slide" id="goal" data-sec="학습 목표" data-title="학습 목표">
+  <h2 data-enter="off">학습 목표</h2>
+  <span class="badge" data-enter="off" aria-hidden="true">학습 목표</span>
+  <ol class="goals">
+    <li><b>1</b><span>확산 현상을 입자의 운동으로 설명할 수 있다.</span></li>
+    <li><b>2</b><span>온도에 따라 확산 빠르기가 달라지는 까닭을 설명할 수 있다.</span></li>
+  </ol>
+</section>
+
+<!-- 3. 생각 열기 -->
+<section class="slide" id="perfume" data-sec="생각 열기" data-title="교실 앞에서 향수 뚜껑을 열면?">
+  <h2 data-enter="off">교실 앞에서 향수 뚜껑을 열면?</h2>
+  <span class="badge" data-enter="off" aria-hidden="true">생각 열기</span>
+  <div class="open">
+    <div>
+      <p class="lead">교실 앞 교탁에서 향수병 뚜껑을 열면 잠시 뒤 맨 뒷자리 학생도 냄새를 맡을 수 있다.</p>
+      <div class="short" data-ph="내 생각을 한 문장으로 적어 보자">
+        <p class="ask">창문을 모두 닫아 바람이 없는데도 냄새가 퍼지는 이유는 무엇일까?</p>
+      </div>
+    </div>
+    <figure class="fig"><img src="data:image/png;base64,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" alt="향수병에서 냄새 입자가 퍼져 뒷자리 학생에게 닿는 모습" width="560"></figure>
+  </div>
+</section>
+
+<!-- 4. 확산이란? -->
+<section class="slide" id="define" data-sec="개념" data-title="확산이란?">
+  <h2 data-enter="off">확산이란?</h2>
+  <span class="badge" data-enter="off" aria-hidden="true">개념</span>
+  <div class="def"><p><b>확산</b>물질을 이루는 입자가 스스로 움직여 다른 물질 속으로 퍼져 나가는 현상</p></div>
+  <p class="lead">입자는 끊임없이 스스로 움직이기 때문에 확산이 일어난다.</p>
+  <p class="sub">생활 속 확산</p>
+  <ul class="ex">
+    <li class="step">향수 냄새가 방 안에 퍼진다.</li>
+    <li class="step">물에 잉크를 떨어뜨리면 물 전체로 퍼진다.</li>
+    <li class="step">티백을 넣은 물의 색이 점점 진해진다.</li>
+  </ul>
+</section>
+
+<!-- 5. 잉크 입자 익스플로라그램 -->
+<section class="slide" id="ink-model" data-sec="개념" data-title="잉크 입자는 물속에서 어떻게 퍼질까?">
+  <h2 data-enter="off">잉크 입자는 물속에서 어떻게 퍼질까?</h2>
+  <span class="badge" data-enter="off" aria-hidden="true">개념</span>
+  <div class="dx" data-ai="잉크 확산 입자 모형" data-activity>
+    <div class="dx-view">
+      <div class="dx-box">
+        <canvas id="dx1-cv" data-w="692" data-h="300" width="692" height="300" style="width:692px;height:300px" aria-label="물 입자 사이에서 잉크 입자가 퍼지는 모형"></canvas>
+        <span class="dx-tag l">왼쪽 절반</span><span class="dx-tag r">오른쪽 절반</span>
+      </div>
+      <svg class="dx-g" id="dx1-g" role="img" aria-label="시간에 따라 오른쪽 절반에 있는 잉크 입자 수"></svg>
+      <div class="dx-veil" id="dx1-veil"><span>「재생」을 누르거나 시간 막대를 밀어 보자</span></div>
+    </div>
+    <div class="dx-side">
+      <p class="dx-legend"><span><i style="background:#E0474C"></i>잉크 입자</span><span><i style="background:#A7CBF2"></i>물 입자</span><span>(모형)</span></p>
+      <p class="dx-num">흐른 시간 <b id="dx1-time">시작</b></p>
+      <div class="dx-slider">
+        <input type="range" id="dx1-t" min="-5" max="300" step="5" value="-5" data-play="16" autocomplete="off" aria-label="흐른 시간">
+        <div class="dx-ticks" aria-hidden="true"><span style="--f:0">시작</span><span style="--f:.2131">1분</span><span style="--f:.4098">2분</span><span style="--f:.6066">3분</span><span style="--f:.8033">4분</span><span style="--f:1">5분</span></div>
+      </div>
+      <p class="dx-num" data-ai="모형 수치">잉크가 들어간 칸 <b id="dx1-lit">–</b></p>
+      <p class="dx-num" data-ai="모형 수치">오른쪽 절반의 잉크 입자 <b id="dx1-count">–</b></p>
+      <p class="dx-say" id="dx1-say"></p>
+    </div>
+  </div>
+</section>
+
+<!-- 6. 실험 준비 -->
+<section class="slide" id="experiment" data-sec="실험" data-title="실험: 물의 온도와 확산">
+  <h2 data-enter="off">실험: 물의 온도와 확산</h2>
+  <span class="badge" data-enter="off" aria-hidden="true">실험</span>
+  <p class="lab-q" data-ai="실험 물음">물의 온도가 다르면 잉크가 퍼지는 빠르기는 어떻게 달라질까?</p>
+  <div class="lab">
+    <div>
+      <p class="sub" style="margin-top:0">준비물</p>
+      <ul class="kit">
+        <li>비커 2개</li><li>잉크</li>
+        <li>찬물(10 ℃)</li><li>스포이트</li>
+        <li>따뜻한 물(60 ℃)</li><li>초시계</li>
+      </ul>
+      <p class="warn">※ 뜨거운 물에 손을 데지 않게 조심한다.</p>
+    </div>
+    <figure class="fig"><img src="data:image/png;base64,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" alt="10 ℃ 물과 60 ℃ 물이 담긴 비커 위에서 스포이트로 잉크를 떨어뜨리는 장면" width="440"></figure>
+  </div>
+</section>
+
+<!-- 7. 실험 방법 -->
+<section class="slide" id="procedure" data-sec="실험" data-title="실험 방법">
+  <h2 data-enter="off">실험 방법</h2>
+  <span class="badge" data-enter="off" aria-hidden="true">실험</span>
+  <ol class="proc">
+    <li>비커 2개에 찬물과 따뜻한 물을 200 mL씩 담는다.</li>
+    <li>물이 잔잔해질 때까지 1분 동안 기다린다.</li>
+    <li>두 비커에 잉크를 한 방울씩 동시에 떨어뜨린다.</li>
+    <li>잉크가 비커 전체에 고르게 퍼질 때까지 걸린 시간을 잰다.</li>
+    <li>결과를 표에 기록한다.</li>
+  </ol>
+  <p class="tip"><b>비커를 흔들거나 젓지 않는다.</b> 저으면 확산이 아니라 섞기가 된다.</p>
+</section>
+
+<!-- 8. 실험 결과와 그래프 -->
+<section class="slide" id="result" data-sec="실험" data-title="실험 결과 (예시)">
+  <h2 data-enter="off">실험 결과 (예시)</h2>
+  <span class="badge" data-enter="off" aria-hidden="true">실험</span>
+  <div class="res-table">
+    <table class="compare">
+      <thead><tr><th>물의 온도(℃)</th><th>10</th><th>20</th><th>40</th><th>60</th></tr></thead>
+      <tbody><tr><th>잉크가 고르게 퍼진 시간(초)</th><td>360</td><td>260</td><td>160</td><td>110</td></tr></tbody>
+    </table>
+  </div>
+  <div class="calc res" data-let="ok1 = p1x == 10 && p1y == 360; ok2 = p2x == 20 && p2y == 260; ok3 = p3x == 40 && p3y == 160; ok4 = p4x == 60 && p4y == 110; ok = (ok1 ? 1 : 0) + (ok2 ? 1 : 0) + (ok3 ? 1 : 0) + (ok4 ? 1 : 0)">
+    <figure class="plot" data-x="0, 70" data-y="0, 400" data-xstep="10" data-ystep="100" data-height="268" data-xlabel="물의 온도(℃)" data-ylabel="고르게 퍼진 시간(초)" aria-label="물의 온도와 잉크가 고르게 퍼진 시간을 점으로 옮기는 그래프">
+      <i data-path="p1x, p1y; p2x, p2y; p3x, p3y; p4x, p4y" data-color="#0F766E" data-show="ok == 4"></i>
+      <i data-drag="p1x, p1y" data-value="10, 0" data-snap="10, 10" data-color="#1D5FB4"></i>
+      <i data-drag="p2x, p2y" data-value="20, 0" data-snap="10, 10" data-color="#0F766E"></i>
+      <i data-drag="p3x, p3y" data-value="40, 0" data-snap="10, 10" data-color="#B45309"></i>
+      <i data-drag="p4x, p4y" data-value="60, 0" data-snap="10, 10" data-color="#B3261E"></i>
+    </figure>
+    <div>
+      <p><b>표의 값을 그래프에 점으로 옮겨 보자.</b></p>
+      <p class="note" data-ai="활동 안내">점을 위로 끌어 그 온도에서 걸린 시간에 놓는다.</p>
+      <ul class="read">
+        <li><i class="dot" style="background:#1D5FB4"></i><output data-expr="p1x"></output> ℃ → <output data-expr="p1y" data-unit="초"></output> <span class="ok" data-show="ok1">✓</span></li>
+        <li><i class="dot" style="background:#0F766E"></i><output data-expr="p2x"></output> ℃ → <output data-expr="p2y" data-unit="초"></output> <span class="ok" data-show="ok2">✓</span></li>
+        <li><i class="dot" style="background:#B45309"></i><output data-expr="p3x"></output> ℃ → <output data-expr="p3y" data-unit="초"></output> <span class="ok" data-show="ok3">✓</span></li>
+        <li><i class="dot" style="background:#B3261E"></i><output data-expr="p4x"></output> ℃ → <output data-expr="p4y" data-unit="초"></output> <span class="ok" data-show="ok4">✓</span></li>
+      </ul>
+      <p>맞게 놓은 점 <b><output data-expr="ok"></output> / 4개</b></p>
+      <p class="step"><b>물의 온도가 높을수록 잉크가 퍼지는 데 걸리는 시간이 짧다.</b></p>
+      <p class="note">※ 실제 실험값은 비커 크기, 잉크 양에 따라 달라질 수 있다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 9. 온도 익스플로라그램 -->
+<section class="slide" id="temp-model" data-sec="개념" data-title="왜 따뜻한 물에서 더 빨리 퍼질까?">
+  <h2 data-enter="off">왜 따뜻한 물에서 더 빨리 퍼질까?</h2>
+  <span class="badge" data-enter="off" aria-hidden="true">개념</span>
+  <div class="dx" data-ai="물의 온도와 확산 입자 모형" data-activity>
+    <div class="dx-view">
+      <div class="bks">
+        <div class="bk">
+          <p class="bk-h cold"><span>10 ℃ 물</span><span class="bk-done is-off" id="dx2-a-done">✓ 360초</span></p>
+          <p class="bk-move" data-ai="모형 수치"><span>입자 운동</span><i><b id="dx2-a-move" style="width:31%"></b></i></p>
+          <div class="bk-cv cold">
+            <canvas id="dx2-a" data-w="320" data-h="230" width="320" height="230" style="width:320px;height:230px" aria-label="10 ℃ 물에서 잉크 입자가 퍼지는 모형"></canvas>
+          </div>
+        </div>
+        <div class="bk">
+          <p class="bk-h warm"><span id="dx2-b-h">□ ℃ 물</span><span class="bk-done is-off" id="dx2-b-done">✓</span></p>
+          <p class="bk-move" data-ai="모형 수치"><span>입자 운동</span><i><b id="dx2-b-move" style="width:0%"></b></i></p>
+          <div class="bk-cv warm">
+            <canvas id="dx2-b" data-w="320" data-h="230" width="320" height="230" style="width:320px;height:230px" aria-label="고른 온도의 물에서 잉크 입자가 퍼지는 모형"></canvas>
+          </div>
+        </div>
+      </div>
+      <svg class="dx-g" id="dx2-g" role="img" aria-label="두 비커에서 시간에 따라 아래쪽 절반에 있는 잉크 입자 수"></svg>
+      <div class="chain step" data-ai="온도와 확산의 사슬 도식">
+        <p>온도가 높다</p><i></i><p>입자의 운동이 활발하다</p><i></i><p>확산이 빠르다</p>
+      </div>
+      <div class="dx-veil" id="dx2-veil"><span>오른쪽 비커의 물 온도를 골라 보자</span></div>
+    </div>
+    <div class="dx-side">
+      <p class="dx-lab">오른쪽 비커의 물 온도</p>
+      <div class="dx-btns" id="dx2-btns">
+        <button type="button" data-temp="20" aria-pressed="false">20 ℃</button>
+        <button type="button" data-temp="40" aria-pressed="false">40 ℃</button>
+        <button type="button" data-temp="60" aria-pressed="false">60 ℃</button>
+      </div>
+      <p class="dx-num">흐른 시간 <b id="dx2-time">0초</b></p>
+      <div class="dx-slider">
+        <input type="range" id="dx2-t" min="0" max="400" step="5" value="0" data-play="12" autocomplete="off" aria-label="흐른 시간">
+        <div class="dx-ticks" aria-hidden="true"><span style="--f:0">0초</span><span style="--f:.25">100초</span><span style="--f:.5">200초</span><span style="--f:.75">300초</span><span style="--f:1">400초</span></div>
+      </div>
+      <p class="note" data-ai="모형 수치">그림과 막대는 모형이다. 퍼지는 시간은 표의 값에 맞췄다.</p>
+      <p class="dx-say" id="dx2-say"></p>
+    </div>
+  </div>
+</section>
+
+<!-- 10. 매질 익스플로라그램 -->
+<section class="slide" id="medium-model" data-sec="개념" data-title="어디에서 가장 빨리 퍼질까?">
+  <h2 data-enter="off">어디에서 가장 빨리 퍼질까?</h2>
+  <span class="badge" data-enter="off" aria-hidden="true">개념</span>
+  <div class="dx" data-ai="매질과 확산 입자 모형" data-activity>
+    <div class="dx-view">
+      <div class="dx-box is-low">
+        <canvas id="dx3-cv" data-w="692" data-h="280" width="692" height="280" style="width:692px;height:280px" aria-label="액체, 기체, 진공 속에서 잉크 입자가 퍼지는 모형"></canvas>
+        <span class="dx-tag l" id="dx3-where">액체(물) 속</span><span class="dx-tag r" data-ai="모형 수치">잉크가 들어간 칸 <b id="dx3-lit">–</b></span>
+      </div>
+      <svg class="dx-g" id="dx3-g" role="img" aria-label="물질마다 시간에 따라 오른쪽 절반에 있는 잉크 입자 수"></svg>
+      <p class="dx-legend under"><span><i style="background:#E0474C"></i>잉크 입자</span><span><i style="background:#A7CBF2"></i>물 입자</span><span><i style="background:#BCC3CC"></i>공기 입자</span><span>(모형)</span></p>
+      <div class="dx-veil" id="dx3-veil"><span>잉크 입자가 퍼질 곳을 골라 보자</span></div>
+    </div>
+    <div class="dx-side">
+      <p class="dx-lab">잉크 입자가 퍼지는 곳</p>
+      <div class="dx-btns" id="dx3-btns">
+        <button type="button" data-med="liquid" aria-pressed="false">액체</button>
+        <button type="button" data-med="gas" aria-pressed="false">기체</button>
+        <button type="button" data-med="vacuum" aria-pressed="false">진공</button>
+      </div>
+      <div class="dx-slider">
+        <input type="range" id="dx3-t" min="0" max="10" step="0.1" value="0" data-play="14" autocomplete="off" aria-label="흐른 시간">
+        <div class="dx-ticks" aria-hidden="true"><span style="--f:0">처음</span><span style="--f:1">나중</span></div>
+      </div>
+      <p class="dx-num" data-ai="모형 수치">오른쪽 절반의 잉크 입자 <b id="dx3-count">–</b></p>
+      <p class="dx-num" data-ai="모형 수치">잉크 입자 하나가 부딪힌 횟수<br><b id="dx3-hits">–</b></p>
+      <p class="dx-say" id="dx3-say"></p>
+    </div>
+  </div>
+</section>
+
+<!-- 11. 확인 문제 1 -->
+<section class="slide" id="check-1" data-sec="확인 문제" data-title="확인 문제 1">
+  <h2 data-enter="off">확인 문제 1</h2>
+  <span class="badge" data-enter="off" aria-hidden="true">확인 문제</span>
+  <p class="q" data-n="1">다음 중 확산으로 설명할 수 있는 현상이 아닌 것은?</p>
+  <div class="quiz" data-ai="보기마다의 풀이">
+    <button class="opt" data-why="빵 냄새 입자가 스스로 움직여 공기 속으로 퍼진다. 확산이다.">빵 굽는 냄새가 집 안에 퍼진다.</button>
+    <button class="opt" data-why="잉크 입자가 물 입자 사이로 퍼져 나간다. 확산이다.">물에 떨어뜨린 잉크가 퍼진다.</button>
+    <button class="opt" data-ok data-why="맞다. 빨래가 마르는 것은 액체 표면의 입자가 기체로 날아가는 증발이다.">젖은 빨래가 햇볕에 마른다.</button>
+    <button class="opt" data-why="방향제 입자가 공기 속으로 퍼져 나간다. 확산이다.">방향제 냄새가 방 안에 퍼진다.</button>
+    <button class="opt" data-why="홍차의 색을 내는 입자가 물속으로 퍼져 나간다. 확산이다.">홍차 티백을 넣은 물의 색이 점점 진해진다.</button>
+  </div>
+</section>
+
+<!-- 12. 확인 문제 2 -->
+<section class="slide" id="check-2" data-sec="확인 문제" data-title="확인 문제 2">
+  <h2 data-enter="off">확인 문제 2</h2>
+  <span class="badge" data-enter="off" aria-hidden="true">확인 문제</span>
+  <p class="q" data-n="2">다음 현상을 확산과 증발로 분류해 보자.</p>
+  <div class="sort" data-ai="카드마다의 풀이와 실마리">
+    <div class="bin" data-bin="d"><h3>확산</h3></div>
+    <div class="bin" data-bin="e"><h3>증발</h3></div>
+    <span data-bin="d" data-why="꽃향기 입자가 공기 속으로 퍼져 나간다." data-hint="향기 입자가 무엇 속으로 움직였을까?">ㄱ. 꽃향기가 정원 전체에 퍼진다.</span>
+    <span data-bin="e" data-why="물 표면의 입자가 기체가 되어 날아가서 물이 줄어든다." data-hint="어항의 물이 어디로 갔을까?">ㄴ. 어항의 물이 조금씩 줄어든다.</span>
+    <span data-bin="d" data-why="설탕 입자가 스스로 움직여 물 전체로 퍼진다." data-hint="젓지 않았는데 설탕이 물 전체로 갔다.">ㄷ. 물에 설탕을 넣으면 저어 주지 않아도 물 전체가 달아진다.</span>
+    <span data-bin="e" data-why="알코올 표면의 입자가 기체가 되어 날아간다." data-hint="알코올이 손등에서 사라졌다.">ㄹ. 손등에 바른 알코올이 금방 마른다.</span>
+    <span data-bin="d" data-why="모기향 냄새 입자가 공기 속으로 퍼져 나간다." data-hint="냄새 입자가 무엇 속으로 움직였을까?">ㅁ. 모기향 냄새가 방 안에 퍼진다.</span>
+    <span data-bin="e" data-why="물 표면의 입자가 기체가 되어 날아가서 마당이 마른다." data-hint="뿌린 물이 어디로 갔을까?">ㅂ. 마당에 뿌린 물이 마른다.</span>
+  </div>
+  <p class="step"><b>확산</b>: ㄱ, ㄷ, ㅁ &nbsp; <b>증발</b>: ㄴ, ㄹ, ㅂ</p>
+</section>
+
+<!-- 13. 정리 -->
+<section class="slide" id="summary" data-sec="정리" data-title="정리">
+  <h2 data-enter="off">정리</h2>
+  <span class="badge" data-enter="off" aria-hidden="true">정리</span>
+  <ul class="sum">
+    <li><b class="key">확산</b>: 입자가 <span class="blank">스스로</span> 움직여 퍼져 나가는 현상</li>
+    <li>온도가 높을수록 입자 운동이 <span class="blank">활발</span>해서 확산이 빠르다.</li>
+    <li>확산 빠르기: <span class="blank">진공 &gt; 기체 &gt; 액체</span></li>
+  </ul>
+  <p class="next">다음 시간: 증발</p>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const $ = (s) => document.querySelector(s);
+  const root = document.documentElement;
+  // ⚙ 「움직임 끄기」와 자동 점검 때는 바로 끝값을 그린다(운영체제 설정은 따르지 않는다)
+  const still = () => root.classList.contains('ch-motion-off') || root.classList.contains('ch-auditing');
+
+  // ---- 입자 모형: 씨앗이 같으면 늘 같은 움직임이 나온다(되감고 다시 봐도 같다) ----
+  function rng(seed) {
+    let s = seed >>> 0;
+    return () => { s = (s + 0x6D2B79F5) >>> 0; let t = s; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+  }
+  // 잉크 입자는 곧게 가다가 벽이나 다른 입자(물·공기)에 부딪히면 방향이 바뀐다. 다른 입자는 제자리 근처에서 흔들리며 움직인다.
+  // far[칸] = 반대쪽 절반(axis가 x면 오른쪽, y면 아래쪽)에 있는 잉크 입자 수, hits[칸] = 그때까지 부딪힌 횟수
+  function simulate(o) {
+    const R = rng(o.seed), n = o.ink, N = n + o.med, w = o.w, h = o.h;
+    const X = new Float32Array(N), Y = new Float32Array(N), VX = new Float32Array(N), VY = new Float32Array(N);
+    const rad = (i) => (i < n ? o.inkR : o.medR);
+    const free = (x, y, r, upto) => { for (let j = 0; j < upto; j++) { const d = rad(j) + r + 1; if ((X[j] - x) ** 2 + (Y[j] - y) ** 2 < d * d) return false; } return true; };
+    for (let i = 0; i < n; i++) {
+      let x, y, k = 0;
+      do { const a = R() * 2 * Math.PI, rr = o.drop.r * Math.sqrt(R()); x = o.drop.x + rr * Math.cos(a); y = o.drop.y + rr * Math.sin(a); k++; } while (!free(x, y, o.inkR, i) && k < 300);
+      X[i] = Math.min(w - o.inkR, Math.max(o.inkR, x)); Y[i] = Math.min(h - o.inkR, Math.max(o.inkR, y));
+      const a = R() * 2 * Math.PI; VX[i] = Math.cos(a); VY[i] = Math.sin(a);
+    }
+    for (let i = n; i < N; i++) {
+      let x, y, k = 0;
+      do { x = o.medR + R() * (w - 2 * o.medR); y = o.medR + R() * (h - 2 * o.medR); k++; } while (!free(x, y, o.medR, i) && k < 500);
+      X[i] = x; Y[i] = y; const a = R() * 2 * Math.PI; VX[i] = Math.cos(a); VY[i] = Math.sin(a);
+    }
+    const S = o.steps, pos = new Float32Array((S + 1) * N * 2), far = new Uint16Array(S + 1), hits = new Uint32Array(S + 1);
+    const half = o.axis === 'y' ? h / 2 : w / 2, D = o.inkR + o.medR;
+    let hit = 0;
+    const rec = (s) => {
+      const b = s * N * 2; let c = 0;
+      for (let i = 0; i < N; i++) { pos[b + 2 * i] = X[i]; pos[b + 2 * i + 1] = Y[i]; if (i < n && (o.axis === 'y' ? Y[i] : X[i]) > half) c++; }
+      far[s] = c; hits[s] = hit;
+    };
+    rec(0);
+    for (let s = 1; s <= S; s++) {
+      for (let i = n; i < N; i++) {
+        const a = Math.atan2(VY[i], VX[i]) + (R() - 0.5) * 1.2; VX[i] = Math.cos(a); VY[i] = Math.sin(a);
+        X[i] += VX[i] * o.medStep; Y[i] += VY[i] * o.medStep; const r = o.medR;
+        if (X[i] < r) { X[i] = r; VX[i] = Math.abs(VX[i]); } if (X[i] > w - r) { X[i] = w - r; VX[i] = -Math.abs(VX[i]); }
+        if (Y[i] < r) { Y[i] = r; VY[i] = Math.abs(VY[i]); } if (Y[i] > h - r) { Y[i] = h - r; VY[i] = -Math.abs(VY[i]); }
+      }
+      for (let i = 0; i < n; i++) {
+        X[i] += VX[i] * o.speed; Y[i] += VY[i] * o.speed; const r = o.inkR;
+        let wall = null;
+        if (X[i] < r) { X[i] = r; wall = 0; } else if (X[i] > w - r) { X[i] = w - r; wall = Math.PI; } else if (Y[i] < r) { Y[i] = r; wall = Math.PI / 2; } else if (Y[i] > h - r) { Y[i] = h - r; wall = -Math.PI / 2; }
+        if (wall !== null) { const a = wall + Math.asin(2 * R() - 1); VX[i] = Math.cos(a); VY[i] = Math.sin(a); }
+        for (let j = n; j < N; j++) {
+          const dx = X[i] - X[j], dy = Y[i] - Y[j], d2 = dx * dx + dy * dy;
+          if (d2 >= D * D || d2 < 1e-6) continue;
+          const d = Math.sqrt(d2), nx = dx / d, ny = dy / d, vn = VX[i] * nx + VY[i] * ny;
+          if (vn < 0) { VX[i] -= 2 * vn * nx; VY[i] -= 2 * vn * ny; const a = Math.atan2(VY[i], VX[i]) + (R() - 0.5) * 0.6; VX[i] = Math.cos(a); VY[i] = Math.sin(a); hit++; }
+          X[i] = X[j] + nx * D; Y[i] = Y[j] + ny * D;
+        }
+      }
+      rec(s);
+    }
+    return { n, N, S, pos, far, hits, o };
+  }
+  const reach = (sim, need) => { for (let s = 0; s <= sim.S; s++) if (sim.far[s] >= need) return s; return sim.S; };
+
+  const INK = '#E0474C', WATER = '#A7CBF2', AIR = '#BCC3CC';
+  const lazy = (make) => { let v = null; return () => v || (v = make()); };   // 그 장을 처음 쓸 때 계산한다
+  const BOX = { w: 692, ink: 60, inkR: 6, medR: 7, speed: 3, medStep: 1.2, drop: { x: 82, y: 82, r: 64 }, axis: 'x' };
+  const LIQ = lazy(() => simulate({ ...BOX, h: 300, med: 130, seed: 21, steps: 2130 }));   // 5쪽: 물속
+  const MED = {                                                                          // 10쪽: 같은 잉크 방울, 둘레만 다르다
+    liquid: lazy(() => simulate({ ...BOX, h: 280, med: 122, seed: 3, steps: 2010 })),
+    gas: lazy(() => simulate({ ...BOX, h: 280, med: 42, seed: 3, steps: 2010 })),
+    vacuum: lazy(() => simulate({ ...BOX, h: 280, med: 0, seed: 3, steps: 2010 })),
+  };
+  // 9쪽: 두 비커는 같은 잉크 방울에서 시작한다. 온도가 높으면 같은 움직임이 더 빨리 일어난다.
+  const BK = lazy(() => simulate({ w: 320, h: 230, ink: 30, inkR: 5, medR: 6, med: 46, speed: 3, medStep: 1.2, drop: { x: 160, y: 36, r: 36 }, axis: 'y', seed: 31, steps: 480 }));
+
+  // ---- 그리기 ----
+  function ctxOf(cv) {
+    const w = +cv.dataset.w, h = +cv.dataset.h, box = cv.getBoundingClientRect();
+    const zoom = box.width > 0 ? box.width / w : 1;
+    const ratio = Math.max(1, Math.min(3, (window.devicePixelRatio || 1) * zoom));
+    const W = Math.round(w * ratio), H = Math.round(h * ratio);
+    if (cv.width !== W || cv.height !== H) { cv.width = W; cv.height = H; }
+    const ctx = cv.getContext('2d');
+    ctx.setTransform(W / w, 0, 0, H / h, 0, 0);
+    return ctx;
+  }
+  function paint(cv, sim, f, look) {
+    const ctx = ctxOf(cv), w = +cv.dataset.w, h = +cv.dataset.h;
+    ctx.clearRect(0, 0, w, h);
+    const half = () => { ctx.save(); ctx.strokeStyle = '#8C99A5'; ctx.lineWidth = 2; ctx.setLineDash([8, 8]); ctx.beginPath();
+      if (look.axis === 'y') { ctx.moveTo(0, h / 2); ctx.lineTo(w, h / 2); } else { ctx.moveTo(w / 2, 0); ctx.lineTo(w / 2, h); }
+      ctx.stroke(); ctx.restore(); };
+    if (!sim) { half(); return 0; }
+    const N = sim.N, n = sim.n, P = sim.pos;
+    f = Math.max(0, Math.min(sim.S, f));
+    const i0 = Math.floor(f), i1 = Math.min(sim.S, i0 + 1), a = f - i0, b0 = i0 * N * 2, b1 = i1 * N * 2;
+    let lit = 0;
+    if (look.cells) {   // 칸 나누기: 잉크 입자가 많은 칸일수록 진하게 물든다
+      const [cx, cy] = look.cells, cw = w / cx, ch = h / cy, cnt = new Array(cx * cy).fill(0);
+      for (let i = 0; i < n; i++) {
+        const x = P[b0 + 2 * i] + (P[b1 + 2 * i] - P[b0 + 2 * i]) * a, y = P[b0 + 2 * i + 1] + (P[b1 + 2 * i + 1] - P[b0 + 2 * i + 1]) * a;
+        cnt[Math.min(cy - 1, Math.floor(y / ch)) * cx + Math.min(cx - 1, Math.floor(x / cw))]++;
+      }
+      cnt.forEach((c, k) => {
+        if (!c) return;
+        lit++;
+        ctx.fillStyle = `rgba(224, 71, 76, ${Math.min(0.42, 0.04 + c * 0.018)})`;
+        ctx.fillRect((k % cx) * cw, Math.floor(k / cx) * ch, cw, ch);
+      });
+      ctx.strokeStyle = '#D5DCE3'; ctx.lineWidth = 1.5; ctx.beginPath();
+      for (let k = 1; k < cx; k++) { ctx.moveTo(k * cw, 0); ctx.lineTo(k * cw, h); }
+      for (let k = 1; k < cy; k++) { ctx.moveTo(0, k * ch); ctx.lineTo(w, k * ch); }
+      ctx.stroke();
+    }
+    half();
+    const dot = (from, to, r, color) => {
+      ctx.fillStyle = color; ctx.beginPath();
+      for (let i = from; i < to; i++) {
+        const x = P[b0 + 2 * i] + (P[b1 + 2 * i] - P[b0 + 2 * i]) * a, y = P[b0 + 2 * i + 1] + (P[b1 + 2 * i + 1] - P[b0 + 2 * i + 1]) * a;
+        ctx.moveTo(x + r, y); ctx.arc(x, y, r, 0, 2 * Math.PI);
+      }
+      ctx.fill();
+    };
+    dot(n, N, sim.o.medR, look.med);
+    dot(0, n, sim.o.inkR, INK);
+    return lit;
+  }
+
+  // 시간 값을 0.6~0.8초 동안 이어서 옮긴다(재생 중에는 한 칸 시간 동안 고르게)
+  function clock(draw) {
+    let v = null, raf = 0;
+    return {
+      get v() { return v; },
+      to(target, ms) {
+        cancelAnimationFrame(raf);
+        if (v === null || still() || !(ms > 0)) { v = target; draw(v); return; }
+        const from = v, t0 = performance.now(), ease = ms >= 300;
+        const step = (now) => {
+          const p = Math.min(1, (now - t0) / ms);
+          v = from + (target - from) * (ease ? 1 - (1 - p) ** 3 : p);
+          draw(v);
+          if (p < 1) raf = requestAnimationFrame(step);
+        };
+        raf = requestAnimationFrame(step);
+      },
+    };
+  }
+  // 처음으로 되돌릴 때는 거꾸로 감지 않고 0.6초 동안 흐려졌다가 새로 나타난다
+  function swap(cvs, apply) {
+    if (still()) { apply(); return; }
+    cvs.forEach((cv) => cv.classList.add('is-swap'));
+    clearTimeout(swap.t);
+    swap.t = setTimeout(() => { apply(); cvs.forEach((cv) => cv.classList.remove('is-swap')); }, 300);
+  }
+
+  // ---- 그래프(SVG, 화면 1px = 그림 1px) ----
+  const NS = 'http://www.w3.org/2000/svg';
+  const mk = (tag, attrs, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.append(e); return e; };
+  function graph(svg, o) {
+    const W = o.w, H = o.h, L = 52, R = 24, T = 40, B = 36;
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('width', W); svg.setAttribute('height', H);
+    const X = (v) => L + ((v - o.x[0]) / (o.x[1] - o.x[0])) * (W - L - R);
+    const Y = (v) => H - B - ((v - o.y[0]) / (o.y[1] - o.y[0])) * (H - T - B);
+    for (const [v, lab] of o.yt) {
+      mk('line', { x1: L, x2: W - R, y1: Y(v), y2: Y(v), stroke: '#E3E7EC', 'stroke-width': 2 }, svg);
+      mk('text', { x: L - 10, y: Y(v) + 7, 'text-anchor': 'end', 'font-size': 20, fill: '#4F5D6A' }, svg).textContent = lab;
+    }
+    o.xt.forEach(([v, lab], i) => {
+      const anchor = i === o.xt.length - 1 && v === o.x[1] ? 'end' : 'middle';
+      mk('text', { x: X(v), y: H - B + 26, 'text-anchor': anchor, 'font-size': 20, fill: '#4F5D6A' }, svg).textContent = lab;
+    });
+    if (o.half != null) {
+      mk('line', { x1: L, x2: W - R, y1: Y(o.half), y2: Y(o.half), stroke: '#8C99A5', 'stroke-width': 2, 'stroke-dasharray': '8 6' }, svg);
+      mk('text', { x: L + 8, y: Y(o.half) - 8, 'font-size': 20, fill: '#4F5D6A' }, svg).textContent = o.halfLabel;
+    }
+    mk('path', { d: `M${L} ${T - 8} V${H - B} H${W - R}`, fill: 'none', stroke: '#3B4A5A', 'stroke-width': 3 }, svg);
+    mk('text', { x: 4, y: 22, 'font-size': 20, 'font-weight': 700, fill: '#33404C' }, svg).textContent = o.ylabel;
+    const legend = mk('g', {}, svg);
+    const line = (color, extra = {}) => {
+      const p = mk('polyline', { fill: 'none', stroke: color, 'stroke-width': 4, 'stroke-linejoin': 'round', 'stroke-linecap': 'round', ...extra }, svg);
+      return { set(pts) { p.setAttribute('points', pts.map(([x, y]) => `${X(x).toFixed(1)},${Y(y).toFixed(1)}`).join(' ')); } };
+    };
+    const point = (color, r = 8) => {
+      const c = mk('circle', { r, fill: color, stroke: '#fff', 'stroke-width': 3, visibility: 'hidden' }, svg);
+      return { set(p) { if (!p) { c.setAttribute('visibility', 'hidden'); return; } c.setAttribute('cx', X(p[0])); c.setAttribute('cy', Y(p[1])); c.setAttribute('visibility', 'visible'); } };
+    };
+    const label = (color) => {
+      const t = mk('text', { 'font-size': 20, 'font-weight': 800, fill: color, visibility: 'hidden' }, svg);
+      return { set(p, text, anchor = 'start') { if (!p) { t.setAttribute('visibility', 'hidden'); return; } t.setAttribute('x', X(p[0])); t.setAttribute('y', Y(p[1])); t.setAttribute('text-anchor', anchor); t.textContent = text; t.setAttribute('visibility', 'visible'); } };
+    };
+    const legendSet = (items) => {   // [[색, 이름], …] 오른쪽 위에 놓는다
+      legend.replaceChildren();
+      let x = W - R;
+      for (const [color, name] of [...items].reverse()) {
+        const t = mk('text', { x, y: 22, 'text-anchor': 'end', 'font-size': 20, 'font-weight': 800, fill: color }, legend);
+        t.textContent = name;
+        const tw = name.length * 18 + 6;
+        mk('line', { x1: x - tw - 30, x2: x - tw - 6, y1: 15, y2: 15, stroke: color, 'stroke-width': 4 }, legend);
+        x -= tw + 50;
+      }
+    };
+    return { X, Y, line, point, label, legendSet };
+  }
+  const curve = (sim, k, upto, every) => {   // 0초부터 upto까지 반대쪽 잉크 수
+    const pts = [];
+    for (let s = 0; s < upto; s += every) pts.push([s, sim.far[Math.min(sim.S, Math.round(s * k))]]);
+    pts.push([upto, sim.far[Math.min(sim.S, Math.round(upto * k))]]);
+    return pts;
+  };
+  const say = (el, text) => { if (el.textContent !== text) el.textContent = text; };
+  // 슬라이더: 채운 길이 표시, 손을 떼면 초점을 풀어 → 키와 리모컨이 다시 장을 넘기게
+  function slider(el, onChange) {
+    const fill = () => el.style.setProperty('--p', `${((+el.value - +el.min) / (+el.max - +el.min)) * 100}%`);
+    el.addEventListener('input', (e) => { fill(); onChange(+el.value, e); });
+    el.addEventListener('change', () => { fill(); el.blur(); });
+    fill();
+    return {
+      reset(v) {   // 재생을 멈추고 값을 되돌린다(엔진 재생은 손으로 잡으면 멈춘다)
+        el.dispatchEvent(new Event('pointerdown'));
+        el.value = String(v); fill();
+        el.dispatchEvent(new Event('change', { bubbles: true }));
+      },
+    };
+  }
+  const isRewind = (e, to, from) => from != null && to < from && !e.isTrusted && !e.chPlay;   // 「처음으로」 단추
+
+  // ================= 5쪽: 잉크 입자는 물속에서 어떻게 퍼질까? =================
+  (() => {
+    const cv = $('#dx1-cv'), veil = $('#dx1-veil'), out = { time: $('#dx1-time'), count: $('#dx1-count'), lit: $('#dx1-lit'), say: $('#dx1-say') };
+    const FULL = 240;   // 60개 가운데 27개(45 %)가 오른쪽 절반에 오는 때를 4분으로 맞춘다
+    let K = 0;
+    const g = graph($('#dx1-g'), { w: 692, h: 210, x: [0, 300], y: [0, 60], yt: [[0, '0'], [30, '30'], [60, '60']],
+      xt: [[0, '0'], [60, '1분'], [120, '2분'], [180, '3분'], [240, '4분'], [300, '5분']], half: 30, halfLabel: '절반(30개)', ylabel: '오른쪽 절반의 잉크 입자(개)' });
+    const ln = g.line('#0F766E'), pt = g.point('#0F766E');
+    const fmt = (t) => { const s = Math.round(t / 5) * 5, m = Math.floor(s / 60), r = s % 60; return s === 0 ? '처음' : m ? `${m}분${r ? ` ${r}초` : ''}` : `${r}초`; };
+    const draw = (t) => {
+      const on = t >= 0;
+      veil.classList.toggle('is-off', on);
+      if (!on) { paint(cv, null, 0, { axis: 'x' }); ln.set([]); pt.set(null); say(out.time, '시작'); say(out.count, '–'); say(out.lit, '–'); say(out.say, ''); return; }
+      const sim = LIQ(); if (!K) K = reach(sim, 27) / FULL;
+      const tt = t, f = tt * K, c = sim.far[Math.min(sim.S, Math.round(f))];
+      const lit = paint(cv, sim, f, { med: WATER, axis: 'x', cells: [4, 3] });
+      say(out.lit, `${lit} / 12칸`);
+      ln.set(curve(sim, K, tt, 2.5));
+      pt.set(on ? [tt, c] : null);
+      say(out.time, on ? fmt(tt) : '시작');
+      say(out.count, on ? `${c} / 60개` : '–');
+      say(out.say, !on ? '' : tt === 0 ? '잉크 입자가 떨어뜨린 곳에 모여 있다.'
+        : tt < FULL ? (c < 6 ? '잉크 입자가 물 입자 사이로 조금씩 퍼져 나간다.' : '잉크 입자가 오른쪽 절반까지 퍼져 나간다.')
+        : '잉크 입자와 물 입자는 모두 스스로 움직인다. 그래서 잉크 입자가 물 전체에 고르게 퍼졌다.');
+    };
+    const clk = clock(draw);
+    slider($('#dx1-t'), (v, e) => {
+      if (isRewind(e, v, clk.v)) { swap([cv], () => clk.to(v, 0)); return; }
+      clk.to(v, e.chPlay ?? 700);
+    });
+    clk.to(+$('#dx1-t').value, 0);
+    window.addEventListener('resize', () => draw(clk.v));
+    Exploragram.onShow((slide) => { if (slide.id === 'ink-model') draw(clk.v); });
+  })();
+
+  // ================= 9쪽: 왜 따뜻한 물에서 더 빨리 퍼질까? =================
+  (() => {
+    const TT = { 10: 360, 20: 260, 40: 160, 60: 110 };   // 실험 결과 표의 값(초)
+    const NEED = 13;                                     // 30개 가운데 13개(약 45 %)가 아래쪽 절반에 오면 고르게 퍼진 것으로 본다
+    const cvA = $('#dx2-a'), cvB = $('#dx2-b'), veil = $('#dx2-veil'), range = $('#dx2-t');
+    let s0 = 0;   // 고르게 퍼질 때까지 걸린 칸 수. 10 ℃는 360초, 고른 온도는 표의 시간에 맞춰 흘린다
+    const out = { time: $('#dx2-time'), say: $('#dx2-say'), head: $('#dx2-b-h'), doneA: $('#dx2-a-done'), doneB: $('#dx2-b-done') };
+    const g = graph($('#dx2-g'), { w: 692, h: 128, x: [0, 400], y: [0, 30], yt: [[0, '0'], [15, '15'], [30, '30']],
+      xt: [[0, '0'], [100, '100'], [200, '200'], [300, '300'], [400, '400초']], half: 15, halfLabel: '절반(15개)', ylabel: '아래쪽 절반의 잉크 입자(개)' });
+    const past = { 20: g.line('#9AA3AD', { 'stroke-dasharray': '6 6', 'stroke-width': 3 }), 40: g.line('#9AA3AD', { 'stroke-dasharray': '6 6', 'stroke-width': 3 }), 60: g.line('#9AA3AD', { 'stroke-dasharray': '6 6', 'stroke-width': 3 }) };
+    const pastLab = { 20: g.label('#5F646B'), 40: g.label('#5F646B'), 60: g.label('#5F646B') };
+    const lnA = g.line('#1D5FB4'), lnB = g.line('#B3261E'), ptA = g.point('#1D5FB4'), ptB = g.point('#B3261E');
+    const mA = g.point('#1D5FB4', 7), mB = g.point('#B3261E', 7);
+    let T = null;
+    const seen = {};   // 온도마다 어디까지 보았나(흐린 점선으로 남긴다)
+    const draw = (t) => {
+      veil.classList.toggle('is-off', T !== null);
+      if (T === null) { paint(cvA, null, 0, { axis: 'y' }); paint(cvB, null, 0, { axis: 'y' }); return; }
+      const sim = BK(); if (!s0) s0 = reach(sim, NEED);
+      const kA = s0 / TT[10], kB = s0 / TT[T], fA = t * kA, fB = t * kB;
+      paint(cvA, sim, fA, { med: WATER, axis: 'y' });
+      paint(cvB, sim, fB, { med: WATER, axis: 'y' });
+      lnA.set(curve(sim, kA, t, 4)); lnB.set(curve(sim, kB, t, 4));
+      ptA.set([t, sim.far[Math.min(sim.S, Math.round(fA))]]); ptB.set([t, sim.far[Math.min(sim.S, Math.round(fB))]]);
+      const doneA = t >= TT[10], doneB = t >= TT[T];
+      mA.set(doneA ? [TT[10], NEED] : null); mB.set(doneB ? [TT[T], NEED] : null);
+      out.doneA.classList.toggle('is-off', !doneA);
+      out.doneB.classList.toggle('is-off', !doneB);
+      say(out.doneB, `✓ ${TT[T]}초`);
+      for (const k of [20, 40, 60]) {
+        const show = k !== T && seen[k] > 0;
+        past[k].set(show ? curve(sim, s0 / TT[k], seen[k], 4) : []);
+        pastLab[k].set(show ? [seen[k] - 4, sim.far[Math.min(sim.S, Math.round(seen[k] * s0 / TT[k]))] + 5] : null, `${k} ℃`, 'end');
+      }
+      say(out.time, `${Math.round(t / 5) * 5}초`);
+      say(out.say, t === 0 ? '두 비커에 잉크를 한 방울씩 동시에 떨어뜨렸다. 「재생」을 눌러 보자.'
+        : !doneA && !doneB ? `${T} ℃ 물의 입자가 더 활발하게 움직인다. 잉크도 더 빨리 퍼진다.`
+        : !doneA ? `${T} ℃ 물은 ${TT[T]}초 만에 고르게 퍼졌다. 10 ℃ 물은 아직 퍼지는 중이다.`
+        : `10 ℃ 물은 ${TT[10]}초, ${T} ℃ 물은 ${TT[T]}초가 걸렸다. 물의 온도가 높을수록 확산이 빠르다.`);
+    };
+    const clk = clock(draw);
+    const sl = slider(range, (v, e) => {
+      if (T !== null) seen[T] = Math.max(seen[T] || 0, v);
+      if (isRewind(e, v, clk.v)) { swap([cvA, cvB], () => clk.to(v, 0)); return; }
+      clk.to(v, e.chPlay ?? 700);
+    });
+    g.legendSet([['#1D5FB4', '10 ℃'], ['#B3261E', '고른 온도']]);
+    document.querySelectorAll('#dx2-btns button').forEach((b) => b.addEventListener('click', () => {
+      const next = +b.dataset.temp;
+      document.querySelectorAll('#dx2-btns button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+      b.blur();
+      if (next === T) return;
+      const first = T === null;
+      sl.reset(0);
+      $('#dx2-b-move').style.width = `${(TT[60] / TT[next]) * 100}%`;   // 10 ℃는 110/360(약 31 %), 고른 온도는 110/표의 시간
+      const apply = () => { T = next; say(out.head, `${T} ℃ 물`); g.legendSet([['#1D5FB4', '10 ℃'], ['#B3261E', `${T} ℃`]]); clk.to(0, 0); };
+      if (first) apply(); else swap([cvA, cvB], apply);
+    }));
+    clk.to(0, 0);
+    window.addEventListener('resize', () => draw(clk.v));
+    Exploragram.onShow((slide) => { if (slide.id === 'temp-model') draw(clk.v); });
+  })();
+
+  // ================= 10쪽: 어디에서 가장 빨리 퍼질까? =================
+  (() => {
+    const NAME = { liquid: '액체(물) 속', gas: '기체(공기) 속', vacuum: '진공 속' };
+    const LOOK = { liquid: WATER, gas: AIR, vacuum: AIR };
+    const COLOR = { liquid: '#1D5FB4', gas: '#A16207', vacuum: '#6D28D9' };
+    const SHORT = { liquid: '액체', gas: '기체', vacuum: '진공' };
+    const NEED = 27;   // 60개 가운데 27개(45 %)가 오른쪽 절반에 오면 고르게 퍼진 것으로 본다
+    let K = 0; const at = {};
+    const ready = () => { if (!K) { K = reach(MED.liquid(), NEED) / 8; for (const m in MED) at[m] = reach(MED[m](), NEED) / K; } };   // 물속에서 고르게 퍼지는 때를 8로 둔 모형 시간
+    const cv = $('#dx3-cv'), veil = $('#dx3-veil'), range = $('#dx3-t');
+    const out = { where: $('#dx3-where'), count: $('#dx3-count'), hits: $('#dx3-hits'), lit: $('#dx3-lit'), say: $('#dx3-say') };
+    const g = graph($('#dx3-g'), { w: 692, h: 200, x: [0, 10], y: [0, 60], yt: [[0, '0'], [30, '30'], [60, '60']],
+      xt: [[0, '처음'], [10, '나중']], half: 30, halfLabel: '절반(30개)', ylabel: '오른쪽 절반의 잉크 입자(개)' });
+    const lines = {}, dots = {};
+    for (const m of ['liquid', 'gas', 'vacuum']) { lines[m] = g.line(COLOR[m]); dots[m] = g.point(COLOR[m]); }
+    let M = null;
+    const seen = {}, done = new Set();
+    const draw = (t) => {
+      veil.classList.toggle('is-off', M !== null);
+      if (M === null) { paint(cv, null, 0, { axis: 'x' }); say(out.lit, '–'); return; }
+      ready();
+      const sim = MED[M](), f = t * K, c = sim.far[Math.min(sim.S, Math.round(f))], hits = sim.hits[Math.min(sim.S, Math.round(f))] / sim.n;
+      say(out.lit, `${paint(cv, sim, f, { med: LOOK[M], axis: 'x', cells: [4, 3] })} / 12`);
+      for (const m in MED) {
+        const upto = m === M ? t : seen[m] || 0;
+        lines[m].set(upto > 0 || m === M ? curve(MED[m](), K, upto, 0.05) : []);
+        dots[m].set(m === M ? [t, c] : null);
+      }
+      g.legendSet(['liquid', 'gas', 'vacuum'].filter((m) => m === M || seen[m] > 0).map((m) => [COLOR[m], SHORT[m]]));
+      if (t >= at[M]) done.add(M);
+      say(out.where, NAME[M]);
+      say(out.count, `${c} / 60개`);
+      say(out.hits, `평균 ${hits === 0 ? 0 : hits < 10 ? hits.toFixed(1) : Math.round(hits)}번`);
+      const moving = { liquid: '잉크 입자가 물 입자에 자주 부딪히며 조금씩 퍼진다.', gas: '잉크 입자가 공기 입자에 가끔 부딪히며 퍼진다.', vacuum: '부딪힐 입자가 없다. 잉크 입자가 곧게 날아간다.' };
+      const start = { liquid: '물 입자가 빽빽하다. 「재생」을 눌러 보자.', gas: '공기 입자가 드문드문 있다. 「재생」을 눌러 보자.', vacuum: '잉크 입자 말고는 아무 입자도 없다. 「재생」을 눌러 보자.' };
+      let text = t === 0 ? start[M] : t < at[M] ? moving[M] : '';
+      if (t >= at[M]) {
+        if (M === 'vacuum') text = '진공 속에서는 움직임을 방해하는 다른 입자가 없어서 확산이 가장 빠르다.';
+        else if (done.has('liquid') && done.has('gas')) text = '확산은 액체보다 기체에서 더 빠르게 일어난다.';
+        else text = M === 'gas' ? '공기 속에서는 물속보다 빨리 고르게 퍼졌다.' : '물속에서는 고르게 퍼지기까지 오래 걸린다.';
+      }
+      say(out.say, text);
+    };
+    const clk = clock(draw);
+    const sl = slider(range, (v, e) => {
+      if (M !== null) seen[M] = Math.max(seen[M] || 0, v);
+      if (isRewind(e, v, clk.v)) { swap([cv], () => clk.to(v, 0)); return; }
+      clk.to(v, e.chPlay ?? 700);
+    });
+    document.querySelectorAll('#dx3-btns button').forEach((b) => b.addEventListener('click', () => {
+      const next = b.dataset.med;
+      document.querySelectorAll('#dx3-btns button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+      b.blur();
+      if (next === M) return;
+      const first = M === null;
+      sl.reset(0);
+      const apply = () => { M = next; clk.to(0, 0); };
+      if (first) apply(); else swap([cv], apply);
+    }));
+    clk.to(0, 0);
+    window.addEventListener('resize', () => draw(clk.v));
+    Exploragram.onShow((slide) => { if (slide.id === 'medium-model') draw(clk.v); });
+  })();
+});
+</script>
+</body>
+</html>
