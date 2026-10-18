@@ -206,6 +206,8 @@ h3 { font-size:clamp(1.4rem,2.2vw,1.9rem); }
 .ai-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; margin-top:28px; }
 .ai-card { display:flex; flex-direction:column; gap:16px; padding:22px; border-radius:var(--radius); background:var(--paper); }
 .ai-card h4 { display:flex; align-items:center; gap:10px; font-size:1.35rem; }
+.ai-card .ai-rec { margin:-6px 0 0; color:#57564F; font-size:16px; line-height:1.55; text-wrap:pretty; }
+.ai-card .ai-rec b { display:inline-block; margin-right:6px; padding:1px 8px; border-radius:999px; background:var(--white); color:var(--ai-text); font-size:14px; font-weight:800; }
 .ai-logo { width:28px; height:28px; flex:none; }
 .ai-card[data-ai="chatgpt"] { --ai:#0D0D0D; --ai-ink:#FFFFFF; --ai-text:#0D0D0D; --ai-bg:linear-gradient(#0D0D0D,#0D0D0D); }
 .ai-card[data-ai="gemini"] { --ai:#1B66C9; --ai-ink:#FFFFFF; --ai-text:#1B5FBF; --ai-bg:linear-gradient(90deg,#1B66C9,#7E57C2); }
