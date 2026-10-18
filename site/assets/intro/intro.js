@@ -23,6 +23,9 @@
   var FONT = '"Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif';
   var MONO = 'ui-monospace, "SF Mono", Menlo, Consolas, "D2Coding", monospace';
   var FONT_CSS = 'https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css';
+  // 끝 화면 로고만 다른 글꼴을 쓴다: 「공명」은 명조(한자어의 무게), resonance는 세리프 이탤릭. 필요한 글자만 받는다.
+  var DISPLAY_TXT = '공명resonance';
+  var DISPLAY_CSS = 'https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@900&family=Instrument+Serif:ital@1&display=swap&text=' + encodeURIComponent(DISPLAY_TXT);
 
   var TXT = {
     features: ['HTML 생성 및 편집', '익스플로라그램', '실시간 수업', '전자칠판 기능'],
@@ -1109,8 +1112,9 @@
   function drawFinale(ctx, t, L, extra) {
     var s = t - T.end, F = L.fin; if (!F) return;
     var W = L.W, r0 = Math.max(2.8, L.u * 0.46), G = F.ring;
+    var wv = t >= DUR && F.wave && F.wave.on ? F.wave : null, ex = wv ? wv.e : 0;
     var bloom = 0.32 * Math.exp(-Math.pow((s - 0.66) / 0.13, 2)) + 0.1 * E.outC(seg(s, 0.55, 1.2)) * (1 - 0.35 * seg(s, 1.5, 3.75));
-    glow(ctx, F.nc.x, F.nc.y, F.fs * 2.2, 'clay', bloom);
+    glow(ctx, F.nc.x, F.nc.y, F.fs * 2.2, 'clay', bloom + 0.2 * ex);
     var A = lerp(F.a0, F.af, E.ioC(seg(s, 1.4, 3.75))), ph = PHI_E(t) + (extra || 0);
     var lineA = E.outC(seg(s, 0.95, 1.6)), rev = E.outC(seg(s, 0.9, 1.6));
     // 2.0~3.4초(장면 시각): 가로 파동의 양 끝이 위로 감겨 올라가 「공명」을 두르는 고리가 된다.
@@ -1121,7 +1125,7 @@
       var x = lerp(xa, xb, u), y = F.wy + A * (1 - j * 0.18) * Math.sin(F.k * x - ph - j * 0.35);
       if (m <= 0) return [x, y];
       var th = Math.PI / 2 + TAU * u + ph * 0.05;
-      var r = G.R + G.amp * breathe * (1 - j * 0.12) * Math.sin(G.n * th - ph - j * 2.09) * m;
+      var r = G.R + G.amp * breathe * (1 + (wv ? wv.res * 1.4 : 0)) * (1 - j * 0.12) * Math.sin(G.n * th - ph - j * 2.09) * m + (wv ? wv.sample(th) * G.R * (1 - j * 0.08) : 0);
       return [lerp(x, G.cx + r * Math.cos(th), m), lerp(y, G.cy + r * Math.sin(th), m)];
     }
     if (lineA > 0) {
@@ -1132,12 +1136,17 @@
         ctx.beginPath();
         for (var i = 0; i <= 180; i++) { var P = pt(i / 180, j); if (i) ctx.lineTo(P[0], P[1]); else ctx.moveTo(P[0], P[1]); }
         var base = j === 0 ? 0.42 : 0.22, ringBoost = j === 0 ? 0.4 : 0.5;
-        ctx.lineWidth = Math.max(1.2, L.u * (j ? 0.1 : 0.16) * (1 + m * 0.9));
-        ctx.strokeStyle = rgba(cols[j], (base + ringBoost * m) * lineA);
-        ctx.shadowColor = rgba(cols[j], 0.8 * m); ctx.shadowBlur = 14 * m;
+        ctx.lineWidth = Math.max(1.2, L.u * (j ? 0.1 : 0.16) * (1 + m * 0.9) * (1 + ex * 0.3));
+        ctx.strokeStyle = rgba(cols[j], (base + ringBoost * m + ex * 0.18) * lineA);
+        ctx.shadowColor = rgba(cols[j], 0.8 * m); ctx.shadowBlur = 14 * m + 8 * ex;
         ctx.stroke();
       }
       ctx.restore();
+    }
+    if (wv && (wv.near > 0.02 || wv.flash > 0)) {
+      var lx = G.cx + Math.cos(wv.ang) * G.R, ly = G.cy + Math.sin(wv.ang) * G.R;
+      glow(ctx, lx, ly, G.R * (0.42 + wv.flash * 0.3), 'clay', 0.3 * wv.near + 0.35 * wv.flash);
+      glow(ctx, lx, ly, G.R * 0.16, 'paper', 0.18 * wv.near + 0.4 * wv.flash);
     }
     if (s > 0.6) {
       F.dots.forEach(function (d, i) {
@@ -1146,16 +1155,75 @@
         var P = pt(clamp((d.x - xa) / Math.max(1, xb - xa), 0, 1), 0);
         var X = lerp(bx, P[0], mm), Y = lerp(by, P[1], mm);
         var col = i % 2 ? 'tideHi' : 'clay';
-        glow(ctx, X, Y, r0 * (3.4 + m * 1.6), col, 0.22 + 0.12 * m);
+        glow(ctx, X, Y, r0 * (3.4 + m * 1.6) * (1 + ex * 0.5), col, 0.22 + 0.12 * m + 0.14 * ex);
         circle(ctx, X, Y, r0 * E.outBack(seg(s, 0.6, 0.85))); ctx.fillStyle = HEX[col]; ctx.fill();
       });
     }
   }
 
+  /* ── 끝 장면 고리: 마우스·손가락으로 밀고 튕기는 둥근 줄(감쇠 파동 방정식) ──
+     고리 근처에 머물면 그 자리가 밀려 들어가고, 떠나면 출렁이며 돌아온다. 누르면 튕겨 두 물결이 양쪽으로 돈다.
+     고리를 따라 한 방향으로 계속 돌면 고리의 물결이 점점 커지고 밝아진다(공명). 손을 떼면 몇 초 안에 잦아든다. */
+  var RW_N = 160, RW_C = 2.6, RW_W0 = 2.3, RW_DAMP = 1.1, RW_MAX = 0.13, RW_SMOOTH = 0.04;
+  function makeRingWave() {
+    var n = RW_N, y = new Float32Array(n), yo = new Float32Array(n), yn = new Float32Array(n), gk = new Float32Array(n);
+    var W = { e: 0, res: 0, on: false, near: 0, ang: 0, flash: 0, load: 0, orbit: 0, lastTh: null };
+    // 각 th0 둘레의 종 모양 분포. 평균을 빼서 고리 전체가 한쪽으로 부풀지 않게 한다
+    function shape(th0, sw) {
+      var mean = 0, i;
+      for (i = 0; i < n; i++) { var d = wrapPi(i / n * TAU - th0); gk[i] = Math.exp(-(d * d) / (sw * sw)); mean += gk[i]; }
+      mean /= n; for (i = 0; i < n; i++) gk[i] -= mean;
+      return gk;
+    }
+    W.reset = function () { y.fill(0); yo.fill(0); W.e = 0; W.res = 0; W.on = false; W.near = 0; W.flash = 0; W.load = 0; W.orbit = 0; W.lastTh = null; };
+    W.sample = function (th) {
+      var x = (((th % TAU) + TAU) % TAU) / TAU * n, i = Math.floor(x) % n, f = x - Math.floor(x);
+      var v = y[i] + (y[(i + 1) % n] - y[i]) * f;
+      return RW_MAX * Math.tanh(v / RW_MAX);   // 그릴 때만 부드럽게 포화
+    };
+    // 튕기기: 자리를 옮겨 놓으면 두 물결로 갈라져 양쪽으로 돈다
+    W.pluck = function (th0, a) { var g = shape(th0, 0.2); for (var i = 0; i < n; i++) { y[i] += a * g[i]; yo[i] += a * g[i]; } W.on = true; };
+    // 고리를 따라 한 방향으로 도는 만큼 공명이 쌓인다
+    W.track = function (th, band) {
+      if (W.lastTh != null && band > 0.12) {
+        var d = wrapPi(th - W.lastTh);
+        if (Math.abs(d) < 0.6) {
+          if (d * W.orbit >= 0) W.orbit += d * band; else W.orbit *= 0.4;
+          W.res = Math.max(W.res, clamp(Math.abs(W.orbit) / (TAU * 1.1), 0, 1));
+        }
+      }
+      W.lastTh = th;
+    };
+    W.step = function (dt) {
+      if (!W.on) return;
+      var sub = Math.max(1, Math.ceil(dt * 120)), h = dt / sub, dth = TAU / n, k2 = RW_C * RW_C / (dth * dth), w2 = RW_W0 * RW_W0, ss = 0;
+      var g = W.load ? shape(W.ang, 0.3) : null;
+      for (var s2 = 0; s2 < sub; s2++) {
+        for (var i = 0; i < n; i++) {
+          var yi = y[i], acc = k2 * (y[(i + n - 1) % n] - 2 * yi + y[(i + 1) % n]) - w2 * yi + (g ? W.load * g[i] : 0);
+          yn[i] = clamp(yi + (yi - yo[i]) * (1 - RW_DAMP * h) + acc * h * h, -0.6, 0.6);
+        }
+        // 짧은 물결(톱니)만 빨리 죽인다
+        for (var j = 0; j < n; j++) {
+          yo[j] = y[j] + RW_SMOOTH * (y[(j + n - 1) % n] + y[(j + 1) % n] - 2 * y[j]);
+          y[j] = yn[j] + RW_SMOOTH * (yn[(j + n - 1) % n] + yn[(j + 1) % n] - 2 * yn[j]);
+        }
+      }
+      for (var q = 0; q < n; q++) ss += y[q] * y[q];
+      var rms = Math.sqrt(ss / n);
+      W.res = Math.max(0, W.res - dt * 0.22);
+      W.orbit *= Math.exp(-dt * 0.35);
+      W.e += (Math.max(clamp(rms / 0.08, 0, 0.6), W.res) - W.e) * Math.min(1, dt * 5);
+      W.flash = Math.max(0, W.flash - dt * 2.5);
+      if (rms < 2e-5 && W.near < 0.01 && W.e < 0.01 && W.res <= 0 && W.flash <= 0) W.reset();
+    };
+    return W;
+  }
+
   /* ── 모듈 ── */
-  function ensureFontCss() {
-    var link = document.querySelector('link[href*="pretendard"]');
-    if (!link) { link = document.createElement('link'); link.rel = 'stylesheet'; link.href = FONT_CSS; document.head.appendChild(link); }
+  function ensureCss(sel, href) {
+    var link = document.querySelector(sel);
+    if (!link) { link = document.createElement('link'); link.rel = 'stylesheet'; link.href = href; document.head.appendChild(link); }
     return new Promise(function (res) {
       if (link.sheet) return res();
       link.addEventListener('load', function () { res(); }, { once: true });
@@ -1163,12 +1231,16 @@
       setTimeout(res, 2500);
     });
   }
+  function ensureFontCss() {
+    return Promise.all([ensureCss('link[href*="pretendard"]', FONT_CSS), ensureCss('link[href*="Noto+Serif+KR"][href*="Instrument+Serif"]', DISPLAY_CSS)]);
+  }
   function loadFonts() {
     var all = TXT.features.join('') + TXT.cap1.concat(TXT.cap2, TXT.tag).map(function (w) { return w[0]; }).join('') + TXT.name + TXT.skip + TXT.pause + TXT.play + CANVAS_TXT;
     return ensureFontCss().then(function () {
       if (!document.fonts || !document.fonts.load) return;
       return Promise.race([
-        Promise.all(['900', '800', '700', '600', '500'].map(function (w) { return document.fonts.load(w + ' 40px "Pretendard Variable"', all); })).then(function () { return document.fonts.ready; }),
+        Promise.all(['900', '800', '700', '600', '500'].map(function (w) { return document.fonts.load(w + ' 40px "Pretendard Variable"', all); }).concat(
+          document.fonts.load('900 80px "Noto Serif KR"', TXT.name), document.fonts.load('italic 400 40px "Instrument Serif"', TXT.en))).then(function () { return document.fonts.ready; }),
         new Promise(function (r) { setTimeout(r, 3500); })
       ]);
     }).catch(function () {});
@@ -1257,7 +1329,7 @@
     var bar = mk('i', '', mk('span', 'ri-bar', bSkip));
 
     var L = null, t = clamp(+opts.startAt || 0, 0, DUR), playing = false, userPaused = !autoplay, ended = false, raf = 0, last = 0, dead = false, ready = false;
-    var extraPh = 0, idleRaf = 0, idleLast = 0;
+    var extraPh = 0, idleRaf = 0, idleLast = 0, rw = makeRingWave(), glowQ = -1;
     var api = {};
     function setPauseUi() {
       bPause.textContent = '';
@@ -1318,7 +1390,7 @@
       for (var pass = 0; pass < 6; pass++) {
         nfs = clamp(nfs0, 48, 560); tfs = clamp(nfs * 0.19, 18, 96); gap = nfs * 0.5; ctaGap = Math.max(20, nfs * 0.18);
         nameEl.style.fontSize = nfs + 'px'; tagEl.style.fontSize = tfs + 'px';
-        enEl.style.fontSize = clamp(nfs * 0.15, 16, 72) + 'px'; enEl.style.marginTop = (nfs * 0.06) + 'px';
+        enEl.style.fontSize = clamp(nfs * 0.27, 20, 130) + 'px'; enEl.style.marginTop = (nfs * 0.01) + 'px';
         nameEl.style.transform = 'none'; nameEl._t = null;
         tagEl.style.marginTop = gap + 'px';
         rg.selectNodeContents(tagEl);
@@ -1347,8 +1419,9 @@
       var rnd = rng(31), dots = [];
       for (var i = 0; i < 28; i++) dots.push({ x: lerp(-L.W * 0.02, L.W * 1.02, i / 27), ang: (i / 28) * TAU + rnd() * 0.5, dist: (0.16 + rnd() * 0.3) * Math.min(L.W, L.H), o: Math.abs(i / 27 - 0.5) * 2 * 0.5 + rnd() * 0.15 });
       L.fin = { nb: nb, nc: { x: nb.x + nb.w / 2, y: nb.y + nb.h / 2 }, fs: nfs, wy: wy, k: TAU / (L.land ? L.W * 0.42 : L.W * 0.9), a0: Math.min(tagGlyphTop - enBottom, nfs * 0.6) * 0.36, af: Math.min(tagGlyphTop - enBottom, nfs * 0.6) * 0.2, dots: dots,
-        ring: { cx: nr.left - rr0.left + nr.width / 2, cy: nameTop + (enBottom - nameTop) / 2, R: ringR, amp: ringAmp, n: 6 } };
+        ring: { cx: nr.left - rr0.left + nr.width / 2, cy: nameTop + (enBottom - nameTop) / 2, R: ringR, amp: ringAmp, n: 6 }, wave: rw };
       api.ctaTop = Math.round(tr.bottom - rr0.top + ctaGap);
+      api.ring = { cx: L.fin.ring.cx, cy: L.fin.ring.cy, R: L.fin.ring.R };
       el.style.setProperty('--ri-cta-top', api.ctaTop + 'px');
       // 손가락 길
       var K = L.f1.K, tb = L.f1.tb, g2 = panelGeom(L.S);
@@ -1458,7 +1531,10 @@
       if (dead || !ended || !idleOk()) return;
       var dt = clamp((now - idleLast) / 1000, 0, 0.1); idleLast = now;
       extraPh = (extraPh + dt * IDLE_W) % (TAU * 64);
+      rw.step(dt);
       render(DUR);
+      var gq = Math.round(rw.e * 20);
+      if (gq !== glowQ) { glowQ = gq; nameEl.style.textShadow = gq ? '0 0 .4em rgba(217,119,87,' + (0.2 + gq * 0.025).toFixed(3) + '), 0 0 1.1em rgba(217,119,87,' + (gq * 0.015).toFixed(3) + ')' : ''; }
       idleRaf = requestAnimationFrame(idleFrame);
     }
     function onMotion(e) { if (e && e.detail && e.detail.paused) stopIdle(); else startIdle(); }
@@ -1469,7 +1545,7 @@
     }
     function replay() {
       if (dead) return;
-      stopIdle(); extraPh = 0;
+      stopIdle(); extraPh = 0; rw.reset(); glowQ = -1; nameEl.style.textShadow = '';
       ended = false; root.classList.remove('ri-done', 'ri-flash'); t = 0; render(t); playing = false; play();
     }
     function seek(v) { t = clamp(+v || 0, 0, DUR); render(t); return t; }
@@ -1481,6 +1557,28 @@
     bSkip.addEventListener('click', skip);
     document.addEventListener('visibilitychange', onVis);
     document.addEventListener('gm:motion-change', onMotion);
+    // 끝 장면 고리 손맛: 움직이면 밀고, 누르면 튕긴다(움직임 멈춤 중에는 반응하지 않는다)
+    function ringHit(e) {
+      if (!ended || dead || !idleRaf || !L || !L.fin) return null;
+      var r = root.getBoundingClientRect(), G = L.fin.ring, x = e.clientX - r.left, y = e.clientY - r.top;
+      var dx = x - G.cx, dy = y - G.cy, rp = Math.hypot(dx, dy);
+      return { x: x, y: y, th: Math.atan2(dy, dx), band: Math.exp(-Math.pow((rp - G.R) / (G.R * 0.32), 2)), dir: rp < G.R ? 1 : -1, G: G };
+    }
+    function onPtrMove(e) {
+      var h = ringHit(e); if (!h) { rw.load = 0; rw.near = 0; return; }
+      rw.near = h.band; rw.ang = h.th;
+      rw.load = h.band > 0.03 ? h.dir * 8.5 * h.band : 0;   // 머무는 자리를 민다(고리가 손을 피한다)
+      if (h.band > 0.03) rw.on = true;
+      rw.track(h.th, h.band);
+    }
+    function onPtrDown(e) {
+      var h = ringHit(e); if (!h || h.band < 0.08) return;
+      rw.pluck(h.th, h.dir * 0.2 * h.band); rw.near = h.band; rw.ang = h.th; rw.flash = 1;
+    }
+    function onPtrLeave() { rw.near = 0; rw.load = 0; rw.lastTh = null; }
+    el.addEventListener('pointermove', onPtrMove, { passive: true });
+    el.addEventListener('pointerdown', onPtrDown, { passive: true });
+    el.addEventListener('pointerleave', onPtrLeave, { passive: true });
     var ro = typeof ResizeObserver === 'function' ? new ResizeObserver(function () { relayout(); }) : null;
     if (ro) ro.observe(root); else window.addEventListener('resize', relayout);
     setPauseUi();
@@ -1500,6 +1598,7 @@
       dead = true; playing = false; if (raf) cancelAnimationFrame(raf); stopIdle();
       document.removeEventListener('visibilitychange', onVis);
       document.removeEventListener('gm:motion-change', onMotion);
+      el.removeEventListener('pointermove', onPtrMove); el.removeEventListener('pointerdown', onPtrDown); el.removeEventListener('pointerleave', onPtrLeave);
       if (ro) ro.disconnect(); else window.removeEventListener('resize', relayout);
       root.remove();
       if (window.__intro === api) delete window.__intro;

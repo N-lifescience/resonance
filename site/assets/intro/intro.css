@@ -4,6 +4,8 @@
   --ri-mute: #A8A49B; --ri-tide: #2B6E69; --ri-tide-hi: #4FA39A;
   --ri-font: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
   --ri-mono: ui-monospace, "SF Mono", Menlo, Consolas, "D2Coding", monospace;
+  --ri-display: "Noto Serif KR", "Nanum Myeongjo", AppleMyungjo, Batang, serif;
+  --ri-latin: "Instrument Serif", "Iowan Old Style", Georgia, serif;
   position: absolute; inset: 0; overflow: hidden;
   background: var(--ri-char); color: var(--ri-paper);
   font-family: var(--ri-font); line-height: 1.2;
@@ -50,10 +52,10 @@
 /* 끝 화면 로고 묶음 */
 .ri-lock { position: absolute; left: 0; right: 0; top: 0; text-align: center; pointer-events: none; }
 .ri-name {
-  display: inline-block; margin: 0; font-weight: 900; line-height: 1; letter-spacing: -.035em;
+  display: inline-block; margin: 0; font-family: var(--ri-display); font-weight: 900; line-height: 1; letter-spacing: -.02em;
   color: var(--ri-paper); opacity: 0; text-shadow: 0 0 .4em rgba(217, 119, 87, .2); will-change: opacity, filter, transform;
 }
-.ri-en { display: block; margin: 0; font-weight: 600; line-height: 1.1; letter-spacing: .32em; text-indent: .32em; color: var(--ri-mute); opacity: 0; }
+.ri-en { display: block; margin: 0; font-family: var(--ri-latin); font-style: italic; font-weight: 400; line-height: 1.05; letter-spacing: .01em; color: rgba(244, 241, 234, .8); opacity: 0; }
 .ri-tag { display: block; margin: 0 auto; padding: 0 16px; font-weight: 700; letter-spacing: -.02em; line-height: 1.3; color: var(--ri-paper); text-wrap: balance; }
 .ri-tag .ri-dim { color: var(--ri-mute); }
 
