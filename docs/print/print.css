@@ -163,3 +163,29 @@ img { display: block; max-inline-size: 100%; block-size: auto; }
   h1, h2, h3 { break-after: avoid; page-break-after: avoid; }
   thead { display: table-header-group; }
 }
+
+/* 기획의도는 A4 1장 이내(제출 요건): 글자와 간격을 조금 줄이고 기능 카드는 한 줄 넷으로 */
+.document-intent { font-size: 12.6px; line-height: 1.48; }
+.document-intent h2 { margin: 1em 0 0.4em; }
+.document-intent .table-wrap { margin-block: 0.4em 0.6em; }
+.document-intent .feature-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.5em; margin-block: 0.5em 0.6em; }
+.document-intent .feature-card figcaption { font-size: 0.9em; }
+.document-intent ul { margin-block-end: 0.4em; }
+.document-intent li { margin-block: 0.12em; }
+@media print {
+  .document-intent .masthead { padding: 2.6mm 4.5mm; margin-block-end: 2.6mm; }
+  .document-intent .brand { font-size: 16pt; }
+  .document-intent .tagline { margin-block-start: 1mm; font-size: 9.5pt; }
+  .document-intent .masthead h1 { font-size: 15pt; }
+  .document-intent h2 { margin-block: 3mm 1.3mm; font-size: 11.5pt; }
+  .document-intent th, .document-intent td { padding: 0.85mm 1.6mm; }
+  .document-intent p { margin-block-end: 1.6mm; }
+  .document-intent .feature-card { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); }
+  .document-intent .feature-card figcaption { font-size: 9.2pt; overflow-wrap: normal; }
+  .document-intent td, .document-intent li, .document-intent p { text-wrap: pretty; }
+  .document-intent td:first-child { white-space: nowrap; }
+  .document-intent .table-wrap:first-of-type td:first-child { white-space: normal; text-wrap: balance; }
+}
+/* 기획의도만 여백을 줄여 A4 1장에 담는다. 쪽 아래 글은 기본 @page 것을 그대로 쓴다. */
+.document-intent { page: intent; }
+@page intent { margin: 12mm 15mm 14mm; }
