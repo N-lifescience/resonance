@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI 대화 — 수업 만들기</title>
+  <style>
+    :root { --clay:#D97757; --clay-deep:#C15F3C; --char:#141413; --char-2:#1F1E1C; --paper:#F4F1EA; --white:#FFFFFF; --mute:#6B6A65; --tide:#2B6E69; color-scheme:light; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--paper); color:var(--char); font:400 20px/1.6 'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo',sans-serif; word-break:keep-all; overflow-wrap:anywhere; }
+    ::selection { background:var(--clay); color:var(--char); }
+    :focus-visible { outline:3px solid var(--tide); outline-offset:4px; }
+    h1,h2 { margin:0; line-height:1.3; text-wrap:balance; font-weight:800; }
+    p { margin:0; text-wrap:pretty; }
+    button,textarea { font:inherit; color:inherit; }
+    button { min-block-size:44px; padding:10px 18px; border:0; border-radius:12px; cursor:pointer; white-space:normal; }
+    button:hover { filter:brightness(.95); }
+    button:disabled { opacity:.5; cursor:wait; }
+    button:focus-visible { outline-offset:2px; }
+    [hidden] { display:none !important; }
+    .shell { display:grid; grid-template-rows:auto minmax(0,1fr) auto; min-block-size:100dvh; block-size:100dvh; }
+    .top { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:16px; padding:18px clamp(20px,5vw,80px); border-bottom:1px solid #D5D0C7; }
+    h1 { font-size:26px; }
+    .top p { color:var(--mute); font-size:18px; }
+    .controls { display:flex; flex-wrap:wrap; gap:8px; }
+    .controls button { background:transparent; border:1px solid #B8B2A7; }
+    .conversation { overflow:auto; scrollbar-color:#B8B2A7 var(--paper); scrollbar-width:thin; padding:30px max(20px,calc((100% - 1120px)/2)); }
+    .message { max-inline-size:100%; margin:0 0 24px; min-inline-size:0; }
+    .speaker { display:block; margin-bottom:7px; font-size:16px; font-weight:700; color:var(--mute); }
+    .message.teacher { margin-inline-start:12%; }
+    .message.teacher .content { background:var(--white); border-radius:16px; padding:18px 24px; }
+    .message.assistant { padding-inline:6px; }
+    .content { min-inline-size:0; }
+    .content h2 { font-size:24px; margin-block-end:12px; }
+    .file { display:inline-flex; align-items:center; gap:10px; max-inline-size:100%; background:#E7E1D6; border-radius:10px; padding:8px 14px; margin-bottom:12px; font-size:18px; }
+    .file svg { flex:none; inline-size:24px; block-size:24px; color:var(--clay-deep); }
+    ol { margin:8px 0 0; padding-inline-start:1.4em; }
+    li { margin-block:5px; padding-inline-start:4px; }
+    .recommend { color:var(--clay-deep); font-weight:700; }
+    .table-wrap { overflow:auto; scrollbar-color:#B8B2A7 var(--paper); margin-block:14px; }
+    table { border-collapse:collapse; inline-size:100%; font-size:19px; }
+    th,td { text-align:start; padding:12px 14px; border-bottom:1px solid #CCC6BB; vertical-align:top; }
+    th { color:var(--tide); font-weight:700; }
+    .composer-area { padding:12px max(20px,calc((100% - 1120px)/2)) 22px; }
+    .composer { display:flex; align-items:end; gap:16px; background:var(--white); padding:12px 16px; border-radius:16px; }
+    textarea { flex:1; min-inline-size:0; resize:none; border:0; background:transparent; padding:8px; line-height:1.5; min-block-size:52px; max-block-size:160px; caret-color:var(--clay-deep); }
+    textarea::placeholder { color:var(--mute); opacity:1; }
+    #send { background:var(--clay); color:var(--char); min-block-size:52px; font-weight:700; }
+    .demo-note { font-size:16px; color:var(--mute); margin-top:8px; text-align:center; }
+    .lesson-view { position:fixed; inset:0; z-index:10; background:var(--char); }
+    #lesson { display:block; inline-size:100%; block-size:100%; border:0; }
+    .lesson-controls { position:absolute; top:12px; right:16px; z-index:11; display:flex; flex-wrap:wrap; gap:8px; }
+    .lesson-controls button { background:var(--paper); color:var(--char); font-size:16px; }
+    @media (max-width:767px) {
+      body { font-size:18px; }
+      .top { padding:14px 20px; }
+      .top p { font-size:16px; }
+      .conversation { padding-block:20px; }
+      .message.teacher { margin-inline-start:3%; }
+      .message.teacher .content { padding:16px; }
+      .content h2 { font-size:22px; }
+      .composer { flex-wrap:wrap; gap:8px; }
+      textarea { flex-basis:100%; }
+      #send { margin-inline-start:auto; }
+      th,td { padding:10px 6px; font-size:16px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell" id="chat">
+    <header class="top">
+      <div><h1>AI 대화</h1><p>PPT로 수업을 만들어요</p></div>
+      <div class="controls"><button type="button" id="pause" aria-pressed="false">움직임 멈춤</button><button type="button" id="skip">대화 건너뛰기</button></div>
+    </header>
+    <div class="conversation" id="conversation" aria-label="교사와 AI의 대화"></div>
+    <div class="composer-area">
+      <form class="composer" id="composer">
+        <label hidden for="prompt">AI에게 보낼 내용</label>
+        <textarea id="prompt" rows="2" placeholder="PPT와 함께 부탁을 적어 주세요" aria-label="AI에게 보낼 내용"></textarea>
+        <button type="submit" id="send">보내기</button>
+      </form>
+      <p class="demo-note">수업 제작 과정을 보여 주는 예시 대화예요.</p>
+    </div>
+  </main>
+  <div class="lesson-view" id="lesson-view" hidden>
+    <iframe id="lesson" src="../../_site/lessons/sci-diffusion.html" title="확산과 입자의 운동 수업" tabindex="-1"></iframe>
+    <div class="lesson-controls"><button type="button" id="back">대화로 돌아가기</button></div>
+  </div>
+  <template id="file-chip">
+    <div class="file"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M6 3h8l4 4v14H6zM14 3v5h4M9 12h6M9 16h5"/></svg><span>입자의 운동.pptx</span></div>
+  </template>
+  <template id="features">
+    <h2>이 PPT에 맞는 기능이에요</h2>
+    <ol>
+      <li>잉크가 퍼지는 입자 장면 <span class="recommend">(추천)</span></li>
+      <li>온도에 따라 달라지는 확산 장면 <span class="recommend">(추천)</span></li>
+      <li>확인 문제</li>
+      <li>타이머</li>
+      <li>실시간 학생 값 모으기</li>
+    </ol>
+  </template>
+  <template id="plan">
+    <h2>이렇게 만들게요</h2>
+    <div class="table-wrap"><table>
+      <thead><tr><th scope="col">개념</th><th scope="col">손잡이</th><th scope="col">축</th><th scope="col">움직이는 것</th></tr></thead>
+      <tbody>
+        <tr><td>확산</td><td>시간 막대</td><td>시간과 공간</td><td>잉크 입자의 위치</td></tr>
+        <tr><td>온도와 확산</td><td>온도 막대</td><td>온도와 확산 시간</td><td>입자의 경로와 그래프</td></tr>
+      </tbody>
+    </table></div>
+    <p>타이머도 넣을게요. 이대로 만들까요?</p>
+  </template>
+  <script>
+    (() => {
+      const conversation = document.querySelector('#conversation');
+      const prompt = document.querySelector('#prompt');
+      const send = document.querySelector('#send');
+      let first = true, paused = false, busy = false;
+      const delay = (ms) => new Promise((done) => setTimeout(done, ms));
+      const bottom = () => { conversation.scrollTop = conversation.scrollHeight; };
+      const message = (role) => {
+        const article = document.createElement('article'); article.className = 'message ' + role;
+        const speaker = document.createElement('span'); speaker.className = 'speaker'; speaker.textContent = role === 'teacher' ? '교사' : 'AI';
+        const content = document.createElement('div'); content.className = 'content';
+        article.append(speaker, content); conversation.append(article); return content;
+      };
+      document.querySelector('#composer').addEventListener('submit', (event) => {
+        event.preventDefault(); if (!prompt.value.trim() || busy) return;
+        const content = message('teacher');
+        if (first) { content.append(document.querySelector('#file-chip').content.cloneNode(true)); first = false; }
+        const p = document.createElement('p'); p.textContent = prompt.value.trim(); content.append(p);
+        prompt.value = ''; bottom();
+      });
+      document.querySelector('#pause').addEventListener('click', (event) => {
+        paused = !paused; event.currentTarget.textContent = paused ? '움직임 재개' : '움직임 멈춤'; event.currentTarget.setAttribute('aria-pressed', String(paused));
+      });
+      const iframe = document.querySelector('#lesson');
+      const ready = async () => {
+        for (let i = 0; i < 200; i++) {
+          const engine = iframe.contentWindow?.Exploragram;
+          if (engine && iframe.contentDocument.querySelector('.ch-toolbar [data-name="edit"]')) {
+            await engine.ready; await iframe.contentDocument.fonts.ready; window.__ready = true; return;
+          }
+          await delay(100);
+        }
+        window.__error = '수업 파일을 열지 못했어요. 먼저 사이트를 빌드해 주세요.';
+      };
+      const showLesson = () => {
+        if (!window.__ready) throw new Error(window.__error || '수업 파일을 준비하고 있어요.');
+        paused = false; document.querySelector('#chat').hidden = true; document.querySelector('#lesson-view').hidden = false;
+        // The iframe was preloaded while hidden: recalculate its stage against the visible viewport.
+        iframe.contentWindow.dispatchEvent(new Event('resize')); return true;
+      };
+      document.querySelector('#skip').addEventListener('click', () => {
+        try { showLesson(); } catch (error) { const content=message('assistant'); const p=document.createElement('p');p.textContent=error.message;content.append(p);bottom(); }
+      });
+      document.querySelector('#back').addEventListener('click', () => {
+        document.querySelector('#lesson-view').hidden = true; document.querySelector('#chat').hidden = false; bottom();
+      });
+      window.interview = {
+        showLesson,
+        async reply(id, interval = 12) {
+          if (busy || !['features','plan'].includes(id)) throw new Error('Invalid interview step');
+          busy = true; send.disabled = true;
+          try {
+            const content = message('assistant'); content.append(document.querySelector('#' + id).content.cloneNode(true));
+            const walker = document.createTreeWalker(content, NodeFilter.SHOW_TEXT);
+            const texts = []; while (walker.nextNode()) { const node = walker.currentNode; if (node.textContent.trim()) texts.push([node, node.textContent]); }
+            for (const [node] of texts) node.textContent = '';
+            for (const [node, text] of texts) for (const char of text) {
+              while (paused) await delay(50);
+              node.textContent += char; bottom(); await delay(interval);
+            }
+          } finally { busy = false; send.disabled = false; }
+          return true;
+        },
+      };
+      ready();
+    })();
+  </script>
+</body>
+</html>
