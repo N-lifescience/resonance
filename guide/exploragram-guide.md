@@ -208,9 +208,10 @@ PPT를 HTML로 옮기는 일이 아니다. PPT로는 못 하는 수업을 만든
 쓴 AI: (ChatGPT | Gemini | Claude | 기타)
 ```
 
-설문: {{FORM_URL}}
+설문: https://docs.google.com/forms/d/e/1FAIpQLSfqJT-yrBF9SlhaEJhkUiCGSvtCeP6o4x82GMAK5FyNN65qUw/viewform
 미리 채운 주소를 만들 수 있으면 아래 형식으로 값을 URL 인코딩해 넣는다. 만들 수 없으면 위 글과 빈 설문 주소만 준다.
-`{{FORM_PREFILL}}`
+`https://docs.google.com/forms/d/e/1FAIpQLSfqJT-yrBF9SlhaEJhkUiCGSvtCeP6o4x82GMAK5FyNN65qUw/viewform?usp=pp_url&entry.760913700=학교급&entry.131310930=교과&entry.771430082=원하는기능&entry.1617097534=쓴AI`
+학교급은 초등·중등·고등·기타, 쓴 AI는 ChatGPT·Gemini·Claude·기타 가운데 하나를 글자 그대로 넣는다(설문 선택지와 같아야 미리 선택된다).
 
 ---
 
