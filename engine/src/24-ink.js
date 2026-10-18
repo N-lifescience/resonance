@@ -48,17 +48,17 @@ const Ink = {
     this.layer = h('div', { class: 'ch-ink', 'aria-hidden': 'true' });
     for (const name of ['hl', 'pen', 'laser']) {
       this.cv[name] = h('canvas', { class: `ch-ink-${name}` });
-      // desynchronized: 합성 단계를 건너뛰어 바로 화면에 올린다(전자칠판·복제 화면에서 펜 지연을 줄인다).
-      // 형광펜층은 글자와 곱하기로 섞여야 해서 그대로 둔다.
-      this.ctx[name] = this.cv[name].getContext('2d', name === 'hl' ? undefined : { desynchronized: true });
+      // desynchronized(저지연)는 쓰지 않는다: 윈도 크롬·엣지·웨일은 이 캔버스를 투명도를 무시하는 덧씌움층으로 올려
+      // 슬라이드를 가린다(2026-10 윈도 데스크톱·학교 노트북에서 장이 어두운 바탕만 보이고 판서만 남았다).
+      this.ctx[name] = this.cv[name].getContext('2d');
       this.layer.append(this.cv[name]);
     }
     Stage.deck.append(this.layer);
     // 그리는 중인 펜 획만 따로 그리는 화면 맨 위 캔버스. 확대(transform)된 무대 안 캔버스는 슬라이드와
-    // 함께 합성돼야 화면에 오르지만, 바깥의 저지연 캔버스는 다음 화면 갱신을 기다리지 않고 바로 오른다.
-    // 손을 떼면 획을 무대 판서층에 옮기고 이 캔버스는 비운다.
+    // 함께 다시 합성돼야 화면에 오르지만, 바깥 캔버스는 그 캔버스만 다시 그려 빨리 오른다.
+    // 손을 떼면 획을 무대 판서층에 옮기고 이 캔버스는 비운다. desynchronized는 위 이유로 쓰지 않는다.
     this.live = h('canvas', { class: 'ch-ink-live', 'aria-hidden': 'true' });
-    this.lctx = this.live.getContext('2d', { desynchronized: true });
+    this.lctx = this.live.getContext('2d');
     document.body.append(this.live);
     const d = Stage.deck;
     // pointerrawupdate: 화면 갱신 주기에 맞춰 모아 보내는 pointermove보다 먼저, 입력이 들어오는 즉시 온다.
