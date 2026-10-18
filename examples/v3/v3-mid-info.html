@@ -1,0 +1,664 @@
+<!doctype html>
+<html lang="ko" data-deck="v3-mid-info">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>정렬 알고리즘 · 비교와 교환 횟수 세기</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/engine/exploragram.css">
+<script defer src="https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/engine/exploragram.js"></script>
+<style>
+body[data-theme="ppt"] {
+  --accent: #1E2430; --tab: #1E2430; --tab-ink: #FFFFFF;
+  --ink: #1E2430; --gray: #5B6472; --code: #F3F5F8; --line: #D7DCE3;
+  --sel: #2F6FDE; --bub: #0B7285; --ins: #7C3AED;
+  --cmp: #F5C518; --swp: #E5484D; --done: #2F9E44; --bar: #A3ACB9;
+}
+.mono { font-family: Consolas, Menlo, "D2Coding", monospace; }
+
+/* ── 얼굴: 편집기 같은 어두운 머리 띠 + 파랑·보라 줄 + 왼쪽 줄 번호 칸 ── */
+body[data-theme="ppt"] section.slide {
+  background:
+    linear-gradient(#1E2430, #1E2430) 0 0 / 100% 96px no-repeat,
+    linear-gradient(90deg, var(--sel), var(--ins)) 0 96px / 100% 5px no-repeat,
+    linear-gradient(var(--code), var(--code)) 0 0 / 44px 100% no-repeat,
+    #FFFFFF;
+  color: var(--ink);
+}
+body[data-theme="ppt"] section.slide[data-sec]::before {
+  left: auto; right: 40px; top: 24px; height: 48px; line-height: 48px; min-width: 150px; padding: 0 20px 0 40px; box-sizing: border-box;
+  display: flex; align-items: center; justify-content: center; border-radius: 8px 8px 0 0; background: #2B3242; color: #E6EDF3;
+  font-family: Consolas, Menlo, monospace; font-size: 23px; font-weight: 700;
+  background-image: radial-gradient(circle, var(--cmp) 0 6px, transparent 7px); background-repeat: no-repeat; background-position: 12px 50%; background-size: 16px 16px;
+}
+body[data-theme="ppt"] section.slide > h2:first-child {
+  position: absolute; top: 0; left: 70px; right: 250px; height: 96px; margin: 0; padding: 0; border: 0; background: none; width: auto;
+  display: flex; align-items: center; color: #FFFFFF; font-size: 40px; line-height: 1.2; text-wrap: balance;
+}
+.k-sel { color: var(--sel); font-weight: 800; } .k-bub { color: var(--bub); font-weight: 800; } .k-ins { color: var(--ins); font-weight: 800; }
+
+/* 표지 */
+body[data-theme="ppt"] section.slide#cover { background: #1E2430; color: #fff; }
+body[data-theme="ppt"] section.slide#cover::after { color: #fff; }
+.cv { display: grid; grid-template-columns: 1fr 460px; gap: 30px; align-items: center; height: 100%; }
+.cv p, .cv h1 { margin: 0; color: #fff; }
+.cv-k { font-size: 30px; opacity: .85; }
+.cv h1 { margin: 22px 0 22px; font-size: 76px; line-height: 1.15; }
+.cv-s { font-size: 34px; color: #C9D4E3 !important; }
+
+/* 학습 목표 */
+.goals { margin: 36px 0 0; padding: 0; list-style: none; counter-reset: g; }
+.goals li { counter-increment: g; position: relative; padding: 0 0 0 70px; margin: 0 0 30px; font-size: 32px; line-height: 1.45; }
+.goals li::before { content: counter(g, decimal-leading-zero); position: absolute; left: 0; top: 2px; font-family: Consolas, Menlo, monospace; color: var(--gray); font-size: 28px; font-weight: 700; }
+
+/* 생각 열기 */
+.cards { display: flex; gap: 14px; margin: 8px 0 22px; }
+.cards span { display: grid; place-items: center; width: 92px; height: 120px; border-radius: 12px; background: #fff; border: 3px solid var(--ink); font-size: 46px; font-weight: 800; box-shadow: 0 4px 0 var(--line); }
+
+/* 개념 */
+.defs { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-top: 4px; }
+.defs > div { padding: 10px 16px; border-radius: 10px; background: var(--code); font-size: 25px; line-height: 1.4; }
+.defs b { font-size: 27px; }
+.algs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 16px; }
+.algs > div { padding: 14px 18px; border-radius: 12px; border: 3px solid; background: #fff; font-size: 25px; line-height: 1.45; }
+.algs b { display: block; font-size: 30px; margin-bottom: 6px; }
+.algs .ar { display: block; margin-top: 10px; padding: 8px 10px; border-radius: 8px; background: var(--code); font-family: Consolas, Menlo, monospace; font-size: 23px; line-height: 1.5; }
+.a-sel { border-color: var(--sel) !important; } .a-sel b { color: var(--sel); }
+.a-bub { border-color: var(--bub) !important; } .a-bub b { color: var(--bub); }
+.a-ins { border-color: var(--ins) !important; } .a-ins b { color: var(--ins); }
+
+/* ── 익스플로라그램 공통 ── */
+.ex { display: grid; grid-template-columns: 1fr 390px; gap: 0 32px; align-items: start; }
+.ex-view { position: relative; padding: 0 0 10px 10px; }
+.ex-view svg { display: block; width: 100%; height: auto; }
+.ctl { display: flex; flex-direction: column; gap: 8px; }
+.ctl > p { margin: 0; }
+.lab { font-size: 23px; font-weight: 700; color: var(--gray); }
+.seg { display: flex; gap: 8px; }
+section.slide .seg button { flex: 1; min-height: 56px; margin: 0; padding: 4px 6px; font: inherit; font-size: 23px; font-weight: 700; line-height: 1.2; border: 3px solid var(--line); border-radius: 10px; background: #fff; color: var(--ink); cursor: pointer; }
+section.slide .seg button[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
+section.slide input.rg { -webkit-appearance: none; appearance: none; width: 100%; height: 56px; margin: 0; background: transparent; cursor: pointer; --p: 0%; }
+section.slide input.rg::-webkit-slider-runnable-track { height: 12px; border-radius: 6px; background: linear-gradient(90deg, var(--ink) var(--p), #D5D9DF var(--p)); }
+section.slide input.rg::-webkit-slider-thumb { -webkit-appearance: none; width: 44px; height: 44px; margin-top: -16px; border-radius: 50%; background: #fff; border: 7px solid var(--ink); box-shadow: 0 2px 8px rgba(0,0,0,.3); }
+section.slide input.rg::-moz-range-track { height: 12px; border-radius: 6px; background: #D5D9DF; }
+section.slide input.rg::-moz-range-progress { height: 12px; border-radius: 6px; background: var(--ink); }
+section.slide input.rg::-moz-range-thumb { width: 32px; height: 32px; border-radius: 50%; background: #fff; border: 7px solid var(--ink); }
+.veil-x { position: absolute; inset: 0; z-index: 3; display: flex; align-items: center; justify-content: center; text-align: center; padding: 20px;
+  background: #EEF2F5; border: 3px dashed #B8C4CE; border-radius: 18px; color: #4C5866; font-size: 28px; font-weight: 600; line-height: 1.5; }
+.veil-x[hidden] { display: none; }
+.msg { margin: 6px 0 0; min-height: 76px; font-size: 26px; line-height: 1.45; font-weight: 700; text-wrap: pretty; }
+.cnt { display: grid; grid-template-columns: 64px 1fr 82px; gap: 10px; align-items: center; font-size: 24px; font-weight: 800; }
+.cnt .tr { height: 24px; border-radius: 6px; background: #E6EAF0; overflow: hidden; }
+.cnt .tr i { display: block; height: 100%; width: 0; border-radius: 6px; transition: width .45s ease-out; }
+.cnt em { font-style: normal; text-align: right; font-variant-numeric: tabular-nums; }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 21px; color: var(--gray); }
+.legend i { display: inline-block; width: 20px; height: 20px; border-radius: 4px; vertical-align: -3px; margin-right: 6px; }
+.pos { font-size: 22px; color: var(--gray); font-weight: 700; }
+
+/* 막대 움직임: 자리를 바꾸면 0.45초 동안 미끄러진다 */
+.bar-g { transition: transform .45s ease-in-out; }
+.bar-g rect { fill: var(--bar); transition: fill .25s; }
+.bar-g.is-cmp rect { fill: var(--cmp); }
+.bar-g.is-swap rect { fill: var(--swp); }
+.bar-g.is-done rect { fill: var(--done); }
+.bar-g.is-key rect { stroke: var(--ink); stroke-width: 5; stroke-dasharray: 8 5; }
+.bar-g.is-min rect { stroke: var(--ins); stroke-width: 7; }
+#se-band { transition: width .45s ease-in-out; }
+#se-minmk { transition: transform .45s ease-in-out, opacity .25s; }
+.flag { transition: opacity .3s; }
+
+/* 결과 표 */
+table.res { width: 100%; border-collapse: collapse; font-size: 23px; }
+table.res th, table.res td { padding: 6px 8px; border-bottom: 2px solid var(--line); text-align: right; font-variant-numeric: tabular-nums; }
+table.res th:first-child, table.res td:first-child { text-align: left; }
+table.res thead th { color: var(--gray); font-size: 21px; }
+.note { margin: 0; font-size: 21px; color: var(--gray); }
+
+/* 확인 */
+.sort .bin { min-height: 92px; }
+.sort > span { font-size: 23px; }
+
+/* 정리 */
+.sum { margin: 24px 0 0; padding: 0; list-style: none; }
+.sum li { position: relative; padding-left: 44px; margin: 0 0 20px; font-size: 29px; line-height: 1.45; }
+.sum li::before { content: "›"; position: absolute; left: 6px; top: -4px; font-family: Consolas, Menlo, monospace; font-size: 40px; font-weight: 800; color: var(--sel); }
+</style>
+</head>
+<body data-theme="ppt">
+
+<!-- 1 표지 -->
+<section class="slide" id="cover" data-title="표지">
+  <div class="cv">
+    <div>
+      <p class="cv-k">중학교 3학년 정보 · 알고리즘</p>
+      <h1>정렬 알고리즘</h1>
+      <p class="cv-s">몇 번 견주고 몇 번 바꿀까?</p>
+    </div>
+    <svg width="460" height="360" viewBox="0 0 460 360" aria-label="높이가 차례로 커지는 막대 여덟 개">
+      <g fill="#2F6FDE"><rect x="20" y="290" width="40" height="40" rx="5"/><rect x="74" y="255" width="40" height="75" rx="5"/><rect x="128" y="220" width="40" height="110" rx="5"/></g>
+      <g fill="#F5C518"><rect x="182" y="185" width="40" height="145" rx="5"/><rect x="236" y="150" width="40" height="180" rx="5"/></g>
+      <g fill="#7C3AED"><rect x="290" y="115" width="40" height="215" rx="5"/><rect x="344" y="80" width="40" height="250" rx="5"/><rect x="398" y="45" width="40" height="285" rx="5"/></g>
+      <path d="M202 170 C 220 120, 240 120, 256 140" stroke="#FFFFFF" stroke-width="4" fill="none"/><path d="M248 132 L258 144 L262 128 Z" fill="#FFFFFF"/>
+    </svg>
+  </div>
+</section>
+
+<!-- 2 학습 목표 -->
+<section class="slide" id="goal" data-sec="학습 목표" data-title="학습 목표">
+  <h2>학습 목표</h2>
+  <ol class="goals">
+    <li>선택 정렬, 버블 정렬, 삽입 정렬이 자료를 정렬하는 과정을 설명할 수 있다.</li>
+    <li>비교 횟수와 교환 횟수로 정렬 알고리즘의 효율을 견줄 수 있다.</li>
+  </ol>
+</section>
+
+<!-- 3 생각 열기 -->
+<section class="slide" id="think" data-sec="생각 열기" data-title="카드 8장 늘어놓기">
+  <h2>카드 8장을 작은 수부터 늘어놓으려면?</h2>
+  <div>
+    <div class="cards mono" aria-label="숫자 카드 5, 2, 8, 1, 9, 3, 7, 4"><span>5</span><span>2</span><span>8</span><span>1</span><span>9</span><span>3</span><span>7</span><span>4</span></div>
+    <div class="short" data-ph="예: 가장 작은 카드부터 찾아서 앞으로 옮긴다">
+      <p class="ask">나는 어떤 순서로 카드를 옮길까? 두 카드를 몇 번쯤 견주게 될까?</p>
+    </div>
+  </div>
+</section>
+
+<!-- 4 개념 -->
+<section class="slide" id="ideas" data-sec="개념" data-title="정렬, 비교, 교환과 세 정렬">
+  <h2>견주고 바꾸며 정렬하는 세 가지 방법</h2>
+  <div>
+    <div class="defs">
+      <div><b>정렬</b><br>자료를 정한 순서대로 늘어놓기</div>
+      <div><b>비교</b><br>두 값 가운데 어느 쪽이 큰지 견주기</div>
+      <div><b>교환</b><br>두 값의 자리를 서로 바꾸기</div>
+    </div>
+    <div class="algs">
+      <div class="a-sel"><b>선택 정렬</b>남은 값 가운데 가장 작은 값을 골라 남은 부분의 맨 앞과 바꾼다.<span class="ar">5 2 8 1 → 1 2 8 5</span></div>
+      <div class="a-bub"><b>버블 정렬</b>이웃한 두 값을 견주어 앞이 크면 바꾼다. 한 바퀴 돌면 가장 큰 값이 맨 뒤로 간다.<span class="ar">5 2 8 1 → 2 5 1 8</span></div>
+      <div class="a-ins"><b>삽입 정렬</b>값을 하나씩 꺼내 앞쪽에 정렬된 부분의 알맞은 자리에 끼운다.<span class="ar">2 5 8 | 1 → 1 2 5 8</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 5 익스플로라그램: 한 단계씩 -->
+<section class="slide" id="step" data-sec="개념" data-title="한 단계씩 따라가기">
+  <h2>한 단계씩 보면 세 정렬은 어떻게 다를까?</h2>
+  <div class="ex" data-ai="정렬 단계 따라가기: 비교·교환 횟수 세기">
+    <div class="ex-view">
+      <svg id="se-svg" viewBox="0 0 640 340" aria-label="높이가 값인 막대 8개. 견주는 두 막대와 자리를 바꾸는 막대가 표시된다">
+        <rect id="se-band" x="14" y="8" height="324" width="0" rx="10" fill="#EFE7FD"/>
+        <path d="M14 292 H626" stroke="#1E2430" stroke-width="3"/>
+        <g id="se-bars"></g>
+        <g id="se-minmk" style="opacity:0">
+          <path d="M54 0 L66 0 L60 12 Z" fill="#7C3AED"/>
+          <text x="60" y="-8" text-anchor="middle" font-size="20" font-weight="800" fill="#7C3AED" stroke="#FFFFFF" stroke-width="6" paint-order="stroke">가장 작은 값</text>
+        </g>
+      </svg>
+      <p class="msg" id="se-msg"></p>
+      <div class="legend"><span><i style="background:var(--cmp)"></i>견주는 두 값</span><span><i style="background:var(--swp)"></i>자리를 바꾼 값</span><span><i style="background:var(--done)"></i>자리가 정해진 값</span></div>
+      <div class="veil-x" id="se-veil"><span>정렬 방법을 고르거나<br>「▶ 재생」을 눌러 보자</span></div>
+    </div>
+    <div class="ctl">
+      <p class="lab">정렬 방법</p>
+      <div class="seg" id="se-alg"><button data-v="sel" aria-pressed="true">선택</button><button data-v="bub" aria-pressed="false">버블</button><button data-v="ins" aria-pressed="false">삽입</button></div>
+      <p class="pos" id="se-pos" style="margin-top:8px">시작</p>
+      <input class="rg" type="range" id="se-k" min="0" max="37" value="0" autocomplete="off" data-play="24" aria-label="정렬 단계">
+      <div class="cnt"><span>비교</span><div class="tr"><i id="se-cbar" style="background:var(--sel)"></i></div><em id="se-c">0번</em></div>
+      <div class="cnt"><span>교환</span><div class="tr"><i id="se-wbar" style="background:var(--swp)"></i></div><em id="se-w">0번</em></div>
+      <p class="note" id="se-sum" style="margin-top:6px"></p>
+    </div>
+  </div>
+</section>
+
+<!-- 6 확인 문제 1 -->
+<section class="slide" id="check-1" data-sec="확인 문제" data-title="확인 문제 1">
+  <h2>확인 문제 1</h2>
+  <div>
+    <p class="q" data-n="1" data-ai="문항"><span class="mono">[5, 3, 8, 1]</span>을 버블 정렬로 한 바퀴 돌린 뒤의 배열은?</p>
+    <div class="quiz mono" data-cols="2">
+      <button class="opt" data-ai="풀이" data-why="모두 정렬된 모습이다. 한 바퀴만 돌면 가장 큰 8만 맨 뒤에 자리 잡는다.">[1, 3, 5, 8]</button>
+      <button class="opt" data-ok data-ai="풀이" data-why="맞다. 5와 3을 바꾸고, 5와 8은 그대로, 8과 1을 바꾼다.">[3, 5, 1, 8]</button>
+      <button class="opt" data-ai="풀이" data-why="가장 작은 1을 맨 앞의 5와 바꾼 것은 선택 정렬의 첫 바퀴다.">[1, 3, 8, 5]</button>
+      <button class="opt" data-ai="풀이" data-why="8과 1도 이웃해 있으므로 견주어 바꾸어야 한다.">[3, 5, 8, 1]</button>
+      <button class="opt" data-ai="풀이" data-why="두 바퀴를 돈 결과다. 둘째 바퀴에서 5와 1을 바꾼다.">[3, 1, 5, 8]</button>
+    </div>
+  </div>
+</section>
+
+<!-- 7 익스플로라그램: 동시에 출발 -->
+<section class="slide" id="race" data-sec="개념" data-title="같은 자료로 함께 출발하면">
+  <h2>같은 자료로 함께 출발하면 누가 먼저 끝날까?</h2>
+  <div class="ex" data-ai="세 정렬 동시 실행: 비교 한 번을 시간 한 칸으로">
+    <div class="ex-view">
+      <svg id="rc-svg" viewBox="0 0 680 436" aria-label="선택, 버블, 삽입 정렬이 같은 자료를 동시에 정렬하는 세 줄"></svg>
+      <div class="veil-x" id="rc-veil"><span>자료 모양을 고르고<br>「▶ 재생」을 눌러 보자</span></div>
+    </div>
+    <div class="ctl">
+      <p class="lab">자료 모양</p>
+      <div class="seg" id="rc-shape"><button data-v="rand" aria-pressed="true">무작위</button><button data-v="near" aria-pressed="false">거의 정렬됨</button><button data-v="rev" aria-pressed="false">거꾸로</button></div>
+      <p class="pos" id="rc-pos" style="margin-top:8px">시작</p>
+      <input class="rg" type="range" id="rc-k" min="0" max="29" value="0" autocomplete="off" data-play="15" aria-label="비교한 횟수">
+      <p class="msg" id="rc-msg" style="min-height:0;font-size:24px"></p>
+    </div>
+  </div>
+</section>
+
+<!-- 8 익스플로라그램: 자료 수와 비교 횟수 -->
+<section class="slide" id="grow" data-sec="개념" data-title="자료가 많아지면">
+  <h2>자료가 2배가 되면 비교 횟수는 몇 배일까?</h2>
+  <div class="ex" data-ai="자료 수에 따른 비교 횟수(정렬 코드를 실제로 돌려 센 값)">
+    <div class="ex-view">
+      <svg id="gr-svg" viewBox="0 0 660 446" aria-label="자료 수에 따른 세 정렬의 비교 횟수 그래프"></svg>
+      <div class="veil-x" id="gr-veil"><span>자료 수 막대를 밀면<br>그래프가 그려진다</span></div>
+    </div>
+    <div class="ctl">
+      <p class="lab">자료 모양</p>
+      <div class="seg" id="gr-shape"><button data-v="rand" aria-pressed="true">무작위</button><button data-v="near" aria-pressed="false">거의 정렬됨</button><button data-v="rev" aria-pressed="false">거꾸로</button></div>
+      <p class="lab" style="margin-top:6px">자료 수 <b id="gr-n" style="color:var(--ink)">시작</b></p>
+      <input class="rg" type="range" id="gr-k" min="0" max="18" value="0" autocomplete="off" aria-label="자료 수">
+      <table class="res">
+        <thead><tr><th></th><th>비교</th><th>교환</th></tr></thead>
+        <tbody>
+          <tr><td class="k-sel">선택</td><td id="gr-sc">?</td><td id="gr-sw">?</td></tr>
+          <tr><td class="k-bub">버블</td><td id="gr-bc">?</td><td id="gr-bw">?</td></tr>
+          <tr><td class="k-ins">삽입</td><td id="gr-ic">?</td><td id="gr-iw">?</td></tr>
+        </tbody>
+      </table>
+      <p class="msg" id="gr-msg" style="min-height:0;font-size:23px"></p>
+      <p class="note" id="gr-note"></p>
+    </div>
+  </div>
+</section>
+
+<!-- 9 확인 문제 2 -->
+<section class="slide" id="check-2" data-sec="확인 문제" data-title="확인 문제 2">
+  <h2>확인 문제 2</h2>
+  <div>
+    <p class="q" data-n="2">어느 정렬에 대한 설명인지 나누어 보자.</p>
+    <div class="sort">
+      <div class="bin" data-bin="s"><h3 class="k-sel">선택 정렬</h3></div>
+      <div class="bin" data-bin="b"><h3 class="k-bub">버블 정렬</h3></div>
+      <div class="bin" data-bin="i"><h3 class="k-ins">삽입 정렬</h3></div>
+      <span data-bin="s" data-ai="풀이와 실마리" data-why="선택 정렬은 남은 값 가운데 가장 작은 값을 골라 앞으로 보낸다." data-hint="가장 작은 값을 '고르는' 정렬은 무엇일까?">가장 작은 값을 찾아 남은 부분의 맨 앞과 바꾼다.</span>
+      <span data-bin="b" data-ai="풀이와 실마리" data-why="버블 정렬은 이웃한 두 값을 견주어 큰 값을 뒤로 보낸다." data-hint="이웃끼리만 견주는 정렬은 무엇일까?">이웃한 두 값을 견주어 앞이 크면 바꾼다.</span>
+      <span data-bin="i" data-ai="풀이와 실마리" data-why="삽입 정렬은 앞쪽 정렬된 부분에 새 값을 끼워 넣는다." data-hint="손에 든 카드 사이에 새 카드를 끼우는 모습을 떠올려 보자.">카드를 한 장씩 집어 손에 든 카드 사이에 끼우는 방법과 같다.</span>
+      <span data-bin="s" data-ai="풀이와 실마리" data-why="선택 정렬은 한 바퀴에 많아야 한 번만 바꾸므로 교환이 적다." data-hint="한 바퀴를 도는 동안 몇 번 바꾸는지 떠올려 보자.">한 바퀴에 많아야 한 번만 바꾼다.</span>
+      <span data-bin="b" data-ai="풀이와 실마리" data-why="버블 정렬은 한 바퀴를 돌 때마다 가장 큰 값이 맨 뒤에 자리 잡는다." data-hint="큰 값이 거품처럼 뒤로 떠오르는 정렬은 무엇일까?">한 바퀴를 돌면 가장 큰 값이 맨 뒤에 자리 잡는다.</span>
+      <span data-bin="i" data-ai="풀이와 실마리" data-why="거의 정렬된 자료에서는 끼울 자리가 가까워 삽입 정렬의 비교가 크게 준다." data-hint="자료 모양에 따라 비교 횟수가 크게 달라지는 정렬은 무엇이었나?">거의 정렬된 자료에서 비교 횟수가 크게 준다.</span>
+    </div>
+  </div>
+</section>
+
+<!-- 10 확인 문제 3 -->
+<section class="slide" id="check-3" data-sec="확인 문제" data-title="확인 문제 3">
+  <h2>확인 문제 3</h2>
+  <div>
+    <p class="q" data-n="3" data-ai="문항">자료 10개를 선택 정렬로 정렬할 때 비교는 모두 몇 번일까?</p>
+    <div class="quiz" data-cols="2">
+      <button class="opt" data-ai="풀이" data-why="첫 바퀴에서만 9번 견준다. 바퀴마다 비교가 하나씩 준다.">10번</button>
+      <button class="opt" data-ai="풀이" data-why="10 × 10은 같은 값끼리도 견준 셈이다.">100번</button>
+      <button class="opt" data-ai="풀이" data-why="10 × 9 = 90은 두 값을 두 번씩 센 값이다. 2로 나눈다.">90번</button>
+      <button class="opt" data-ok data-ai="풀이" data-why="맞다. 9 + 8 + 7 + … + 1 = 45번이다.">45번</button>
+    </div>
+    <p class="step" style="font-size:27px;margin-top:10px">자료가 <span class="mono">n</span>개이면 (<span class="mono">n</span> − 1) + (<span class="mono">n</span> − 2) + … + 1 = <span class="mono">n</span>(<span class="mono">n</span> − 1) ÷ 2번 견준다.</p>
+  </div>
+</section>
+
+<!-- 11 정리 -->
+<section class="slide" id="summary" data-sec="정리" data-title="정리">
+  <h2>정리</h2>
+  <ul class="sum">
+    <li><span class="k-sel">선택 정렬</span>은 가장 작은 값을 골라 앞으로 보낸다. 교환이 <span class="blank">적다</span>.</li>
+    <li><span class="k-bub">버블 정렬</span>은 <span class="blank">이웃한 두 값</span>을 견주어 큰 값을 뒤로 보낸다.</li>
+    <li><span class="k-ins">삽입 정렬</span>은 정렬된 부분에 값을 끼운다. <span class="blank">거의 정렬된</span> 자료에서 빠르다.</li>
+    <li>선택 정렬과 버블 정렬은 자료 모양과 상관없이 <span class="blank"><span class="mono">n</span>(<span class="mono">n</span> − 1) ÷ 2</span>번 견준다.</li>
+    <li>자료가 2배가 되면 비교 횟수는 약 <span class="blank">4배</span>가 된다.</li>
+  </ul>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // 슬라이더는 손을 떼면 초점을 풀어 → 키·리모컨이 다시 장을 넘기게 한다
+  document.querySelectorAll('section.slide input[type=range]').forEach((r) => r.addEventListener('change', () => r.blur()));
+  const $ = (s) => document.querySelector(s);
+  const SVG = 'http://www.w3.org/2000/svg';
+  const mk = (tag, attrs, parent) => { const e = document.createElementNS(SVG, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; };
+  const still = () => document.documentElement.classList.contains('ch-motion-off');   // ⚙ 「움직임 끄기」만 본다
+  const fill = (r) => r.style.setProperty('--p', ((r.value - r.min) / (r.max - r.min || 1)) * 100 + '%');
+  // 재생 중에 다른 단추를 누르면 재생을 멈춘다(엔진이 슬라이더 바로 앞에 단 재생 단추)
+  const stopPlay = (r) => { const run = r.previousElementSibling && r.previousElementSibling.querySelector('.ch-play-run'); if (run && run.textContent.includes('멈춤')) run.click(); };
+  // 조사: 숫자를 한국어로 읽을 때 받침이 있는지(영·일·삼·육·칠·팔·십)
+  const B = (n) => [0, 1, 3, 6, 7, 8].includes(n % 10);
+  const ga = (n) => n + (B(n) ? '이' : '가');
+  const eul = (n) => n + (B(n) ? '을' : '를');
+  const wa = (n) => n + (B(n) ? '과' : '와');
+  const eun = (n) => n + (B(n) ? '은' : '는');
+  const NAME = { sel: '선택 정렬', bub: '버블 정렬', ins: '삽입 정렬' };
+  const COLOR = { sel: '#2F6FDE', bub: '#0B7285', ins: '#7C3AED' };
+
+  /* ── 정렬 기록: 단계마다 배열, 견준 두 값, 바꿨는지, 자리 잡은 값, 누적 비교·교환, 설명 ── */
+  function selection(a0) {
+    const a = a0.slice(), n = a.length, out = [], fixed = []; let c = 0, w = 0;
+    for (let i = 0; i < n - 1; i++) {
+      let m = i;
+      for (let j = i + 1; j < n; j++) {
+        c++;
+        const old = a[m], less = a[j] < old;
+        if (less) m = j;
+        out.push({ a: a.slice(), pair: [old, a[j]], swap: false, min: a[m], fixed: fixed.slice(), c, w,
+          msg: less ? `${ga(a[j])} 지금까지 가장 작은 ${old}보다 작다. ${eul(a[j])} 가장 작은 값으로 기억한다.`
+                    : `${eun(a[j])} 지금까지 가장 작은 ${old}보다 크다. 그대로 둔다.` });
+      }
+      const head = a[i], mv = a[m], sw = m !== i;
+      if (sw) { a[m] = head; a[i] = mv; w++; }
+      fixed.push(mv);
+      out.push({ a: a.slice(), pair: sw ? [head, mv] : [], swap: sw, min: null, fixed: fixed.slice(), c, w,
+        msg: sw ? `가장 작은 ${eul(mv)} 남은 부분 맨 앞의 ${wa(head)} 바꾼다. ${mv}의 자리가 정해졌다.`
+                : `가장 작은 ${ga(mv)} 이미 남은 부분 맨 앞에 있다. 바꾸지 않고 자리를 정한다.` });
+    }
+    return { steps: out, c, w, final: a };
+  }
+  function bubble(a0) {
+    const a = a0.slice(), n = a.length, out = [], fixed = []; let c = 0, w = 0;
+    for (let p = 0; p < n - 1; p++) {
+      for (let j = 0; j < n - 1 - p; j++) {
+        c++;
+        const x = a[j], y = a[j + 1], sw = x > y;
+        if (sw) { a[j] = y; a[j + 1] = x; w++; }
+        const last = j === n - 2 - p;
+        if (last) fixed.push(a[n - 1 - p]);
+        out.push({ a: a.slice(), pair: [x, y], swap: sw, min: null, fixed: fixed.slice(), c, w,
+          msg: (sw ? `${wa(x)} ${eul(y)} 견준다. 앞의 ${ga(x)} 더 크니 자리를 바꾼다.` : `${wa(x)} ${eul(y)} 견준다. 앞이 더 작으니 그대로 둔다.`)
+            + (last ? ` 한 바퀴가 끝나 ${a[n - 1 - p]}의 자리가 정해졌다.` : '') });
+      }
+    }
+    return { steps: out, c, w, final: a };
+  }
+  function insertion(a0) {
+    const a = a0.slice(), n = a.length, out = []; let c = 0, w = 0;
+    for (let i = 1; i < n; i++) {
+      const key = a[i]; let j = i;
+      while (j > 0) {
+        c++;
+        const prev = a[j - 1], sw = prev > key;
+        if (sw) { a[j - 1] = key; a[j] = prev; w++; j--; }
+        out.push({ a: a.slice(), pair: [prev, key], swap: sw, key, part: i, fixed: [], c, w,
+          msg: `${eul(key)} 앞의 ${wa(prev)} 견준다. ` + (sw ? `${ga(prev)} 더 크니 자리를 바꾼다.` + (j === 0 ? ` ${ga(key)} 맨 앞까지 왔다.` : '')
+                                                         : `${ga(prev)} 더 작으니 ${ga(key)} 제자리를 찾았다.`) });
+        if (!sw) break;
+      }
+    }
+    return { steps: out, c, w, final: a };
+  }
+  const RUN = { sel: selection, bub: bubble, ins: insertion };
+
+  /* ── 장면 1: 한 단계씩 따라가기 ── */
+  {
+    const DATA = [5, 2, 8, 1, 9, 3, 7, 4];
+    const T = { sel: selection(DATA), bub: bubble(DATA), ins: insertion(DATA) };
+    let alg = 'sel';
+    const r = $('#se-k'), X = (i) => 24 + i * 76;
+    const bars = {};
+    DATA.forEach((v) => {
+      const g = mk('g', { class: 'bar-g' }, $('#se-bars'));
+      mk('rect', { x: 0, y: 290 - v * 30, width: 60, height: v * 30, rx: 6 }, g);
+      mk('text', { x: 30, y: 324, 'text-anchor': 'middle', 'font-size': 28, 'font-weight': 800, fill: '#1E2430' }, g).textContent = v;
+      bars[v] = g;
+    });
+    const place = (a) => a.forEach((v, i) => { bars[v].style.transform = `translateX(${X(i)}px)`; });
+    const paint = (fn) => DATA.forEach((v) => { const g = bars[v]; for (const c of ['is-cmp', 'is-swap', 'is-done', 'is-key', 'is-min']) g.classList.toggle(c, fn(v, c)); });
+    place(DATA);
+
+    function draw() {
+      const S = T[alg].steps, n = S.length, k = +r.value;
+      fill(r);
+      $('#se-veil').hidden = k > 0;
+      $('#se-alg').querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v === alg)));
+      $('#se-sum').textContent = `${NAME[alg]}: 모두 ${n + 2}단계`;
+      let st = null, msg = '', c = 0, w = 0;
+      if (k === 0) { place(DATA); paint(() => false); }
+      else if (k === 1) { place(DATA); paint(() => false); msg = '처음 자료다. 「한 칸」을 누르면 한 단계씩 나아간다.'; }
+      else if (k <= n + 1) {
+        st = S[k - 2]; c = st.c; w = st.w; msg = st.msg;
+        place(st.a);
+        paint((v, cl) => cl === 'is-done' ? st.fixed.includes(v) && !(st.pair.includes(v) && st.swap)
+          : cl === 'is-cmp' ? st.pair.includes(v) && !st.swap && !(alg === 'sel' && st.min === null)
+          : cl === 'is-swap' ? st.pair.includes(v) && st.swap
+          : cl === 'is-key' ? alg === 'ins' && v === st.key
+          : cl === 'is-min' ? alg === 'sel' && st.min === v : false);
+      } else {
+        const A = T[alg]; c = A.c; w = A.w;
+        place(A.final); paint((v, cl) => cl === 'is-done');
+        msg = `정렬이 끝났다. 비교 ${c}번, 교환 ${w}번이다.`;
+      }
+      // 삽입 정렬: 앞쪽 정렬된 부분을 옅은 보라 띠로
+      $('#se-band').setAttribute('width', alg === 'ins' && st ? 76 * (st.part + 1) - 4 : alg === 'ins' && k > n + 1 ? 612 : 0);
+      // 선택 정렬: 가장 작은 값 표시
+      const mm = alg === 'sel' && st && st.min !== null ? st.min : null;
+      $('#se-minmk').style.opacity = mm === null ? 0 : 1;
+      if (mm !== null) $('#se-minmk').style.transform = `translate(${X(st.a.indexOf(mm))}px, ${290 - mm * 30 - 8}px)`;
+      $('#se-c').textContent = c + '번'; $('#se-w').textContent = w + '번';
+      $('#se-cbar').style.width = (c / 30) * 100 + '%'; $('#se-wbar').style.width = (w / 30) * 100 + '%';
+      $('#se-msg').textContent = msg;
+      $('#se-pos').textContent = k === 0 ? '시작' : `${k}단계 / ${n + 2}단계`;
+    }
+    $('#se-alg').querySelectorAll('button').forEach((b) => b.addEventListener('click', () => {
+      stopPlay(r);
+      alg = b.dataset.v;
+      r.max = T[alg].steps.length + 2;
+      r.value = 1;
+      draw();
+      b.blur();
+    }));
+    r.max = T[alg].steps.length + 2;
+    r.addEventListener('input', draw);
+    draw();
+  }
+
+  /* ── 장면 2: 같은 자료로 동시에 출발 (비교 한 번 = 시간 한 칸) ── */
+  {
+    const SHAPES = { rand: [6, 3, 8, 1, 7, 2, 5, 4], near: [1, 2, 4, 3, 5, 6, 8, 7], rev: [8, 7, 6, 5, 4, 3, 2, 1] };
+    const ALGS = ['sel', 'bub', 'ins'];
+    let shape = 'rand';
+    const r = $('#rc-k'), S = $('#rc-svg');
+    const LY = { sel: 0, bub: 148, ins: 296 }, BX = (i) => 140 + i * 44;
+    const lanes = {};
+    for (const a of ALGS) {
+      const y0 = LY[a], L = { bars: {} };
+      mk('rect', { x: 0, y: y0, width: 680, height: 140, rx: 12, fill: '#F6F8FA' }, S);
+      mk('text', { x: 14, y: y0 + 60, 'font-size': 26, 'font-weight': 800, fill: COLOR[a] }, S).textContent = NAME[a].replace(' 정렬', '');
+      mk('text', { x: 14, y: y0 + 92, 'font-size': 24, 'font-weight': 700, fill: COLOR[a] }, S).textContent = '정렬';
+      mk('path', { d: `M136 ${y0 + 106} H498`, stroke: '#1E2430', 'stroke-width': 2 }, S);
+      for (let v = 1; v <= 8; v++) {
+        const g = mk('g', { class: 'bar-g' }, S);
+        mk('rect', { x: 0, y: y0 + 106 - v * 11.5, width: 36, height: v * 11.5, rx: 4 }, g);
+        mk('text', { x: 18, y: y0 + 130, 'text-anchor': 'middle', 'font-size': 21, 'font-weight': 700, fill: '#1E2430' }, g).textContent = v;
+        L.bars[v] = g;
+      }
+      L.c = mk('text', { x: 512, y: y0 + 46, 'font-size': 23, 'font-weight': 800, fill: '#1E2430' }, S);
+      L.w = mk('text', { x: 512, y: y0 + 80, 'font-size': 23, 'font-weight': 700, fill: '#5B6472' }, S);
+      L.flag = mk('g', { class: 'flag', style: 'opacity:0' }, S);
+      mk('rect', { x: 512, y: y0 + 98, width: 84, height: 30, rx: 6, fill: '#2F9E44' }, L.flag);
+      mk('text', { x: 554, y: y0 + 121, 'text-anchor': 'middle', 'font-size': 21, 'font-weight': 800, fill: '#FFFFFF' }, L.flag).textContent = '끝';
+      lanes[a] = L;
+    }
+    // 비교를 cc번 마친 뒤의 모습(선택 정렬의 바퀴 끝 교환은 그 바퀴 마지막 비교에 붙인다)
+    const snaps = (t, a0) => { const s = [{ a: a0.slice(), w: 0, pair: [], swap: false }]; for (const st of t.steps) s[st.c] = st; return s; };
+    let T = {}, SN = {}, MAX = 0;
+    function build() {
+      const d = SHAPES[shape];
+      T = {}; SN = {};
+      for (const a of ALGS) { T[a] = RUN[a](d); SN[a] = snaps(T[a], d); }
+      MAX = Math.max(...ALGS.map((a) => T[a].c));
+      r.max = MAX + 1;
+    }
+    function draw() {
+      const k = +r.value, cc = Math.max(0, k - 1);
+      fill(r);
+      $('#rc-veil').hidden = k > 0;
+      $('#rc-shape').querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v === shape)));
+      const finished = [];
+      for (const a of ALGS) {
+        const L = lanes[a], tot = T[a].c, done = k > 0 && cc >= tot, st = SN[a][Math.min(cc, tot)];
+        st.a.forEach((v, i) => { L.bars[v].style.transform = `translateX(${BX(i)}px)`; });
+        for (let v = 1; v <= 8; v++) {
+          const g = L.bars[v], on = k > 1 && !done && st.pair.includes(v);
+          g.classList.toggle('is-done', done);
+          g.classList.toggle('is-cmp', on && !st.swap);
+          g.classList.toggle('is-swap', on && st.swap);
+        }
+        L.c.textContent = `비교 ${Math.min(cc, tot)}번`;
+        L.w.textContent = `교환 ${st.w}번`;
+        L.flag.style.opacity = done ? 1 : 0;
+        if (done) finished.push(a);
+      }
+      $('#rc-pos').textContent = k === 0 ? '시작' : `비교 ${cc}번째`;
+      let msg = '';
+      if (k === 1) msg = '세 정렬이 같은 자료로 함께 출발한다. 비교 한 번이 시간 한 칸이다.';
+      else if (k > 1 && !finished.length) msg = '세 정렬 모두 아직 견주는 중이다.';
+      else if (finished.length && finished.length < 3) {
+        const f = finished.sort((x, y) => T[x].c - T[y].c)[0];
+        msg = `${NAME[f]}이 비교 ${T[f].c}번 만에 먼저 끝났다.`;
+      } else if (finished.length === 3) {
+        const cs = ALGS.map((a) => T[a].c), same = cs.every((x) => x === cs[0]);
+        msg = (same ? `세 정렬 모두 비교 ${cs[0]}번으로 같다.` : `비교: 선택 ${T.sel.c}번, 버블 ${T.bub.c}번, 삽입 ${T.ins.c}번.`)
+          + ` 교환: 선택 ${T.sel.w}번, 버블 ${T.bub.w}번, 삽입 ${T.ins.w}번.`;
+      }
+      $('#rc-msg').textContent = msg;
+    }
+    $('#rc-shape').querySelectorAll('button').forEach((b) => b.addEventListener('click', () => {
+      stopPlay(r);
+      shape = b.dataset.v;
+      build();
+      r.value = 1;
+      draw();
+      b.blur();
+    }));
+    r.addEventListener('input', draw);
+    build();
+    draw();
+  }
+
+  /* ── 장면 3: 자료 수와 비교 횟수 그래프 (정렬 코드를 실제로 돌려 센다) ── */
+  {
+    const ALGS = ['sel', 'bub', 'ins'];
+    const rng = (a) => () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+    // 세기만 하는 정렬(그래프용). 위 기록 함수와 같은 규칙으로 센다.
+    const cSel = (a0) => { const a = a0.slice(), n = a.length; let c = 0, w = 0; for (let i = 0; i < n - 1; i++) { let m = i; for (let j = i + 1; j < n; j++) { c++; if (a[j] < a[m]) m = j; } if (m !== i) { [a[i], a[m]] = [a[m], a[i]]; w++; } } return [c, w]; };
+    const cBub = (a0) => { const a = a0.slice(), n = a.length; let c = 0, w = 0; for (let p = 0; p < n - 1; p++) for (let j = 0; j < n - 1 - p; j++) { c++; if (a[j] > a[j + 1]) { [a[j], a[j + 1]] = [a[j + 1], a[j]]; w++; } } return [c, w]; };
+    const cIns = (a0) => { const a = a0.slice(), n = a.length; let c = 0, w = 0; for (let i = 1; i < n; i++) { let j = i; while (j > 0) { c++; if (a[j - 1] > a[j]) { [a[j - 1], a[j]] = [a[j], a[j - 1]]; w++; j--; } else break; } } return [c, w]; };
+    const CNT = { sel: cSel, bub: cBub, ins: cIns };
+    const NMAX = 40, TRIES = 30;
+    const C = { rand: [], near: [], rev: [] };   // C[모양][n][정렬] = [비교, 교환] (무작위·거의 정렬됨은 30벌 평균)
+    for (const sh of ['rand', 'near', 'rev']) {
+      for (let n = 2; n <= NMAX; n++) {
+        const R = rng(1000 * n + (sh === 'rand' ? 7 : 13)), T = sh === 'rev' ? 1 : TRIES, acc = { sel: [0, 0], bub: [0, 0], ins: [0, 0] };
+        for (let t = 0; t < T; t++) {
+          const a = [...Array(n)].map((_, i) => i + 1);
+          if (sh === 'rev') a.reverse();
+          else if (sh === 'rand') { for (let i = n - 1; i > 0; i--) { const j = Math.floor(R() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } }
+          else { const m = Math.max(1, Math.round(n / 8)); for (let q = 0; q < m; q++) { const i = Math.floor(R() * (n - 1)); [a[i], a[i + 1]] = [a[i + 1], a[i]]; } }
+          for (const g of ALGS) { const [c, w] = CNT[g](a); acc[g][0] += c; acc[g][1] += w; }
+        }
+        C[sh][n] = {}; for (const g of ALGS) C[sh][n][g] = [acc[g][0] / T, acc[g][1] / T];
+      }
+    }
+    let shape = 'rand';
+    const r = $('#gr-k'), S = $('#gr-svg');
+    const X = (n) => 90 + (n / NMAX) * 540, Y = (v) => 386 - (v / 800) * 330;
+    // 틀
+    for (const v of [0, 200, 400, 600, 800]) {
+      mk('path', { d: `M90 ${Y(v)} H630`, stroke: v ? '#E6EAF0' : '#1E2430', 'stroke-width': v ? 1.5 : 3 }, S);
+      mk('text', { x: 80, y: Y(v) + 7, 'text-anchor': 'end', 'font-size': 20, fill: '#5B6472' }, S).textContent = v;
+    }
+    for (const n of [0, 10, 20, 30, 40]) mk('text', { x: X(n), y: 412, 'text-anchor': 'middle', 'font-size': 20, fill: '#5B6472' }, S).textContent = n;
+    mk('path', { d: 'M90 46 V386', stroke: '#1E2430', 'stroke-width': 3 }, S);
+    mk('text', { x: 630, y: 440, 'text-anchor': 'end', 'font-size': 20, fill: '#5B6472' }, S).textContent = '자료 수(개)';
+    mk('text', { x: 6, y: 22, 'font-size': 20, fill: '#5B6472' }, S).textContent = '비교 횟수(번)';
+    const probe = mk('path', { d: 'M90 46 V386', stroke: '#1E2430', 'stroke-width': 2, 'stroke-dasharray': '5 6', opacity: 0 }, S);
+    const half = mk('circle', { r: 8, fill: '#FFFFFF', stroke: COLOR.sel, 'stroke-width': 4, cx: -50, cy: -50 }, S);
+    const hl = mk('text', { 'font-size': 20, 'font-weight': 800, fill: COLOR.sel, 'text-anchor': 'middle', stroke: '#FFFFFF', 'stroke-width': 6, 'paint-order': 'stroke' }, S);
+    const xl = mk('text', { 'font-size': 24, 'font-weight': 800, fill: '#1E2430', 'text-anchor': 'end', stroke: '#FFFFFF', 'stroke-width': 6, 'paint-order': 'stroke' }, S);
+    const line = {}, dot = {};
+    line.sel = mk('polyline', { fill: 'none', stroke: COLOR.sel, 'stroke-width': 8, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }, S);
+    line.bub = mk('polyline', { fill: 'none', stroke: COLOR.bub, 'stroke-width': 4, 'stroke-dasharray': '10 8', 'stroke-linejoin': 'round' }, S);
+    line.ins = mk('polyline', { fill: 'none', stroke: COLOR.ins, 'stroke-width': 5, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }, S);
+    for (const g of ALGS) dot[g] = mk('circle', { r: g === 'bub' ? 7 : 10, fill: COLOR[g], stroke: '#FFFFFF', 'stroke-width': 3, cx: -50, cy: -50 }, S);
+    // 범례
+    const lg = [['sel', '선택'], ['bub', '버블 (선택과 겹친다)'], ['ins', '삽입']];
+    lg.forEach(([g, t], i) => {
+      mk('path', { d: `M110 ${62 + i * 30} H140`, stroke: COLOR[g], 'stroke-width': 6, 'stroke-dasharray': g === 'bub' ? '8 6' : '' }, S);
+      mk('text', { x: 148, y: 69 + i * 30, 'font-size': 21, 'font-weight': 700, fill: COLOR[g] }, S).textContent = t;
+    });
+
+    const vals = (sh) => { const o = {}; for (const g of ALGS) o[g] = Array.from({ length: NMAX + 1 }, (_, n) => (n >= 2 ? C[sh][n][g][0] : 0)); return o; };
+    const shown = { nf: 2, v: vals('rand') };
+    let raf = 0;
+    function render() {
+      const nf = shown.nf, n0 = Math.floor(nf), f = nf - n0;
+      const at = (g) => (n0 >= NMAX ? shown.v[g][NMAX] : shown.v[g][n0] + (shown.v[g][n0 + 1] - shown.v[g][n0]) * f);
+      for (const g of ALGS) {
+        const pts = [];
+        for (let n = 2; n <= n0; n++) pts.push(X(n).toFixed(1) + ',' + Y(shown.v[g][n]).toFixed(1));
+        if (f > 0.001) pts.push(X(nf).toFixed(1) + ',' + Y(at(g)).toFixed(1));
+        line[g].setAttribute('points', pts.join(' '));
+        dot[g].setAttribute('cx', X(nf).toFixed(1)); dot[g].setAttribute('cy', Y(at(g)).toFixed(1));
+      }
+      probe.setAttribute('d', `M${X(nf).toFixed(1)} 46 V386`);
+      // 반으로 줄인 자료 수의 자리와 '몇 배'를 그래프 위에 적는다
+      const h = nf / 2, h0 = Math.floor(h), hf = h - h0;
+      const atH = h0 >= 2 ? shown.v.sel[h0] + (shown.v.sel[Math.min(h0 + 1, NMAX)] - shown.v.sel[h0]) * hf : 0;
+      const ok = nf >= 9.5 && atH > 0;
+      half.setAttribute('cx', ok ? X(h).toFixed(1) : -50); half.setAttribute('cy', ok ? Y(atH).toFixed(1) : -50);
+      hl.setAttribute('x', X(h).toFixed(1)); hl.setAttribute('y', (Y(atH) - 16).toFixed(1));
+      hl.textContent = ok ? `${Math.round(h)}개` : '';
+      xl.setAttribute('x', (X(nf) - 16).toFixed(1)); xl.setAttribute('y', (Y(at('sel')) - 10).toFixed(1));
+      xl.textContent = ok ? `약 ${(at('sel') / atH).toFixed(1)}배` : '';
+    }
+    function go(nT, ms = 700) {
+      cancelAnimationFrame(raf);
+      const a = { nf: shown.nf, v: {} }, b = vals(shape), t0 = performance.now();
+      for (const g of ALGS) a.v[g] = shown.v[g].slice();
+      const step = (now) => {
+        const p = still() || ms <= 0 ? 1 : Math.min(1, (now - t0) / ms), e = 1 - (1 - p) ** 3;
+        shown.nf = a.nf + (nT - a.nf) * e;
+        for (const g of ALGS) shown.v[g] = a.v[g].map((x, i) => x + (b[g][i] - x) * e);
+        render();
+        if (p < 1) raf = requestAnimationFrame(step);
+      };
+      raf = requestAnimationFrame(step);
+    }
+    const R0 = (x) => Math.round(x);
+    function draw(e) {
+      const k = +r.value, n = 2 * k + 4;
+      fill(r);
+      $('#gr-veil').hidden = k > 0;
+      $('#gr-shape').querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v === shape)));
+      probe.setAttribute('opacity', k > 0 ? 1 : 0);
+      if (!k) {
+        $('#gr-n').textContent = '시작';
+        for (const id of ['sc', 'sw', 'bc', 'bw', 'ic', 'iw']) $('#gr-' + id).textContent = '?';
+        $('#gr-msg').textContent = ''; $('#gr-note').textContent = '';
+        go(2, 0);
+        return;
+      }
+      go(n, e && e.instant ? 0 : 700);
+      const q = C[shape][n];
+      $('#gr-n').textContent = n + '개';
+      $('#gr-sc').textContent = R0(q.sel[0]) + '번'; $('#gr-sw').textContent = R0(q.sel[1]) + '번';
+      $('#gr-bc').textContent = R0(q.bub[0]) + '번'; $('#gr-bw').textContent = R0(q.bub[1]) + '번';
+      $('#gr-ic').textContent = R0(q.ins[0]) + '번'; $('#gr-iw').textContent = R0(q.ins[1]) + '번';
+      const h = n / 2, s1 = C[shape][h].sel[0], s2 = q.sel[0];
+      const pct = Math.round((q.ins[0] / q.sel[0]) * 100);
+      $('#gr-msg').textContent = (n >= 10 ? `${h}개 → ${n}개면 비교가 약 ${(s2 / s1).toFixed(1)}배다.` : '자료를 10개 넘게 늘려 보자.')
+        + (shape === 'rev' ? ' 삽입 정렬도 똑같이 견준다.' : ` 삽입 정렬은 선택의 약 ${pct}%만 견준다.`);
+      $('#gr-note').textContent = shape === 'rev' ? '' : '자료 30벌의 평균';
+    }
+    $('#gr-shape').querySelectorAll('button').forEach((b) => b.addEventListener('click', () => { shape = b.dataset.v; draw(); b.blur(); }));
+    r.addEventListener('input', draw);
+    render();
+    draw({ instant: true });
+  }
+});
+</script>
+</body>
+</html>

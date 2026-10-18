@@ -1,0 +1,83 @@
+[
+ {
+  "slide": 5,
+  "name": "D20S20",
+  "js": "{ const r = document.querySelector('#shift input[name=D]'); r.value = 20; r.dispatchEvent(new Event('input', { bubbles: true })) } { const r = document.querySelector('#shift input[name=S]'); r.value = 20; r.dispatchEvent(new Event('input', { bubbles: true })) }"
+ },
+ {
+  "slide": 5,
+  "name": "D20Sm20",
+  "js": "{ const r = document.querySelector('#shift input[name=D]'); r.value = 20; r.dispatchEvent(new Event('input', { bubbles: true })) } { const r = document.querySelector('#shift input[name=S]'); r.value = -20; r.dispatchEvent(new Event('input', { bubbles: true })) }"
+ },
+ {
+  "slide": 5,
+  "name": "Dm20S10",
+  "js": "{ const r = document.querySelector('#shift input[name=D]'); r.value = -20; r.dispatchEvent(new Event('input', { bubbles: true })) } { const r = document.querySelector('#shift input[name=S]'); r.value = 10; r.dispatchEvent(new Event('input', { bubbles: true })) }"
+ },
+ {
+  "slide": 5,
+  "name": "D10S0",
+  "js": "{ const r = document.querySelector('#shift input[name=D]'); r.value = 10; r.dispatchEvent(new Event('input', { bubbles: true })) } { const r = document.querySelector('#shift input[name=S]'); r.value = 0; r.dispatchEvent(new Event('input', { bubbles: true })) }"
+ },
+ {
+  "slide": 5,
+  "name": "D0S0",
+  "js": "{ const r = document.querySelector('#shift input[name=D]'); r.value = 0; r.dispatchEvent(new Event('input', { bubbles: true })) } { const r = document.querySelector('#shift input[name=S]'); r.value = 0; r.dispatchEvent(new Event('input', { bubbles: true })) }"
+ },
+ {
+  "slide": 8,
+  "name": "c60",
+  "js": "{ const r = document.querySelector('#ceiling input[name=c]'); r.value = 60; r.dispatchEvent(new Event('input', { bubbles: true })) }"
+ },
+ {
+  "slide": 8,
+  "name": "c35",
+  "js": "{ const r = document.querySelector('#ceiling input[name=c]'); r.value = 35; r.dispatchEvent(new Event('input', { bubbles: true })) }"
+ },
+ {
+  "slide": 8,
+  "name": "c25",
+  "js": "{ const r = document.querySelector('#ceiling input[name=c]'); r.value = 25; r.dispatchEvent(new Event('input', { bubbles: true })) }"
+ },
+ {
+  "slide": 9,
+  "name": "f28-t10",
+  "js": "{ const r = document.querySelector('#floor input[name=t]'); r.value = 10; r.dispatchEvent(new Event('input', { bubbles: true })) }"
+ },
+ {
+  "slide": 9,
+  "name": "f30-t10",
+  "js": "{ const r = document.querySelector('#floor input[name=f]'); r.value = 3; r.dispatchEvent(new Event('input', { bubbles: true })) }"
+ },
+ {
+  "slide": 9,
+  "name": "f24",
+  "js": "{ const r = document.querySelector('#floor input[name=f]'); r.value = 2.4; r.dispatchEvent(new Event('input', { bubbles: true })) }"
+ },
+ {
+  "slide": 9,
+  "name": "f28-t0",
+  "js": "{ const r = document.querySelector('#floor input[name=f]'); r.value = 2.8; r.dispatchEvent(new Event('input', { bubbles: true })) } { const r = document.querySelector('#floor input[name=t]'); r.value = 0; r.dispatchEvent(new Event('input', { bubbles: true })) }"
+ },
+ {
+  "slide": 1,
+  "name": "v"
+ },
+ {
+  "slide": 3,
+  "name": "v"
+ },
+ {
+  "slide": 4,
+  "name": "v"
+ },
+ {
+  "slide": 7,
+  "name": "v"
+ },
+ {
+  "slide": 11,
+  "name": "v",
+  "js": "Exploragram.next()"
+ }
+]

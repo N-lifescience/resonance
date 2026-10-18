@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="ko" data-deck="v3-high-econ">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>가격을 법으로 묶으면? · 시장 균형과 가격 규제</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/engine/exploragram.css">
+<script defer src="https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/engine/exploragram.js"></script>
+<style>
+/* 시세판: 짙은 초록 머리 띠, 아래 오르내림 색 줄, 오른쪽 위 가격표 꼬리표 */
+body[data-theme="ppt"] {
+  --accent: #0F6B4F; --tab: #0F3D2E; --tab-ink: #FFFFFF;
+  --board: #0F3D2E; --tag: #F2C14E; --dem: #2558A8; --sup: #C43D2B; --cap: #7B3FB8; --flr: #C77700;
+  --ink: #1D2421; --mute: #5B6560; --line: #D5DDD8; --soft: #F1F5F3;
+}
+body[data-theme="ppt"] section.slide {
+  color: var(--ink);
+  background:
+    repeating-linear-gradient(90deg, #C43D2B 0 40px, #2558A8 40px 80px) 0 80px / 100% 6px no-repeat,
+    linear-gradient(var(--board), var(--board)) 0 0 / 100% 80px no-repeat,
+    #FBFBF8;
+}
+body[data-theme="ppt"] section.slide[data-sec]::before {
+  left: auto; right: 40px; top: 14px; height: 52px; padding: 0 22px 0 40px; border-radius: 0 8px 8px 0;
+  clip-path: polygon(20px 0, 100% 0, 100% 100%, 20px 100%, 0 50%);
+  background: radial-gradient(circle at 22px 50%, var(--board) 6px, transparent 6.5px), var(--tag);
+  color: #1D2421; font-size: 23px;
+}
+body[data-theme="ppt"] section.slide > h2:first-of-type {
+  position: absolute; top: 0; left: 56px; right: 300px; height: 80px; margin: 0; padding: 0; width: auto;
+  display: flex; align-items: center; border: 0; color: #FFFFFF; font-size: 38px; line-height: 1.15; text-wrap: balance;
+}
+.key { color: var(--accent); font-weight: 800; }
+.c-d { color: var(--dem); font-weight: 800; } .c-s { color: var(--sup); font-weight: 800; }
+.c-cap { color: var(--cap); font-weight: 800; } .c-flr { color: var(--flr); font-weight: 800; }
+
+/* 표지 */
+body[data-theme="ppt"] section.slide.cover { background: repeating-linear-gradient(90deg, #C43D2B 0 40px, #2558A8 40px 80px) 0 100% / 100% 10px no-repeat, var(--board); color: #fff; }
+body[data-theme="ppt"] section.slide.cover::after { color: #CFE0D8; }
+.cv { display: grid; grid-template-columns: 1fr 440px; gap: 30px; align-items: center; margin-top: 16px; }
+.cv-k { margin: 0 0 22px; font-size: 28px; font-weight: 700; color: var(--tag); }
+section.slide.cover h1 { margin: 0; font-size: 76px; line-height: 1.18; color: #fff; }
+.cv-s { margin: 28px 0 0; padding-top: 22px; border-top: 4px solid var(--tag); font-size: 34px; font-weight: 600; color: #fff; width: fit-content; }
+
+/* 학습 목표 */
+.goals { list-style: none; margin: 40px 0 0; padding: 0; counter-reset: g; }
+.goals li { counter-increment: g; display: grid; grid-template-columns: 58px 1fr; gap: 22px; align-items: start; margin: 0 0 34px; font-size: 32px; line-height: 1.45; }
+.goals li::before { content: counter(g); width: 52px; height: 52px; border-radius: 8px; background: var(--tag); color: var(--ink); font-weight: 800; font-size: 28px; display: grid; place-items: center; margin-top: 2px; }
+
+/* 생각 열기 */
+.open { display: grid; grid-template-columns: 1fr 420px; gap: 40px; align-items: start; margin-top: 18px; }
+.open .lead { margin: 0 0 20px; font-size: 31px; line-height: 1.55; }
+.open .poll p { font-size: 28px; }
+
+/* 개념 */
+#shifts table.compare { width: 100%; margin-top: 8px; font-size: 28px; --table-head: #DCE8E2; --table-side: #EEF4F1; }
+#shifts table.compare th { color: var(--ink); }
+#shifts table.compare td { text-align: center; }
+.ask { margin: 22px 0 0; padding: 16px 24px; border-left: 10px solid var(--tag); background: #FFF7DF; border-radius: 0 14px 14px 0; font-size: 29px; font-weight: 800; line-height: 1.45; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; margin-top: 6px; }
+.two > div { border: 3px solid var(--line); border-radius: 18px; padding: 16px 22px 18px; background: #FFFFFF; }
+.two h3 { margin: 0 0 10px; font-size: 32px; }
+.two p { margin: 0 0 10px; font-size: 25px; line-height: 1.45; }
+.two .eg { color: var(--mute); font-size: 23px; }
+.two svg { display: block; margin: 4px auto 8px; }
+
+/* 익스플로라그램 공통 */
+.ex { display: grid; gap: 24px; align-items: start; }
+.ex p { margin: 0; }
+.ex-ctrl { display: flex; flex-direction: column; gap: 8px; }
+.ex-lab { font-size: 24px; font-weight: 700; line-height: 1.35; }
+.ex-say { font-size: 24px; line-height: 1.4; font-weight: 700; color: var(--accent); }
+.ex-note { font-size: 21px; line-height: 1.4; color: var(--mute); }
+.ex-box { font-size: 23px; line-height: 1.5; padding: 8px 14px; border-radius: 12px; background: var(--soft); }
+.ex-box b { font-size: 25px; }
+.ex .bar { height: 22px; }
+.ex-bars { display: grid; grid-template-columns: 96px 1fr 84px; gap: 6px 10px; align-items: center; font-size: 22px; font-weight: 700; }
+.ex-bars output { text-align: right; }
+.ex .ch-play { flex-wrap: wrap; }
+.ex svg text { font-family: inherit; }
+#shift .ex { grid-template-columns: 1fr 420px; }
+#ceiling .ex { grid-template-columns: 1fr 400px; }
+#floor .ex { grid-template-columns: 330px 1fr 360px; gap: 20px; }
+.verdict { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.verdict > div { padding: 8px 12px; border-radius: 12px; background: #FFFFFF; border: 3px solid var(--line); font-size: 22px; font-weight: 700; line-height: 1.35; }
+.verdict b { display: block; font-size: 28px; }
+.up { color: var(--sup); } .down { color: var(--dem); } .same { color: var(--mute); } .unk { color: var(--cap); }
+
+/* 확인 문제 */
+.q-wrap .q { font-size: 30px; line-height: 1.45; }
+#kinds .sort .bin { min-height: 100px; }
+#kinds .sort > span { font-size: 23px; }
+
+/* 정리 */
+.sum { list-style: none; margin: 14px 0 0; padding: 0; }
+.sum li { position: relative; padding: 14px 0 14px 40px; font-size: 29px; line-height: 1.45; border-bottom: 2px solid var(--line); }
+.sum li::before { content: ""; position: absolute; left: 6px; top: 24px; width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-bottom: 16px solid var(--accent); }
+.back { margin-top: 20px; padding: 16px 24px; border-left: 10px solid var(--cap); background: #F4EEFA; border-radius: 0 14px 14px 0; font-size: 27px; line-height: 1.5; }
+.back b { color: var(--cap); }
+</style>
+</head>
+<body data-theme="ppt">
+
+<!-- 1 표지 -->
+<section class="slide cover" id="cover" data-title="표지">
+  <div class="cv">
+    <div>
+      <p class="cv-k">고등학교 경제 · 시장과 가격</p>
+      <h1>가격을 법으로<br>묶으면?</h1>
+      <p class="cv-s">시장 균형의 변동과 가격 규제</p>
+    </div>
+    <svg width="440" height="420" viewBox="0 0 440 420" aria-label="수요 곡선과 공급 곡선, 그 아래 그어진 가격 상한선">
+      <path d="M50 30 V370 H420" fill="none" stroke="#CFE0D8" stroke-width="5"/>
+      <path d="M80 60 L400 340" stroke="#7FA6E8" stroke-width="10" stroke-linecap="round"/>
+      <path d="M80 340 L400 60" stroke="#F08A78" stroke-width="10" stroke-linecap="round"/>
+      <path d="M50 270 H420" stroke="#F2C14E" stroke-width="6" stroke-dasharray="16 10"/>
+      <path d="M160 270 H320" stroke="#F2C14E" stroke-width="16" stroke-linecap="round" opacity=".55"/>
+      <circle cx="240" cy="200" r="13" fill="#FFFFFF"/>
+      <g transform="translate(300 300) rotate(-12)"><path d="M0 0 H96 V48 H0 L-22 24 Z" fill="#F2C14E"/><circle cx="-6" cy="24" r="6" fill="#0F3D2E"/><text x="46" y="33" font-size="24" font-weight="800" text-anchor="middle" fill="#1D2421">상한</text></g>
+    </svg>
+  </div>
+</section>
+
+<!-- 2 학습 목표 -->
+<section class="slide" id="goal" data-sec="학습 목표" data-title="학습 목표">
+  <h2>학습 목표</h2>
+  <ol class="goals">
+    <li>수요와 공급이 함께 변할 때 균형 가격과 거래량의 변화를<br>설명할 수 있다.</li>
+    <li>최고 가격제와 최저 가격제가 시장에 미치는 영향을<br>설명할 수 있다.</li>
+  </ol>
+</section>
+
+<!-- 3 생각 열기 -->
+<section class="slide" id="open" data-sec="생각 열기" data-title="월세 상한은 세입자에게 좋기만 할까">
+  <h2>월세 상한은 세입자에게 좋기만 할까?</h2>
+  <div class="open">
+    <div>
+      <p class="lead">대학가 원룸 월세가 크게 올랐다.<br>정부가 "월세는 30만 원을 넘을 수 없다"는<br>규칙을 만들었다고 하자.</p>
+      <div class="poll" data-options="세입자에게 좋기만 하다|좋은 점도 있지만 문제도 생긴다|잘 모르겠다">
+        <p>이 규칙은 세입자에게 좋기만 할까?</p>
+      </div>
+    </div>
+    <svg width="420" height="380" viewBox="0 0 420 380" aria-label="원룸 건물과 월세 상한 안내문">
+      <rect x="60" y="60" width="300" height="300" rx="10" fill="#E8EEEA" stroke="#5B6560" stroke-width="5"/>
+      <g fill="#FFFFFF" stroke="#5B6560" stroke-width="4">
+        <rect x="90" y="90" width="70" height="56"/><rect x="175" y="90" width="70" height="56"/><rect x="260" y="90" width="70" height="56"/>
+        <rect x="90" y="170" width="70" height="56"/><rect x="175" y="170" width="70" height="56"/><rect x="260" y="170" width="70" height="56"/>
+      </g>
+      <rect x="180" y="270" width="60" height="90" fill="#5B6560"/>
+      <g transform="translate(250 250) rotate(-6)"><rect width="150" height="96" rx="8" fill="#FFF7DF" stroke="#C77700" stroke-width="4"/><text x="75" y="40" font-size="24" font-weight="800" text-anchor="middle" fill="#1D2421">월세 상한</text><text x="75" y="76" font-size="26" font-weight="900" text-anchor="middle" fill="#7B3FB8">30만 원</text></g>
+    </svg>
+  </div>
+</section>
+
+<!-- 4 수요·공급의 변동 -->
+<section class="slide" id="shifts" data-sec="1. 균형의 변동" data-title="수요와 공급이 변하면">
+  <h2>수요나 공급 하나만 변하면</h2>
+  <table class="compare">
+    <thead><tr><th>변화</th><th>곡선의 이동</th><th>균형 가격</th><th>균형 거래량</th></tr></thead>
+    <tbody>
+      <tr><th>수요 증가</th><td>수요 곡선 오른쪽으로</td><td class="up">오른다</td><td class="up">늘어난다</td></tr>
+      <tr><th>수요 감소</th><td>수요 곡선 왼쪽으로</td><td class="down">내린다</td><td class="down">줄어든다</td></tr>
+      <tr><th>공급 증가</th><td>공급 곡선 오른쪽으로</td><td class="down">내린다</td><td class="up">늘어난다</td></tr>
+      <tr><th>공급 감소</th><td>공급 곡선 왼쪽으로</td><td class="up">오른다</td><td class="down">줄어든다</td></tr>
+    </tbody>
+  </table>
+  <p class="ask">수요와 공급이 함께 변하면 가격과 거래량은 어떻게 될까?</p>
+</section>
+
+<!-- 5 익스플로라그램 A: 수요와 공급이 함께 변하면 -->
+<section class="slide" id="shift" data-sec="1. 균형의 변동" data-title="수요와 공급이 함께 변할 때">
+  <h2>딸기 시장의 수요와 공급이 함께 변하면?</h2>
+  <div class="calc ex" data-ai="딸기 시장 수요·공급 동시 변동 모형(가상 수치)"
+       data-let="pn = (120 + D - S) / 10; qn = 40 + (D + S) / 2">
+    <figure class="plot" data-x="0, 100" data-y="0, 24" data-xstep="20" data-ystep="4" data-height="440" data-xlabel="거래량(톤)" data-ylabel="가격(천 원/kg)" aria-label="딸기 시장의 처음 곡선과 새 곡선, 두 균형점">
+      <i data-line="(100 - x) / 5" data-dash data-color="#A9B4AE"></i>
+      <i data-line="(x + 20) / 5" data-dash data-color="#A9B4AE"></i>
+      <i data-line="(100 + D - x) / 5" data-x="0, min(100, 100 + D)" data-label="수요" data-color="#2558A8"></i>
+      <i data-line="(x + 20 - S) / 5" data-x="max(0, S - 20), 100" data-label="공급" data-color="#C43D2B"></i>
+      <i data-path="0, pn; qn, pn; qn, 0" data-dash data-color="#5B6560"></i>
+      <i data-point="40, 12" data-label="E" data-color="#A9B4AE"></i>
+      <i data-point="qn, pn" data-label="E′" data-color="#1D2421"></i>
+    </figure>
+    <div class="ex-ctrl">
+      <p class="ex-lab"><span class="c-d">수요</span> <output data-expr="D == 0 ? '그대로' : abs(D) + '톤 ' + (D > 0 ? '증가' : '감소')"></output></p>
+      <input type="range" name="D" min="-20" max="20" step="10" value="0" aria-label="수요의 변화(모든 가격에서 늘거나 준 양)">
+      <p class="ex-lab"><span class="c-s">공급</span> <output data-expr="S == 0 ? '그대로' : abs(S) + '톤 ' + (S > 0 ? '증가' : '감소')"></output></p>
+      <input type="range" name="S" min="-20" max="20" step="10" value="0" aria-label="공급의 변화(모든 가격에서 늘거나 준 양)">
+      <p class="ex-box" data-ai="모형 수치">균형 가격 12,000원 → <b data-expr="pn * 1000" data-comma></b>원<br>균형 거래량 40톤 → <b data-expr="qn"></b>톤 (모형)</p>
+      <div class="verdict">
+        <div>가격<b data-class="up: D > S; down: D < S; same: D == S" data-expr="D > S ? '오른다' : D < S ? '내린다' : '그대로'"></b></div>
+        <div>거래량<b data-class="up: D + S > 0; down: D + S < 0; same: D + S == 0" data-expr="D + S > 0 ? '늘어난다' : D + S < 0 ? '줄어든다' : '그대로'"></b></div>
+      </div>
+      <p class="ex-say" data-show="D == 0 && S == 0">막대를 밀어 수요와 공급을 바꿔 보자.<br>예: 건강 방송(수요)과 풍년(공급)</p>
+      <p class="ex-say" data-show="D != 0 && S != 0 && D * S > 0">둘이 같은 쪽으로 변했다.<br>거래량은 정해지고 가격은 변화 폭에 달렸다.</p>
+      <p class="ex-say" data-show="D != 0 && S != 0 && D * S < 0">둘이 반대쪽으로 변했다.<br>가격은 정해지고 거래량은 변화 폭에 달렸다.</p>
+      <p class="ex-say" data-show="(D == 0) != (S == 0)">하나만 변했다.<br>가격과 거래량이 함께 정해진다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 6 확인 문제 1 -->
+<section class="slide" id="check-1" data-sec="1. 균형의 변동" data-title="확인 문제 1">
+  <h2>확인 문제 1</h2>
+  <div class="q-wrap">
+    <p class="q" data-n="1" data-ai="문항">딸기가 몸에 좋다는 방송이 나가 수요가 늘었다.<br>같은 해 풍년이 들어 공급도 늘었다. 반드시 옳은 것은?</p>
+    <div class="quiz" data-cols="2" data-ai="보기와 풀이">
+      <button class="opt" data-ok data-why="맞다. 수요와 공급이 모두 늘면 균형 거래량은 반드시 늘어난다.">균형 거래량이 늘어난다.</button>
+      <button class="opt" data-why="가격은 수요가 더 많이 늘면 오르고 공급이 더 많이 늘면 내린다. 반드시 오르지는 않는다.">균형 가격이 오른다.</button>
+      <button class="opt" data-why="공급이 더 많이 늘 때만 내린다. 반드시 내리지는 않는다.">균형 가격이 내린다.</button>
+      <button class="opt" data-why="수요와 공급이 모두 늘면 거래량은 줄지 않는다.">균형 거래량이 줄어든다.</button>
+    </div>
+  </div>
+</section>
+
+<!-- 7 가격 규제 -->
+<section class="slide" id="rules" data-sec="2. 가격 규제" data-title="최고 가격제와 최저 가격제">
+  <h2>최고 가격제와 최저 가격제</h2>
+  <div class="two">
+    <div>
+      <svg width="260" height="120" viewBox="0 0 260 120" aria-hidden="true"><path d="M20 10 V110 H250" fill="none" stroke="#5B6560" stroke-width="4"/><path d="M40 20 L230 104" stroke="#2558A8" stroke-width="6"/><path d="M40 104 L230 20" stroke="#C43D2B" stroke-width="6"/><path d="M20 84 H250" stroke="#7B3FB8" stroke-width="5" stroke-dasharray="12 8"/></svg>
+      <h3 class="c-cap">최고 가격제</h3>
+      <p>정부가 정한 가격보다 <b>비싸게</b> 거래하지 못하게 한다.<br>균형 가격보다 낮게 정해야 효과가 있다.</p>
+      <p>소비자를 보호하려고 쓴다.</p>
+      <p class="eg">예: 임대료 상한, 분양가 상한제, 대출 이자율 상한</p>
+    </div>
+    <div>
+      <svg width="260" height="120" viewBox="0 0 260 120" aria-hidden="true"><path d="M20 10 V110 H250" fill="none" stroke="#5B6560" stroke-width="4"/><path d="M40 20 L230 104" stroke="#2558A8" stroke-width="6"/><path d="M40 104 L230 20" stroke="#C43D2B" stroke-width="6"/><path d="M20 38 H250" stroke="#C77700" stroke-width="5" stroke-dasharray="12 8"/></svg>
+      <h3 class="c-flr">최저 가격제</h3>
+      <p>정부가 정한 가격보다 <b>싸게</b> 거래하지 못하게 한다.<br>균형 가격보다 높게 정해야 효과가 있다.</p>
+      <p>생산자와 노동자를 보호하려고 쓴다.</p>
+      <p class="eg">예: 최저 임금제, 농산물 가격 지지</p>
+    </div>
+  </div>
+</section>
+
+<!-- 8 익스플로라그램 B: 최고 가격제 -->
+<section class="slide" id="ceiling" data-sec="2. 가격 규제" data-title="월세 상한을 내리면">
+  <h2>월세 상한을 낮출수록 원룸 시장은 어떻게 될까?</h2>
+  <div class="calc ex" data-ai="원룸 월세 시장 최고 가격제 모형(가상 수치)"
+       data-let="qd = 200 - 2 * c; qs = 4 * c - 40; bind = c < 40; sh = bind ? qd - qs : 0; tr = bind ? qs : 120; pb = bind ? (200 - qs) / 2 : 40">
+    <figure class="plot" data-x="0, 200" data-y="0, 100" data-xstep="40" data-ystep="20" data-height="440" data-xlabel="원룸 수(실)" data-ylabel="월세(만 원)" aria-label="원룸 시장의 수요·공급 곡선과 월세 상한선">
+      <i data-line="(200 - x) / 2" data-label="수요" data-color="#2558A8"></i>
+      <i data-line="(x + 40) / 4" data-label="공급" data-color="#C43D2B"></i>
+      <i data-line="c" data-dash data-label="월세 상한" data-color="#7B3FB8"></i>
+      <i data-path="qs, c; qd, c" data-show="bind" data-label="부족한 방" data-color="#F2A100"></i>
+      <i data-path="qs, c; qs, pb" data-show="bind" data-dash data-color="#5B6560"></i>
+      <i data-point="qs, pb" data-show="bind" data-label="웃돈 월세" data-color="#7B3FB8"></i>
+      <i data-point="120, 40" data-label="E" data-color="#1D2421"></i>
+    </figure>
+    <div class="ex-ctrl">
+      <p class="ex-lab"><span class="c-cap">월세 상한</span> <output data-expr="c" data-unit="만 원"></output></p>
+      <input type="range" name="c" min="25" max="60" step="5" value="60" aria-label="월세 상한">
+      <div class="ex-bars" data-ai="모형 수치">
+        <span class="c-d">빌리려는</span><div class="bar" data-value="qd" data-max="200" style="--bar-c:#2558A8"></div><output data-expr="qd" data-unit="실"></output>
+        <span class="c-s">내놓는</span><div class="bar" data-value="qs" data-max="200" style="--bar-c:#C43D2B"></div><output data-expr="qs" data-unit="실"></output>
+      </div>
+      <p class="ex-box" data-ai="모형 수치">부족한 방 <b data-expr="sh"></b>실<br>실제로 거래되는 방 <b data-expr="tr"></b>실 (모형)</p>
+      <p class="ex-say" data-show="!bind">상한이 균형 월세 40만 원보다 높다.<br>시장 월세 40만 원 그대로다(효과 없음).</p>
+      <p class="ex-say" data-show="bind">상한이 균형보다 낮다.<br>빌리려는 방이 <output data-expr="sh"></output>실 모자란다.</p>
+      <p class="ex-note" data-show="bind">방을 구하는 사람은<br><output data-expr="pb"></output>만 원까지 낼 생각이 있다.<br>몰래 웃돈을 얹는 거래(암시장)가 생길 수 있다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 9 익스플로라그램 C: 쌀 가격 지지 -->
+<section class="slide" id="floor" data-sec="2. 가격 규제" data-title="쌀 가격을 떠받치면 쌓이는 재고">
+  <h2>쌀 가격을 떠받치면 해마다 무엇이 쌓일까?</h2>
+  <div class="calc ex" data-ai="쌀 시장 최저 가격제(정부 수매) 모형(가상 수치)"
+       data-let="qd = 500 - 100 * f; qs = 200 * f - 250; bind = f > 2.5; sur = bind ? qs - qd : 0; st = sur * t; cost = f * sur * 0.01 * t">
+    <div>
+      <figure class="plot" data-x="100, 400" data-y="2, 3.2" data-xstep="100" data-ystep="0.4" data-height="230" data-xlabel="양(만 톤)" data-ylabel="가격(천 원/kg)" aria-label="쌀 시장의 수요·공급과 지지 가격선">
+        <i data-line="(500 - x) / 100" data-x="180, 300" data-color="#2558A8"></i>
+        <i data-line="(x + 250) / 200" data-x="150, 390" data-color="#C43D2B"></i>
+        <i data-line="f" data-dash data-color="#C77700"></i>
+        <i data-path="qd, f; qs, f" data-show="bind" data-color="#F2A100"></i>
+      </figure>
+      <svg width="330" height="190" viewBox="0 0 330 190" aria-label="정부 창고에 쌓인 쌀">
+        <defs><pattern id="fl-sack" width="36" height="24" patternUnits="userSpaceOnUse"><rect x="2" y="2" width="32" height="20" rx="7" fill="#EBD9A6" stroke="#A88A3C" stroke-width="2"/></pattern></defs>
+        <path d="M30 70 L165 16 L300 70 Z" fill="#5B6560"/>
+        <rect x="40" y="70" width="250" height="110" fill="#F3F1EA" stroke="#5B6560" stroke-width="4"/>
+        <rect x="44" width="242" fill="url(#fl-sack)" data-attr="y: 178 - min(1, st / 1500) * 106; height: min(1, st / 1500) * 106"/>
+        <text x="165" y="56" font-size="22" font-weight="800" text-anchor="middle" fill="#FFFFFF">정부 창고</text>
+      </svg>
+    </div>
+    <figure class="plot" data-x="0, 10" data-y="0, 1600" data-xstep="2" data-ystep="400" data-height="440" data-comma data-xlabel="지난 해(년)" data-ylabel="쌓인 재고(만 톤)" aria-label="해마다 쌓이는 쌀 재고 그래프">
+      <i data-line="sur * x" data-x="0, max(t, 0.01)" data-color="#C77700"></i>
+      <i data-point="t, st" data-color="#C77700"></i>
+    </figure>
+    <div class="ex-ctrl">
+      <p class="ex-lab"><span class="c-flr">지지 가격</span> <output data-expr="f * 1000" data-comma></output>원/kg</p>
+      <input type="range" name="f" min="2.3" max="3" step="0.1" value="2.8" aria-label="쌀 지지 가격">
+      <input type="range" name="t" min="0" max="10" step="1" value="0" data-play="8" aria-label="지난 해">
+      <p class="ex-box" data-ai="모형 수치">해마다 남는 쌀 <b data-expr="sur"></b>만 톤<br><b data-expr="t"></b>년 동안 쌓인 재고 <b data-expr="st" data-comma></b>만 톤<br>사들인 돈 약 <b data-expr="cost" data-digits="1"></b>조 원 (모형)</p>
+      <p class="ex-say" data-show="!bind">지지 가격이 균형 가격(2,500원)보다 낮다.<br>남는 쌀이 없다(효과 없음).</p>
+      <p class="ex-say" data-show="bind && t == 0">균형보다 비싸게 묶으면 해마다 남는다.<br>「재생」으로 10년을 흘려 보자.</p>
+      <p class="ex-say" data-show="bind && t > 0">정부가 남는 쌀을 지지 가격에 사들여<br>창고에 재고가 쌓인다.</p>
+      <p class="ex-note">농민 소득은 지켜지지만<br>세금이 들고 재고를 보관할 곳이 필요하다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 10 확인 문제 2 -->
+<section class="slide" id="kinds" data-sec="2. 가격 규제" data-title="확인 문제 2">
+  <h2>확인 문제 2</h2>
+  <p class="q" data-n="2">어느 가격 규제인지 나누어 보자.</p>
+  <div class="sort" data-ai="카드와 이유, 실마리">
+    <div class="bin" data-bin="c"><h3>최고 가격제</h3></div>
+    <div class="bin" data-bin="f"><h3>최저 가격제</h3></div>
+    <span data-bin="c" data-why="맞다. 정한 월세보다 비싸게 받지 못하게 하는 최고 가격제다." data-hint="이 규칙은 가격의 위쪽을 막을까, 아래쪽을 막을까?">원룸 월세를 일정 금액 넘게 받지 못하게 한다.</span>
+    <span data-bin="f" data-why="맞다. 정한 임금보다 적게 주지 못하게 하는 최저 가격제다." data-hint="임금은 노동이라는 상품의 가격이다. 어느 쪽을 막을까?">시간당 임금을 일정 금액보다 적게 주지 못하게 한다.</span>
+    <span data-bin="c" data-why="맞다. 새 아파트를 정한 값보다 비싸게 팔지 못하게 하는 최고 가격제다." data-hint="분양가의 위쪽을 막을까, 아래쪽을 막을까?">새 아파트의 분양 가격에 상한을 둔다.</span>
+    <span data-bin="f" data-why="맞다. 쌀값이 정한 가격 아래로 떨어지지 않게 떠받치는 최저 가격제다." data-hint="농민을 보호하려면 쌀값의 어느 쪽을 막아야 할까?">정부가 정한 가격으로 쌀을 사들여 쌀값을 떠받친다.</span>
+    <span data-bin="c" data-why="맞다. 이자율은 돈을 빌리는 값이다. 그 위쪽을 막는 최고 가격제다." data-hint="이자율은 돈을 빌리는 가격이다. 위쪽을 막을까, 아래쪽을 막을까?">대출 이자율이 법이 정한 수준을 넘지 못하게 한다.</span>
+  </div>
+</section>
+
+<!-- 11 정리 -->
+<section class="slide" id="summary" data-sec="정리" data-title="정리">
+  <h2>정리</h2>
+  <ul class="sum">
+    <li>수요와 공급이 함께 변하면 가격이나 거래량 가운데 하나는 변화 폭에 따라 달라진다.</li>
+    <li><span class="c-cap">최고 가격제</span>를 균형보다 낮게 정하면 <b>부족</b>이 생긴다.</li>
+    <li><span class="c-flr">최저 가격제</span>를 균형보다 높게 정하면 <b>남는 양</b>이 생긴다.</li>
+    <li>최고 가격을 균형보다 높게, 최저 가격을 균형보다 낮게 정하면 시장은 그대로다.</li>
+  </ul>
+  <p class="back step" data-ai="생각 열기 답"><b>다시 월세로</b> 30만 원 상한이 균형 월세보다 낮으면 월세는 내려간다.<br>하지만 내놓는 방이 줄어 방을 못 구하는 사람이 생기고 웃돈 거래가 생길 수 있다.</p>
+</section>
+
+</body>
+</html>

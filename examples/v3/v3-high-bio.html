@@ -1,0 +1,536 @@
+<!doctype html>
+<html lang="ko" data-deck="v3-high-bio">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>배추는 왜 절여질까? · 삼투와 세포의 변화</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/engine/exploragram.css">
+<script defer src="https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/engine/exploragram.js"></script>
+<style>
+/* 관찰 노트: 연두 머리 띠 아래 인지질 이중층 줄, 오른쪽 위 프레파라트 모양 꼬리표 */
+body[data-theme="ppt"] {
+  --accent: #2F7D4A; --tab: #2F7D4A; --tab-ink: #FFFFFF;
+  --leaf: #2F7D4A; --leaf-d: #1D5233; --mint: #E5F1E8; --water: #2B73B0; --sugar: #B9531A;
+  --ink: #1F2A24; --mute: #55635A; --line: #CFE0D5; --cream: #FFF7E2;
+}
+body[data-theme="ppt"] section.slide {
+  color: var(--ink);
+  background:
+    radial-gradient(circle, var(--leaf) 4px, transparent 4.6px) 0 87px / 13px 10px repeat-x,
+    radial-gradient(circle, var(--leaf) 4px, transparent 4.6px) 0 99px / 13px 10px repeat-x,
+    linear-gradient(#EED58C, #EED58C) 0 95px / 100% 6px no-repeat,
+    linear-gradient(var(--mint), var(--mint)) 0 0 / 100% 87px no-repeat,
+    #FFFFFF;
+}
+body[data-theme="ppt"] section.slide[data-sec]::before {
+  left: auto; right: 40px; top: 18px; height: 50px; padding: 0 24px 0 56px; border-radius: 6px;
+  border: 3px solid #8DB2C6; background: linear-gradient(90deg, #D3DDE3 0 36px, #EEF6FA 36px);
+  color: #1C4A5C; font-size: 24px; box-shadow: 0 2px 0 rgba(0,0,0,.08);
+}
+body[data-theme="ppt"] section.slide > h2:first-of-type {
+  position: absolute; top: 0; left: 56px; right: 290px; height: 87px; margin: 0; padding: 0; width: auto;
+  display: flex; align-items: center; border: 0; color: var(--leaf-d); font-size: 38px; line-height: 1.15; text-wrap: balance;
+}
+.key { color: var(--leaf-d); font-weight: 800; }
+.wt { color: var(--water); font-weight: 800; }
+.sg { color: var(--sugar); font-weight: 800; }
+
+/* 표지 */
+body[data-theme="ppt"] section.slide.cover { background: var(--mint); }
+.cv { display: grid; grid-template-columns: 1fr 470px; gap: 30px; align-items: center; margin-top: 30px; }
+.cv-k { margin: 0 0 22px; font-size: 28px; font-weight: 700; color: var(--leaf); }
+section.slide.cover h1 { margin: 0; font-size: 76px; line-height: 1.18; color: var(--leaf-d); }
+.cv-s { margin: 28px 0 0; padding-top: 22px; border-top: 4px solid var(--leaf); font-size: 34px; font-weight: 600; color: var(--ink); width: fit-content; }
+
+/* 학습 목표 */
+.goals { list-style: none; margin: 30px 0 0; padding: 0; counter-reset: g; }
+.goals li { counter-increment: g; display: grid; grid-template-columns: 58px 1fr; gap: 22px; align-items: start; margin: 0 0 30px; font-size: 32px; line-height: 1.45; }
+.goals li::before { content: counter(g); width: 52px; height: 52px; border-radius: 50%; background: var(--leaf); color: #fff; font-weight: 800; font-size: 28px; display: grid; place-items: center; margin-top: 2px; }
+
+/* 생각 열기 */
+.open { display: grid; grid-template-columns: 1fr 520px; gap: 36px; align-items: start; margin-top: 12px; }
+.open .lead { margin: 0 0 22px; font-size: 31px; line-height: 1.55; }
+.pane-cap { display: flex; justify-content: space-around; margin: 6px 0 0; font-size: 24px; font-weight: 700; color: var(--mute); }
+
+/* 개념 */
+.def { margin: 8px 0 0; padding: 20px 28px; border-left: 10px solid var(--leaf); background: #F2F8F3; border-radius: 0 14px 14px 0; font-size: 30px; line-height: 1.5; }
+.def b { color: var(--leaf-d); }
+.note { margin: 10px 0 0; font-size: 26px; line-height: 1.45; color: var(--mute); }
+.sol { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; margin-top: 16px; }
+.sol > div { border: 3px solid var(--line); border-radius: 16px; padding: 8px 18px 12px; }
+.sol h3 { margin: 0 0 6px; font-size: 30px; color: var(--leaf-d); }
+.sol p { margin: 0; font-size: 25px; line-height: 1.4; }
+.sol svg { display: block; margin: 0 auto 6px; }
+.rel { margin-top: 14px; font-size: 27px; line-height: 1.45; font-weight: 700; color: var(--leaf-d); }
+
+.press { display: grid; grid-template-columns: 1fr 360px; gap: 34px; align-items: start; margin-top: 4px; }
+.press dl { margin: 0; }
+.press dl > div { display: grid; grid-template-columns: 130px 1fr; gap: 18px; padding: 14px 0; border-bottom: 2px solid var(--line); }
+.press dt { font-size: 29px; font-weight: 800; color: var(--leaf-d); }
+.press dd { margin: 0; font-size: 26px; line-height: 1.45; }
+.formula { margin: 18px 0 0; padding: 14px 22px; border-radius: 14px; background: var(--cream); font-size: 32px; font-weight: 800; text-align: center; }
+.formula .o { color: var(--water); } .formula .t { color: var(--sugar); } .formula .s { color: var(--leaf-d); }
+.press .step { margin: 16px 0 0; font-size: 26px; line-height: 1.45; }
+
+/* 익스플로라그램 공통 */
+.ox { display: grid; gap: 26px; align-items: start; margin-top: 0; }
+.ox p { margin: 0; }
+.ox-lab { font-size: 25px; font-weight: 700; line-height: 1.35; }
+.ox-say { font-size: 24px; line-height: 1.4; font-weight: 700; color: var(--leaf-d); }
+.ox-note { font-size: 21px; line-height: 1.4; color: var(--mute); }
+.ox-eq { font-size: 22px; line-height: 1.45; padding: 8px 12px; border-radius: 12px; background: #F4F7F5; }
+.ox-eq b { font-size: 25px; }
+.ox-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+section.slide .ox button[data-set] { min-height: 56px; padding: 6px 14px; font-size: 22px; font-weight: 700; border-radius: 12px; line-height: 1.2; }
+.ox svg text { font-family: inherit; }
+
+/* A 막 */
+#membrane .ox { grid-template-columns: 1fr 400px; }
+#membrane .ox-ctrl { display: flex; flex-direction: column; gap: 10px; }
+.ut-water { transition: y .45s linear, height .45s linear; }
+
+/* B 식물 세포 */
+#plant .ox { grid-template-columns: 290px 1fr 360px; gap: 22px; }
+#plant .ox-ctrl { display: flex; flex-direction: column; gap: 8px; }
+#plant .e-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+#plant .ch-play { flex-wrap: wrap; }
+.legend { display: flex; flex-direction: column; gap: 2px; font-size: 20px; color: var(--mute); line-height: 1.35; }
+.sw { display: inline-block; width: 26px; height: 0; border-top: 5px solid; vertical-align: 6px; margin-right: 8px; }
+
+/* C 소금물 */
+#tubes .ox { grid-template-columns: 640px 1fr; gap: 26px; }
+#tubes .cells { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 8px; }
+#tubes .cell-card { border: 3px solid var(--line); border-radius: 16px; padding: 8px 12px 10px; }
+#tubes .cell-card h3 { margin: 0; font-size: 24px; color: var(--leaf-d); }
+#tubes .cell-card p { min-height: 64px; font-size: 21px; line-height: 1.4; font-weight: 700; }
+.tb-ring { transition: transform .7s cubic-bezier(.2,.7,.2,1), opacity .4s; }
+
+/* 확인 문제 */
+.q-wrap .q { font-size: 30px; line-height: 1.45; }
+#sorting .sort .bin { min-height: 96px; }
+#sorting .sort > span { font-size: 23px; }
+
+/* 정리 */
+.sum { list-style: none; margin: 10px 0 0; padding: 0; }
+.sum li { position: relative; padding: 13px 0 13px 40px; font-size: 29px; line-height: 1.45; border-bottom: 2px solid var(--line); }
+.sum li::before { content: ""; position: absolute; left: 8px; top: 27px; width: 14px; height: 14px; border-radius: 50%; background: var(--leaf); }
+.back { margin-top: 18px; padding: 16px 24px; border-left: 10px solid var(--water); background: #EEF5FB; border-radius: 0 14px 14px 0; font-size: 27px; line-height: 1.5; }
+.back b { color: var(--water); }
+</style>
+</head>
+<body data-theme="ppt">
+
+<!-- 1 표지 -->
+<section class="slide cover" id="cover" data-title="표지">
+  <div class="cv">
+    <div>
+      <p class="cv-k">고2 생명과학 · 세포막을 통한 물질 이동</p>
+      <h1>배추는 왜<br>절여질까?</h1>
+      <p class="cv-s">삼투와 세포의 변화</p>
+    </div>
+    <svg width="470" height="420" viewBox="0 0 470 420" aria-label="물이 빠져나가 세포막이 세포벽에서 떨어진 식물 세포">
+      <rect x="45" y="70" width="380" height="280" rx="26" fill="#FBFDF9" stroke="#8A7550" stroke-width="12"/>
+      <rect x="110" y="128" width="250" height="164" rx="70" fill="#CFE8D2" stroke="#2F7D4A" stroke-width="7"/>
+      <rect x="150" y="160" width="170" height="100" rx="46" fill="#D7ECF8"/>
+      <circle cx="132" cy="210" r="16" fill="#7A9B5C"/>
+      <g fill="#2B73B0">
+        <circle cx="30" cy="140" r="11"/><circle cx="22" cy="250" r="11"/><circle cx="445" cy="120" r="11"/>
+        <circle cx="452" cy="300" r="11"/><circle cx="235" cy="30" r="11"/><circle cx="300" cy="392" r="11"/>
+      </g>
+      <g stroke="#2B73B0" stroke-width="6" stroke-linecap="round" fill="none">
+        <path d="M95 160 L52 145 M44 153 L52 145 L47 136"/>
+        <path d="M375 150 L428 128 M419 124 L428 128 L424 137"/>
+        <path d="M380 270 L432 292 M428 283 L432 292 L423 296"/>
+        <path d="M235 112 L235 52 M227 60 L235 52 L243 60"/>
+      </g>
+    </svg>
+  </div>
+</section>
+
+<!-- 2 학습 목표 -->
+<section class="slide" id="goal" data-sec="학습 목표" data-title="학습 목표">
+  <h2>학습 목표</h2>
+  <ol class="goals">
+    <li>삼투가 일어나는 방향을 두 용액의 농도로 설명할 수 있다.</li>
+    <li>식물 세포의 흡수력을 삼투압과 팽압으로 설명할 수 있다.</li>
+    <li>농도가 다른 용액에 넣은 적혈구와 식물 세포의 변화를<br>비교할 수 있다.</li>
+  </ol>
+</section>
+
+<!-- 3 생각 열기 -->
+<section class="slide" id="open" data-sec="생각 열기" data-title="소금을 뿌린 배추">
+  <h2>소금을 뿌린 배추는 왜 숨이 죽을까?</h2>
+  <div class="open">
+    <div>
+      <p class="lead">배추에 굵은 소금을 뿌려 두면<br>몇 시간 뒤 잎이 흐물흐물해지고<br>그릇 바닥에 물이 고인다.</p>
+      <div class="short" data-ph="내 생각을 한 문장으로 적어요">
+        <p class="ask">그릇에 고인 물은<br>어디에서 나왔을까?</p>
+      </div>
+    </div>
+    <div>
+      <svg width="520" height="330" viewBox="0 0 520 330" aria-label="소금을 뿌리기 전 빳빳한 배춧잎과 뿌린 뒤 늘어진 배춧잎, 바닥에 고인 물">
+        <rect x="10" y="20" width="235" height="290" rx="18" fill="#F6FAF4" stroke="#CFE0D5" stroke-width="3"/>
+        <rect x="275" y="20" width="235" height="290" rx="18" fill="#F6FAF4" stroke="#CFE0D5" stroke-width="3"/>
+        <path d="M70 280 C60 200 80 110 128 50 C176 110 196 200 186 280 Z" fill="#B7DB9C" stroke="#4E8B3A" stroke-width="5"/>
+        <path d="M128 60 V280" stroke="#F4F8EC" stroke-width="12" stroke-linecap="round"/>
+        <path d="M100 150 L128 175 M156 150 L128 175 M96 210 L128 235 M160 210 L128 235" stroke="#8FBF72" stroke-width="4" fill="none"/>
+        <rect x="40" y="280" width="176" height="14" rx="7" fill="#D9D2C3"/>
+        <path d="M335 278 C330 240 352 200 395 172 C440 150 478 160 492 182 C452 182 420 205 402 240 C392 260 390 272 392 278 Z" fill="#CFE3A9" stroke="#6D9A45" stroke-width="5"/>
+        <path d="M368 276 C372 236 410 192 480 176" stroke="#F4F8EC" stroke-width="10" fill="none" stroke-linecap="round"/>
+        <g fill="#FFFFFF" stroke="#9AA7A0" stroke-width="2"><rect x="400" y="196" width="10" height="10"/><rect x="430" y="186" width="10" height="10" transform="rotate(20 435 191)"/><rect x="372" y="236" width="10" height="10"/></g>
+        <path d="M300 286 Q392 270 486 286 L486 296 L300 296 Z" fill="#9CC7EA"/>
+        <rect x="305" y="280" width="176" height="14" rx="7" fill="#D9D2C3" opacity=".6"/>
+        <g fill="#2B73B0"><circle cx="352" cy="262" r="6"/><circle cx="452" cy="250" r="6"/></g>
+      </svg>
+      <p class="pane-cap"><span>소금을 뿌리기 전</span><span>몇 시간 뒤</span></p>
+    </div>
+  </div>
+</section>
+
+<!-- 4 삼투와 세 가지 용액 -->
+<section class="slide" id="osmosis" data-sec="1. 삼투" data-title="삼투와 세 가지 용액">
+  <h2>삼투와 세 가지 용액</h2>
+  <p class="def"><b>삼투</b>: 선택적 투과성 막을 사이에 두고 농도가 다른 두 용액이 있을 때<br>물이 용질 농도가 낮은 쪽에서 높은 쪽으로 이동하는 현상</p>
+  <p class="note">세포막은 물을 잘 통과시키지만 설탕 같은 용질은 잘 통과시키지 않는다.</p>
+  <div class="sol">
+    <div>
+      <svg width="150" height="81" viewBox="0 0 170 92" aria-hidden="true"><rect x="40" y="12" width="90" height="68" rx="30" fill="#D7ECF8" stroke="#2F7D4A" stroke-width="5"/><g fill="#B9531A"><circle cx="70" cy="40" r="6"/><circle cx="96" cy="52" r="6"/><circle cx="84" cy="30" r="6"/></g><circle cx="16" cy="40" r="6" fill="#B9531A"/></svg>
+      <h3>저장액</h3><p>세포 안보다<br>용질 농도가 낮은 용액</p>
+    </div>
+    <div>
+      <svg width="150" height="81" viewBox="0 0 170 92" aria-hidden="true"><rect x="40" y="12" width="90" height="68" rx="30" fill="#D7ECF8" stroke="#2F7D4A" stroke-width="5"/><g fill="#B9531A"><circle cx="70" cy="40" r="6"/><circle cx="96" cy="52" r="6"/><circle cx="84" cy="30" r="6"/><circle cx="14" cy="28" r="6"/><circle cx="22" cy="62" r="6"/><circle cx="152" cy="46" r="6"/></g></svg>
+      <h3>등장액</h3><p>세포 안과<br>용질 농도가 같은 용액</p>
+    </div>
+    <div>
+      <svg width="150" height="81" viewBox="0 0 170 92" aria-hidden="true"><rect x="40" y="12" width="90" height="68" rx="30" fill="#D7ECF8" stroke="#2F7D4A" stroke-width="5"/><g fill="#B9531A"><circle cx="70" cy="40" r="6"/><circle cx="96" cy="52" r="6"/><circle cx="84" cy="30" r="6"/><circle cx="12" cy="20" r="6"/><circle cx="26" cy="46" r="6"/><circle cx="12" cy="72" r="6"/><circle cx="146" cy="22" r="6"/><circle cx="158" cy="50" r="6"/><circle cx="144" cy="76" r="6"/></g></svg>
+      <h3>고장액</h3><p>세포 안보다<br>용질 농도가 높은 용액</p>
+    </div>
+  </div>
+  <p class="rel step">저장액과 고장액은 세포 안 용액과 견주어 부르는 이름이다.<br>같은 용액도 어느 세포와 견주느냐에 따라 이름이 달라진다.</p>
+</section>
+
+<!-- 5 익스플로라그램 A: 막을 오가는 물 -->
+<section class="slide" id="membrane" data-sec="1. 삼투" data-title="막을 사이에 둔 물의 이동">
+  <h2>막을 사이에 두면 물은 어느 쪽으로 더 많이 갈까?</h2>
+  <div class="calc ox" data-ai="반투과성 막을 오가는 물 입자 모형과 U자관 수면" data-let="gap = wr - wl">
+    <figure class="particles" data-membrane="0.5" data-labels="왼쪽|오른쪽" data-height="300" aria-label="가운데 막을 사이에 두고 물 입자와 설탕 입자가 움직이는 상자">
+      <i data-kind="물" data-left="45" data-right="45" data-pass="1" data-color="#2B73B0" data-size="5" data-count="wl, wr"></i>
+      <i data-kind="설탕" data-left="0" data-right="s" data-pass="0" data-color="#B9531A" data-size="9"></i>
+    </figure>
+    <div class="ox-ctrl">
+      <p class="ox-lab">오른쪽에 넣은 <span class="sg">설탕</span> 입자 <output data-expr="s" data-unit="개"></output></p>
+      <input type="range" name="s" min="0" max="30" step="10" value="0" aria-label="오른쪽 설탕 입자 수">
+      <svg width="400" height="196" viewBox="0 0 400 196" aria-label="가운데에 막이 있는 U자관의 양쪽 수면">
+        <path d="M60 14 V160 Q60 186 86 186 H190 M210 186 H314 Q340 186 340 160 V14" fill="none" stroke="#8C99A5" stroke-width="4"/>
+        <path d="M120 14 V128 H280 V14" fill="none" stroke="#8C99A5" stroke-width="4"/>
+        <rect x="62" y="128" width="276" height="56" fill="#9CC7EA"/>
+        <rect class="ut-water" x="62" width="56" fill="#9CC7EA" data-attr="y: 128 - (60 + gap * -2.4); height: 60 + gap * -2.4"/>
+        <rect class="ut-water" x="282" width="56" fill="#9CC7EA" data-attr="y: 128 - (60 + gap * 2.4); height: 60 + gap * 2.4"/>
+        <g fill="#B9531A" data-attr="opacity: s > 0 ? 1 : 0"><circle cx="300" cy="166" r="5"/><circle cx="322" cy="150" r="5"/><circle cx="240" cy="170" r="5"/><circle cx="298" cy="120" r="5"/></g>
+        <path d="M200 130 V184" stroke="#2F7D4A" stroke-width="5" stroke-dasharray="7 5"/>
+        <text x="200" y="112" font-size="20" text-anchor="middle" fill="#2F7D4A" font-weight="700">막</text>
+        <text x="90" y="40" font-size="20" text-anchor="middle" fill="#55635A">왼쪽</text>
+        <text x="310" y="40" font-size="20" text-anchor="middle" fill="#55635A">오른쪽</text>
+      </svg>
+      <p class="ox-eq" data-ai="모형 수치">물 입자 수 차이(오른쪽 − 왼쪽) <b><output data-expr="gap"></output>개</b><br>U자관 수면은 이 차이로 그린 모형이다.</p>
+      <p class="ox-say" data-show="s == 0">양쪽 농도가 같다.<br>물은 양쪽으로 비슷하게 오간다.</p>
+      <p class="ox-say" data-show="s > 0 && gap < 5">물 입자는 막을 양쪽으로 지나간다.<br>어느 쪽으로 더 많이 갈지 지켜보자.</p>
+      <p class="ox-say" data-show="s > 0 && gap >= 5">설탕물 쪽으로 옮겨 간 물이 더 많다.<br>오른쪽 수면이 올라간다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 6 확인 문제 1 -->
+<section class="slide" id="check-1" data-sec="1. 삼투" data-title="확인 문제 1">
+  <h2>확인 문제 1</h2>
+  <div class="q-wrap">
+    <p class="q" data-n="1" data-ai="문항">반투과성 막의 왼쪽에 5% 설탕물, 오른쪽에 10% 설탕물을 넣었다.<br>이에 대한 설명으로 옳은 것은?</p>
+    <div class="quiz" data-ai="보기와 풀이">
+      <button class="opt" data-why="설탕 분자는 반투과성 막을 지나지 못한다.">설탕 분자가 오른쪽에서 왼쪽으로 옮겨 간다.</button>
+      <button class="opt" data-why="물 분자는 양쪽으로 모두 움직인다. 한쪽으로 가는 양이 더 많을 뿐이다.">물 분자는 왼쪽에서 오른쪽으로만 움직인다.</button>
+      <button class="opt" data-ok data-why="맞다. 물은 용질 농도가 낮은 왼쪽에서 높은 오른쪽으로 더 많이 옮겨 간다.">왼쪽에서 오른쪽으로 옮겨 가는 물이 더 많다.</button>
+      <button class="opt" data-why="물이 더 많이 들어간 쪽은 오른쪽이다. 오른쪽 수면이 높아진다.">시간이 지나면 왼쪽 수면이 높아진다.</button>
+    </div>
+  </div>
+</section>
+
+<!-- 7 삼투압, 팽압, 흡수력 -->
+<section class="slide" id="pressure" data-sec="2. 흡수력" data-title="삼투압, 팽압, 흡수력">
+  <h2>삼투압, 팽압, 흡수력</h2>
+  <div class="press">
+    <div>
+      <dl>
+        <div><dt>삼투압</dt><dd>삼투로 물이 이동하려는 압력.<br>용액의 농도가 높을수록 크다.</dd></div>
+        <div><dt>팽압</dt><dd>식물 세포에 물이 들어와<br>세포막이 세포벽을 바깥쪽으로 미는 압력</dd></div>
+        <div><dt>흡수력</dt><dd>식물 세포가 물을 빨아들이는 힘</dd></div>
+      </dl>
+      <p class="formula"><span class="s">흡수력</span> = <span class="o">삼투압</span> − <span class="t">팽압</span></p>
+      <p class="step">물이 들어오면 세포액이 묽어져 <span class="wt">삼투압</span>은 작아진다.<br>그 사이 세포벽을 미는 <span class="sg">팽압</span>은 커진다.</p>
+    </div>
+    <svg width="360" height="300" viewBox="0 0 360 300" aria-label="물이 들어와 세포막이 세포벽을 바깥쪽으로 미는 식물 세포">
+      <rect x="30" y="40" width="300" height="220" rx="24" fill="#FBFDF9" stroke="#8A7550" stroke-width="12"/>
+      <rect x="44" y="54" width="272" height="192" rx="16" fill="#CFE8D2" stroke="#2F7D4A" stroke-width="6"/>
+      <rect x="84" y="88" width="192" height="124" rx="40" fill="#D7ECF8"/>
+      <circle cx="66" cy="150" r="13" fill="#7A9B5C"/>
+      <g stroke="#B9531A" stroke-width="6" stroke-linecap="round" fill="none">
+        <path d="M180 120 V66 M171 75 L180 66 L189 75"/><path d="M180 180 V234 M171 225 L180 234 L189 225"/>
+        <path d="M230 150 H298 M289 141 L298 150 L289 159"/><path d="M130 150 H90 M99 141 L90 150 L99 159"/>
+      </g>
+      <text x="180" y="156" font-size="24" text-anchor="middle" font-weight="800" fill="#B9531A">팽압</text>
+      <text x="180" y="28" font-size="22" text-anchor="middle" fill="#6E5B38" font-weight="700">세포벽</text>
+      <text x="180" y="292" font-size="22" text-anchor="middle" fill="#2F7D4A" font-weight="700">세포막</text>
+    </svg>
+  </div>
+</section>
+
+<!-- 8 익스플로라그램 B: 식물 세포의 흡수력 -->
+<section class="slide" id="plant" data-sec="2. 흡수력" data-title="식물 세포는 언제 물 흡수를 멈출까">
+  <h2>설탕물에 넣은 식물 세포는 언제까지 부피가 변할까?</h2>
+  <div class="calc ox" data-ai="식물 세포 흡수력 모형(세포액 삼투압 8기압, 팽압은 부피에 비례)"
+       data-const="o0 = 8; kp = 20.5"
+       data-let="vs = ex >= o0 ? o0 / ex : ((kp - ex) + sqrt((ex - kp) ^ 2 + 4 * kp * o0)) / (2 * kp); v = vs + (1 - vs) * exp(-t / 1.8); o = o0 / v; tp = v <= 1 ? 0 : kp * (v - 1); s = o - tp; d = s - ex; ww = v > 1 ? 1 + 0.45 * (v - 1) : 1; pw = v >= 1 ? 220 * ww - 16 : 204 * sqrt(v); ph = v >= 1 ? 150 * ww - 16 : 134 * sqrt(v); pr = v >= 1 ? 14 : 14 + 90 * (1 - v)">
+    <div>
+      <svg width="290" height="230" viewBox="0 0 290 230" aria-label="설탕물 속 식물 세포의 세포벽, 세포막, 액포">
+        <g fill="#2B73B0" stroke="#2B73B0" stroke-width="5" stroke-linecap="round" data-attr="opacity: clamp(d / 2, 0, 1)">
+          <path d="M6 115 H24 M17 107 L25 115 L17 123" fill="none"/><path d="M284 115 H266 M273 107 L265 115 L273 123" fill="none"/>
+          <path d="M145 4 V22 M137 15 L145 23 L153 15" fill="none"/><path d="M145 226 V208 M137 215 L145 207 L153 215" fill="none"/>
+        </g>
+        <g fill="#B9531A" stroke="#B9531A" stroke-width="5" stroke-linecap="round" data-attr="opacity: clamp(-d / 2, 0, 1)">
+          <path d="M24 115 H6 M13 107 L5 115 L13 123" fill="none"/><path d="M266 115 H284 M277 107 L285 115 L277 123" fill="none"/>
+          <path d="M145 22 V4 M137 11 L145 3 L153 11" fill="none"/><path d="M145 208 V226 M137 219 L145 227 L153 219" fill="none"/>
+        </g>
+        <rect fill="#FBFDF9" stroke="#8A7550" stroke-width="10" data-attr="x: 145 - 110 * ww; y: 115 - 75 * ww; width: 220 * ww; height: 150 * ww; rx: 18"/>
+        <rect fill="#CFE8D2" stroke="#2F7D4A" stroke-width="5" data-attr="x: 145 - pw / 2; y: 115 - ph / 2; width: pw; height: ph; rx: pr"/>
+        <rect fill="#D7ECF8" data-attr="x: 145 - (pw - 56) / 2 + 12; y: 115 - (ph - 44) / 2; width: pw - 56; height: ph - 44; rx: min((ph - 44) / 2, 30)"/>
+        <circle r="11" cy="115" fill="#7A9B5C" data-attr="cx: 145 - pw / 2 + 20"/>
+      </svg>
+      <p class="ox-lab" style="margin-top:6px">세포 부피 <output data-expr="v" data-digits="2"></output>배</p>
+      <p class="ox-eq" data-ai="모형 수치"><span class="key">흡수력</span> = <span class="wt">삼투압</span> − <span class="sg">팽압</span><br><b class="key" data-expr="s" data-digits="1"></b> = <b class="wt" data-expr="o" data-digits="1"></b> − <b class="sg" data-expr="tp" data-digits="1"></b></p>
+      <p class="ox-note" data-ai="모형 수치">압력 단위는 기압이다(모형).</p>
+      <div class="legend"><span><i class="sw" style="color:#8A7550"></i>세포벽</span><span><i class="sw" style="color:#2F7D4A"></i>세포막</span></div>
+    </div>
+    <figure class="plot" data-x="0.6, 1.4" data-y="0, 14" data-xstep="0.2" data-ystep="2" data-height="350" data-xlabel="세포의 상대 부피" data-ylabel="압력(기압)" aria-label="세포 부피에 따른 삼투압, 팽압, 흡수력 그래프">
+      <i data-line="o0 / x" data-label="삼투압" data-color="#2B73B0"></i>
+      <i data-line="x <= 1 ? 0 : kp * (x - 1)" data-label="팽압" data-color="#B9531A"></i>
+      <i data-line="o0 / x - (x <= 1 ? 0 : kp * (x - 1))" data-x="0.6, 1.3" data-label="흡수력" data-color="#1D5233"></i>
+      <i data-line="ex" data-dash data-label="바깥 용액" data-color="#6E7A73"></i>
+      <i data-point="v, s" data-label="세포" data-color="#1D5233"></i>
+    </figure>
+    <div class="ox-ctrl">
+      <p class="ox-lab">바깥 용액의 삼투압 <output data-expr="ex" data-unit="기압"></output></p>
+      <div class="e-btns">
+        <button data-set="ex" data-value="0" aria-pressed="true">증류수</button>
+        <button data-set="ex" data-value="4">묽은 설탕물</button>
+        <button data-set="ex" data-value="8">설탕물</button>
+        <button data-set="ex" data-value="12">진한 설탕물</button>
+      </div>
+      <p class="ox-lab">넣은 뒤 <output data-expr="t" data-digits="1" data-unit="분"></output> <span class="ox-note">(모형)</span></p>
+      <input type="range" name="t" min="0" max="10" step="0.2" value="0" data-play="8" aria-label="넣은 뒤 흐른 시간">
+      <p class="ox-say" data-show="t == 0">재생하기 전에 초록 점이<br>어디서 멈출지 예상해 보자.</p>
+      <p class="ox-say" data-show="t > 0 && d > 0.05">세포의 흡수력이 바깥 용액보다 크다.<br>물이 세포 안으로 들어온다.</p>
+      <p class="ox-say" data-show="t > 0 && d < -0.05">바깥 용액의 삼투압이 더 크다.<br>물이 세포 밖으로 나간다.</p>
+      <p class="ox-say" data-show="t > 0 && abs(d) <= 0.05">흡수력과 바깥 용액의 삼투압이 같다.<br>들어오고 나가는 물의 양이 같다.</p>
+      <p class="ox-note" data-show="t > 0 && v < 0.99">세포막이 세포벽에서 떨어졌다.<br>(원형질 분리)</p>
+      <p class="ox-note" data-show="t > 0 && ex == 0 && abs(d) <= 0.05">팽압이 삼투압과 같아져 흡수력이 0이다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 9 확인 문제 2 -->
+<section class="slide" id="check-2" data-sec="2. 흡수력" data-title="확인 문제 2">
+  <h2>확인 문제 2</h2>
+  <div class="q-wrap">
+    <p class="q" data-n="2" data-ai="문항">증류수에 넣은 식물 세포의 부피가 더 늘지 않게 되었다.<br>이때에 대한 설명으로 옳은 것은?</p>
+    <div class="quiz" data-ai="보기와 풀이">
+      <button class="opt" data-why="부피가 가장 커졌으므로 팽압도 가장 크다. 이때 팽압은 삼투압과 같다.">팽압이 0이다.</button>
+      <button class="opt" data-ok data-why="맞다. 팽압이 삼투압만큼 커져 흡수력이 0이 되었다.">삼투압과 팽압이 같아 흡수력이 0이다.</button>
+      <button class="opt" data-why="흡수력은 부피가 가장 작을 때 크다. 지금은 0이다.">흡수력이 가장 크다.</button>
+      <button class="opt" data-why="물 분자는 계속 오간다. 들어오는 양과 나가는 양이 같을 뿐이다.">세포 안으로 들어오는 물 분자가 하나도 없다.</button>
+    </div>
+  </div>
+</section>
+
+<!-- 10 익스플로라그램 C: 소금물 속 두 세포 -->
+<section class="slide" id="tubes" data-sec="3. 세포의 변화" data-title="소금물 속 적혈구와 식물 세포">
+  <h2>소금물 농도에 따라 적혈구와 식물 세포는 어떻게 달라질까?</h2>
+  <div class="calc" data-ai="소금물 농도별 적혈구와 식물 세포 모형(두 세포의 세포 안 농도를 0.9% 소금물과 같다고 둠)"
+       data-let="c = k <= 1 ? 0 : k == 2 ? 0.3 : k == 3 ? 0.6 : k == 4 ? 0.9 : k == 5 ? 1.2 : 1.8; vr = c <= 0.45 ? 1.6 : 0.4 + 0.54 / c; ep = 8 * c / 0.9; vp = ep >= 8 ? 8 / ep : ((20.5 - ep) + sqrt((ep - 20.5) ^ 2 + 656)) / 41">
+    <div class="reveal" id="tb" data-name="k" data-stops="시작|0%|0.3%|0.6%|0.9%|1.2%|1.8%" data-veil="막대를 밀어 시험관을 하나씩 골라 보자">
+      <div class="ox">
+        <div class="veil">
+          <svg width="640" height="124" viewBox="0 0 640 124" aria-label="농도가 다른 소금물이 든 시험관 여섯 개">
+            <g class="tb-ring" id="tb-ring" style="transform: translateX(0px); opacity: 0"><rect x="14" y="4" width="92" height="116" rx="16" fill="#FFF3C4" stroke="#E0A800" stroke-width="4"/></g>
+            <g stroke="#7C8B95" stroke-width="3">
+              <path d="M44 14 V78 a16 16 0 0 0 32 0 V14" fill="#EAF4FB"/><path d="M148 14 V78 a16 16 0 0 0 32 0 V14" fill="#E6F1F8"/>
+              <path d="M252 14 V78 a16 16 0 0 0 32 0 V14" fill="#E1EDF5"/><path d="M356 14 V78 a16 16 0 0 0 32 0 V14" fill="#DCE9F2"/>
+              <path d="M460 14 V78 a16 16 0 0 0 32 0 V14" fill="#D7E5EF"/><path d="M564 14 V78 a16 16 0 0 0 32 0 V14" fill="#D2E1EC"/>
+            </g>
+            <g font-size="20" text-anchor="middle" fill="#1F2A24" font-weight="700">
+              <text x="60" y="116">0%</text><text x="164" y="116">0.3%</text><text x="268" y="116">0.6%</text>
+              <text x="372" y="116">0.9%</text><text x="476" y="116">1.2%</text><text x="580" y="116">1.8%</text>
+            </g>
+          </svg>
+          <div class="cells">
+            <div class="cell-card">
+              <h3>적혈구 <span class="ox-note">옆에서 본 모습</span></h3>
+              <svg width="290" height="160" viewBox="0 0 290 160" aria-label="적혈구 모양"><path id="rbc" fill="#D9473F" stroke="#9E2A24" stroke-width="4"/><g id="rbc-hb" fill="#D9473F"></g></svg>
+              <p data-show="c < 0.45">물이 계속 들어와 터졌다.<br>(용혈)</p>
+              <p data-show="c >= 0.45 && c < 0.9">물이 들어와 부풀었다.</p>
+              <p data-show="c == 0.9">모양이 그대로다.</p>
+              <p data-show="c > 0.9">물이 빠져나가 쭈그러들었다.</p>
+            </div>
+            <div class="cell-card">
+              <h3>식물 세포 <span class="ox-note">위에서 본 모습</span></h3>
+              <svg width="290" height="160" viewBox="0 0 290 160" aria-label="식물 세포 모양"><rect id="pc-wall" fill="#FBFDF9" stroke="#8A7550" stroke-width="9"/><rect id="pc-prot" fill="#CFE8D2" stroke="#2F7D4A" stroke-width="5"/><rect id="pc-vac" fill="#D7ECF8"/></svg>
+              <p data-show="c < 0.9">부풀어 세포벽을 민다.<br>세포벽 덕분에 터지지 않는다.</p>
+              <p data-show="c == 0.9">모양이 그대로다.</p>
+              <p data-show="c > 0.9">세포막이 세포벽에서 떨어졌다.<br>(원형질 분리)</p>
+            </div>
+          </div>
+          <p class="ox-note" data-ai="모형 수치" style="margin-top:8px">두 세포 모두 세포 안 농도를 0.9% 소금물과 같게 두었다(모형).</p>
+        </div>
+        <div>
+          <div class="ch-stops"></div>
+          <div data-at="1">
+            <figure class="plot" data-x="0, 1.9" data-y="0, 1.8" data-xstep="0.3" data-ystep="0.4" data-height="250" data-xlabel="소금물 농도(%)" data-ylabel="상대 부피" aria-label="소금물 농도에 따른 두 세포의 상대 부피">
+              <i data-line="0.4 + 0.54 / x" data-x="0.45, max(c, 0.46)" data-show="c > 0.45" data-label="적혈구" data-color="#C7362F"></i>
+              <i data-line="8 * x / 0.9 >= 8 ? 0.9 / x : ((20.5 - 8 * x / 0.9) + sqrt((8 * x / 0.9 - 20.5) ^ 2 + 656)) / 41" data-x="0, max(c, 0.01)" data-label="식물 세포" data-color="#2F7D4A"></i>
+              <i data-line="1.6" data-dash data-color="#C7362F"></i>
+              <i data-point="c, vr" data-show="c > 0.45" data-color="#C7362F"></i>
+              <i data-point="c, vp" data-color="#2F7D4A"></i>
+            </figure>
+            <p class="ox-note" data-ai="모형 수치">빨간 점선: 적혈구가 터지는 부피(모형)</p>
+            <p class="ox-say" style="margin-top:4px"><output data-expr="c"></output>% 소금물은 <output data-expr="c < 0.9 ? '저장액' : c == 0.9 ? '등장액' : '고장액'"></output>이다.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 11 확인 문제 3 -->
+<section class="slide" id="sorting" data-sec="3. 세포의 변화" data-title="확인 문제 3">
+  <h2>확인 문제 3</h2>
+  <p class="q" data-n="3">세포 바깥 용액이 세포 안보다 진한 경우와 묽은 경우로 나누어 보자.</p>
+  <div class="sort" data-ai="카드와 이유, 실마리">
+    <div class="bin" data-bin="h"><h3>바깥이 더 진하다(고장액)</h3></div>
+    <div class="bin" data-bin="l"><h3>바깥이 더 묽다(저장액)</h3></div>
+    <span data-bin="h" data-why="맞다. 소금물이 배추 세포보다 진해 세포 안의 물이 빠져나온다." data-hint="잎에서 물이 빠져나왔을까, 들어갔을까?">배추를 소금에 절이면 숨이 죽는다.</span>
+    <span data-bin="l" data-why="맞다. 찬물이 세포 안보다 묽어 물이 세포로 들어가 팽압이 회복된다." data-hint="잎이 빳빳해지려면 물이 어느 쪽으로 가야 할까?">시든 상추를 찬물에 담가 두면 싱싱해진다.</span>
+    <span data-bin="l" data-why="맞다. 증류수는 적혈구보다 묽어 물이 계속 들어가 터진다." data-hint="증류수에는 용질이 얼마나 들어 있을까?">적혈구를 증류수에 넣으면 터진다.</span>
+    <span data-bin="h" data-why="맞다. 흙 속 용액이 뿌리털 세포보다 진해져 물이 뿌리에서 빠져나간다." data-hint="비료가 녹은 흙 속 물은 묽어질까, 진해질까?">비료를 한꺼번에 많이 주면 식물이 시든다.</span>
+    <span data-bin="h" data-why="맞다. 몸 표면의 소금물이 세포 안보다 진해 물이 빠져나간다." data-hint="소금이 녹은 물은 민달팽이 세포보다 진할까, 묽을까?">민달팽이에 소금을 뿌리면 몸이 쪼그라든다.</span>
+    <span data-bin="l" data-why="맞다. 물이 건포도 세포 안보다 묽어 물이 안으로 들어간다." data-hint="건포도가 부풀려면 물이 어느 쪽으로 가야 할까?">건포도를 물에 담가 두면 불어난다.</span>
+  </div>
+</section>
+
+<!-- 12 정리 -->
+<section class="slide" id="summary" data-sec="정리" data-title="정리">
+  <h2>정리</h2>
+  <ul class="sum">
+    <li>물 분자는 막을 양쪽으로 오간다.<br>용질 농도가 높은 쪽으로 더 많이 옮겨 간다(삼투).</li>
+    <li><b class="key">흡수력 = 삼투압 − 팽압.</b> 물이 들어올수록 흡수력은 작아진다.</li>
+    <li>세포의 흡수력이 바깥 용액의 삼투압과 같아지면 부피가 더 변하지 않는다.</li>
+    <li>저장액에서 적혈구는 터지지만 식물 세포는 세포벽 덕분에 터지지 않는다.</li>
+  </ul>
+  <p class="back step" data-ai="생각 열기 답"><b>다시 배추로</b> 소금이 녹은 물은 배추 세포보다 진한 고장액이다.<br>세포 안의 물이 빠져나와 원형질 분리가 일어나고 잎은 팽압을 잃어 늘어진다.</p>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const $ = (s) => document.querySelector(s);
+  const SVGNS = 'http://www.w3.org/2000/svg';
+  const still = () => document.documentElement.classList.contains('ch-motion-off');
+  const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+  function tween(job, to, draw, ms = 700) {   // job = { v, raf }: 앞 값에서 새 값까지 이어서 그린다
+    cancelAnimationFrame(job.raf);
+    const from = job.v, t0 = performance.now();
+    const step = (now) => {
+      const p = still() || ms <= 0 ? 1 : Math.min(1, (now - t0) / ms);
+      job.v = from + (to - from) * (1 - (1 - p) ** 3);
+      draw(job.v, p);
+      if (p < 1) job.raf = requestAnimationFrame(step);
+      else if (job.done) { const f = job.done; job.done = null; f(); }
+    };
+    job.raf = requestAnimationFrame(step);
+  }
+
+  /* C. 소금물 속 적혈구와 식물 세포: 시험관을 고를 때마다 정상 세포에서 그 시험관의 끝 모양까지 이어서 바뀐다 */
+  const CONC = [null, 0, 0.3, 0.6, 0.9, 1.2, 1.8];
+  const rbcVol = (c) => (c <= 0.45 ? 1.6 : 0.4 + 0.54 / c);   // 상대 부피(모형), 1.6에 닿으면 터진다
+  const plantVol = (c) => { const e = 8 * c / 0.9; return e >= 8 ? 8 / e : ((20.5 - e) + Math.sqrt((e - 20.5) ** 2 + 656)) / 41; };
+  const rbc = $('#rbc'), hb = $('#rbc-hb');
+  const dots = [];
+  for (let i = 0; i < 12; i++) {
+    const c = document.createElementNS(SVGNS, 'circle');
+    c.setAttribute('r', 5);
+    hb.appendChild(c);
+    dots.push({ el: c, a: (i / 12) * Math.PI * 2 + 0.3 * Math.sin(i * 7), d: 0.75 + 0.4 * ((i * 37) % 10) / 10 });
+  }
+  // 옆에서 본 적혈구 테두리. q = 상대 부피(1 = 가운데가 오목한 원반, 1.6 = 공 모양), w = 쭈그러진 정도
+  function rbcShape(q, lyse) {
+    const cx = 145, cy = 80, R0 = 92, N = 144;
+    const u = clamp((q - 1) / 0.6, 0, 1), w = clamp((1 - q) / 0.35, 0, 1);
+    const R = R0 * (1 - 0.3 * u - 0.2 * w);
+    const a = 0.13 + 0.87 * u + 0.32 * w, b = 0.6 * (1 - u) * (1 - 0.5 * w);
+    const gap = lyse > 0 ? 0.4 * Math.min(1, lyse * 2) : 0;   // 터지면 막 한쪽이 벌어진다
+    let d = '';
+    for (let i = 0; i <= N; i++) {
+      const th = gap + (i / N) * (Math.PI * 2 - 2 * gap);
+      const c = Math.cos(th), s = Math.sin(th);
+      let x = R * c, y = R * s * (a + b * c * c);
+      if (w > 0) {
+        const r = Math.hypot(x, y), ph = Math.atan2(y, x);
+        const k = 1 + 0.13 * w * Math.max(0, Math.cos(16 * ph)) ** 4;
+        x = r * k * Math.cos(ph); y = r * k * Math.sin(ph);
+      }
+      d += `${i ? ' L' : 'M'}${(cx + x).toFixed(1)} ${(cy + y).toFixed(1)}`;
+    }
+    rbc.setAttribute('d', gap ? d : d + ' Z');
+    rbc.setAttribute('fill', lyse > 0 ? `rgba(217,71,63,${(1 - 0.82 * lyse).toFixed(2)})` : '#D9473F');
+    rbc.setAttribute('stroke-dasharray', lyse > 0.5 ? '10 7' : 'none');
+    dots.forEach((p) => {
+      const r = R * (0.3 + p.d * 1.1 * lyse);
+      p.el.setAttribute('cx', (cx + r * Math.cos(p.a) * 1.25).toFixed(1));
+      p.el.setAttribute('cy', (cy + r * Math.sin(p.a) * 0.62).toFixed(1));
+      p.el.setAttribute('opacity', lyse > 0 ? (0.9 * (1 - 0.4 * lyse)).toFixed(2) : 0);
+    });
+  }
+  // 위에서 본 식물 세포. v = 상대 부피(1이면 세포막이 세포벽에 막 닿은 상태)
+  const wall = $('#pc-wall'), prot = $('#pc-prot'), vac = $('#pc-vac');
+  function plantShape(v) {
+    const cx = 145, cy = 80;
+    const g = v > 1 ? 1 + 0.45 * (v - 1) : 1;
+    const W = 220 * g, H = 130 * g;
+    const set = (el, a) => { for (const k in a) el.setAttribute(k, a[k].toFixed ? a[k].toFixed(1) : a[k]); };
+    set(wall, { x: cx - W / 2, y: cy - H / 2, width: W, height: H, rx: 16 });
+    const pw = v >= 1 ? W - 14 : 206 * Math.sqrt(v), ph = v >= 1 ? H - 14 : 116 * Math.sqrt(v);
+    set(prot, { x: cx - pw / 2, y: cy - ph / 2, width: pw, height: ph, rx: v >= 1 ? 12 : 12 + 80 * (1 - v) });
+    const vw = Math.max(10, pw - 50), vh = Math.max(10, ph - 36);
+    set(vac, { x: cx - vw / 2 + 10, y: cy - vh / 2, width: vw, height: vh, rx: Math.min(vh / 2, 26) });
+  }
+  const rj = { v: 1, raf: 0 }, lj = { v: 0, raf: 0 }, pj = { v: 1, raf: 0 };
+  function showTube(k, src) {
+    const ring = $('#tb-ring');
+    ring.style.opacity = k > 0 ? 1 : 0;
+    ring.style.transform = `translateX(${Math.max(0, k - 1) * 104}px)`;
+    cancelAnimationFrame(lj.raf); lj.done = null; rj.done = null;
+    if (!k) { rj.v = 1; lj.v = 0; pj.v = 1; rbcShape(1, 0); plantShape(1); return; }
+    const c = CONC[k], qr = rbcVol(c), qp = plantVol(c);
+    if (src !== 'input' && src !== 'nav') {   // 점검·장 들어오기는 끝 모양을 바로 그린다
+      cancelAnimationFrame(rj.raf); cancelAnimationFrame(pj.raf);
+      rj.v = Math.min(qr, 1.6); lj.v = qr >= 1.6 ? 1 : 0; pj.v = qp;
+      rbcShape(rj.v, lj.v); plantShape(qp); return;
+    }
+    // 학생이 고른 새 시험관의 세포는 정상 모양에서 시작해 끝 모양으로 바뀐다
+    rj.v = 1; lj.v = 0; pj.v = 1; rbcShape(1, 0); plantShape(1);
+    if (qr >= 1.6) rj.done = () => tween(lj, 1, (L) => rbcShape(1.6, L), 700);
+    tween(rj, qr, (q) => rbcShape(q, 0), 800);
+    tween(pj, qp, (v) => plantShape(v), 800);
+  }
+  $('#tb').addEventListener('ch-stepper', (e) => showTube(e.detail.pos, e.detail.src));
+  showTube(0);
+});
+</script>
+</body>
+</html>

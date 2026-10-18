@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="ko" data-deck="v3-mid-english">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>시간선 위의 동사 · 과거, 현재 진행, 미래</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/engine/exploragram.css">
+<script defer src="https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/engine/exploragram.js"></script>
+<style>
+body[data-theme="ppt"] {
+  --accent: #222B36; --tab: #222B36; --tab-ink: #FFFFFF;
+  --ink: #222B36; --paper: #FBF8F1; --gray: #5E6670;
+  --past: #2F6DB5; --now: #D64545; --fut: #2E8B57; --hab: #8A5CC2;
+  --past-soft: #E3EDF8; --now-soft: #FBE4E2; --fut-soft: #E0F1E7; --hab-soft: #EFE7F8;
+}
+
+/* ── 얼굴: 종이 바탕 + 제목 아래 시간선(과거·지금·미래 세 점) + 둥근 꼬리표 ── */
+body[data-theme="ppt"] section.slide {
+  background:
+    radial-gradient(circle, var(--past) 0 8px, transparent 9px) 190px 88px / 20px 20px no-repeat,
+    radial-gradient(circle, var(--now) 0 11px, transparent 12px) 628px 86px / 24px 24px no-repeat,
+    radial-gradient(circle, var(--fut) 0 8px, transparent 9px) 1070px 88px / 20px 20px no-repeat,
+    linear-gradient(var(--ink), var(--ink)) 60px 97px / 1160px 3px no-repeat,
+    var(--paper);
+  color: var(--ink);
+}
+body[data-theme="ppt"] section.slide[data-sec]::before {
+  left: auto; right: 48px; top: 22px; height: 46px; line-height: 46px; min-width: 140px; padding: 0 24px; box-sizing: border-box;
+  display: flex; align-items: center; justify-content: center; border-radius: 23px; background: #FFFFFF; color: var(--ink);
+  border: 3px solid var(--ink); font-size: 23px; font-weight: 800;
+}
+body[data-theme="ppt"] section.slide > h2:first-child {
+  position: absolute; top: 16px; left: 60px; right: 240px; height: 66px; margin: 0; padding: 0; border: 0; background: none; width: auto;
+  display: flex; align-items: center; color: var(--ink); font-size: 40px; line-height: 1.2; text-wrap: balance;
+}
+.en { font-family: Georgia, "Times New Roman", serif; }
+.c-past { color: var(--past); }
+.c-now { color: var(--now); }
+.c-fut { color: var(--fut); }
+.c-hab { color: var(--hab); }
+
+/* 표지 */
+body[data-theme="ppt"] section.slide#cover { background: var(--ink); color: #fff; }
+body[data-theme="ppt"] section.slide#cover::after { color: #fff; }
+.cv { display: flex; flex-direction: column; justify-content: center; height: 100%; }
+.cv p, .cv h1 { margin: 0; color: #fff; }
+.cv-k { font-size: 30px; opacity: .9; }
+.cv h1 { margin: 22px 0 18px; font-size: 72px; line-height: 1.15; }
+.cv-s { font-size: 34px; }
+.cv svg { margin-top: 44px; }
+
+/* 학습 목표 */
+.goals { margin: 36px 0 0; padding: 0; list-style: none; counter-reset: g; }
+.goals li { counter-increment: g; position: relative; padding: 0 0 0 64px; margin: 0 0 30px; font-size: 32px; line-height: 1.45; }
+.goals li::before { content: counter(g); position: absolute; left: 0; top: 0; width: 46px; height: 46px; border-radius: 50%; background: var(--now); color: #fff; font-weight: 800; font-size: 26px; text-align: center; line-height: 46px; }
+
+/* 생각 열기 */
+.three { display: grid; gap: 14px; margin-top: 8px; }
+.three p { margin: 0; padding: 14px 24px; border-radius: 14px; background: #fff; border: 2px solid #DDD6C8; font-size: 36px; }
+.ask { margin: 18px 0 0; font-size: 30px; font-weight: 800; }
+.think-a { margin: 14px 0 0; padding: 12px 22px; border-radius: 12px; background: #fff; border-left: 8px solid var(--now); font-size: 28px; line-height: 1.5; }
+
+/* 개념: 시간선과 네 모양 */
+.forms { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 10px; }
+.forms > div { padding: 14px 16px; border-radius: 14px; background: #fff; border-top: 10px solid; font-size: 25px; line-height: 1.4; }
+.forms b { display: block; font-size: 27px; margin-bottom: 4px; }
+.forms .f { display: block; margin: 8px 0; padding: 6px 10px; border-radius: 8px; font-weight: 800; font-size: 25px; }
+.forms .ex { display: block; font-size: 30px; font-weight: 700; }
+.fp { border-color: var(--past) !important; } .fp b { color: var(--past); } .fp .f { background: var(--past-soft); }
+.fn { border-color: var(--now) !important; } .fn b { color: var(--now); } .fn .f { background: var(--now-soft); }
+.ff { border-color: var(--fut) !important; } .ff b { color: var(--fut); } .ff .f { background: var(--fut-soft); }
+.fh { border-color: var(--hab) !important; } .fh b { color: var(--hab); } .fh .f { background: var(--hab-soft); }
+
+/* ── 익스플로라그램 공통 ── */
+.ex { display: grid; grid-template-columns: 1fr 372px; gap: 0 32px; align-items: start; }
+.ex-wide { grid-template-columns: 648px 1fr; }
+.ex svg { display: block; width: 100%; height: auto; }
+.ctl { display: flex; flex-direction: column; gap: 8px; }
+.ctl > p { margin: 0; }
+.lab { font-size: 23px; font-weight: 700; color: var(--gray); }
+.seg { display: flex; gap: 8px; }
+section.slide .seg button { flex: 1; min-height: 56px; margin: 0; padding: 0 6px; font: inherit; font-size: 24px; font-weight: 700; border: 3px solid #D5CCBB; border-radius: 10px; background: #fff; color: var(--ink); cursor: pointer; }
+section.slide .seg button[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
+.sent { margin: 10px 0 0; padding: 12px 20px; border-radius: 14px; background: #fff; border: 3px solid var(--ink); font-size: 36px; line-height: 1.3; }
+.sent b { padding: 0 6px; border-radius: 6px; }
+.sent b.c-past { background: var(--past-soft); } .sent b.c-now { background: var(--now-soft); }
+.sent b.c-fut { background: var(--fut-soft); } .sent b.c-hab { background: var(--hab-soft); }
+.gloss { margin: 6px 0 0; font-size: 24px; color: var(--gray); }
+.rule { padding: 10px 14px; border-radius: 12px; background: #fff; border: 2px dashed #B9B0A0; font-size: 23px; line-height: 1.45; }
+.rule b { font-size: 26px; }
+.say { margin: 0; font-size: 24px; line-height: 1.45; font-weight: 700; text-wrap: pretty; }
+.tag { display: inline-block; padding: 2px 12px; border-radius: 8px; color: #fff; font-size: 22px; font-weight: 800; }
+.t-past { background: var(--past); } .t-now { background: var(--now); } .t-fut { background: var(--fut); } .t-hab { background: var(--hab); }
+
+/* 지금이 흐르면 */
+.card2 { display: grid; grid-template-columns: 112px 1fr; gap: 12px; align-items: center; margin-top: 10px; padding: 10px 14px; border-radius: 14px; background: #fff; border: 2px solid #DDD6C8; }
+.card2 .en { font-size: 30px; line-height: 1.3; }
+.card2 .en b { padding: 0 4px; border-radius: 6px; }
+.card2 .tag { text-align: center; }
+.clockrow { display: grid; grid-template-columns: 150px 1fr; gap: 14px; align-items: center; }
+.digi { font-size: 36px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.cnt { display: flex; gap: 8px; flex-wrap: wrap; }
+.cnt span { padding: 4px 10px; border-radius: 8px; font-size: 22px; font-weight: 800; }
+
+/* 과거형 규칙 */
+.rules { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 22px; margin-top: 6px; }
+.rules > div { padding: 12px 18px; border-radius: 12px; background: #fff; border-left: 8px solid var(--past); font-size: 27px; line-height: 1.5; }
+.rules > div.irr { border-left-color: var(--now); grid-column: 1 / -1; }
+.rules b { display: block; font-size: 27px; margin-bottom: 4px; }
+.rules .en { font-size: 30px; }
+.blank { min-width: 3em; }
+
+/* 확인 */
+.quiz .opt { font-family: Georgia, "Times New Roman", serif; }
+.sort > span { font-family: Georgia, "Times New Roman", serif; font-size: 24px; }
+.sort .bin { min-height: 92px; }
+.write .short { margin-bottom: 14px; }
+
+/* 정리 */
+.sum { margin: 26px 0 0; padding: 0; list-style: none; }
+.sum li { position: relative; padding-left: 40px; margin: 0 0 20px; font-size: 30px; line-height: 1.45; }
+.sum li::before { content: ""; position: absolute; left: 4px; top: 13px; width: 20px; height: 20px; border-radius: 50%; background: var(--now); }
+.sum li.p::before { background: var(--past); } .sum li.f::before { background: var(--fut); }
+</style>
+</head>
+<body data-theme="ppt">
+
+<!-- 1 표지 -->
+<section class="slide" id="cover" data-title="표지">
+  <div class="cv">
+    <p class="cv-k">중학교 영어 · 문법</p>
+    <h1>시간선 위의 동사</h1>
+    <p class="cv-s">과거, 현재 진행, 미래</p>
+    <svg width="1000" height="120" viewBox="0 0 1000 120" aria-label="과거, 지금, 미래가 표시된 시간선">
+      <path d="M10 60 H975" stroke="#FFFFFF" stroke-width="5"/><path d="M975 46 L995 60 L975 74 Z" fill="#FFFFFF"/>
+      <circle cx="170" cy="60" r="18" fill="#2F6DB5"/><circle cx="500" cy="60" r="24" fill="#D64545"/><circle cx="830" cy="60" r="18" fill="#2E8B57"/>
+      <g font-size="28" font-weight="700" fill="#FFFFFF" text-anchor="middle" font-family="Georgia, serif">
+        <text x="170" y="112">played</text><text x="500" y="20">is playing</text><text x="830" y="112">will play</text>
+      </g>
+    </svg>
+  </div>
+</section>
+
+<!-- 2 학습 목표 -->
+<section class="slide" id="goal" data-sec="학습 목표" data-title="학습 목표">
+  <h2>학습 목표</h2>
+  <ol class="goals">
+    <li>말하는 때와 일이 일어난 때를 시간선 위에 나타낼 수 있다.</li>
+    <li>일이 일어난 때에 맞게 동사 모양을 바꿔 문장을 쓸 수 있다.</li>
+  </ol>
+</section>
+
+<!-- 3 생각 열기 -->
+<section class="slide" id="think" data-sec="생각 열기" data-title="세 문장에서 달라진 것">
+  <h2>세 문장에서 무엇이 달라졌을까?</h2>
+  <div data-ai="생각 열기 예문">
+    <div class="three en">
+      <p>I played badminton yesterday.</p>
+      <p>I am playing badminton now.</p>
+      <p>I will play badminton tomorrow.</p>
+    </div>
+    <p class="ask">같은 동사 play가 세 문장에서 어떻게 바뀌었는지 찾아보자.</p>
+    <p class="think-a step">배드민턴을 친 때가 어제, 지금, 내일로 다르다.<br>그래서 동사가 <b class="c-past en">played</b>, <b class="c-now en">am playing</b>, <b class="c-fut en">will play</b>로 바뀌었다.</p>
+  </div>
+</section>
+
+<!-- 4 개념: 시간선 -->
+<section class="slide" id="timeline" data-sec="개념" data-title="시간선과 동사 모양">
+  <h2>말하는 지금을 기준으로 보는 시간선</h2>
+  <div>
+    <svg viewBox="0 0 1120 150" aria-label="말하는 지금을 가운데에 둔 시간선. 왼쪽은 과거, 오른쪽은 미래">
+      <rect x="20" y="60" width="520" height="40" rx="8" fill="#E3EDF8"/>
+      <rect x="580" y="60" width="500" height="40" rx="8" fill="#E0F1E7"/>
+      <path d="M20 80 H1085" stroke="#222B36" stroke-width="4"/><path d="M1085 68 L1104 80 L1085 92 Z" fill="#222B36"/>
+      <circle cx="560" cy="80" r="16" fill="#D64545"/>
+      <g font-size="26" font-weight="800" text-anchor="middle">
+        <text x="280" y="44" fill="#2F6DB5">과거: 지금보다 앞의 일</text>
+        <text x="560" y="138" fill="#D64545">말하는 지금</text>
+        <text x="830" y="44" fill="#2E8B57">미래: 지금보다 뒤의 일</text>
+      </g>
+    </svg>
+    <div class="forms" data-anim="fade-up" data-stagger>
+      <div class="fp"><b>과거</b>지금보다 앞에 끝난 일<span class="f">동사 + -ed</span><span class="ex en">played</span></div>
+      <div class="fn"><b>현재 진행</b>지금 하고 있는 일<span class="f">am / is / are + -ing</span><span class="ex en">am playing</span></div>
+      <div class="ff"><b>미래</b>지금보다 뒤에 할 일<span class="f">will + 동사원형</span><span class="ex en">will play</span></div>
+      <div class="fh"><b>현재</b>늘 되풀이하는 일<span class="f">동사원형 (+ -s, -es)</span><span class="ex en">play, plays</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 5 익스플로라그램: 일을 시간선 위로 옮기기 -->
+<section class="slide" id="move" data-sec="개념" data-title="일이 일어난 때를 옮기면">
+  <h2>일이 일어난 때를 옮기면 문장은?</h2>
+  <div class="calc" data-ai="시간선 위 사건 옮기기: 동사 모양 판정"
+       data-let="d = k == 1 ? -4 : k == 2 ? -1 : k == 4 ? 1 : k == 5 ? 4 : 0;
+                 tn = k == 6 ? 'habit' : d < 0 ? 'past' : d == 0 ? 'now' : 'future';
+                 px = 324 + d * 66;
+                 pa = v == 'play' ? 'played' : v == 'study' ? 'studied' : 'went';
+                 ing = v == 'play' ? 'playing' : v == 'study' ? 'studying' : 'going';
+                 s3 = v == 'play' ? 'plays' : v == 'study' ? 'studies' : 'goes';
+                 be = s == 'I' ? 'am' : s == 'She' ? 'is' : 'are';
+                 vp = tn == 'past' ? pa : tn == 'now' ? be + ' ' + ing : tn == 'future' ? 'will ' + v : (s == 'She' ? s3 : v);
+                 ob = v == 'play' ? 'badminton' : v == 'study' ? 'English' : 'to the library';
+                 tw = k == 1 ? 'last week' : k == 2 ? 'yesterday' : k == 3 ? 'now' : k == 4 ? 'tomorrow' : k == 5 ? 'next week' : 'every day';
+                 col = tn == 'past' ? '#2F6DB5' : tn == 'now' ? '#D64545' : tn == 'future' ? '#2E8B57' : '#8A5CC2';
+                 ks = s == 'I' ? '나는' : s == 'She' ? '그녀는' : '그들은';
+                 kt = k == 1 ? '지난주에' : k == 2 ? '어제' : k == 3 ? '지금' : k == 4 ? '내일' : k == 5 ? '다음 주에' : '매일';
+                 ko = v == 'play' ? '배드민턴을 ' + (tn == 'past' ? '쳤다' : tn == 'now' ? '치고 있다' : tn == 'future' ? '칠 것이다' : '친다') : v == 'study' ? '영어를 ' + (tn == 'past' ? '공부했다' : tn == 'now' ? '공부하고 있다' : tn == 'future' ? '공부할 것이다' : '공부한다') : '도서관에 ' + (tn == 'past' ? '갔다' : tn == 'now' ? '가고 있다' : tn == 'future' ? '갈 것이다' : '간다')">
+    <div class="reveal ex ex-wide" data-name="k" data-stops="시작|지난주|어제|지금|내일|다음 주|매일">
+      <div class="veil">
+        <svg viewBox="0 0 648 230" aria-label="말하는 지금을 가운데에 둔 시간선과 일이 일어난 때">
+          <rect x="14" y="104" width="298" height="40" rx="8" fill="#E3EDF8"/>
+          <rect x="336" y="104" width="292" height="40" rx="8" fill="#E0F1E7"/>
+          <path d="M14 124 H620" stroke="#222B36" stroke-width="4"/><path d="M620 113 L638 124 L620 135 Z" fill="#222B36"/>
+          <g fill="#5E6670" font-size="21" text-anchor="middle" font-family="Georgia, serif">
+            <text x="60" y="172">last week</text><text x="258" y="172">yesterday</text><text x="390" y="172">tomorrow</text><text x="588" y="172">next week</text>
+          </g>
+          <g stroke="#5E6670" stroke-width="2"><path d="M60 144 V152 M258 144 V152 M390 144 V152 M588 144 V152 M126 144 V150 M192 144 V150 M456 144 V150 M522 144 V150"/></g>
+          <g font-size="22" font-weight="800" text-anchor="middle"><text x="160" y="218" fill="#2F6DB5">과거</text><text x="490" y="218" fill="#2E8B57">미래</text></g>
+          <path d="M324 100 V150" stroke="#D64545" stroke-width="5"/>
+          <text x="324" y="200" font-size="22" font-weight="800" fill="#D64545" text-anchor="middle">말하는 지금</text>
+          <path fill="none" stroke-width="4" stroke-dasharray="8 7" data-attr="d: 'M 324 112 Q ' + (324 + px) / 2 + ' ' + (112 - abs(d) * 14 - 24) + ' ' + px + ' 112'; stroke: col" data-style="opacity: k == 3 || k == 6 ? 0 : 1"/>
+          <g data-style="opacity: k == 6 ? 1 : 0" fill="#8A5CC2">
+            <circle cx="60" cy="124" r="11"/><circle cx="126" cy="124" r="11"/><circle cx="192" cy="124" r="11"/><circle cx="258" cy="124" r="11"/><circle cx="324" cy="124" r="11"/>
+            <circle cx="390" cy="124" r="11"/><circle cx="456" cy="124" r="11"/><circle cx="522" cy="124" r="11"/><circle cx="588" cy="124" r="11"/>
+          </g>
+          <g data-attr="transform: 'translate(' + (px - 324) + ' 0)'" data-style="opacity: k == 6 ? 0 : 1">
+            <path d="M324 124 L308 78 A 22 22 0 1 1 340 78 Z" data-attr="fill: col"/>
+            <circle cx="324" cy="62" r="9" fill="#FFFFFF"/>
+          </g>
+          <text x="324" y="30" font-size="28" font-weight="800" text-anchor="middle" data-attr="fill: col" data-expr="tn == 'past' ? '과거' : tn == 'now' ? '현재 진행' : tn == 'future' ? '미래' : '현재 (늘 하는 일)'"></text>
+        </svg>
+        <p class="sent en"><span data-expr="s"></span> <b data-expr="vp" data-class="c-past: tn == 'past'; c-now: tn == 'now'; c-fut: tn == 'future'; c-hab: tn == 'habit'"></b> <span data-expr="ob + ' ' + tw + '.'"></span></p>
+        <p class="gloss" data-expr="ks + ' ' + kt + ' ' + ko + '.'"></p>
+      </div>
+      <div class="ctl">
+        <p class="lab">일이 일어난 때</p>
+        <div class="ch-stops"></div>
+        <p class="lab">동사</p>
+        <div class="seg en"><button data-set="v" data-value="play" aria-pressed="true">play</button><button data-set="v" data-value="study">study</button><button data-set="v" data-value="go">go</button></div>
+        <p class="lab">주어</p>
+        <div class="seg en"><button data-set="s" data-value="I">I</button><button data-set="s" data-value="She" aria-pressed="true">She</button><button data-set="s" data-value="They">They</button></div>
+        <div class="rule" data-at="1">
+          <span class="tag" data-class="t-past: tn == 'past'; t-now: tn == 'now'; t-fut: tn == 'future'; t-hab: tn == 'habit'" data-expr="tn == 'past' ? '과거' : tn == 'now' ? '현재 진행' : tn == 'future' ? '미래' : '현재'"></span>
+          <b data-expr="tn == 'past' ? (v == 'go' ? '불규칙 동사: go → went' : v == 'study' ? 'y를 i로 바꾸고 -ed' : '동사 + -ed') : tn == 'now' ? be + ' + 동사-ing' : tn == 'future' ? 'will + 동사원형' : (s == 'She' ? '3인칭 단수: ' + v + ' → ' + s3 : '동사원형 그대로')"></b><br>
+          <span data-expr="tn == 'past' ? '말하는 지금보다 앞의 일이다.' : tn == 'now' ? '말하는 지금 하고 있는 일이다.' : tn == 'future' ? '말하는 지금보다 뒤의 일이다.' : '날마다 되풀이하는 일이다.'"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 6 과거형 만들기 -->
+<section class="slide" id="past-forms" data-sec="개념" data-title="과거형 만드는 법">
+  <h2>과거형은 어떻게 만들까?</h2>
+  <div class="rules">
+    <div><b>대부분: 동사 + -ed</b><span class="en">play → <span class="blank">played</span>, watch → <span class="blank">watched</span></span></div>
+    <div><b>e로 끝나면: + -d</b><span class="en">like → <span class="blank">liked</span>, dance → <span class="blank">danced</span></span></div>
+    <div><b>자음 + y로 끝나면: y를 i로 바꾸고 -ed</b><span class="en">study → <span class="blank">studied</span>, cry → <span class="blank">cried</span></span></div>
+    <div><b>짧은 모음 + 자음 하나: 자음을 겹치고 -ed</b><span class="en">stop → <span class="blank">stopped</span>, plan → <span class="blank">planned</span></span></div>
+    <div class="irr"><b>불규칙 동사: 모양이 따로 있다</b><span class="en">go → <span class="blank">went</span>, have → <span class="blank">had</span>, eat → <span class="blank">ate</span>, see → <span class="blank">saw</span>, make → <span class="blank">made</span></span></div>
+  </div>
+</section>
+
+<!-- 7 확인 문제 1 -->
+<section class="slide" id="check-1" data-sec="확인 문제" data-title="확인 문제 1">
+  <h2>확인 문제 1</h2>
+  <div>
+    <p class="q" data-n="1" data-ai="문항">빈칸에 알맞은 말은?<br><span class="en">My sister ______ to the museum last Saturday.</span></p>
+    <div class="quiz">
+      <button class="opt" data-ai="풀이" data-why="last Saturday는 지난 일이다. 동사원형 go는 쓰지 않는다.">go</button>
+      <button class="opt" data-ai="풀이" data-why="goes는 늘 되풀이하는 일을 말할 때 쓴다.">goes</button>
+      <button class="opt" data-ok data-ai="풀이" data-why="맞다. last Saturday는 지난 일이고 go의 과거형은 went다.">went</button>
+      <button class="opt" data-ai="풀이" data-why="will go는 앞으로 할 일이다. last Saturday와 맞지 않는다.">will go</button>
+      <button class="opt" data-ai="풀이" data-why="is going은 지금 하고 있는 일이다. last Saturday와 맞지 않는다.">is going</button>
+    </div>
+  </div>
+</section>
+
+<!-- 8 익스플로라그램: 지금이 흐르면 -->
+<section class="slide" id="now-moves" data-sec="개념" data-title="지금이 흐르면">
+  <h2>지금이 흐르면 같은 일도 다르게 말할까?</h2>
+  <div class="calc ex" data-ai="하루 일정과 말하는 때: 시제 판정"
+       data-let="sa = t < 120 ? 'f' : t < 210 ? 'n' : 'p'; sb = t < 300 ? 'f' : t < 340 ? 'n' : 'p';
+                 np = (sa == 'p' ? 1 : 0) + (sb == 'p' ? 1 : 0); nn = (sa == 'n' ? 1 : 0) + (sb == 'n' ? 1 : 0); nf = 2 - np - nn;
+                 mm = t % 60; hh = 1 + floor(t / 60)">
+    <div>
+      <svg viewBox="0 0 720 222" aria-label="오후 1시부터 7시까지의 하루 띠와 두 일정, 지금 표시">
+        <rect x="40" y="70" width="640" height="56" rx="10" fill="#FFFFFF" stroke="#D5CCBB" stroke-width="2"/>
+        <rect x="40" y="70" height="56" rx="10" fill="#E9E4DA" data-attr="width: t * 1.7778"/>
+        <rect x="253.3" y="78" width="160" height="40" rx="8" stroke-width="4" data-attr="fill: sa == 'p' ? '#2F6DB5' : sa == 'n' ? '#D64545' : '#E0F1E7'; stroke: sa == 'p' ? '#2F6DB5' : sa == 'n' ? '#D64545' : '#2E8B57'"/>
+        <rect x="573.3" y="78" width="71.1" height="40" rx="8" stroke-width="4" data-attr="fill: sb == 'p' ? '#2F6DB5' : sb == 'n' ? '#D64545' : '#E0F1E7'; stroke: sb == 'p' ? '#2F6DB5' : sb == 'n' ? '#D64545' : '#2E8B57'"/>
+        <g font-size="22" font-weight="800" fill="#222B36" text-anchor="middle"><text x="333" y="58">배드민턴 연습</text><text x="609" y="58">저녁 식사</text></g>
+        <g fill="#5E6670" font-size="20" text-anchor="middle">
+          <text x="40" y="154">1시</text><text x="146.7" y="154">2시</text><text x="253.3" y="154">3시</text><text x="360" y="154">4시</text><text x="466.7" y="154">5시</text><text x="573.3" y="154">6시</text><text x="680" y="154">7시</text>
+        </g>
+        <g data-attr="transform: 'translate(' + t * 1.7778 + ' 0)'">
+          <path d="M40 62 V134" stroke="#D64545" stroke-width="5"/>
+          <path d="M28 190 L40 164 L52 190 Z" fill="#D64545"/>
+          <text x="40" y="216" font-size="22" font-weight="800" fill="#D64545" text-anchor="middle">지금</text>
+        </g>
+      </svg>
+      <div class="card2">
+        <span class="tag" data-class="t-past: sa == 'p'; t-now: sa == 'n'; t-fut: sa == 'f'" data-expr="sa == 'p' ? '끝난 일' : sa == 'n' ? '하는 중' : '할 일'"></span>
+        <p class="en" style="margin:0">We <b data-class="c-past: sa == 'p'; c-now: sa == 'n'; c-fut: sa == 'f'" data-expr="sa == 'p' ? 'practiced' : sa == 'n' ? 'are practicing' : 'will practice'"></b> <span data-expr="'badminton ' + (sa == 'p' ? 'this afternoon.' : sa == 'n' ? 'now.' : 'at three.')"></span></p>
+      </div>
+      <div class="card2">
+        <span class="tag" data-class="t-past: sb == 'p'; t-now: sb == 'n'; t-fut: sb == 'f'" data-expr="sb == 'p' ? '끝난 일' : sb == 'n' ? '하는 중' : '할 일'"></span>
+        <p class="en" style="margin:0">My family <b data-class="c-past: sb == 'p'; c-now: sb == 'n'; c-fut: sb == 'f'" data-expr="sb == 'p' ? 'had' : sb == 'n' ? 'is having' : 'will have'"></b> <span data-expr="'dinner ' + (sb == 'p' ? 'this evening.' : sb == 'n' ? 'now.' : 'at six.')"></span></p>
+      </div>
+    </div>
+    <div class="ctl">
+      <div class="clockrow">
+        <svg viewBox="0 0 150 150" aria-label="지금 시각을 가리키는 시계">
+          <circle cx="75" cy="75" r="68" fill="#FFFFFF" stroke="#222B36" stroke-width="5"/>
+          <g stroke="#222B36" stroke-width="4"><path d="M75 12 V22 M75 128 V138 M12 75 H22 M128 75 H138"/></g>
+          <path d="M75 75 V40" stroke="#222B36" stroke-width="8" stroke-linecap="round" data-attr="transform: 'rotate(' + (30 + t * 0.5) + ' 75 75)'"/>
+          <path d="M75 75 V22" stroke="#D64545" stroke-width="5" stroke-linecap="round" data-attr="transform: 'rotate(' + t * 6 + ' 75 75)'"/>
+          <circle cx="75" cy="75" r="7" fill="#222B36"/>
+        </svg>
+        <div>
+          <p class="lab" style="margin:0">지금</p>
+          <p class="digi" style="margin:0" data-expr="'오후 ' + hh + ':' + (mm < 10 ? '0' : '') + mm"></p>
+        </div>
+      </div>
+      <input type="range" name="t" min="0" max="360" step="10" value="0" data-play="12" aria-label="지금 시각">
+      <div class="cnt">
+        <span class="c-past" style="background:var(--past-soft)">끝난 일 <output data-expr="np"></output></span>
+        <span class="c-now" style="background:var(--now-soft)">하는 중 <output data-expr="nn"></output></span>
+        <span class="c-fut" style="background:var(--fut-soft)">할 일 <output data-expr="nf"></output></span>
+      </div>
+      <p class="say" data-show="t == 0">「▶ 재생」을 누르고<br>일정이 어떻게 바뀌는지 보자.</p>
+      <p class="say" data-show="t > 0 && t < 360 && nn == 0">끝난 일은 과거로,<br>할 일은 미래로 말한다.</p>
+      <p class="say" data-show="t > 0 && nn == 1">지금 하고 있는 일은<br>am / is / are + -ing로 말한다.</p>
+      <p class="say" data-show="t == 360">일은 그대로인데 지금이 흘렀다.<br>그래서 시제가 바뀌었다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 9 확인 문제 2 -->
+<section class="slide" id="check-2" data-sec="확인 문제" data-title="확인 문제 2">
+  <h2>확인 문제 2</h2>
+  <div>
+    <p class="q" data-n="2">문장이 말하는 때에 따라 나누어 보자.</p>
+    <div class="sort">
+      <div class="bin" data-bin="p"><h3 class="c-past">과거</h3></div>
+      <div class="bin" data-bin="n"><h3 class="c-now">지금 하고 있는 일</h3></div>
+      <div class="bin" data-bin="f"><h3 class="c-fut">미래</h3></div>
+      <span data-bin="p" data-ai="예문과 풀이" data-why="watched와 last night이 지난 일을 말한다." data-hint="last night은 언제일까?">We watched a movie last night.</span>
+      <span data-bin="n" data-ai="예문과 풀이" data-why="is cooking과 now가 지금 하고 있는 일을 말한다." data-hint="is + -ing는 어느 때를 말할까?">My dad is cooking dinner now.</span>
+      <span data-bin="f" data-ai="예문과 풀이" data-why="will visit와 next week이 앞으로 할 일을 말한다." data-hint="will 다음에는 언제 할 일이 올까?">I will visit my grandma next week.</span>
+      <span data-bin="p" data-ai="예문과 풀이" data-why="studied는 study의 과거형이다." data-hint="studied는 어떤 동사의 어떤 모양일까?">She studied for the test yesterday.</span>
+      <span data-bin="n" data-ai="예문과 풀이" data-why="are swimming과 right now가 지금 하고 있는 일을 말한다." data-hint="are + -ing가 보이는가?">They are swimming in the pool right now.</span>
+      <span data-bin="f" data-ai="예문과 풀이" data-why="will arrive는 10분 뒤에 일어날 일이다." data-hint="in ten minutes는 지금보다 앞일까, 뒤일까?">The bus will arrive in ten minutes.</span>
+    </div>
+  </div>
+</section>
+
+<!-- 10 확인 문제 3 -->
+<section class="slide" id="check-3" data-sec="확인 문제" data-title="확인 문제 3">
+  <h2>확인 문제 3</h2>
+  <div>
+    <p class="q" data-n="3" data-ai="문항">시간 표현과 동사 모양이 맞지 않는 문장은?</p>
+    <div class="quiz">
+      <button class="opt" data-ai="풀이" data-why="tomorrow는 앞으로의 일이다. will meet와 맞다.">I will meet my cousin tomorrow.</button>
+      <button class="opt" data-ai="풀이" data-why="now는 지금이다. is reading과 맞다.">She is reading a comic book now.</button>
+      <button class="opt" data-ai="풀이" data-why="last night은 지난 일이다. eat의 과거형 ate와 맞다.">They ate pizza last night.</button>
+      <button class="opt" data-ok data-ai="풀이" data-why="맞다. next Sunday는 앞으로의 일이다. We will play soccer next Sunday.로 고친다.">We played soccer next Sunday.</button>
+      <button class="opt" data-ai="풀이" data-why="every day는 늘 하는 일이다. 주어 He에 맞게 goes를 썼다.">He goes to school every day.</button>
+    </div>
+  </div>
+</section>
+
+<!-- 11 문장 쓰기 -->
+<section class="slide write" id="write" data-sec="확인 문제" data-title="내 문장 쓰기">
+  <h2>어제 한 일과 내일 할 일을 써 보자</h2>
+  <div>
+    <div class="short" data-ph="Yesterday, I ...">
+      <p class="ask"><span class="tag t-past">과거</span> 어제 한 일을 영어 문장 하나로 써 보자.</p>
+    </div>
+    <div class="short" data-ph="Tomorrow, I will ...">
+      <p class="ask"><span class="tag t-fut">미래</span> 내일 할 일을 영어 문장 하나로 써 보자.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 12 정리 -->
+<section class="slide" id="summary" data-sec="정리" data-title="정리">
+  <h2>정리</h2>
+  <ul class="sum">
+    <li>시제는 <span class="blank">말하는 지금</span>과 일이 일어난 때를 견주어 정한다.</li>
+    <li class="p">과거: 지금보다 앞의 일. 동사 + -ed, 불규칙 동사는 <span class="blank">따로 외운다</span>.</li>
+    <li>현재 진행: 지금 하고 있는 일. <span class="blank">am / is / are</span> + 동사-ing</li>
+    <li class="f">미래: 지금보다 뒤의 일. <span class="blank">will</span> + 동사원형</li>
+    <li>yesterday, now, tomorrow 같은 <span class="blank">시간 표현</span>과 시제를 맞춘다.</li>
+  </ul>
+</section>
+
+</body>
+</html>

@@ -1,0 +1,46 @@
+[
+  {
+    "slug": "v3-mid-math",
+    "level": "중등",
+    "subject": "수학",
+    "title": "그래프로 읽는 일차함수",
+    "question": "기울기와 y절편은 상황에서 무엇을 뜻할까?",
+    "exploragrams": ["걷는 빠르기와 출발점에 따라 그려지는 거리 그래프", "타서 짧아지는 초와 기울기가 음수인 그래프", "이용 시간을 옮기며 견주는 두 대여점 요금"],
+    "slides": 11,
+    "model": "Claude Opus 5.5 · xhigh",
+    "made": "2026-10-18"
+  },
+  {
+    "slug": "v3-mid-english",
+    "level": "중등",
+    "subject": "영어",
+    "title": "시간선 위의 동사",
+    "question": "일이 일어난 때를 옮기면 동사는 어떻게 바뀔까?",
+    "exploragrams": ["시간선 위로 일을 옮기면 바뀌는 동사와 문장", "지금이 흐르면 바뀌는 일정의 시제"],
+    "slides": 12,
+    "model": "Claude Opus 5.5 · xhigh",
+    "made": "2026-10-18"
+  },
+  {
+    "slug": "v3-mid-info",
+    "level": "중등",
+    "subject": "정보",
+    "title": "정렬 알고리즘",
+    "question": "세 정렬은 몇 번 견주고 몇 번 바꿀까?",
+    "exploragrams": ["한 단계씩 재생하며 세는 비교와 교환", "같은 자료로 함께 출발하는 세 정렬", "자료 수에 따른 비교 횟수 그래프"],
+    "slides": 11,
+    "model": "Claude Opus 5.5 · xhigh",
+    "made": "2026-10-18"
+  },
+  {
+    "slug": "v3-mid-tech",
+    "level": "중등",
+    "subject": "기술·가정",
+    "title": "우리 집 전기 사용",
+    "question": "멀티탭에 무엇을 함께 켜면 한도를 넘을까?",
+    "exploragrams": ["가전을 켤 때마다 오르는 멀티탭 전류계", "아침 준비 시간에 겹쳐 켜지는 가전과 전류", "한 달 동안 쌓이는 전력량과 요금(모형)"],
+    "slides": 12,
+    "model": "Claude Opus 5.5 · xhigh",
+    "made": "2026-10-18"
+  }
+]

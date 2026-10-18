@@ -1,0 +1,116 @@
+[
+ {
+  "slide": 5,
+  "name": "tap-start"
+ },
+ {
+  "slide": 5,
+  "name": "tap-tv-nb",
+  "js": "{ const c = document.querySelector('#tap input[name=tv]'); c.checked = !c.checked; c.dispatchEvent(new Event('change', { bubbles: true })); }{ const c = document.querySelector('#tap input[name=nb]'); c.checked = !c.checked; c.dispatchEvent(new Event('change', { bubbles: true })); }"
+ },
+ {
+  "slide": 5,
+  "name": "tap-plus-dryer-mw",
+  "js": "{ const c = document.querySelector('#tap input[name=dr]'); c.checked = !c.checked; c.dispatchEvent(new Event('change', { bubbles: true })); }{ const c = document.querySelector('#tap input[name=mw]'); c.checked = !c.checked; c.dispatchEvent(new Event('change', { bubbles: true })); }"
+ },
+ {
+  "slide": 5,
+  "name": "tap-all-over",
+  "js": "{ const c = document.querySelector('#tap input[name=ht]'); c.checked = !c.checked; c.dispatchEvent(new Event('change', { bubbles: true })); }{ const c = document.querySelector('#tap input[name=kt]'); c.checked = !c.checked; c.dispatchEvent(new Event('change', { bubbles: true })); }"
+ },
+ {
+  "slide": 5,
+  "name": "tap-limit10-dryer",
+  "js": "{ const c = document.querySelector('#tap input[name=ht]'); c.checked = !c.checked; c.dispatchEvent(new Event('change', { bubbles: true })); }{ const c = document.querySelector('#tap input[name=kt]'); c.checked = !c.checked; c.dispatchEvent(new Event('change', { bubbles: true })); }{ const c = document.querySelector('#tap input[name=mw]'); c.checked = !c.checked; c.dispatchEvent(new Event('change', { bubbles: true })); }{ const c = document.querySelector('#tap input[name=tv]'); c.checked = !c.checked; c.dispatchEvent(new Event('change', { bubbles: true })); }{ const c = document.querySelector('#tap input[name=nb]'); c.checked = !c.checked; c.dispatchEvent(new Event('change', { bubbles: true })); }document.querySelector('#tap [data-set=L][data-value=\"10\"]').click();"
+ },
+ {
+  "slide": 5,
+  "name": "tap-limit10-near",
+  "js": "{ const c = document.querySelector('#tap input[name=mw]'); c.checked = !c.checked; c.dispatchEvent(new Event('change', { bubbles: true })); }"
+ },
+ {
+  "slide": 7,
+  "name": "morning-start"
+ },
+ {
+  "slide": 7,
+  "name": "morning-t27-over",
+  "js": "const r = document.querySelector('#morning input[name=t]'); r.value = 27; r.dispatchEvent(new Event('input', { bubbles: true }))"
+ },
+ {
+  "slide": 7,
+  "name": "morning-end-over",
+  "js": "const r = document.querySelector('#morning input[name=t]'); r.value = 60; r.dispatchEvent(new Event('input', { bubbles: true }))"
+ },
+ {
+  "slide": 7,
+  "name": "morning-ds15-end",
+  "js": "{ const r = document.querySelector('#morning input[name=ds]'); r.value = 15; r.dispatchEvent(new Event('input', { bubbles: true })) } { const r= document.querySelector('#morning input[name=t]'); r.value = 60; r.dispatchEvent(new Event('input', { bubbles: true })) }"
+ },
+ {
+  "slide": 7,
+  "name": "morning-ds30-t37",
+  "js": "{ const r = document.querySelector('#morning input[name=ds]'); r.value = 30; r.dispatchEvent(new Event('input', { bubbles: true })) } { const r= document.querySelector('#morning input[name=t]'); r.value = 37; r.dispatchEvent(new Event('input', { bubbles: true })) }"
+ },
+ {
+  "slide": 7,
+  "name": "morning-ds50-t45",
+  "js": "{ const r = document.querySelector('#morning input[name=ds]'); r.value = 50; r.dispatchEvent(new Event('input', { bubbles: true })) } { const r= document.querySelector('#morning input[name=t]'); r.value = 45; r.dispatchEvent(new Event('input', { bubbles: true })) }"
+ },
+ {
+  "slide": 9,
+  "name": "month-start"
+ },
+ {
+  "slide": 9,
+  "name": "month-heater-d15",
+  "js": "const r = document.querySelector('#month input[name=day]'); r.value = 15; r.dispatchEvent(new Event('input', { bubbles: true }))"
+ },
+ {
+  "slide": 9,
+  "name": "month-heater-8h-end",
+  "js": "{ const r = document.querySelector('#month input[name=h]'); r.value = 8; r.dispatchEvent(new Event('input', { bubbles: true })) } { const r= document.querySelector('#month input[name=day]'); r.value = 30; r.dispatchEvent(new Event('input', { bubbles: true })) }"
+ },
+ {
+  "slide": 9,
+  "name": "month-led-1h-end",
+  "js": "document.querySelector('#month [data-set=W][data-value=\"10\"]').click();const r = document.querySelector('#month input[name=h]'); r.value = 1; r.dispatchEvent(new Event('input', { bubbles: true }))"
+ },
+ {
+  "slide": 9,
+  "name": "month-tv-4h-end",
+  "js": "document.querySelector('#month [data-set=W][data-value=\"100\"]').click();const r = document.querySelector('#month input[name=h]'); r.value = 4; r.dispatchEvent(new Event('input', { bubbles: true }))"
+ },
+ {
+  "slide": 1,
+  "name": "cover"
+ },
+ {
+  "slide": 3,
+  "name": "think"
+ },
+ {
+  "slide": 4,
+  "name": "rating"
+ },
+ {
+  "slide": 6,
+  "name": "quiz1"
+ },
+ {
+  "slide": 8,
+  "name": "energy"
+ },
+ {
+  "slide": 10,
+  "name": "quiz2"
+ },
+ {
+  "slide": 11,
+  "name": "sort"
+ },
+ {
+  "slide": 12,
+  "name": "summary"
+ }
+]

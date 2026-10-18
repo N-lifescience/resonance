@@ -1,0 +1,84 @@
+[
+ {
+  "slide": 5,
+  "name": "L025-t8",
+  "js": "{ const r = document.querySelector('#period input[name=L]'); r.value = 0.25; r.dispatchEvent(new Event('input', { bubbles: true })); } { const r = document.querySelector('#period input[name=t]'); r.value = 8; r.dispatchEvent(new Event('input', { bubbles: true })) }"
+ },
+ {
+  "slide": 5,
+  "name": "L225-m200",
+  "js": "{ const r = document.querySelector('#period input[name=L]'); r.value = 2.25; r.dispatchEvent(new Event('input', { bubbles: true })); document.querySelector('#period button[data-value=\"200\"]').click() }"
+ },
+ {
+  "slide": 5,
+  "name": "t0",
+  "js": "{ const r = document.querySelector('#period input[name=t]'); r.value = 0; r.dispatchEvent(new Event('input', { bubbles: true })) }"
+ },
+ {
+  "slide": 8,
+  "name": "f030-t30",
+  "js": "{ const r = document.querySelector('#swing input[name=t]'); r.value = 30; r.dispatchEvent(new Event('input', { bubbles: true })) }"
+ },
+ {
+  "slide": 8,
+  "name": "f050-t30",
+  "js": "{ const r = document.querySelector('#swing input[name=f]'); r.value = 0.5; r.dispatchEvent(new Event('input', { bubbles: true })) }"
+ },
+ {
+  "slide": 8,
+  "name": "f046-t20",
+  "js": "{ const r = document.querySelector('#swing input[name=f]'); r.value = 0.46; r.dispatchEvent(new Event('input', { bubbles: true })); } { const r = document.querySelector('#swing input[name=t]'); r.value = 20; r.dispatchEvent(new Event('input', { bubbles: true })) }"
+ },
+ {
+  "slide": 8,
+  "name": "f070-t30",
+  "js": "{ const r = document.querySelector('#swing input[name=f]'); r.value = 0.7; r.dispatchEvent(new Event('input', { bubbles: true })); } { const r = document.querySelector('#swing input[name=t]'); r.value = 30; r.dispatchEvent(new Event('input', { bubbles: true })) }"
+ },
+ {
+  "slide": 8,
+  "name": "f050-t3",
+  "js": "{ const r = document.querySelector('#swing input[name=f]'); r.value = 0.5; r.dispatchEvent(new Event('input', { bubbles: true })); } { const r = document.querySelector('#swing input[name=t]'); r.value = 3.1; r.dispatchEvent(new Event('input', { bubbles: true })) }"
+ },
+ {
+  "slide": 8,
+  "name": "t0",
+  "js": "{ const r = document.querySelector('#swing input[name=t]'); r.value = 0; r.dispatchEvent(new Event('input', { bubbles: true })) }"
+ },
+ {
+  "slide": 9,
+  "name": "f020"
+ },
+ {
+  "slide": 9,
+  "name": "f050",
+  "js": "{ const r = document.querySelector('#curve input[name=f]'); r.value = 0.5; r.dispatchEvent(new Event('input', { bubbles: true })) }"
+ },
+ {
+  "slide": 9,
+  "name": "f080",
+  "js": "{ const r = document.querySelector('#curve input[name=f]'); r.value = 0.8; r.dispatchEvent(new Event('input', { bubbles: true })) }"
+ },
+ {
+  "slide": 9,
+  "name": "f050-gm25",
+  "js": "{ const r = document.querySelector('#curve input[name=f]'); r.value = 0.5; r.dispatchEvent(new Event('input', { bubbles: true })); document.querySelector('#curve button[data-value=\"0.25\"]').click() }"
+ },
+ {
+  "slide": 1,
+  "name": "v"
+ },
+ {
+  "slide": 3,
+  "name": "v"
+ },
+ {
+  "slide": 7,
+  "name": "v",
+  "js": "{ Exploragram.next() }"
+ },
+ {
+  "slide": 11,
+  "name": "v",
+  "js": "{ Exploragram.next() }"
+ }
+]

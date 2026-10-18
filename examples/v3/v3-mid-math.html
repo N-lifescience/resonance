@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="ko" data-deck="v3-mid-math">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>그래프로 읽는 일차함수 · 기울기와 y절편의 뜻</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/engine/exploragram.css">
+<script defer src="https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/engine/exploragram.js"></script>
+<style>
+body[data-theme="ppt"] {
+  --accent: #1D3557; --tab: #1D3557; --tab-ink: #FFFFFF;
+  --navy: #1D3557; --slope: #2B59C3; --icpt: #1F8A70; --neg: #D1495B; --pen: #F2B705; --soft: #EEF2F8;
+  --ink: #1B2430; --gray: #5B6574; --grid: #E6ECF4;
+}
+
+/* ── 얼굴: 모눈 노트 + 제목 아래 눈금 축 + 오른쪽 위 노란 쪽지 ── */
+body[data-theme="ppt"] section.slide {
+  background:
+    linear-gradient(var(--navy), var(--navy)) 60px 96px / 1160px 4px no-repeat,
+    repeating-linear-gradient(90deg, var(--navy) 0 3px, transparent 3px 40px) 60px 88px / 1163px 20px no-repeat,
+    linear-gradient(var(--grid) 1px, transparent 1px) 0 0 / 32px 32px,
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px) 0 0 / 32px 32px,
+    #FFFFFF;
+  color: var(--ink);
+}
+body[data-theme="ppt"] section.slide[data-sec]::before {
+  left: auto; right: 48px; top: 20px; height: 50px; line-height: 50px; min-width: 150px; padding: 0 22px; box-sizing: border-box;
+  display: flex; align-items: center; justify-content: center; border-radius: 4px; background: var(--pen); color: var(--navy);
+  font-size: 24px; font-weight: 800; transform: rotate(-2deg); box-shadow: 0 3px 0 rgba(29, 53, 87, .25);
+}
+body[data-theme="ppt"] section.slide > h2:first-child {
+  position: absolute; top: 18px; left: 60px; right: 240px; height: 66px; margin: 0; padding: 0; border: 0; background: none; width: auto;
+  display: flex; align-items: center; color: var(--navy); font-size: 40px; line-height: 1.2; text-wrap: balance;
+}
+.v { font-family: "Times New Roman", "STIX Two Text", serif; font-style: italic; font-size: 1.1em; }
+.k-s { color: var(--slope); font-weight: 800; }
+.k-b { color: var(--icpt); font-weight: 800; }
+.k-n { color: var(--neg); font-weight: 800; }
+
+/* 표지 */
+body[data-theme="ppt"] section.slide#cover { background: var(--navy); color: #fff; }
+body[data-theme="ppt"] section.slide#cover::after { color: #fff; }
+.cv { display: grid; grid-template-columns: 1fr 440px; gap: 30px; align-items: center; height: 100%; }
+.cv p, .cv h1 { margin: 0; color: #fff; }
+.cv-k { font-size: 30px; opacity: .9; }
+.cv h1 { margin: 24px 0 28px; font-size: 70px; line-height: 1.18; text-wrap: balance; }
+.cv-s { display: inline-block; padding: 8px 22px; border-radius: 4px; background: var(--pen); color: var(--navy) !important; font-size: 32px; font-weight: 800; transform: rotate(-1.5deg); }
+
+/* 학습 목표 */
+.goals { margin: 36px 0 0; padding: 0; list-style: none; counter-reset: g; }
+.goals li { counter-increment: g; position: relative; padding: 0 0 0 64px; margin: 0 0 30px; font-size: 32px; line-height: 1.45; }
+.goals li::before { content: counter(g); position: absolute; left: 0; top: 0; width: 46px; height: 46px; border-radius: 50%; border: 4px solid var(--navy); box-sizing: border-box; color: var(--navy); font-weight: 800; font-size: 26px; text-align: center; line-height: 38px; background: #fff; }
+
+/* 생각 열기 */
+.lead { margin: 10px 0 18px; font-size: 30px; line-height: 1.5; text-wrap: pretty; }
+table.compare.wk { font-size: 28px; --table-head: #E3E9F3; --table-side: #E3E9F3; background: #fff; margin-bottom: 14px; }
+table.compare.wk th:first-child { white-space: nowrap; }
+table.compare.wk td { text-align: center; }
+.reveal-eq { margin: 12px 0 0; font-size: 30px; font-weight: 700; }
+
+/* 개념 */
+.big-eq { margin: 18px 0 0; text-align: center; font-size: 64px; font-weight: 800; color: var(--navy); letter-spacing: .02em; }
+.big-eq .s { color: var(--slope); border-bottom: 6px solid var(--slope); padding: 0 6px; }
+.big-eq .b { color: var(--icpt); border-bottom: 6px solid var(--icpt); padding: 0 6px; }
+.means { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 26px; }
+.means > div { padding: 16px 22px; border-radius: 14px; background: #fff; font-size: 27px; line-height: 1.45; }
+.means .ms { border: 4px solid var(--slope); }
+.means .mb { border: 4px solid var(--icpt); }
+.means b { display: block; font-size: 30px; margin-bottom: 4px; }
+.means .ms b { color: var(--slope); }
+.means .mb b { color: var(--icpt); }
+.means .ctx { display: block; margin-top: 8px; padding-top: 8px; border-top: 2px dashed #CBD5E1; font-weight: 700; }
+.foot { margin: 22px 0 0; font-size: 28px; line-height: 1.45; text-align: center; }
+
+/* ── 익스플로라그램 공통 ── */
+.ex { display: grid; grid-template-columns: 1fr 384px; gap: 0 36px; align-items: start; }
+.ex .plot { margin: 0; background: #fff; }
+.ctl { display: flex; flex-direction: column; gap: 8px; }
+.ctl > p { margin: 0; }
+.row { display: grid; grid-template-columns: 108px 1fr; gap: 10px; align-items: center; }
+.row > span { font-size: 23px; font-weight: 700; color: var(--gray); line-height: 1.25; }
+.row small { font-size: 20px; font-weight: 500; }
+.seg { display: flex; gap: 8px; }
+section.slide .seg button { flex: 1; min-height: 56px; margin: 0; padding: 0 6px; font: inherit; font-size: 23px; font-weight: 700; border: 3px solid #CBD5E1; border-radius: 10px; background: #fff; color: var(--ink); cursor: pointer; }
+section.slide .seg button[aria-pressed="true"] { background: var(--navy); border-color: var(--navy); color: #fff; }
+.eqbox { margin: 2px 0 0; padding: 8px 14px; border-radius: 10px; background: var(--soft); border: 3px solid var(--navy); font-size: 32px; font-weight: 800; text-align: center; color: var(--navy); }
+.readout { font-size: 25px; font-weight: 700; line-height: 1.4; }
+.readout output { color: var(--navy); }
+.say { margin: 0; font-size: 24px; line-height: 1.45; font-weight: 700; text-wrap: pretty; }
+.model { font-size: 20px; color: var(--gray); font-weight: 500; }
+.ex-pic { display: flex; flex-direction: column; gap: 6px; }
+.ex-pic svg { display: block; width: 100%; height: auto; }
+
+/* 걷기: 길 */
+.road-man { transition: none; }
+/* 초: 불꽃 흔들림 */
+@keyframes flick { 0%, 100% { transform: scale(1, 1); } 50% { transform: scale(.92, 1.08); } }
+.flame { transform-box: fill-box; transform-origin: 50% 100%; animation: flick .9s ease-in-out 400; }
+.cdl { display: grid; grid-template-columns: 190px 1fr; gap: 14px; align-items: end; }
+
+/* 요금 막대 */
+.fee { display: grid; grid-template-columns: 96px 1fr 132px; gap: 8px; align-items: center; font-size: 23px; font-weight: 700; }
+.fee .bar { height: 30px; border-radius: 6px; }
+.fee output { text-align: right; }
+.shop { padding: 8px 12px; border-radius: 10px; background: #fff; border: 2px solid #CBD5E1; font-size: 22px; line-height: 1.4; }
+.shop b { font-size: 23px; }
+.take { margin: 10px 0 0; padding: 10px 20px; border-radius: 10px; background: #FFF4CC; border-left: 8px solid var(--pen); font-size: 26px; line-height: 1.45; font-weight: 700; }
+
+/* 확인 문제 */
+.qgrid { display: grid; grid-template-columns: 440px 1fr; gap: 30px; align-items: start; margin-top: 8px; }
+.qgrid .plot { margin: 0; background: #fff; }
+.sort .bin { min-height: 96px; }
+.sort > span { font-size: 23px; }
+
+/* 정리 */
+.sum { margin: 26px 0 0; padding: 0; list-style: none; }
+.sum li { position: relative; padding-left: 40px; margin: 0 0 22px; font-size: 30px; line-height: 1.45; }
+.sum li::before { content: ""; position: absolute; left: 4px; top: 14px; width: 18px; height: 18px; border-radius: 3px; background: var(--pen); border: 3px solid var(--navy); box-sizing: border-box; }
+</style>
+</head>
+<body data-theme="ppt">
+
+<!-- 1 표지 -->
+<section class="slide" id="cover" data-title="표지">
+  <div class="cv">
+    <div>
+      <p class="cv-k">중학교 2학년 수학 · 일차함수</p>
+      <h1>그래프로 읽는<br>일차함수</h1>
+      <p class="cv-s">기울기와 y절편의 뜻</p>
+    </div>
+    <svg width="440" height="400" viewBox="0 0 440 400" aria-label="좌표평면 위에 오른쪽 위로 가는 직선, 오른쪽 아래로 가는 직선, 두 직선이 만나는 점">
+      <g stroke="#FFFFFF" stroke-opacity=".14" stroke-width="2">
+        <path d="M40 20 V380 M80 20 V380 M120 20 V380 M160 20 V380 M200 20 V380 M240 20 V380 M280 20 V380 M320 20 V380 M360 20 V380 M400 20 V380"/>
+        <path d="M20 40 H420 M20 80 H420 M20 120 H420 M20 160 H420 M20 200 H420 M20 240 H420 M20 280 H420 M20 320 H420 M20 360 H420"/>
+      </g>
+      <path d="M40 360 H420 M40 380 V20" stroke="#FFFFFF" stroke-width="4"/>
+      <path d="M40 300 L420 110" stroke="#F2B705" stroke-width="9" stroke-linecap="round"/>
+      <path d="M40 120 L360 360" stroke="#7FD1B9" stroke-width="9" stroke-linecap="round"/>
+      <circle cx="40" cy="300" r="11" fill="#F2B705"/>
+      <circle cx="40" cy="120" r="11" fill="#7FD1B9"/>
+      <circle cx="191" cy="224" r="13" fill="#FFFFFF"/>
+    </svg>
+  </div>
+</section>
+
+<!-- 2 학습 목표 -->
+<section class="slide" id="goal" data-sec="학습 목표" data-title="학습 목표">
+  <h2>학습 목표</h2>
+  <ol class="goals">
+    <li>일차함수의 그래프에서 기울기와 <span class="v">y</span>절편을 찾을 수 있다.</li>
+    <li>실생활 상황에서 기울기와 <span class="v">y</span>절편이<br>무엇을 뜻하는지 설명할 수 있다.</li>
+  </ol>
+</section>
+
+<!-- 3 생각 열기 -->
+<section class="slide" id="think" data-sec="생각 열기" data-title="공원 입구에서 걷기 시작하면">
+  <h2>공원 입구에서 걷기 시작하면?</h2>
+  <div data-ai="생각 열기 상황(가상 자료)">
+    <p class="lead">나는 집에서 300 m 떨어진 공원 입구에서 출발해 1분에 60 m씩 일정하게 걷는다.</p>
+    <table class="compare wk">
+      <thead><tr><th>걸은 시간(분)</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th></tr></thead>
+      <tbody><tr><th>집에서 거리(m)</th><td>300</td><td>360</td><td>420</td><td>480</td><td>540</td></tr></tbody>
+    </table>
+    <div class="short" data-ph="식을 적어 보자">
+      <p class="ask"><span class="v">x</span>분 걸었을 때 집에서 거리를 <span class="v">y</span> m라 하자. <span class="v">y</span>를 <span class="v">x</span>의 식으로 나타내 보자.</p>
+    </div>
+    <p class="reveal-eq step"><span class="v">y</span> = 60<span class="v">x</span> + 300. 처음 거리 300에 1분마다 60씩 더한다.</p>
+  </div>
+</section>
+
+<!-- 4 개념 -->
+<section class="slide" id="meaning" data-sec="개념" data-title="기울기와 y절편의 뜻">
+  <h2>식의 두 수는 상황에서 무엇일까?</h2>
+  <div>
+    <p class="big-eq"><span class="v">y</span> = <span class="s">60</span><span class="v">x</span> + <span class="b">300</span></p>
+    <div class="means">
+      <div class="ms"><b>기울기 60</b><span class="v">x</span>가 1 늘 때 <span class="v">y</span>가 변하는 양<span class="ctx">걷기에서는 1분마다 걷는 거리,<br>곧 걷는 빠르기다.</span></div>
+      <div class="mb"><b><span class="v">y</span>절편 300</b><span class="v">x</span> = 0일 때 <span class="v">y</span>의 값<span class="ctx">걷기에서는 출발할 때<br>집에서 떨어진 거리다.</span></div>
+    </div>
+    <p class="foot step">그래프에서 기울기는 <span class="k-s">기울어진 정도</span>,<br><span class="v">y</span>절편은 그래프가 <span class="k-b"><span class="v">y</span>축과 만나는 점</span>이다.</p>
+  </div>
+</section>
+
+<!-- 5 익스플로라그램: 걷기 -->
+<section class="slide" id="walk" data-sec="개념" data-title="빠르기와 출발점을 바꾸면">
+  <h2>빠르기와 출발점을 바꾸면 그래프는?</h2>
+  <div class="calc ex" data-ai="걷기 상황 일차함수(가상 자료)" data-let="y = a * t + b; w = a * t">
+    <div class="ex-pic">
+      <svg viewBox="0 0 700 112" aria-label="집에서 시작하는 길과 걷는 사람">
+        <rect x="40" y="62" width="640" height="18" rx="9" fill="#D8DEE8"/>
+        <rect y="62" height="18" rx="9" fill="#F2B705" data-attr="x: 40 + b * 0.4571; width: w * 0.4571"/>
+        <g fill="#5B6574" font-size="20" text-anchor="middle">
+          <text x="40" y="108">0</text><text x="223" y="108">400</text><text x="406" y="108">800</text><text x="589" y="108">1200 m</text>
+        </g>
+        <g stroke="#5B6574" stroke-width="2"><path d="M40 82 V90 M131 82 V88 M223 82 V90 M314 82 V88 M406 82 V90 M497 82 V88 M589 82 V90 M680 82 V88"/></g>
+        <path d="M14 60 L40 38 L66 60 Z M20 60 H60 V80 H20 Z" fill="#1D3557"/>
+        <g data-attr="transform: 'translate(' + (b * 0.4571) + ' 0)'">
+          <path d="M40 60 V22" stroke="#1F8A70" stroke-width="4"/><path d="M40 22 L62 29 L40 36 Z" fill="#1F8A70"/>
+        </g>
+        <g data-attr="transform: 'translate(' + (y * 0.4571) + ' 0)'">
+          <circle cx="40" cy="14" r="9" fill="#2B59C3"/>
+          <path d="M40 23 V44 M40 44 L31 60 M40 44 L49 60 M40 30 L29 39 M40 30 L51 37" stroke="#2B59C3" stroke-width="5" stroke-linecap="round" fill="none"/>
+        </g>
+      </svg>
+      <figure class="plot" data-x="0, 10" data-y="0, 1400" data-xstep="1" data-ystep="200" data-height="350" data-xlabel="걸은 시간(분)" data-ylabel="집에서 거리(m)" aria-label="걸은 시간에 따른 집에서 거리 그래프">
+        <i data-line="a * x + b" data-x="0, max(t, 0.01)" data-color="#2B59C3"></i>
+        <i data-point="0, b" data-label="y절편" data-color="#1F8A70"></i>
+        <i data-point="t, y" data-label="지금" data-color="#2B59C3" data-show="t > 0"></i>
+      </figure>
+    </div>
+    <div class="ctl">
+      <div class="row"><span>빠르기<br><small>m/분</small></span><div class="seg"><button data-set="a" data-value="40">40</button><button data-set="a" data-value="60" aria-pressed="true">60</button><button data-set="a" data-value="80">80</button></div></div>
+      <div class="row"><span>출발점<br><small>m</small></span><div class="seg"><button data-set="b" data-value="0">0</button><button data-set="b" data-value="300" aria-pressed="true">300</button><button data-set="b" data-value="600">600</button></div></div>
+      <input type="range" name="t" min="0" max="10" step="0.5" value="0" data-play="8" aria-label="걸은 시간" style="margin-top:8px">
+      <p class="eqbox" data-expr="'y = ' + a + 'x' + (b > 0 ? ' + ' + b : '')"></p>
+      <p class="readout"><output data-expr="t" data-unit="분"></output> 뒤 집에서 거리 <output data-expr="y" data-unit="m"></output></p>
+      <p class="say" data-show="t == 0">「▶ 재생」을 누르고<br>사람과 그래프를 함께 보자.</p>
+      <p class="say" data-show="t > 0 && t < 10">1분마다 <output data-expr="a"></output> m씩 멀어진다.<br>그래프도 1분에 <output data-expr="a"></output>씩 오른다.</p>
+      <p class="say" data-show="t == 10">빠를수록 그래프가 가파르다.<br>값을 바꿔 다시 재생해 보자.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 6 익스플로라그램: 타는 초 -->
+<section class="slide" id="candle" data-sec="개념" data-title="초가 타면">
+  <h2>초가 타면 그래프는 어느 쪽으로 기울까?</h2>
+  <div class="calc ex" data-ai="타는 초 일차함수(가상 자료)" data-let="te = b / r; y = max(b - r * t, 0)">
+    <div class="cdl">
+      <svg viewBox="0 0 190 450" aria-label="타서 짧아지는 초와 눈금자">
+        <g fill="#5B6574" font-size="20" text-anchor="end">
+          <text x="34" y="407">0</text><text x="34" y="299">6</text><text x="34" y="191">12</text><text x="34" y="83">18</text>
+        </g>
+        <path d="M44 400 V76 M44 400 H54 M44 346 H50 M44 292 H54 M44 238 H50 M44 184 H54 M44 130 H50 M44 76 H54" stroke="#5B6574" stroke-width="2"/>
+        <text x="40" y="442" fill="#5B6574" font-size="20">(cm)</text>
+        <rect x="88" width="64" fill="#FDF6E3" stroke="#C9B37E" stroke-width="3" data-attr="y: 400 - y * 18; height: y * 18"/>
+        <g data-attr="transform: 'translate(0 ' + (400 - y * 18) + ')'">
+          <path d="M120 0 V-12" stroke="#3A3A3A" stroke-width="3" data-style="opacity: y > 0 ? 1 : 0"/>
+          <path class="flame" d="M120 -12 C 104 -30, 112 -50, 120 -64 C 128 -50, 136 -30, 120 -12 Z" fill="#F2B705" stroke="#E07A1F" stroke-width="3" data-style="opacity: y > 0 ? 1 : 0"/>
+        </g>
+        <rect x="70" y="400" width="100" height="22" rx="6" fill="#8A6D3B"/>
+      </svg>
+      <figure class="plot" data-x="0, 40" data-y="0, 20" data-xstep="5" data-ystep="4" data-height="420" data-xlabel="불을 붙인 뒤 시간(분)" data-ylabel="남은 길이(cm)" aria-label="시간에 따른 초의 남은 길이 그래프">
+        <i data-line="b - r * x" data-x="0, min(max(t, 0.01), te)" data-color="#D1495B"></i>
+        <i data-point="0, b" data-label="y절편" data-color="#1F8A70"></i>
+        <i data-point="te, 0" data-label="다 탄 때" data-color="#D1495B" data-show="t >= te"></i>
+        <i data-point="t, y" data-label="지금" data-color="#1D3557" data-show="t > 0 && t < te"></i>
+      </figure>
+    </div>
+    <div class="ctl">
+      <div class="row"><span>타는<br>빠르기</span><div class="seg"><button data-set="r" data-value="0.5" aria-pressed="true">0.5</button><button data-set="r" data-value="1">1</button></div></div>
+      <p class="model" style="text-align:right;margin-top:-4px">1분에 줄어드는 길이(cm)</p>
+      <div class="row"><span>처음<br>길이</span><div class="seg"><button data-set="b" data-value="12">12 cm</button><button data-set="b" data-value="18" aria-pressed="true">18 cm</button></div></div>
+      <p class="readout" style="margin-top:6px">불을 붙인 뒤 <output data-expr="t" data-unit="분"></output></p>
+      <input type="range" name="t" min="0" max="40" step="1" value="0" data-play="10" aria-label="불을 붙인 뒤 시간">
+      <p class="eqbox" data-expr="'y = −' + (r == 1 ? '' : r) + 'x + ' + b"></p>
+      <p class="readout">남은 길이 <output data-expr="y" data-digits="1" data-unit="cm"></output></p>
+      <p class="say" data-show="t == 0">「▶ 재생」을 누르고 초를 지켜보자.</p>
+      <p class="say" data-show="t > 0 && t < te">1분마다 <output data-expr="r"></output> cm씩 준다.<br>그래서 기울기는 <span class="k-n">−<output data-expr="r"></output></span>이다.</p>
+      <p class="say" data-show="t >= te"><output data-expr="te"></output>분에 다 탔다.<br>그래프가 <span class="k-n"><span class="v">x</span>축과 만나는 점</span>이다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 7 확인 문제 1 -->
+<section class="slide" id="check-1" data-sec="확인 문제" data-title="확인 문제 1">
+  <h2>확인 문제 1</h2>
+  <div>
+    <p class="q" data-n="1" data-ai="문항">길이 20 cm인 초가 1분에 0.4 cm씩 탄다.<br><span class="v">x</span>분 뒤 남은 길이를 <span class="v">y</span> cm라 할 때, 알맞은 식은?</p>
+    <div class="quiz" data-cols="2">
+      <button class="opt" data-ai="풀이" data-why="1분마다 길이가 줄므로 기울기는 음수여야 한다.">y = 0.4x + 20</button>
+      <button class="opt" data-ai="풀이" data-why="x = 0일 때 y는 처음 길이 20이어야 한다. 이 식은 −0.4가 된다.">y = 20x − 0.4</button>
+      <button class="opt" data-ok data-ai="풀이" data-why="맞다. 처음 길이 20이 y절편이고 1분마다 0.4씩 주므로 기울기는 −0.4다.">y = −0.4x + 20</button>
+      <button class="opt" data-ai="풀이" data-why="기울기와 y절편이 서로 바뀌었다. 1분마다 20 cm씩 줄지 않는다.">y = −20x + 0.4</button>
+    </div>
+  </div>
+</section>
+
+<!-- 8 익스플로라그램: 두 대여점 -->
+<section class="slide" id="rent" data-sec="활용" data-title="두 대여점 요금 비교">
+  <h2>두 자전거 대여점, 어디가 더 쌀까?</h2>
+  <div class="calc ex" data-ai="자전거 대여 요금 비교(가상 요금)" data-let="pa = 50 * m + 2000; pb = r * m + 500; c = 1500 / (r - 50); d = abs(pa - pb)">
+    <figure class="plot" data-x="0, 60" data-y="0, 10000" data-xstep="10" data-ystep="2000" data-comma data-height="400" data-xlabel="이용 시간(분)" data-ylabel="요금(원)" aria-label="이용 시간에 따른 두 대여점의 요금 그래프">
+      <i data-line="50 * x + 2000" data-x="0, max(m, 0.01)" data-label="가 대여점" data-color="#1D3557"></i>
+      <i data-line="r * x + 500" data-x="0, max(m, 0.01)" data-label="나 대여점" data-color="#E07A1F"></i>
+      <i data-vline="m"></i>
+      <i data-point="c, 50 * c + 2000" data-color="#1F8A70" data-show="m >= c"></i>
+      <i data-point="m, pa" data-color="#1D3557"></i>
+      <i data-point="m, pb" data-color="#E07A1F"></i>
+    </figure>
+    <p class="model" data-ai="모형 수치" style="grid-column:1;margin:0">요금은 수업을 위해 정한 값이다 (모형)</p>
+    <div class="ctl" style="grid-row:1 / span 2;grid-column:2">
+      <div class="shop"><b style="color:#1D3557">가</b> 기본요금 2,000원 + 1분에 50원</div>
+      <div class="shop"><b style="color:#E07A1F">나</b> 기본요금 500원 + 1분에
+        <div class="seg" style="margin-top:6px"><button data-set="r" data-value="80">80원</button><button data-set="r" data-value="100" aria-pressed="true">100원</button><button data-set="r" data-value="150">150원</button></div></div>
+      <p class="readout" style="margin-top:4px">이용 시간 <output data-expr="m" data-unit="분"></output></p>
+      <input type="range" name="m" min="0" max="60" step="5" value="0" aria-label="이용 시간">
+      <div class="fee"><span style="color:#1D3557">가</span><div class="bar" data-value="pa" data-max="10000" style="--bar-c:#1D3557"></div><output data-expr="pa" data-comma data-unit="원"></output></div>
+      <div class="fee"><span style="color:#E07A1F">나</span><div class="bar" data-value="pb" data-max="10000" style="--bar-c:#E07A1F"></div><output data-expr="pb" data-comma data-unit="원"></output></div>
+      <p class="say" data-show="m < c">나 대여점이 <output data-expr="d" data-comma data-unit="원"></output> 더 싸다.</p>
+      <p class="say" data-show="m == c">두 곳 요금이 같다.<br>두 그래프가 만나는 점이다.</p>
+      <p class="say" data-show="m > c">가 대여점이 <output data-expr="d" data-comma data-unit="원"></output> 더 싸다.<br><output data-expr="c" data-unit="분"></output>에 두 요금이 같았다.</p>
+    </div>
+  </div>
+  <p class="take step"><span class="v">y</span>절편(기본요금)이 커도 기울기(1분 요금)가 작으면 오래 탈수록 싸다.</p>
+</section>
+
+<!-- 9 확인 문제 2 -->
+<section class="slide" id="check-2" data-sec="확인 문제" data-title="확인 문제 2">
+  <h2>확인 문제 2</h2>
+  <div>
+    <p class="q" data-n="2">모두 일정하게 변한다고 하자. 기울기의 부호에 따라 나누어 보자.</p>
+    <div class="sort">
+      <div class="bin" data-bin="u"><h3><span class="v">x</span>가 늘면 <span class="v">y</span>도 는다 (기울기 &gt; 0)</h3></div>
+      <div class="bin" data-bin="d"><h3><span class="v">x</span>가 늘면 <span class="v">y</span>는 준다 (기울기 &lt; 0)</h3></div>
+      <span data-bin="u" data-ai="풀이와 실마리" data-why="물을 받는 동안 1분마다 높이가 일정하게 오른다." data-hint="시간이 지나면 물 높이는 오를까, 내려갈까?">수조에 물을 받는 시간 x분, 물의 높이 y cm</span>
+      <span data-bin="d" data-ai="풀이와 실마리" data-why="달릴수록 연료를 쓰므로 남은 연료가 준다." data-hint="달릴수록 연료는 쌓일까, 쓰일까?">자동차가 달린 거리 x km, 남은 연료 y L</span>
+      <span data-bin="u" data-ai="풀이와 실마리" data-why="매주 같은 돈을 넣으므로 모은 돈이 일정하게 는다." data-hint="한 주가 지날 때마다 모은 돈은 어떻게 될까?">저금한 주 x주, 모은 돈 y원</span>
+      <span data-bin="d" data-ai="풀이와 실마리" data-why="내려오는 동안 땅에서의 높이가 일정하게 준다." data-hint="엘리베이터가 내려올 때 높이는 어떻게 될까?">엘리베이터가 내려온 시간 x초, 땅에서의 높이 y m</span>
+      <span data-bin="u" data-ai="풀이와 실마리" data-why="간 거리가 늘수록 요금이 일정하게 오른다." data-hint="멀리 갈수록 요금은 어떻게 될까?">택시가 간 거리 x km, 요금 y원</span>
+      <span data-bin="d" data-ai="풀이와 실마리" data-why="산을 내려오는 동안 해발 높이가 준다." data-hint="내려오는 길에서 높이는 오를까, 내려갈까?">산을 내려온 시간 x분, 해발 높이 y m</span>
+    </div>
+    <p class="step" style="font-size:26px;margin-top:6px">늘어나는 상황은 기울기가 양수, 줄어드는 상황은 기울기가 음수다.</p>
+  </div>
+</section>
+
+<!-- 10 확인 문제 3 -->
+<section class="slide" id="check-3" data-sec="확인 문제" data-title="확인 문제 3">
+  <h2>확인 문제 3</h2>
+  <div>
+    <p class="q" data-n="3" data-ai="문항">물탱크의 물을 빼기 시작한 뒤 남은 물의 양을 나타낸 그래프다.<br><span class="v">y</span>절편 30이 뜻하는 것은?</p>
+    <div class="qgrid">
+      <figure class="plot" data-x="0, 8" data-y="0, 40" data-xstep="1" data-ystep="10" data-height="340" data-xlabel="물을 뺀 시간(분)" data-ylabel="남은 물(L)" aria-label="남은 물의 양이 30 L에서 시작해 6분 뒤 0이 되는 직선 그래프" data-ai="문항 그래프">
+        <i data-line="30 - 5 * x" data-x="0, 6" data-color="#1D3557"></i>
+        <i data-point="0, 30" data-label="30" data-color="#1F8A70"></i>
+      </figure>
+      <div class="quiz">
+        <button class="opt" data-ai="풀이" data-why="1분마다 빠지는 양은 기울기다. 이 그래프에서는 5 L다.">1분마다 빠지는 물의 양</button>
+        <button class="opt" data-ai="풀이" data-why="다 빠지는 때는 그래프가 x축과 만나는 6분이다.">물이 다 빠질 때까지 걸리는 시간</button>
+        <button class="opt" data-ok data-ai="풀이" data-why="맞다. y절편은 x = 0일 때 y의 값이다. 빼기 전 30 L가 들어 있었다.">물을 빼기 시작할 때 들어 있던 물의 양</button>
+        <button class="opt" data-ai="풀이" data-why="6분 뒤에는 그래프가 x축에 닿아 남은 물이 0 L다.">6분 뒤 남은 물의 양</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 11 정리 -->
+<section class="slide" id="summary" data-sec="정리" data-title="정리">
+  <h2>정리</h2>
+  <ul class="sum">
+    <li>기울기는 <span class="v">x</span>가 1 늘 때 <span class="v">y</span>가 변하는 양이다.<br>상황에서는 <span class="blank">1분마다 변하는 양</span>(빠르기, 1분 요금)이다.</li>
+    <li>기울기가 양수면 <span class="v">y</span>가 <span class="blank">늘고</span>, 음수면 <span class="v">y</span>가 <span class="blank">준다</span>.</li>
+    <li><span class="v">y</span>절편은 <span class="v">x</span> = 0일 때 <span class="v">y</span>의 값이다.<br>상황에서는 <span class="blank">처음 값</span>(출발할 때 거리, 처음 길이, 기본요금)이다.</li>
+    <li>두 그래프가 만나는 점에서 두 <span class="blank">값이 같다</span>.</li>
+  </ul>
+</section>
+
+</body>
+</html>

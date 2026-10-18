@@ -1,0 +1,111 @@
+[
+ {
+  "slide": 5,
+  "name": "move-start"
+ },
+ {
+  "slide": 5,
+  "name": "move-lastsun-she-play",
+  "js": "const r = document.querySelector('#move .ch-stops input[type=range]'); r.value = 1; r.dispatchEvent(new Event('input', { bubbles: true }))"
+ },
+ {
+  "slide": 5,
+  "name": "move-yesterday-go",
+  "js": "document.querySelector('#move [data-set=v][data-value=\"go\"]').click();const r = document.querySelector('#move .ch-stops input[type=range]'); r.value = 2; r.dispatchEvent(new Event('input', { bubbles: true }))"
+ },
+ {
+  "slide": 5,
+  "name": "move-now-i-study",
+  "js": "document.querySelector('#move [data-set=v][data-value=\"study\"]').click();document.querySelector('#move [data-set=s][data-value=\"I\"]').click();const r = document.querySelector('#move .ch-stops input[type=range]'); r.value = 3; r.dispatchEvent(new Event('input', { bubbles: true }))"
+ },
+ {
+  "slide": 5,
+  "name": "move-tomorrow-they-go",
+  "js": "document.querySelector('#move [data-set=v][data-value=\"go\"]').click();document.querySelector('#move [data-set=s][data-value=\"They\"]').click();const r = document.querySelector('#move .ch-stops input[type=range]'); r.value = 4; r.dispatchEvent(new Event('input', { bubbles: true }))"
+ },
+ {
+  "slide": 5,
+  "name": "move-nextsun",
+  "js": "const r = document.querySelector('#move .ch-stops input[type=range]'); r.value = 5; r.dispatchEvent(new Event('input', { bubbles: true }))"
+ },
+ {
+  "slide": 5,
+  "name": "move-everyday-she-study",
+  "js": "document.querySelector('#move [data-set=v][data-value=\"study\"]').click();document.querySelector('#move [data-set=s][data-value=\"She\"]').click();const r = document.querySelector('#move .ch-stops input[type=range]'); r.value = 6; r.dispatchEvent(new Event('input', { bubbles: true }))"
+ },
+ {
+  "slide": 5,
+  "name": "move-back-start",
+  "js": "const r = document.querySelector('#move .ch-stops input[type=range]'); r.value = 0; r.dispatchEvent(new Event('input', { bubbles: true }))"
+ },
+ {
+  "slide": 8,
+  "name": "now-start"
+ },
+ {
+  "slide": 8,
+  "name": "now-1430",
+  "js": "const r = document.querySelector('#now-moves input[name=t]'); r.value = 90; r.dispatchEvent(new Event('input', { bubbles: true }))"
+ },
+ {
+  "slide": 8,
+  "name": "now-1500-edge",
+  "js": "const r = document.querySelector('#now-moves input[name=t]'); r.value = 120; r.dispatchEvent(new Event('input', { bubbles: true }))"
+ },
+ {
+  "slide": 8,
+  "name": "now-1620",
+  "js": "const r = document.querySelector('#now-moves input[name=t]'); r.value = 200; r.dispatchEvent(new Event('input', { bubbles: true }))"
+ },
+ {
+  "slide": 8,
+  "name": "now-1630-edge",
+  "js": "const r = document.querySelector('#now-moves input[name=t]'); r.value = 210; r.dispatchEvent(new Event('input', { bubbles: true }))"
+ },
+ {
+  "slide": 8,
+  "name": "now-1810",
+  "js": "const r = document.querySelector('#now-moves input[name=t]'); r.value = 310; r.dispatchEvent(new Event('input', { bubbles: true }))"
+ },
+ {
+  "slide": 8,
+  "name": "now-end",
+  "js": "const r = document.querySelector('#now-moves input[name=t]'); r.value = 360; r.dispatchEvent(new Event('input', { bubbles: true }))"
+ },
+ {
+  "slide": 1,
+  "name": "cover"
+ },
+ {
+  "slide": 3,
+  "name": "think"
+ },
+ {
+  "slide": 4,
+  "name": "timeline"
+ },
+ {
+  "slide": 6,
+  "name": "past-forms"
+ },
+ {
+  "slide": 7,
+  "name": "quiz1"
+ },
+ {
+  "slide": 9,
+  "name": "sort"
+ },
+ {
+  "slide": 10,
+  "name": "quiz2"
+ },
+ {
+  "slide": 11,
+  "name": "write"
+ },
+ {
+  "slide": 12,
+  "name": "summary"
+ }
+]

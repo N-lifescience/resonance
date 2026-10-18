@@ -1,0 +1,23 @@
+[
+  { "slide": 5, "name": "walk-start" },
+  { "slide": 5, "name": "walk-t5", "js": "const r = document.querySelector('#walk input[name=t]'); r.value = 5; r.dispatchEvent(new Event('input', { bubbles: true }))" },
+  { "slide": 5, "name": "walk-80-600-end", "js": "document.querySelector('#walk [data-set=a][data-value=\"80\"]').click(); document.querySelector('#walk [data-set=b][data-value=\"600\"]').click(); const r = document.querySelector('#walk input[name=t]'); r.value = 10; r.dispatchEvent(new Event('input', { bubbles: true }))" },
+  { "slide": 5, "name": "walk-40-0-end", "js": "document.querySelector('#walk [data-set=a][data-value=\"40\"]').click(); document.querySelector('#walk [data-set=b][data-value=\"0\"]').click(); const r = document.querySelector('#walk input[name=t]'); r.value = 10; r.dispatchEvent(new Event('input', { bubbles: true }))" },
+  { "slide": 6, "name": "candle-start" },
+  { "slide": 6, "name": "candle-t10", "js": "const r = document.querySelector('#candle input[name=t]'); r.value = 10; r.dispatchEvent(new Event('input', { bubbles: true }))" },
+  { "slide": 6, "name": "candle-end", "js": "const r = document.querySelector('#candle input[name=t]'); r.value = 40; r.dispatchEvent(new Event('input', { bubbles: true }))" },
+  { "slide": 6, "name": "candle-1-12-edge", "js": "document.querySelector('#candle [data-set=r][data-value=\"1\"]').click(); document.querySelector('#candle [data-set=b][data-value=\"12\"]').click(); const r = document.querySelector('#candle input[name=t]'); r.value = 12; r.dispatchEvent(new Event('input', { bubbles: true }))" },
+  { "slide": 6, "name": "candle-1-12-t6", "js": "const r = document.querySelector('#candle input[name=t]'); r.value = 6; r.dispatchEvent(new Event('input', { bubbles: true }))" },
+  { "slide": 8, "name": "rent-start" },
+  { "slide": 8, "name": "rent-m20", "js": "const r = document.querySelector('#rent input[name=m]'); r.value = 20; r.dispatchEvent(new Event('input', { bubbles: true }))" },
+  { "slide": 8, "name": "rent-m30-equal", "js": "const r = document.querySelector('#rent input[name=m]'); r.value = 30; r.dispatchEvent(new Event('input', { bubbles: true }))" },
+  { "slide": 8, "name": "rent-m60", "js": "const r = document.querySelector('#rent input[name=m]'); r.value = 60; r.dispatchEvent(new Event('input', { bubbles: true }))" },
+  { "slide": 8, "name": "rent-150-m15", "js": "document.querySelector('#rent [data-set=r][data-value=\"150\"]').click(); const r = document.querySelector('#rent input[name=m]'); r.value = 15; r.dispatchEvent(new Event('input', { bubbles: true }))" },
+  { "slide": 8, "name": "rent-80-m60", "js": "document.querySelector('#rent [data-set=r][data-value=\"80\"]').click(); const r = document.querySelector('#rent input[name=m]'); r.value = 60; r.dispatchEvent(new Event('input', { bubbles: true }))" },
+  { "slide": 1, "name": "cover" },
+  { "slide": 3, "name": "think" },
+  { "slide": 4, "name": "meaning" },
+  { "slide": 9, "name": "sort" },
+  { "slide": 10, "name": "tank" },
+  { "slide": 11, "name": "summary" }
+]

@@ -1,0 +1,437 @@
+<!doctype html>
+<html lang="ko" data-deck="v3-high-history">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>한강을 차지하라 · 4~6세기 삼국의 영토 변화</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/engine/exploragram.css">
+<script defer src="https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/engine/exploragram.js"></script>
+<style>
+/* 옛 책: 한지 바탕, 제목 아래 굵고 가는 두 줄, 오른쪽 위 붉은 도장 꼬리표 */
+body[data-theme="ppt"] {
+  --accent: #A8342A; --tab: #A8342A; --tab-ink: #FFF7EA;
+  --ink: #2B2118; --mute: #6A5D4F; --line: #D9CDB8; --paper: #F8F2E4; --seal: #A8342A;
+  --gogu: #C9573C; --baek: #3E74A8; --silla: #D9A520; --gaya: #7E6BA6; --etc: #E4DED2;
+}
+body[data-theme="ppt"] section.slide {
+  color: var(--ink);
+  background:
+    linear-gradient(var(--ink), var(--ink)) 0 82px / 100% 4px no-repeat,
+    linear-gradient(var(--ink), var(--ink)) 0 90px / 100% 1.5px no-repeat,
+    var(--paper);
+}
+body[data-theme="ppt"] section.slide[data-sec]::before {
+  left: auto; right: 40px; top: 16px; height: 50px; padding: 0 22px; border-radius: 8px;
+  background: var(--seal); color: #FFF7EA; font-size: 24px; box-shadow: inset 0 0 0 3px var(--seal), inset 0 0 0 5px #F3DCC9;
+}
+body[data-theme="ppt"] section.slide > h2:first-of-type {
+  position: absolute; top: 0; left: 56px; right: 290px; height: 80px; margin: 0; padding: 0; width: auto;
+  display: flex; align-items: center; border: 0; color: var(--ink); font-size: 38px; line-height: 1.15; text-wrap: balance;
+}
+.key { color: var(--seal); font-weight: 800; }
+.c-g { color: var(--gogu); font-weight: 800; } .c-b { color: var(--baek); font-weight: 800; }
+.c-s { color: #A87C08; font-weight: 800; } .c-y { color: var(--gaya); font-weight: 800; }
+
+/* 표지 */
+body[data-theme="ppt"] section.slide.cover { background: var(--paper); }
+.cv { display: grid; grid-template-columns: 1fr 420px; gap: 30px; align-items: center; margin-top: 10px; }
+.cv-k { margin: 0 0 22px; font-size: 28px; font-weight: 700; color: var(--seal); }
+section.slide.cover h1 { margin: 0; font-size: 80px; line-height: 1.15; color: var(--ink); }
+.cv-s { margin: 28px 0 0; padding-top: 20px; border-top: 4px double var(--ink); font-size: 34px; font-weight: 600; width: fit-content; }
+.cv-seal { display: inline-grid; place-items: center; width: 96px; height: 96px; margin-top: 30px; border-radius: 10px; background: var(--seal); color: #FFF7EA; font-size: 30px; font-weight: 800; line-height: 1.1; text-align: center; box-shadow: inset 0 0 0 4px var(--seal), inset 0 0 0 7px #F3DCC9; }
+
+/* 학습 목표 */
+.goals { list-style: none; margin: 40px 0 0; padding: 0; counter-reset: g; }
+.goals li { counter-increment: g; display: grid; grid-template-columns: 58px 1fr; gap: 22px; align-items: start; margin: 0 0 34px; font-size: 32px; line-height: 1.45; }
+.goals li::before { content: counter(g); width: 52px; height: 52px; border-radius: 8px; background: var(--seal); color: #FFF7EA; font-weight: 800; font-size: 28px; display: grid; place-items: center; margin-top: 2px; }
+
+/* 생각 열기 */
+.open { display: grid; grid-template-columns: 1fr 470px; gap: 36px; align-items: start; margin-top: 16px; }
+.open .lead { margin: 0 0 22px; font-size: 31px; line-height: 1.55; }
+
+/* 지도 공통 */
+.tk-map { display: block; }
+.tk-map text { font-family: inherit; }
+.tk-r { transition: fill .7s ease; stroke: #FFFFFF; stroke-width: 2; stroke-opacity: .55; }
+.tk-river { stroke: #7FB3CF; stroke-width: 4; }
+.tk-han { stroke: #1F6FA8; stroke-width: 9; }
+.tk-hanlab { font-size: 40px; font-weight: 800; fill: #1F6FA8; paint-order: stroke; stroke: #FFFFFF; stroke-width: 9px; stroke-linejoin: round; }
+.tk-name { font-size: 50px; font-weight: 900; fill: #1E1A14; paint-order: stroke; stroke: #FFFFFF; stroke-width: 11px; stroke-linejoin: round; text-anchor: middle; transition: transform .8s cubic-bezier(.2,.7,.2,1), opacity .5s; }
+.tk-pin { transition: transform .8s cubic-bezier(.2,.7,.2,1), opacity .5s; }
+.tk-capname { font-size: 38px; font-weight: 800; fill: #1E1A14; paint-order: stroke; stroke: #FFFFFF; stroke-width: 10px; stroke-linejoin: round; }
+.tk-move { fill: none; stroke: #1E1A14; stroke-width: 6; stroke-dasharray: 14 12; opacity: 0; transition: opacity .6s .5s; }
+.tk-move.on { opacity: .85; }
+
+/* A 영토 */
+#map .tk-wrap { display: grid; grid-template-columns: 345px 1fr; gap: 30px; align-items: start; }
+#map .tk-map { width: 345px; height: 540px; }
+#map .veil { border-radius: 10px; overflow: hidden; }
+.tk-side p { margin: 0; }
+.tk-era { font-size: 25px; line-height: 1.45; min-height: 110px; padding: 10px 16px; border-left: 8px solid var(--seal); background: #FFFBF2; border-radius: 0 12px 12px 0; }
+.tk-era b { font-size: 27px; }
+.tk-bars { display: grid; grid-template-columns: 84px 1fr 78px; gap: 6px 12px; align-items: center; margin-top: 12px; font-size: 23px; font-weight: 700; }
+.tk-track { height: 26px; border-radius: 13px; background: #EAE2D2; overflow: hidden; }
+.tk-fill { height: 100%; width: 0; border-radius: 13px; transition: width .8s cubic-bezier(.2,.7,.2,1); }
+.tk-pct { text-align: right; font-variant-numeric: tabular-nums; }
+.tk-han-out { margin-top: 12px !important; font-size: 24px; font-weight: 800; line-height: 1.4; white-space: pre-line; min-height: 68px; }
+.tk-note { font-size: 21px; line-height: 1.4; color: var(--mute); }
+
+/* B 바닷길 */
+#sea .sr-wrap { display: grid; grid-template-columns: 500px 1fr; gap: 28px; align-items: start; }
+#sea .sr-view { position: relative; }
+#sea .tk-map { width: 500px; height: 485px; border-radius: 12px; }
+.sr-route { fill: none; stroke: #1E1A14; stroke-width: 9; stroke-linecap: round; stroke-linejoin: round; opacity: 0; }
+.sr-route.on { opacity: 1; }
+.sr-ship { opacity: 0; }
+.sr-place { font-size: 34px; font-weight: 800; fill: #1E1A14; paint-order: stroke; stroke: #FFFFFF; stroke-width: 8px; stroke-linejoin: round; }
+.sr-veil { position: absolute; inset: 0; z-index: 3; display: grid; place-items: center; padding: 20px; text-align: center; border: 3px dashed #BDB09A; border-radius: 12px; background: #EFE8DA; color: var(--mute); font-size: 28px; font-weight: 700; line-height: 1.5; }
+.sr-veil[hidden] { display: none; }
+.sr-btns { display: flex; flex-direction: column; gap: 10px; }
+section.slide button.sr-b { min-height: 64px; margin: 0; padding: 8px 16px; font: inherit; font-size: 23px; font-weight: 700; line-height: 1.3; text-align: left; border: 3px solid var(--line); border-radius: 14px; background: #FFFFFF; color: var(--ink); cursor: pointer; }
+section.slide button.sr-b[aria-pressed="true"] { border-color: var(--seal); background: var(--seal); color: #FFF7EA; }
+.sr-out { margin: 14px 0 0; font-size: 25px; line-height: 1.45; font-weight: 700; min-height: 110px; }
+.sr-km { font-size: 40px; font-weight: 900; color: var(--seal); font-variant-numeric: tabular-nums; }
+.sr-bars { display: grid; grid-template-columns: 150px 1fr 96px; gap: 6px 10px; align-items: center; margin-top: 8px; font-size: 21px; font-weight: 700; }
+
+/* 연표·표·확인 */
+#events .yearline { margin-top: 0; }
+#kings table.compare { width: 100%; margin-top: 6px; font-size: 25px; --table-head: #E9DCC4; --table-side: #F3EADB; }
+#kings table.compare th { color: var(--ink); }
+#kings table.compare td { line-height: 1.4; }
+.q-wrap .q { font-size: 30px; line-height: 1.45; }
+#who .sort .bin { min-height: 96px; }
+#who .sort > span { font-size: 22px; }
+
+/* 정리 */
+.sum { list-style: none; margin: 14px 0 0; padding: 0; }
+.sum li { position: relative; padding: 14px 0 14px 40px; font-size: 29px; line-height: 1.45; border-bottom: 2px solid var(--line); }
+.sum li::before { content: ""; position: absolute; left: 6px; top: 26px; width: 16px; height: 16px; border-radius: 3px; background: var(--seal); }
+.back { margin-top: 20px; padding: 16px 24px; border-left: 10px solid var(--baek); background: #EEF3F8; border-radius: 0 14px 14px 0; font-size: 27px; line-height: 1.5; }
+.back b { color: var(--baek); }
+</style>
+</head>
+<body data-theme="ppt">
+
+<!-- 1 표지 -->
+<section class="slide cover" id="cover" data-title="표지">
+  <div class="cv">
+    <div>
+      <p class="cv-k">고1 한국사 · 고대 국가의 발전</p>
+      <h1>한강을<br>차지하라</h1>
+      <p class="cv-s">4~6세기 삼국의 영토 변화</p>
+      <div class="cv-seal" aria-hidden="true">三國</div>
+    </div>
+    <svg width="420" height="460" viewBox="0 0 420 460" aria-label="한강을 가운데 둔 세 나라의 깃발">
+      <path d="M40 300 C110 270 150 320 210 290 C270 260 320 300 400 270" fill="none" stroke="#1F6FA8" stroke-width="18" stroke-linecap="round"/>
+      <path d="M40 330 C120 310 180 350 260 330 C320 315 360 330 400 320" fill="none" stroke="#7FB3CF" stroke-width="8" stroke-linecap="round"/>
+      <g stroke="#2B2118" stroke-width="7" stroke-linecap="round"><path d="M100 250 V80"/><path d="M210 260 V60"/><path d="M320 240 V100"/></g>
+      <path d="M104 84 H176 L160 112 L176 140 H104 Z" fill="#C9573C"/>
+      <path d="M214 64 H286 L270 92 L286 120 H214 Z" fill="#3E74A8"/>
+      <path d="M324 104 H396 L380 132 L396 160 H324 Z" fill="#D9A520"/>
+      <g font-size="26" font-weight="800" fill="#FFFFFF" text-anchor="middle"><text x="136" y="121">고구려</text><text x="246" y="101">백제</text><text x="356" y="141">신라</text></g>
+      <path d="M30 400 H390" stroke="#2B2118" stroke-width="4"/><path d="M30 410 H390" stroke="#2B2118" stroke-width="1.5"/>
+    </svg>
+  </div>
+</section>
+
+<!-- 2 학습 목표 -->
+<section class="slide" id="goal" data-sec="학습 목표" data-title="학습 목표">
+  <h2>학습 목표</h2>
+  <ol class="goals">
+    <li>4~6세기 삼국의 영토 변화를 시기 순서대로 설명할 수 있다.</li>
+    <li>삼국이 한강 유역을 두고 다툰 까닭을 말할 수 있다.</li>
+  </ol>
+</section>
+
+<!-- 3 생각 열기 -->
+<section class="slide" id="open" data-sec="생각 열기" data-title="세 나라가 한강을 두고 다툰 까닭">
+  <h2>세 나라는 왜 한강을 두고 다투었을까?</h2>
+  <div class="open">
+    <div>
+      <p class="lead">4세기부터 6세기까지<br>한강 유역의 주인은 세 번 바뀌었다.<br>고구려, 백제, 신라가 모두 이곳을 원했다.</p>
+      <div class="short" data-ph="내 생각을 한 문장으로 적어요">
+        <p class="ask">한강 유역을 차지하면<br>무엇이 좋았을까?</p>
+      </div>
+    </div>
+    <svg width="470" height="420" viewBox="0 0 470 420" aria-label="한강이 흘러 서해로 들어가는 모습과 강가의 들판">
+      <rect x="0" y="0" width="470" height="420" rx="18" fill="#DCEBF2"/>
+      <path d="M150 0 H470 V420 H200 C180 360 210 320 170 280 C140 250 160 200 120 170 C90 140 120 80 150 0 Z" fill="#F3EEE3" stroke="#7D7360" stroke-width="3"/>
+      <path d="M135 205 C190 215 240 190 300 200 C350 208 380 170 420 120 M300 200 C330 240 380 260 450 300" fill="none" stroke="#1F6FA8" stroke-width="12" stroke-linecap="round"/>
+      <g fill="#E3D59B" opacity=".9"><ellipse cx="220" cy="240" rx="60" ry="22"/><ellipse cx="250" cy="165" rx="50" ry="18"/></g>
+      <g stroke="#B49A3E" stroke-width="3"><path d="M190 240 h60 M205 232 h30 M225 165 h50"/></g>
+      <path d="M60 230 C80 222 95 228 110 210" fill="none" stroke="#2B2118" stroke-width="4" stroke-dasharray="8 7"/>
+      <path d="M40 228 L60 230 L52 214" fill="none" stroke="#2B2118" stroke-width="4"/>
+      <text x="30" y="270" font-size="24" font-weight="700" fill="#2B2118">서해</text>
+      <text x="300" y="232" font-size="26" font-weight="800" fill="#1F6FA8">한강</text>
+    </svg>
+  </div>
+</section>
+
+<!-- 4 연표 -->
+<section class="slide" id="events" data-sec="1. 영토의 변화" data-title="4~6세기 삼국의 주요 사건">
+  <h2>4~6세기 삼국에 무슨 일이 있었을까?</h2>
+  <ol class="yearline" data-from="300" data-to="570">
+    <li data-year="313" data-tag="고구려" data-color="#C9573C">미천왕이 낙랑군을 몰아냈다.</li>
+    <li data-year="371" data-tag="백제" data-color="#3E74A8" data-flag>근초고왕이 고구려 평양성을 공격했다.</li>
+    <li data-year="400" data-tag="고구려" data-color="#C9573C">광개토 대왕이 신라에 들어온 왜를 물리쳤다.</li>
+    <li data-year="427" data-tag="고구려" data-color="#C9573C" data-flag>장수왕이 도읍을 평양으로 옮겼다.</li>
+    <li data-year="433" data-tag="나제 동맹" data-color="#5B7F55">백제와 신라가 동맹을 맺었다(나제 동맹).</li>
+    <li data-year="475" data-tag="고구려" data-color="#C9573C" data-flag>고구려가 한성을 빼앗았다. 백제는 웅진으로 옮겼다.</li>
+    <li data-year="532" data-tag="신라" data-color="#B08300">신라 법흥왕이 금관가야를 합쳤다.</li>
+    <li data-year="538" data-tag="백제" data-color="#3E74A8">백제 성왕이 도읍을 사비로 옮겼다.</li>
+    <li data-year="551" data-tag="나제 동맹" data-color="#5B7F55">백제와 신라가 함께 한강 유역을 되찾았다.</li>
+    <li data-year="553" data-tag="신라" data-color="#B08300">신라가 백제가 되찾은 한강 하류까지 차지했다.</li>
+    <li data-year="554" data-tag="백제" data-color="#3E74A8">백제 성왕이 관산성 전투에서 죽었다.</li>
+    <li data-year="562" data-tag="신라" data-color="#B08300">신라 진흥왕이 대가야를 정복했다.</li>
+  </ol>
+</section>
+
+<!-- 5 익스플로라그램 A: 시기 막대로 여는 영토 지도 -->
+<section class="slide" id="map" data-sec="1. 영토의 변화" data-title="시기마다 바뀐 삼국의 영토">
+  <h2>시기마다 한강 유역은 누구의 땅이었을까?</h2>
+  <div class="reveal" id="tk-stage" data-stops="시작|4세기 후반|5세기 후반|6세기 중반|6세기 후반" data-veil="막대를 밀어 시기를 하나씩 열어 보자"
+       data-ai="삼국 영토 지도와 넓이 비율(경계는 근사, 정답 확인 필요)">
+    <div class="tk-wrap">
+      <div class="veil" data-ai="정답 확인 필요"><svg class="tk-map" id="tk" viewBox="241 100 575 900" aria-label="4~6세기 삼국의 영토 지도(근사)">
+<defs><clipPath id="tk-clip"><path d="M-77.7 -150.0 L1010.1 -150.0 L1010.1 100.0 L932.4 120.0 L854.7 135.0 L800.3 140.0 L792.5 170.0 L769.2 175.0 L722.6 220.0 L714.8 260.0 L691.5 315.0 L652.7 350.0 L629.4 370.0 L598.3 400.0 L551.7 418.0 L540.0 450.0 L540.0 480.0 L551.7 495.0 L575.0 505.0 L598.3 540.0 L629.4 580.0 L652.7 620.0 L668.2 650.0 L687.6 700.0 L691.5 750.0 L704.7 795.0 L695.4 820.0 L691.5 850.0 L676.0 880.0 L664.3 892.0 L641.0 900.0 L629.4 915.0 L606.1 915.0 L582.8 910.0 L563.3 925.0 L540.0 940.0 L505.1 940.0 L474.0 965.0 L454.5 930.0 L458.4 900.0 L450.7 880.0 L466.2 840.0 L481.7 800.0 L466.2 765.0 L442.9 725.0 L462.3 705.0 L493.4 705.0 L485.6 685.0 L474.0 655.0 L466.2 630.0 L442.9 615.0 L404.0 605.0 L357.4 610.0 L330.2 585.0 L357.4 540.0 L373.0 528.0 L361.3 460.0 L341.9 440.0 L303.0 415.0 L279.7 420.0 L217.6 425.0 L163.2 460.0 L85.5 515.0 L54.4 520.0 L77.7 470.0 L77.7 430.0 L124.3 375.0 L136.0 335.0 L104.9 310.0 L46.6 315.0 L23.3 340.0 L-15.5 380.0 L-54.4 400.0 L-77.7 420.0 Z"/></clipPath></defs>
+<rect x="-200" y="-200" width="1400" height="1600" fill="#DCEBF2"/>
+<path d="M-77.7 -150.0 L1010.1 -150.0 L1010.1 100.0 L932.4 120.0 L854.7 135.0 L800.3 140.0 L792.5 170.0 L769.2 175.0 L722.6 220.0 L714.8 260.0 L691.5 315.0 L652.7 350.0 L629.4 370.0 L598.3 400.0 L551.7 418.0 L540.0 450.0 L540.0 480.0 L551.7 495.0 L575.0 505.0 L598.3 540.0 L629.4 580.0 L652.7 620.0 L668.2 650.0 L687.6 700.0 L691.5 750.0 L704.7 795.0 L695.4 820.0 L691.5 850.0 L676.0 880.0 L664.3 892.0 L641.0 900.0 L629.4 915.0 L606.1 915.0 L582.8 910.0 L563.3 925.0 L540.0 940.0 L505.1 940.0 L474.0 965.0 L454.5 930.0 L458.4 900.0 L450.7 880.0 L466.2 840.0 L481.7 800.0 L466.2 765.0 L442.9 725.0 L462.3 705.0 L493.4 705.0 L485.6 685.0 L474.0 655.0 L466.2 630.0 L442.9 615.0 L404.0 605.0 L357.4 610.0 L330.2 585.0 L357.4 540.0 L373.0 528.0 L361.3 460.0 L341.9 440.0 L303.0 415.0 L279.7 420.0 L217.6 425.0 L163.2 460.0 L85.5 515.0 L54.4 520.0 L77.7 470.0 L77.7 430.0 L124.3 375.0 L136.0 335.0 L104.9 310.0 L46.6 315.0 L23.3 340.0 L-15.5 380.0 L-54.4 400.0 L-77.7 420.0 Z" fill="#F3EEE3"/>
+<g clip-path="url(#tk-clip)"><path class="tk-r" data-name="북만주" data-own="oggg" data-kor="0" d="M-85.5 -160.0 L1017.9 -160.0 L1017.9 40.0 L738.1 60.0 L582.8 80.0 L388.5 100.0 L240.9 100.0 L-85.5 100.0 Z" fill="#E4DED2"/><path class="tk-r" data-name="요서" data-own="oooo" data-kor="0" d="M-85.5 100.0 L240.9 100.0 L209.8 180.0 L163.2 260.0 L136.0 330.0 L93.2 360.0 L0.0 500.0 L-85.5 500.0 Z" fill="#E4DED2"/><path class="tk-r" data-name="요동" data-own="oggg" data-kor="304" d="M136.0 330.0 L163.2 260.0 L209.8 180.0 L240.9 100.0 L388.5 100.0 L373.0 160.0 L349.7 250.0 L318.6 340.0 L299.1 405.0 L287.5 460.0 L38.9 560.0 L0.0 500.0 L93.2 360.0 Z" fill="#E4DED2"/><path class="tk-r" data-name="압록강 중류" data-own="gggg" data-kor="23088" d="M388.5 100.0 L582.8 80.0 L582.8 200.0 L528.4 300.0 L505.1 390.0 L474.0 400.0 L411.8 425.0 L357.4 445.0 L299.1 405.0 L318.6 340.0 L349.7 250.0 L373.0 160.0 Z" fill="#E4DED2"/><path class="tk-r" data-name="두만강 일대" data-own="gggg" data-kor="17888" d="M582.8 80.0 L738.1 60.0 L1017.9 40.0 L1017.9 340.0 L777.0 360.0 L676.0 335.0 L629.4 300.0 L582.8 200.0 Z" fill="#E4DED2"/><path class="tk-r" data-name="함흥 일대" data-own="gggs" data-kor="18192" d="M582.8 200.0 L629.4 300.0 L676.0 335.0 L738.1 370.0 L606.1 440.0 L547.8 430.0 L505.1 440.0 L505.1 390.0 L528.4 300.0 Z" fill="#E4DED2"/><path class="tk-r" data-name="대동강 유역" data-own="gggg" data-kor="15856" d="M357.4 445.0 L411.8 425.0 L474.0 400.0 L505.1 390.0 L505.1 440.0 L497.3 510.0 L427.4 540.0 L373.0 530.0 L310.8 530.0 L287.5 460.0 L299.1 405.0 Z" fill="#E4DED2"/><path class="tk-r" data-name="황해 북부" data-own="gggg" data-kor="7472" d="M310.8 575.0 L310.8 530.0 L373.0 530.0 L427.4 540.0 L497.3 510.0 L505.1 585.0 L466.2 575.0 L396.3 580.0 Z" fill="#E4DED2"/><path class="tk-r" data-name="황해 남부" data-own="bggg" data-kor="5024" d="M477.9 610.0 L450.7 632.0 L310.8 630.0 L310.8 575.0 L396.3 580.0 L466.2 575.0 L505.1 585.0 Z" fill="#E4DED2"/><path class="tk-r" data-name="원산 일대" data-own="gggs" data-kor="7872" d="M547.8 430.0 L606.1 440.0 L660.5 540.0 L606.1 545.0 L551.7 550.0 L505.1 585.0 L497.3 510.0 L505.1 440.0 Z" fill="#E4DED2"/><path class="tk-r" data-name="동해안" data-own="ogss" data-kor="5888" d="M606.1 545.0 L660.5 540.0 L730.4 740.0 L695.4 740.0 L652.7 730.0 L613.8 713.0 L644.9 690.0 L637.1 650.0 L613.8 590.0 Z" fill="#E4DED2"/><path class="tk-r" data-name="한강 하류" data-own="bgbs" data-kor="7296" d="M477.9 610.0 L505.1 585.0 L543.9 605.0 L547.8 665.0 L540.0 700.0 L493.4 705.0 L442.9 690.0 L450.7 632.0 Z" fill="#E4DED2"/><path class="tk-r" data-name="한강 상류" data-own="bgss" data-kor="14208" d="M505.1 585.0 L551.7 550.0 L606.1 545.0 L613.8 590.0 L637.1 650.0 L644.9 690.0 L613.8 713.0 L575.0 715.0 L540.0 700.0 L547.8 665.0 L543.9 605.0 Z" fill="#E4DED2"/><path class="tk-r" data-name="충청 서부" data-own="bbbb" data-kor="8112" d="M493.4 705.0 L540.0 700.0 L575.0 715.0 L540.0 755.0 L543.9 790.0 L512.8 785.0 L481.7 800.0 L419.6 795.0 L442.9 690.0 Z" fill="#E4DED2"/><path class="tk-r" data-name="보은·옥천" data-own="bsss" data-kor="2944" d="M575.0 715.0 L582.8 760.0 L578.9 800.0 L555.6 825.0 L543.9 790.0 L540.0 755.0 Z" fill="#E4DED2"/><path class="tk-r" data-name="전라" data-own="bbbb" data-kor="14320" d="M555.6 825.0 L551.7 865.0 L563.3 905.0 L563.3 940.0 L442.9 980.0 L419.6 900.0 L419.6 795.0 L481.7 800.0 L512.8 785.0 L543.9 790.0 Z" fill="#E4DED2"/><path class="tk-r" data-name="경북 북부" data-own="ssss" data-kor="7072" d="M613.8 713.0 L652.7 730.0 L695.4 740.0 L730.4 740.0 L730.4 775.0 L695.4 775.0 L629.4 785.0 L606.1 795.0 L578.9 800.0 L582.8 760.0 L575.0 715.0 Z" fill="#E4DED2"/><path class="tk-r" data-name="신라 중심" data-own="ssss" data-kor="7344" d="M695.4 775.0 L730.4 775.0 L730.4 900.0 L676.0 915.0 L656.6 892.0 L648.8 860.0 L617.7 860.0 L615.4 825.0 L606.1 795.0 L629.4 785.0 Z" fill="#E4DED2"/><path class="tk-r" data-name="대가야 일대" data-own="yyys" data-kor="5152" d="M617.7 860.0 L615.4 825.0 L606.1 795.0 L578.9 800.0 L555.6 825.0 L551.7 865.0 L563.3 905.0 L563.3 940.0 L582.8 928.0 L586.6 905.0 L598.3 855.0 Z" fill="#E4DED2"/><path class="tk-r" data-name="금관가야 일대" data-own="yyss" data-kor="3200" d="M656.6 892.0 L676.0 915.0 L582.8 928.0 L586.6 905.0 L598.3 855.0 L617.7 860.0 L648.8 860.0 Z" fill="#E4DED2"/></g>
+<path d="M-77.7 -150.0 L1010.1 -150.0 L1010.1 100.0 L932.4 120.0 L854.7 135.0 L800.3 140.0 L792.5 170.0 L769.2 175.0 L722.6 220.0 L714.8 260.0 L691.5 315.0 L652.7 350.0 L629.4 370.0 L598.3 400.0 L551.7 418.0 L540.0 450.0 L540.0 480.0 L551.7 495.0 L575.0 505.0 L598.3 540.0 L629.4 580.0 L652.7 620.0 L668.2 650.0 L687.6 700.0 L691.5 750.0 L704.7 795.0 L695.4 820.0 L691.5 850.0 L676.0 880.0 L664.3 892.0 L641.0 900.0 L629.4 915.0 L606.1 915.0 L582.8 910.0 L563.3 925.0 L540.0 940.0 L505.1 940.0 L474.0 965.0 L454.5 930.0 L458.4 900.0 L450.7 880.0 L466.2 840.0 L481.7 800.0 L466.2 765.0 L442.9 725.0 L462.3 705.0 L493.4 705.0 L485.6 685.0 L474.0 655.0 L466.2 630.0 L442.9 615.0 L404.0 605.0 L357.4 610.0 L330.2 585.0 L357.4 540.0 L373.0 528.0 L361.3 460.0 L341.9 440.0 L303.0 415.0 L279.7 420.0 L217.6 425.0 L163.2 460.0 L85.5 515.0 L54.4 520.0 L77.7 470.0 L77.7 430.0 L124.3 375.0 L136.0 335.0 L104.9 310.0 L46.6 315.0 L23.3 340.0 L-15.5 380.0 L-54.4 400.0 L-77.7 420.0 Z" fill="none" stroke="#7D7360" stroke-width="3"/>
+<path d="M-77.7 680.0 L-15.5 635.0 L19.4 620.0 L69.9 645.0 L124.3 650.0 L170.9 660.0 L147.6 700.0 L85.5 725.0 L31.1 760.0 L-7.8 795.0 L-38.9 815.0 L-77.7 860.0 Z" fill="#EAE5DA" stroke="#7D7360" stroke-width="3"/>
+<path d="M439.0 1070.0 L450.7 1080.0 L474.0 1077.0 L501.2 1055.0 L485.6 1045.0 L454.5 1053.0 Z" fill="#EAE5DA" stroke="#7D7360" stroke-width="3"/><path d="M676.0 990.0 L687.6 970.0 L695.4 935.0 L683.8 930.0 L676.0 960.0 Z" fill="#EAE5DA" stroke="#7D7360" stroke-width="3"/><path d="M699.3 1140.0 L718.7 1065.0 L753.7 1040.0 L773.1 1010.0 L808.1 1005.0 L815.9 995.0 L846.9 960.0 L878.0 940.0 L909.1 1140.0 Z" fill="#EAE5DA" stroke="#7D7360" stroke-width="3"/>
+<path d="M299.1 405.0 C306.3 396.7 327.0 368.3 341.9 355.0 C356.8 341.7 371.7 335.8 388.5 325.0 C405.3 314.2 424.8 300.8 442.9 290.0 C461.0 279.2 479.2 265.8 497.3 260.0 C515.4 254.2 536.1 255.0 551.7 255.0 C567.2 255.0 584.0 268.3 590.5 260.0 C597.0 251.7 585.3 215.8 590.5 205.0 C595.7 194.2 607.4 200.0 621.6 195.0 C635.8 190.0 659.8 181.7 676.0 175.0 C692.2 168.3 708.4 165.8 718.7 155.0 C729.1 144.2 731.0 112.5 738.1 110.0 C745.3 107.5 752.4 130.0 761.5 140.0 C770.5 150.0 787.4 165.0 792.5 170.0" fill="none" stroke="#7D7360" stroke-width="2.5" stroke-dasharray="10 8" opacity="0.7"/>
+<g fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M470.1 628.0 C475.3 631.2 491.2 643.8 501.2 647.0 C511.1 650.2 521.1 643.2 529.9 647.0 C538.7 650.8 546.1 660.7 554.0 670.0 C561.9 679.3 567.7 697.7 577.3 703.0 C586.9 708.3 602.8 705.8 611.5 702.0 C620.2 698.2 624.4 686.7 629.4 680.0 C634.3 673.3 639.1 665.0 641.0 662.0" class="tk-river tk-han"/><path d="M529.9 647.0 C532.2 643.3 538.6 630.8 543.9 625.0 C549.2 619.2 559.2 617.8 561.8 612.0 C564.4 606.2 557.2 597.8 559.4 590.0 C561.6 582.2 572.4 569.2 575.0 565.0" class="tk-river tk-han"/><path d="M373.0 527.0 C378.8 522.2 397.6 507.5 407.9 498.0 C418.3 488.5 424.1 482.2 435.1 470.0 C446.1 457.8 467.5 432.5 474.0 425.0" class="tk-river"/><path d="M299.1 405.0 C306.3 396.7 327.0 368.3 341.9 355.0 C356.8 341.7 371.7 335.8 388.5 325.0 C405.3 314.2 424.8 300.8 442.9 290.0 C461.0 279.2 479.2 265.8 497.3 260.0 C515.4 254.2 536.1 255.0 551.7 255.0 C567.2 255.0 584.0 268.3 590.5 260.0 C597.0 251.7 590.5 214.2 590.5 205.0" class="tk-river"/><path d="M656.6 890.0 C655.3 885.0 655.3 865.0 648.8 860.0 C642.3 855.0 623.3 865.8 617.7 860.0 C612.1 854.2 616.7 836.7 615.4 825.0 C614.1 813.3 612.1 800.8 609.9 790.0 C607.7 779.2 598.9 767.5 602.2 760.0 C605.4 752.5 620.3 753.3 629.4 745.0 C638.4 736.7 651.4 720.8 656.6 710.0 C661.7 699.2 659.8 685.0 660.5 680.0" class="tk-river"/><path d="M481.7 800.0 C484.3 795.3 491.8 779.7 497.3 772.0 C502.7 764.3 507.9 756.0 514.4 754.0 C520.8 752.0 530.6 754.8 536.1 760.0 C541.7 765.2 545.8 775.8 547.8 785.0 C549.7 794.2 547.8 810.0 547.8 815.0" class="tk-river"/></g>
+<g class="tk-cap" id="tk-cap-g"><path class="tk-move" id="tk-move-g" d=""/><g class="tk-pin"><circle r="12" fill="#FFFFFF" stroke="#1E1A14" stroke-width="6"/><circle r="6" fill="#1E1A14"/><text class="tk-capname" x="22" y="-14"></text></g></g><g class="tk-cap" id="tk-cap-b"><path class="tk-move" id="tk-move-b" d=""/><g class="tk-pin"><circle r="12" fill="#FFFFFF" stroke="#1E1A14" stroke-width="6"/><circle r="6" fill="#1E1A14"/><text class="tk-capname" x="22" y="-14"></text></g></g><g class="tk-cap" id="tk-cap-s"><path class="tk-move" id="tk-move-s" d=""/><g class="tk-pin"><circle r="12" fill="#FFFFFF" stroke="#1E1A14" stroke-width="6"/><circle r="6" fill="#1E1A14"/><text class="tk-capname" x="22" y="-14"></text></g></g><g class="tk-cap" id="tk-cap-y"><path class="tk-move" id="tk-move-y" d=""/><g class="tk-pin"><circle r="12" fill="#FFFFFF" stroke="#1E1A14" stroke-width="6"/><circle r="6" fill="#1E1A14"/><text class="tk-capname" x="22" y="-14"></text></g></g><text class="tk-name tk-name-g" id="tk-name-g">고구려</text><text class="tk-name tk-name-b" id="tk-name-b">백제</text><text class="tk-name tk-name-s" id="tk-name-s">신라</text><text class="tk-name tk-name-y" id="tk-name-y">가야</text><text class="tk-hanlab" x="563.3" y="638">한강</text>
+</svg></div>
+      <div class="tk-side">
+        <div class="ch-stops"></div>
+        <div class="tk-era" data-only="0"><b>시기 막대</b>를 밀면 그 시기의 영토가 열린다.<br>한강의 주인과 땅이 늘어난 나라를 살펴보자.</div>
+        <p class="tk-era" data-only="1"><b class="c-b">백제 근초고왕</b> 마한 땅을 정복하고<br>고구려 평양성을 공격했다(371).</p>
+        <p class="tk-era" data-only="2"><b class="c-g">고구려 장수왕</b> 평양으로 도읍을 옮기고(427)<br>백제 한성을 빼앗았다(475). 백제는 웅진으로.</p>
+        <p class="tk-era" data-only="3"><b class="c-b">백제</b>와 <b class="c-s">신라</b>가 함께 한강 유역을 되찾았다(551).<br>백제는 하류, 신라는 상류를 나눠 가졌다.</p>
+        <p class="tk-era" data-only="4"><b class="c-s">신라 진흥왕</b> 한강 하류까지 차지하고(553)<br>대가야를 정복했다(562). 함흥 일대까지 나아갔다.</p>
+        <div data-at="1">
+          <div class="tk-bars" aria-label="한반도 안 땅 넓이 비율">
+            <span class="c-g">고구려</span><div class="tk-track"><div class="tk-fill" data-k="g" style="background:var(--gogu)"></div></div><span class="tk-pct" data-k="g"></span>
+            <span class="c-b">백제</span><div class="tk-track"><div class="tk-fill" data-k="b" style="background:var(--baek)"></div></div><span class="tk-pct" data-k="b"></span>
+            <span class="c-s">신라</span><div class="tk-track"><div class="tk-fill" data-k="s" style="background:var(--silla)"></div></div><span class="tk-pct" data-k="s"></span>
+            <span class="c-y">가야</span><div class="tk-track"><div class="tk-fill" data-k="y" style="background:var(--gaya)"></div></div><span class="tk-pct" data-k="y"></span>
+          </div>
+          <p class="tk-han-out" id="tk-han"></p>
+          <p class="tk-note" data-ai="모형 수치">비율은 압록강과 두만강 남쪽 땅을 지도에서 잰 근사값이다.<br>경계선도 근사다.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 6 전성기의 왕 -->
+<section class="slide" id="kings" data-sec="1. 영토의 변화" data-title="세 나라의 전성기">
+  <h2>세 나라의 전성기를 이끈 왕</h2>
+  <table class="compare">
+    <thead><tr><th>시기</th><th>나라와 왕</th><th>한 일</th><th>한강 유역</th></tr></thead>
+    <tbody>
+      <tr><th>4세기 후반</th><td><span class="c-b">백제</span> 근초고왕</td><td>마한 정복, 고구려 평양성 공격</td><td>백제</td></tr>
+      <tr><th>5세기</th><td><span class="c-g">고구려</span> 광개토 대왕, 장수왕</td><td>요동 확보, 평양 천도, 한성 함락</td><td>고구려</td></tr>
+      <tr><th>6세기</th><td><span class="c-s">신라</span> 진흥왕</td><td>한강 유역 차지, 대가야 정복</td><td>신라</td></tr>
+    </tbody>
+  </table>
+  <p class="back step"><b>정리</b> 한강 유역을 차지한 나라가 그 시기의 전성기를 누렸다.</p>
+</section>
+
+<!-- 7 익스플로라그램 B: 바닷길 -->
+<section class="slide" id="sea" data-sec="2. 한강 유역의 가치" data-title="한강 하류와 중국으로 가는 바닷길">
+  <h2>한강 하류를 차지하면 중국까지 뱃길은 얼마나 짧아질까?</h2>
+  <div class="sr-wrap" data-activity data-ai="출발 항구별 산둥 반도까지 뱃길 길이(뱃길은 근사, 모형 수치)">
+    <div class="sr-view">
+      <svg class="tk-map" id="sr" viewBox="78 450 660 640" aria-label="6세기 후반 한반도와 산둥 반도 사이 바닷길(근사)">
+<defs><clipPath id="sr-clip"><path d="M-77.7 -150.0 L1010.1 -150.0 L1010.1 100.0 L932.4 120.0 L854.7 135.0 L800.3 140.0 L792.5 170.0 L769.2 175.0 L722.6 220.0 L714.8 260.0 L691.5 315.0 L652.7 350.0 L629.4 370.0 L598.3 400.0 L551.7 418.0 L540.0 450.0 L540.0 480.0 L551.7 495.0 L575.0 505.0 L598.3 540.0 L629.4 580.0 L652.7 620.0 L668.2 650.0 L687.6 700.0 L691.5 750.0 L704.7 795.0 L695.4 820.0 L691.5 850.0 L676.0 880.0 L664.3 892.0 L641.0 900.0 L629.4 915.0 L606.1 915.0 L582.8 910.0 L563.3 925.0 L540.0 940.0 L505.1 940.0 L474.0 965.0 L454.5 930.0 L458.4 900.0 L450.7 880.0 L466.2 840.0 L481.7 800.0 L466.2 765.0 L442.9 725.0 L462.3 705.0 L493.4 705.0 L485.6 685.0 L474.0 655.0 L466.2 630.0 L442.9 615.0 L404.0 605.0 L357.4 610.0 L330.2 585.0 L357.4 540.0 L373.0 528.0 L361.3 460.0 L341.9 440.0 L303.0 415.0 L279.7 420.0 L217.6 425.0 L163.2 460.0 L85.5 515.0 L54.4 520.0 L77.7 470.0 L77.7 430.0 L124.3 375.0 L136.0 335.0 L104.9 310.0 L46.6 315.0 L23.3 340.0 L-15.5 380.0 L-54.4 400.0 L-77.7 420.0 Z"/></clipPath></defs>
+<rect x="-200" y="-200" width="1400" height="1600" fill="#DCEBF2"/>
+<path d="M-77.7 -150.0 L1010.1 -150.0 L1010.1 100.0 L932.4 120.0 L854.7 135.0 L800.3 140.0 L792.5 170.0 L769.2 175.0 L722.6 220.0 L714.8 260.0 L691.5 315.0 L652.7 350.0 L629.4 370.0 L598.3 400.0 L551.7 418.0 L540.0 450.0 L540.0 480.0 L551.7 495.0 L575.0 505.0 L598.3 540.0 L629.4 580.0 L652.7 620.0 L668.2 650.0 L687.6 700.0 L691.5 750.0 L704.7 795.0 L695.4 820.0 L691.5 850.0 L676.0 880.0 L664.3 892.0 L641.0 900.0 L629.4 915.0 L606.1 915.0 L582.8 910.0 L563.3 925.0 L540.0 940.0 L505.1 940.0 L474.0 965.0 L454.5 930.0 L458.4 900.0 L450.7 880.0 L466.2 840.0 L481.7 800.0 L466.2 765.0 L442.9 725.0 L462.3 705.0 L493.4 705.0 L485.6 685.0 L474.0 655.0 L466.2 630.0 L442.9 615.0 L404.0 605.0 L357.4 610.0 L330.2 585.0 L357.4 540.0 L373.0 528.0 L361.3 460.0 L341.9 440.0 L303.0 415.0 L279.7 420.0 L217.6 425.0 L163.2 460.0 L85.5 515.0 L54.4 520.0 L77.7 470.0 L77.7 430.0 L124.3 375.0 L136.0 335.0 L104.9 310.0 L46.6 315.0 L23.3 340.0 L-15.5 380.0 L-54.4 400.0 L-77.7 420.0 Z" fill="#F3EEE3"/>
+<g clip-path="url(#sr-clip)"><path class="tk-r" data-name="북만주" data-own="oggg" data-kor="0" d="M-85.5 -160.0 L1017.9 -160.0 L1017.9 40.0 L738.1 60.0 L582.8 80.0 L388.5 100.0 L240.9 100.0 L-85.5 100.0 Z" fill="#C9573C"/><path class="tk-r" data-name="요서" data-own="oooo" data-kor="0" d="M-85.5 100.0 L240.9 100.0 L209.8 180.0 L163.2 260.0 L136.0 330.0 L93.2 360.0 L0.0 500.0 L-85.5 500.0 Z" fill="#E4DED2"/><path class="tk-r" data-name="요동" data-own="oggg" data-kor="304" d="M136.0 330.0 L163.2 260.0 L209.8 180.0 L240.9 100.0 L388.5 100.0 L373.0 160.0 L349.7 250.0 L318.6 340.0 L299.1 405.0 L287.5 460.0 L38.9 560.0 L0.0 500.0 L93.2 360.0 Z" fill="#C9573C"/><path class="tk-r" data-name="압록강 중류" data-own="gggg" data-kor="23088" d="M388.5 100.0 L582.8 80.0 L582.8 200.0 L528.4 300.0 L505.1 390.0 L474.0 400.0 L411.8 425.0 L357.4 445.0 L299.1 405.0 L318.6 340.0 L349.7 250.0 L373.0 160.0 Z" fill="#C9573C"/><path class="tk-r" data-name="두만강 일대" data-own="gggg" data-kor="17888" d="M582.8 80.0 L738.1 60.0 L1017.9 40.0 L1017.9 340.0 L777.0 360.0 L676.0 335.0 L629.4 300.0 L582.8 200.0 Z" fill="#C9573C"/><path class="tk-r" data-name="함흥 일대" data-own="gggs" data-kor="18192" d="M582.8 200.0 L629.4 300.0 L676.0 335.0 L738.1 370.0 L606.1 440.0 L547.8 430.0 L505.1 440.0 L505.1 390.0 L528.4 300.0 Z" fill="#D9A520"/><path class="tk-r" data-name="대동강 유역" data-own="gggg" data-kor="15856" d="M357.4 445.0 L411.8 425.0 L474.0 400.0 L505.1 390.0 L505.1 440.0 L497.3 510.0 L427.4 540.0 L373.0 530.0 L310.8 530.0 L287.5 460.0 L299.1 405.0 Z" fill="#C9573C"/><path class="tk-r" data-name="황해 북부" data-own="gggg" data-kor="7472" d="M310.8 575.0 L310.8 530.0 L373.0 530.0 L427.4 540.0 L497.3 510.0 L505.1 585.0 L466.2 575.0 L396.3 580.0 Z" fill="#C9573C"/><path class="tk-r" data-name="황해 남부" data-own="bggg" data-kor="5024" d="M477.9 610.0 L450.7 632.0 L310.8 630.0 L310.8 575.0 L396.3 580.0 L466.2 575.0 L505.1 585.0 Z" fill="#C9573C"/><path class="tk-r" data-name="원산 일대" data-own="gggs" data-kor="7872" d="M547.8 430.0 L606.1 440.0 L660.5 540.0 L606.1 545.0 L551.7 550.0 L505.1 585.0 L497.3 510.0 L505.1 440.0 Z" fill="#D9A520"/><path class="tk-r" data-name="동해안" data-own="ogss" data-kor="5888" d="M606.1 545.0 L660.5 540.0 L730.4 740.0 L695.4 740.0 L652.7 730.0 L613.8 713.0 L644.9 690.0 L637.1 650.0 L613.8 590.0 Z" fill="#D9A520"/><path class="tk-r" data-name="한강 하류" data-own="bgbs" data-kor="7296" d="M477.9 610.0 L505.1 585.0 L543.9 605.0 L547.8 665.0 L540.0 700.0 L493.4 705.0 L442.9 690.0 L450.7 632.0 Z" fill="#D9A520"/><path class="tk-r" data-name="한강 상류" data-own="bgss" data-kor="14208" d="M505.1 585.0 L551.7 550.0 L606.1 545.0 L613.8 590.0 L637.1 650.0 L644.9 690.0 L613.8 713.0 L575.0 715.0 L540.0 700.0 L547.8 665.0 L543.9 605.0 Z" fill="#D9A520"/><path class="tk-r" data-name="충청 서부" data-own="bbbb" data-kor="8112" d="M493.4 705.0 L540.0 700.0 L575.0 715.0 L540.0 755.0 L543.9 790.0 L512.8 785.0 L481.7 800.0 L419.6 795.0 L442.9 690.0 Z" fill="#3E74A8"/><path class="tk-r" data-name="보은·옥천" data-own="bsss" data-kor="2944" d="M575.0 715.0 L582.8 760.0 L578.9 800.0 L555.6 825.0 L543.9 790.0 L540.0 755.0 Z" fill="#D9A520"/><path class="tk-r" data-name="전라" data-own="bbbb" data-kor="14320" d="M555.6 825.0 L551.7 865.0 L563.3 905.0 L563.3 940.0 L442.9 980.0 L419.6 900.0 L419.6 795.0 L481.7 800.0 L512.8 785.0 L543.9 790.0 Z" fill="#3E74A8"/><path class="tk-r" data-name="경북 북부" data-own="ssss" data-kor="7072" d="M613.8 713.0 L652.7 730.0 L695.4 740.0 L730.4 740.0 L730.4 775.0 L695.4 775.0 L629.4 785.0 L606.1 795.0 L578.9 800.0 L582.8 760.0 L575.0 715.0 Z" fill="#D9A520"/><path class="tk-r" data-name="신라 중심" data-own="ssss" data-kor="7344" d="M695.4 775.0 L730.4 775.0 L730.4 900.0 L676.0 915.0 L656.6 892.0 L648.8 860.0 L617.7 860.0 L615.4 825.0 L606.1 795.0 L629.4 785.0 Z" fill="#D9A520"/><path class="tk-r" data-name="대가야 일대" data-own="yyys" data-kor="5152" d="M617.7 860.0 L615.4 825.0 L606.1 795.0 L578.9 800.0 L555.6 825.0 L551.7 865.0 L563.3 905.0 L563.3 940.0 L582.8 928.0 L586.6 905.0 L598.3 855.0 Z" fill="#D9A520"/><path class="tk-r" data-name="금관가야 일대" data-own="yyss" data-kor="3200" d="M656.6 892.0 L676.0 915.0 L582.8 928.0 L586.6 905.0 L598.3 855.0 L617.7 860.0 L648.8 860.0 Z" fill="#D9A520"/></g>
+<path d="M-77.7 -150.0 L1010.1 -150.0 L1010.1 100.0 L932.4 120.0 L854.7 135.0 L800.3 140.0 L792.5 170.0 L769.2 175.0 L722.6 220.0 L714.8 260.0 L691.5 315.0 L652.7 350.0 L629.4 370.0 L598.3 400.0 L551.7 418.0 L540.0 450.0 L540.0 480.0 L551.7 495.0 L575.0 505.0 L598.3 540.0 L629.4 580.0 L652.7 620.0 L668.2 650.0 L687.6 700.0 L691.5 750.0 L704.7 795.0 L695.4 820.0 L691.5 850.0 L676.0 880.0 L664.3 892.0 L641.0 900.0 L629.4 915.0 L606.1 915.0 L582.8 910.0 L563.3 925.0 L540.0 940.0 L505.1 940.0 L474.0 965.0 L454.5 930.0 L458.4 900.0 L450.7 880.0 L466.2 840.0 L481.7 800.0 L466.2 765.0 L442.9 725.0 L462.3 705.0 L493.4 705.0 L485.6 685.0 L474.0 655.0 L466.2 630.0 L442.9 615.0 L404.0 605.0 L357.4 610.0 L330.2 585.0 L357.4 540.0 L373.0 528.0 L361.3 460.0 L341.9 440.0 L303.0 415.0 L279.7 420.0 L217.6 425.0 L163.2 460.0 L85.5 515.0 L54.4 520.0 L77.7 470.0 L77.7 430.0 L124.3 375.0 L136.0 335.0 L104.9 310.0 L46.6 315.0 L23.3 340.0 L-15.5 380.0 L-54.4 400.0 L-77.7 420.0 Z" fill="none" stroke="#7D7360" stroke-width="3"/>
+<path d="M-77.7 680.0 L-15.5 635.0 L19.4 620.0 L69.9 645.0 L124.3 650.0 L170.9 660.0 L147.6 700.0 L85.5 725.0 L31.1 760.0 L-7.8 795.0 L-38.9 815.0 L-77.7 860.0 Z" fill="#EAE5DA" stroke="#7D7360" stroke-width="3"/>
+<path d="M439.0 1070.0 L450.7 1080.0 L474.0 1077.0 L501.2 1055.0 L485.6 1045.0 L454.5 1053.0 Z" fill="#EAE5DA" stroke="#7D7360" stroke-width="3"/><path d="M676.0 990.0 L687.6 970.0 L695.4 935.0 L683.8 930.0 L676.0 960.0 Z" fill="#EAE5DA" stroke="#7D7360" stroke-width="3"/><path d="M699.3 1140.0 L718.7 1065.0 L753.7 1040.0 L773.1 1010.0 L808.1 1005.0 L815.9 995.0 L846.9 960.0 L878.0 940.0 L909.1 1140.0 Z" fill="#EAE5DA" stroke="#7D7360" stroke-width="3"/>
+<path d="M299.1 405.0 C306.3 396.7 327.0 368.3 341.9 355.0 C356.8 341.7 371.7 335.8 388.5 325.0 C405.3 314.2 424.8 300.8 442.9 290.0 C461.0 279.2 479.2 265.8 497.3 260.0 C515.4 254.2 536.1 255.0 551.7 255.0 C567.2 255.0 584.0 268.3 590.5 260.0 C597.0 251.7 585.3 215.8 590.5 205.0 C595.7 194.2 607.4 200.0 621.6 195.0 C635.8 190.0 659.8 181.7 676.0 175.0 C692.2 168.3 708.4 165.8 718.7 155.0 C729.1 144.2 731.0 112.5 738.1 110.0 C745.3 107.5 752.4 130.0 761.5 140.0 C770.5 150.0 787.4 165.0 792.5 170.0" fill="none" stroke="#7D7360" stroke-width="2.5" stroke-dasharray="10 8" opacity="0"/>
+<g fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M470.1 628.0 C475.3 631.2 491.2 643.8 501.2 647.0 C511.1 650.2 521.1 643.2 529.9 647.0 C538.7 650.8 546.1 660.7 554.0 670.0 C561.9 679.3 567.7 697.7 577.3 703.0 C586.9 708.3 602.8 705.8 611.5 702.0 C620.2 698.2 624.4 686.7 629.4 680.0 C634.3 673.3 639.1 665.0 641.0 662.0" class="tk-river tk-han"/><path d="M529.9 647.0 C532.2 643.3 538.6 630.8 543.9 625.0 C549.2 619.2 559.2 617.8 561.8 612.0 C564.4 606.2 557.2 597.8 559.4 590.0 C561.6 582.2 572.4 569.2 575.0 565.0" class="tk-river tk-han"/><path d="M373.0 527.0 C378.8 522.2 397.6 507.5 407.9 498.0 C418.3 488.5 424.1 482.2 435.1 470.0 C446.1 457.8 467.5 432.5 474.0 425.0" class="tk-river"/><path d="M299.1 405.0 C306.3 396.7 327.0 368.3 341.9 355.0 C356.8 341.7 371.7 335.8 388.5 325.0 C405.3 314.2 424.8 300.8 442.9 290.0 C461.0 279.2 479.2 265.8 497.3 260.0 C515.4 254.2 536.1 255.0 551.7 255.0 C567.2 255.0 584.0 268.3 590.5 260.0 C597.0 251.7 590.5 214.2 590.5 205.0" class="tk-river"/><path d="M656.6 890.0 C655.3 885.0 655.3 865.0 648.8 860.0 C642.3 855.0 623.3 865.8 617.7 860.0 C612.1 854.2 616.7 836.7 615.4 825.0 C614.1 813.3 612.1 800.8 609.9 790.0 C607.7 779.2 598.9 767.5 602.2 760.0 C605.4 752.5 620.3 753.3 629.4 745.0 C638.4 736.7 651.4 720.8 656.6 710.0 C661.7 699.2 659.8 685.0 660.5 680.0" class="tk-river"/><path d="M481.7 800.0 C484.3 795.3 491.8 779.7 497.3 772.0 C502.7 764.3 507.9 756.0 514.4 754.0 C520.8 752.0 530.6 754.8 536.1 760.0 C541.7 765.2 545.8 775.8 547.8 785.0 C549.7 794.2 547.8 810.0 547.8 815.0" class="tk-river"/></g>
+<path class="sr-route" id="sr-before" d="M695.4 822.0 L703.2 870.0 L676.0 910.0 L621.6 945.0 L543.9 975.0 L466.2 1005.0 L419.6 960.0 L396.3 880.0 L373.0 780.0 L310.8 710.0 L225.3 680.0 L174.8 670.0"/><path class="sr-route" id="sr-after" d="M483.3 682.0 L450.7 685.0 L380.7 678.0 L287.5 670.0 L174.8 670.0"/><path class="sr-route" id="sr-goguryeo" d="M373.0 528.0 L326.3 545.0 L240.9 580.0 L186.5 625.0 L174.8 655.0"/><g id="sr-ship" class="sr-ship"><g transform="scale(.75)"><path d="M-26 -4 H26 L16 14 H-16 Z" fill="#1E1A14"/><path d="M0 -6 V-40 L22 -12 Z" fill="#FFFFFF" stroke="#1E1A14" stroke-width="4"/></g></g><circle cx="483.3" cy="682" r="10" fill="#1E1A14"/><text class="sr-place" x="497.3" y="664">당항성</text><circle cx="676.8" cy="816" r="10" fill="#1E1A14"/><text class="sr-place" x="576.8" y="796">경주</text><circle cx="373" cy="528" r="10" fill="#1E1A14"/><text class="sr-place" x="389" y="568">대동강 하구</text><circle cx="174.8" cy="670" r="10" fill="#1E1A14"/><text class="sr-place" x="114.80000000000001" y="726">산둥 반도</text>
+</svg>
+      <div class="sr-veil" id="sr-veil"><span>오른쪽에서 출발 항구를 골라 보자</span></div>
+    </div>
+    <div>
+      <div class="sr-btns">
+        <button class="sr-b" type="button" data-r="before" aria-pressed="false">553년 이전 신라<br>경주 앞바다에서</button>
+        <button class="sr-b" type="button" data-r="after" aria-pressed="false">553년 이후 신라<br>한강 하류 당항성에서</button>
+        <button class="sr-b" type="button" data-r="goguryeo" aria-pressed="false">고구려<br>대동강 하구에서</button>
+      </div>
+      <p class="sr-out" id="sr-out"></p>
+      <div class="sr-bars" id="sr-bars" data-ai="모형 수치"></div>
+    </div>
+  </div>
+</section>
+
+<!-- 8 순서 배열 -->
+<section class="slide" id="alliance" data-sec="2. 한강 유역의 가치" data-title="나제 동맹의 성립과 결렬">
+  <h2>나제 동맹은 어떻게 맺어지고 깨졌을까?</h2>
+  <div class="q-wrap">
+    <p class="q" data-n="1">일어난 순서대로 눌러 보자.</p>
+    <ol class="order" data-ai="항목별 이유">
+      <li data-why="433년, 고구려의 남진에 맞서 백제와 신라가 손을 잡았다.">백제와 신라가 동맹을 맺었다.</li>
+      <li data-why="475년, 장수왕이 한성을 빼앗자 백제는 웅진으로 옮겼다.">고구려가 백제의 한성을 빼앗았다.</li>
+      <li data-why="551년, 백제는 한강 하류를, 신라는 상류를 차지했다.">백제와 신라가 함께 한강 유역을 되찾았다.</li>
+      <li data-why="553년, 신라가 백제가 차지한 하류까지 빼앗아 동맹이 깨졌다.">신라가 한강 하류까지 차지했다.</li>
+      <li data-why="554년, 백제 성왕이 신라를 치다가 관산성에서 죽었다.">백제 성왕이 관산성 전투에서 죽었다.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- 9 확인 문제 -->
+<section class="slide" id="who" data-sec="확인 문제" data-title="확인 문제">
+  <h2>확인 문제</h2>
+  <p class="q" data-n="2">한 일과 왕을 바르게 짝지어 보자.</p>
+  <div class="sort" data-ai="카드와 이유, 실마리">
+    <div class="bin" data-bin="k"><h3>백제 근초고왕</h3></div>
+    <div class="bin" data-bin="j"><h3>고구려 장수왕</h3></div>
+    <div class="bin" data-bin="h"><h3>신라 진흥왕</h3></div>
+    <span data-bin="k" data-why="맞다. 근초고왕은 4세기 후반 마한 땅을 정복했다." data-hint="마한은 한반도 남서쪽에 있었다. 그 가까이에 있던 나라는?">마한 땅을 정복했다.</span>
+    <span data-bin="j" data-why="맞다. 장수왕은 427년 도읍을 평양으로 옮겼다." data-hint="평양으로 옮기기 전 도읍은 압록강 가의 국내성이었다.">도읍을 평양으로 옮겼다.</span>
+    <span data-bin="h" data-why="맞다. 진흥왕은 562년 대가야를 정복했다." data-hint="가야는 6세기에 어느 나라에 합쳐졌을까?">대가야를 정복했다.</span>
+    <span data-bin="k" data-why="맞다. 근초고왕은 371년 평양성을 공격했다." data-hint="이때는 고구려가 아직 평양으로 도읍을 옮기기 전이다.">고구려 평양성을 공격했다.</span>
+    <span data-bin="j" data-why="맞다. 장수왕은 475년 백제의 한성을 빼앗았다." data-hint="한성은 백제의 도읍이었다. 그곳을 빼앗은 나라는?">백제의 한성을 빼앗았다.</span>
+    <span data-bin="h" data-why="맞다. 진흥왕은 553년 한강 하류까지 차지했다." data-hint="551년 이후 한강 하류를 다시 잃은 나라는 백제였다.">한강 하류까지 차지했다.</span>
+  </div>
+</section>
+
+<!-- 10 정리 -->
+<section class="slide" id="summary" data-sec="정리" data-title="정리">
+  <h2>정리</h2>
+  <ul class="sum">
+    <li>한강 유역의 주인은 <span class="c-b">백제</span>(4세기) → <span class="c-g">고구려</span>(5세기) → <span class="c-s">신라</span>(6세기)로 바뀌었다.</li>
+    <li>한강 유역을 차지한 나라가 그 시기의 전성기를 누렸다.</li>
+    <li>신라는 한강 하류를 얻어 서해를 건너 중국과 직접 오갈 수 있게 되었다.</li>
+  </ul>
+  <p class="back step" data-ai="생각 열기 답"><b>다시 한강으로</b> 한강 유역에는 넓은 들판이 있어 곡식과 사람이 많았다.<br>하류는 서해로 이어져 중국과 오가는 바닷길의 출발점이 되었다.</p>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const $ = (s) => document.querySelector(s);
+  const $$ = (s) => [...document.querySelectorAll(s)];
+  const still = () => document.documentElement.classList.contains('ch-motion-off');
+  function tween(job, to, draw, ms = 700) {
+    cancelAnimationFrame(job.raf);
+    const from = job.v, t0 = performance.now();
+    const step = (now) => {
+      const p = still() || ms <= 0 ? 1 : Math.min(1, (now - t0) / ms);
+      job.v = from + (to - from) * (1 - (1 - p) ** 3);
+      draw(job.v, p);
+      if (p < 1) job.raf = requestAnimationFrame(step);
+    };
+    job.raf = requestAnimationFrame(step);
+  }
+  const NAME = { g: '고구려', b: '백제', s: '신라', y: '가야', o: '다른 세력' };
+  const COLOR = { g: '#C9573C', b: '#3E74A8', s: '#D9A520', y: '#7E6BA6', o: '#E4DED2' };
+
+  /* A. 시기 막대로 여는 영토 지도: 구역 색, 수도, 나라 이름, 넓이 막대, 한강의 주인이 함께 바뀐다 */
+  const CAP = {"g":[null,["국내성",441.3,288,22,-14,"start"],["평양",407.9,498,22,-14,"start"],["평양",407.9,498,22,-14,"start"],["평양",407.9,498,22,-14,"start"]],"b":[null,["한성",512.8,648,-22,-14,"end"],["웅진",514.4,754,22,-14,"start"],["사비",498.1,772,-22,-14,"end"],["사비",498.1,772,-22,-14,"end"]],"s":[null,["금성",676.8,816,20,44,"start"],["금성",676.8,816,20,44,"start"],["금성",676.8,816,20,44,"start"],["금성",676.8,816,20,44,"start"]],"y":[null,["",651.1,877,22,-14,"start"],["",603,827,22,-14,"start"],["",603,827,22,-14,"start"],null]}, LAB = {"g":[null,[505.1,225],[505.1,225],[505.1,225],[505.1,225]],"b":[null,[485.6,885],[485.6,885],[485.6,885],[485.6,885]],"s":[null,[648.8,770],[648.8,770],[629.4,700],[629.4,700]],"y":[null,[582.8,895],[582.8,895],[582.8,895],null]};
+  const regs = $$('#tk .tk-r');
+  const pct = { g: { v: 0, raf: 0 }, b: { v: 0, raf: 0 }, s: { v: 0, raf: 0 }, y: { v: 0, raf: 0 } };
+  function drawMap(k) {
+    const tot = { g: 0, b: 0, s: 0, y: 0, o: 0 };
+    let all = 0;
+    regs.forEach((r) => {
+      const own = k ? r.dataset.own[k - 1] : 'o';
+      r.style.fill = COLOR[own];
+      const a = +r.dataset.kor; tot[own] += a; all += a;
+    });
+    ['g', 'b', 's', 'y'].forEach((c) => {
+      const p = k ? (100 * tot[c]) / all : 0;
+      $(`.tk-fill[data-k="${c}"]`).style.width = `${p}%`;
+      const out = $(`.tk-pct[data-k="${c}"]`);
+      tween(pct[c], p, (v) => { out.textContent = `${v.toFixed(0)}%`; });
+      // 수도와 이름
+      const cap = CAP[c][k], prev = k > 1 ? CAP[c][k - 1] : null;
+      const pin = $(`#tk-cap-${c} .tk-pin`), mv = $(`#tk-move-${c}`), nm = $(`#tk-name-${c}`);
+      pin.style.opacity = cap ? 1 : 0;
+      if (cap) {
+        pin.style.transform = `translate(${cap[1]}px, ${cap[2]}px)`;
+        const tx = pin.querySelector('text');
+        tx.textContent = cap[0]; tx.setAttribute('x', cap[3]); tx.setAttribute('y', cap[4]); tx.setAttribute('text-anchor', cap[5]);
+      }
+      const moved = cap && prev && (cap[1] !== prev[1] || cap[2] !== prev[2]);
+      if (moved) mv.setAttribute('d', `M${prev[1]} ${prev[2]} L${cap[1]} ${cap[2]}`);
+      mv.classList.toggle('on', !!moved);
+      const lab = LAB[c][k];
+      nm.style.opacity = lab ? 1 : 0;
+      if (lab) nm.style.transform = `translate(${lab[0]}px, ${lab[1]}px)`;
+    });
+    const owner = (n) => regs.find((r) => r.dataset.name === n).dataset.own[k - 1];
+    if (k) {
+      const lo = owner('한강 하류'), up = owner('한강 상류');
+      let gain = '';
+      if (k > 1) {   // 앞 시기보다 비율이 가장 많이 늘어난 나라
+        const before = { g: 0, b: 0, s: 0, y: 0, o: 0 };
+        regs.forEach((r) => { before[r.dataset.own[k - 2]] += +r.dataset.kor; });
+        const up2 = ['g', 'b', 's', 'y'].map((c) => [c, (100 * (tot[c] - before[c])) / all]).sort((a, b) => b[1] - a[1])[0];
+        gain = `\n앞 시기보다 땅이 가장 많이 늘어난 나라는 ${NAME[up2[0]]}(+${up2[1].toFixed(0)}%p)다.`;
+      }
+      $('#tk-han').textContent = (lo === up ? `한강 유역은 모두 ${NAME[lo]}의 땅이다.` : `한강 하류는 ${NAME[lo]}, 상류는 ${NAME[up]}의 땅이다.`) + gain;
+    }
+  }
+  // 처음 자리(이름은 그림 밖에서 시작하지 않게 1시기 자리에 둔다)
+  ['g', 'b', 's', 'y'].forEach((c) => {
+    const lab = LAB[c][1], cap = CAP[c][1];
+    $(`#tk-name-${c}`).style.transform = `translate(${lab[0]}px, ${lab[1]}px)`;
+    $(`#tk-cap-${c} .tk-pin`).style.transform = `translate(${cap[1]}px, ${cap[2]}px)`;
+  });
+  $('#tk-stage').addEventListener('ch-stepper', (e) => drawMap(e.detail.pos));
+  drawMap(0);
+
+  /* B. 바닷길: 고른 항구에서 산둥 반도까지 뱃길이 그려지고 배가 따라간다. 길이는 지도 위 뱃길로 잰 값 */
+  const KM = {"before":929,"after":352,"goguryeo":274};
+  const LABEL = { before: '553년 이전 신라', after: '553년 이후 신라', goguryeo: '고구려' };
+  const SAY = {
+    before: '한강 하류가 없으면 신라 배는 남해를 돌아\n서해를 건너야 했다.',
+    after: '한강 하류의 당항성에서 서해를 바로 건넌다.\n553년 이전보다 뱃길이 크게 짧아졌다.',
+    goguryeo: '고구려는 대동강 하구에서\n서해 북쪽을 건너 산둥 반도로 갔다.',
+  };
+  const seen = new Set();
+  const ship = $('#sr-ship'), job = { v: 0, raf: 0 }, kmJob = { v: 0, raf: 0 };
+  function choose(key) {
+    $('#sr-veil').hidden = true;
+    $$('#sea .sr-b').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.r === key)));
+    $$('#sea .sr-route').forEach((p) => p.classList.toggle('on', p.id === `sr-${key}`));
+    const path = $(`#sr-${key}`), L = path.getTotalLength();
+    path.style.strokeDasharray = `${L}`;
+    ship.style.opacity = 1;
+    job.v = 0;
+    tween(job, 1, (p) => {
+      path.style.strokeDashoffset = `${L * (1 - p)}`;
+      const a = path.getPointAtLength(L * p), b = path.getPointAtLength(Math.min(L, L * p + 4));
+      const ang = (Math.atan2(b.y - a.y, b.x - a.x) * 180) / Math.PI;
+      ship.setAttribute('transform', `translate(${a.x} ${a.y}) rotate(${Math.abs(ang) > 90 ? ang + 180 : ang})`);
+    }, 1600);
+    const out = $('#sr-out');
+    tween(kmJob, KM[key], (v) => { out.replaceChildren(document.createTextNode('산둥 반도까지 뱃길 약 '), Object.assign(document.createElement('span'), { className: 'sr-km', textContent: `${Math.round(v)}` }), document.createTextNode(` km (근사)\n${SAY[key]}`)); }, 900);
+    out.style.whiteSpace = 'pre-line';
+    seen.add(key);
+    const bars = $('#sr-bars');
+    bars.replaceChildren();
+    const max = Math.max(...Object.values(KM));
+    Object.keys(KM).filter((k) => seen.has(k)).forEach((k) => {
+      const n = Object.assign(document.createElement('span'), { textContent: LABEL[k] });
+      const tr = Object.assign(document.createElement('div'), { className: 'tk-track' });
+      const f = Object.assign(document.createElement('div'), { className: 'tk-fill' });
+      f.style.background = k === 'goguryeo' ? COLOR.g : COLOR.s;
+      tr.appendChild(f);
+      const v = Object.assign(document.createElement('span'), { className: 'tk-pct', textContent: `${KM[k]} km` });
+      bars.append(n, tr, v);
+      requestAnimationFrame(() => { f.style.width = `${(100 * KM[k]) / max}%`; });
+    });
+  }
+  $$('#sea .sr-b').forEach((b) => b.addEventListener('click', () => { choose(b.dataset.r); b.blur(); }));
+});
+</script>
+</body>
+</html>

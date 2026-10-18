@@ -1,0 +1,79 @@
+[
+ {
+  "slide": 5,
+  "name": "start"
+ },
+ {
+  "slide": 5,
+  "name": "stage1",
+  "js": "{ const r = document.querySelector('#tk-stage .ch-stops input'); r.value = 1; r.dispatchEvent(new Event('input', { bubbles: true })) }",
+  "wait": 1200
+ },
+ {
+  "slide": 5,
+  "name": "stage2",
+  "js": "{ const r = document.querySelector('#tk-stage .ch-stops input'); r.value = 2; r.dispatchEvent(new Event('input', { bubbles: true })) }",
+  "wait": 1200
+ },
+ {
+  "slide": 5,
+  "name": "stage3",
+  "js": "{ const r = document.querySelector('#tk-stage .ch-stops input'); r.value = 3; r.dispatchEvent(new Event('input', { bubbles: true })) }",
+  "wait": 1200
+ },
+ {
+  "slide": 5,
+  "name": "stage4",
+  "js": "{ const r = document.querySelector('#tk-stage .ch-stops input'); r.value = 4; r.dispatchEvent(new Event('input', { bubbles: true })) }",
+  "wait": 1200
+ },
+ {
+  "slide": 5,
+  "name": "back0",
+  "js": "{ const r = document.querySelector('#tk-stage .ch-stops input'); r.value = 0; r.dispatchEvent(new Event('input', { bubbles: true })) }"
+ },
+ {
+  "slide": 7,
+  "name": "start"
+ },
+ {
+  "slide": 7,
+  "name": "before",
+  "js": "document.querySelector('#sea .sr-b[data-r=\"before\"]').click()",
+  "wait": 2000
+ },
+ {
+  "slide": 7,
+  "name": "after",
+  "js": "document.querySelector('#sea .sr-b[data-r=\"after\"]').click()",
+  "wait": 2000
+ },
+ {
+  "slide": 7,
+  "name": "goguryeo",
+  "js": "document.querySelector('#sea .sr-b[data-r=\"goguryeo\"]').click()",
+  "wait": 2000
+ },
+ {
+  "slide": 1,
+  "name": "v"
+ },
+ {
+  "slide": 3,
+  "name": "v"
+ },
+ {
+  "slide": 4,
+  "name": "v",
+  "js": "for (let i = 0; i < 12; i++) Exploragram.next()"
+ },
+ {
+  "slide": 6,
+  "name": "v",
+  "js": "Exploragram.next()"
+ },
+ {
+  "slide": 9,
+  "name": "v"
+ }
+]

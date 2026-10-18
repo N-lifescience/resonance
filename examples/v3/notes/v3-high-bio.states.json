@@ -1,0 +1,15 @@
+[
+  { "slide": 5, "name": "sugar30", "js": "const r = document.querySelector('#membrane input[name=s]'); r.value = 30; r.dispatchEvent(new Event('input', { bubbles: true }))", "wait": 4000 },
+  { "slide": 5, "name": "sugar0", "js": "const r = document.querySelector('#membrane input[name=s]'); r.value = 0; r.dispatchEvent(new Event('input', { bubbles: true }))" },
+  { "slide": 8, "name": "water-t10", "js": "const r = document.querySelector('#plant input[name=t]'); r.value = 10; r.dispatchEvent(new Event('input', { bubbles: true }))" },
+  { "slide": 8, "name": "dilute-t10", "js": "document.querySelector('#plant button[data-value=\"4\"]').click()" },
+  { "slide": 8, "name": "iso-t10", "js": "document.querySelector('#plant button[data-value=\"8\"]').click()" },
+  { "slide": 8, "name": "conc-t10", "js": "document.querySelector('#plant button[data-value=\"12\"]').click()" },
+  { "slide": 8, "name": "conc-t3", "js": "const r = document.querySelector('#plant input[name=t]'); r.value = 3; r.dispatchEvent(new Event('input', { bubbles: true }))" },
+  { "slide": 8, "name": "t0", "js": "const r = document.querySelector('#plant input[name=t]'); r.value = 0; r.dispatchEvent(new Event('input', { bubbles: true }))" },
+  { "slide": 10, "name": "start" },
+  { "slide": 10, "name": "c0", "js": "const r = document.querySelector('#tb .ch-stops input'); r.value = 1; r.dispatchEvent(new Event('input', { bubbles: true }))", "wait": 1800 },
+  { "slide": 10, "name": "c06", "js": "const r = document.querySelector('#tb .ch-stops input'); r.value = 3; r.dispatchEvent(new Event('input', { bubbles: true }))", "wait": 1200 },
+  { "slide": 10, "name": "c09", "js": "const r = document.querySelector('#tb .ch-stops input'); r.value = 4; r.dispatchEvent(new Event('input', { bubbles: true }))", "wait": 1200 },
+  { "slide": 10, "name": "c18", "js": "const r = document.querySelector('#tb .ch-stops input'); r.value = 6; r.dispatchEvent(new Event('input', { bubbles: true }))", "wait": 1200 }
+]

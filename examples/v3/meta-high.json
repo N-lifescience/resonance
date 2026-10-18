@@ -1,0 +1,46 @@
+[
+  {
+    "slug": "v3-high-bio",
+    "level": "고등",
+    "subject": "생명과학",
+    "title": "삼투와 세포의 변화",
+    "question": "소금을 뿌린 배추는 왜 숨이 죽을까?",
+    "exploragrams": ["막을 오가는 물 입자와 U자관 수면", "식물 세포의 흡수력과 부피 변화", "소금물 농도별 적혈구와 식물 세포"],
+    "slides": 12,
+    "model": "Claude Opus 5.5 · xhigh",
+    "made": "2026-10-18"
+  },
+  {
+    "slug": "v3-high-physics",
+    "level": "고등",
+    "subject": "물리학",
+    "title": "진자의 주기와 공명",
+    "question": "미는 박자에 따라 그네는 얼마나 흔들릴까?",
+    "exploragrams": ["진자 길이와 주기", "미는 박자와 그네의 흔들림", "공명 곡선과 저항"],
+    "slides": 11,
+    "model": "Claude Opus 5.5 · xhigh",
+    "made": "2026-10-18"
+  },
+  {
+    "slug": "v3-high-history",
+    "level": "고등",
+    "subject": "한국사",
+    "title": "4~6세기 삼국의 영토 변화",
+    "question": "시기마다 한강 유역은 누구의 땅이었을까?",
+    "exploragrams": ["시기 막대로 여는 삼국 영토 지도", "출발 항구별 중국 뱃길"],
+    "slides": 10,
+    "model": "Claude Opus 5.5 · xhigh",
+    "made": "2026-10-18"
+  },
+  {
+    "slug": "v3-high-econ",
+    "level": "고등",
+    "subject": "경제",
+    "title": "시장 균형의 변동과 가격 규제",
+    "question": "월세 상한은 세입자에게 좋기만 할까?",
+    "exploragrams": ["수요와 공급의 동시 변동", "월세 상한(최고 가격제)", "쌀 가격 지지와 쌓이는 재고"],
+    "slides": 11,
+    "model": "Claude Opus 5.5 · xhigh",
+    "made": "2026-10-18"
+  }
+]

@@ -1,0 +1,148 @@
+[
+ {
+  "slide": 5,
+  "name": "step-start"
+ },
+ {
+  "slide": 5,
+  "name": "step-sel-k1",
+  "js": "const r = document.querySelector('#se-k'); r.value = 1; r.dispatchEvent(new Event('input', { bubbles: true }))"
+ },
+ {
+  "slide": 5,
+  "name": "step-sel-k3",
+  "js": "const r = document.querySelector('#se-k'); r.value = 3; r.dispatchEvent(new Event('input', { bubbles: true }))"
+ },
+ {
+  "slide": 5,
+  "name": "step-sel-k9-swap",
+  "js": "const r = document.querySelector('#se-k'); r.value = 9; r.dispatchEvent(new Event('input', { bubbles: true }))"
+ },
+ {
+  "slide": 5,
+  "name": "step-sel-end",
+  "js": "const r = document.querySelector('#se-k'); r.value = r.max; r.dispatchEvent(new Event('input', { bubbles: true }))"
+ },
+ {
+  "slide": 5,
+  "name": "step-bub-k8",
+  "js": "document.querySelector('#se-alg button[data-v=\"bub\"]').click();const r = document.querySelector('#se-k'); r.value = 8; r.dispatchEvent(new Event('input', { bubbles: true }))"
+ },
+ {
+  "slide": 5,
+  "name": "step-bub-end",
+  "js": "const r = document.querySelector('#se-k'); r.value = r.max; r.dispatchEvent(new Event('input', { bubbles: true }))"
+ },
+ {
+  "slide": 5,
+  "name": "step-ins-k5",
+  "js": "document.querySelector('#se-alg button[data-v=\"ins\"]').click();const r = document.querySelector('#se-k'); r.value = 5; r.dispatchEvent(new Event('input', { bubbles: true }))"
+ },
+ {
+  "slide": 5,
+  "name": "step-ins-k12",
+  "js": "const r = document.querySelector('#se-k'); r.value = 12; r.dispatchEvent(new Event('input', { bubbles: true }))"
+ },
+ {
+  "slide": 5,
+  "name": "step-back",
+  "js": "const r = document.querySelector('#se-k'); r.value = 0; r.dispatchEvent(new Event('input', { bubbles: true }))"
+ },
+ {
+  "slide": 7,
+  "name": "race-start"
+ },
+ {
+  "slide": 7,
+  "name": "race-rand-c10",
+  "js": "const r = document.querySelector('#rc-k'); r.value = 11; r.dispatchEvent(new Event('input', { bubbles: true }))"
+ },
+ {
+  "slide": 7,
+  "name": "race-rand-c22",
+  "js": "const r = document.querySelector('#rc-k'); r.value = 23; r.dispatchEvent(new Event('input', { bubbles: true }))"
+ },
+ {
+  "slide": 7,
+  "name": "race-rand-end",
+  "js": "const r = document.querySelector('#rc-k'); r.value = 29; r.dispatchEvent(new Event('input', { bubbles: true }))"
+ },
+ {
+  "slide": 7,
+  "name": "race-near-c10",
+  "js": "document.querySelector('#rc-shape button[data-v=\"near\"]').click();const r = document.querySelector('#rc-k'); r.value = 11; r.dispatchEvent(new Event('input', { bubbles: true }))"
+ },
+ {
+  "slide": 7,
+  "name": "race-rev-end",
+  "js": "document.querySelector('#rc-shape button[data-v=\"rev\"]').click();const r = document.querySelector('#rc-k'); r.value = 29; r.dispatchEvent(new Event('input', { bubbles: true }))"
+ },
+ {
+  "slide": 8,
+  "name": "grow-start"
+ },
+ {
+  "slide": 8,
+  "name": "grow-n6",
+  "js": "const r = document.querySelector('#gr-k'); r.value = 1; r.dispatchEvent(new Event('input', { bubbles: true }))",
+  "wait": 1000
+ },
+ {
+  "slide": 8,
+  "name": "grow-n20",
+  "js": "const r = document.querySelector('#gr-k'); r.value = 8; r.dispatchEvent(new Event('input', { bubbles: true }))",
+  "wait": 1000
+ },
+ {
+  "slide": 8,
+  "name": "grow-n40",
+  "js": "const r = document.querySelector('#gr-k'); r.value = 18; r.dispatchEvent(new Event('input', { bubbles: true }))",
+  "wait": 1000
+ },
+ {
+  "slide": 8,
+  "name": "grow-near-n40",
+  "js": "document.querySelector('#gr-shape button[data-v=\"near\"]').click();",
+  "wait": 1000
+ },
+ {
+  "slide": 8,
+  "name": "grow-rev-n40",
+  "js": "document.querySelector('#gr-shape button[data-v=\"rev\"]').click();",
+  "wait": 1000
+ },
+ {
+  "slide": 8,
+  "name": "grow-back",
+  "js": "const r = document.querySelector('#gr-k'); r.value = 0; r.dispatchEvent(new Event('input', { bubbles: true }))",
+  "wait": 1000
+ },
+ {
+  "slide": 1,
+  "name": "cover"
+ },
+ {
+  "slide": 3,
+  "name": "think"
+ },
+ {
+  "slide": 4,
+  "name": "ideas"
+ },
+ {
+  "slide": 6,
+  "name": "quiz1"
+ },
+ {
+  "slide": 9,
+  "name": "sort"
+ },
+ {
+  "slide": 10,
+  "name": "quiz3"
+ },
+ {
+  "slide": 11,
+  "name": "summary"
+ }
+]

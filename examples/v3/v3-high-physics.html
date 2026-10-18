@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="ko" data-deck="v3-high-physics">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>박자를 맞추면 커진다 · 진자와 공명</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/engine/exploragram.css">
+<script defer src="https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/engine/exploragram.js"></script>
+<style>
+/* 실험실 모니터: 남색 머리 띠 위로 지나가는 주황 파형, 모눈 바탕, 오른쪽 위 표시창 꼬리표 */
+body[data-theme="ppt"] {
+  --accent: #3446B4; --tab: #18233F; --tab-ink: #FFFFFF;
+  --navy: #18233F; --amber: #F2A93B; --indigo: #3446B4; --swing: #1E8079; --push: #D9502B;
+  --ink: #1C2333; --mute: #586174; --line: #D3DAE6; --soft: #EEF1F8;
+}
+body[data-theme="ppt"] section.slide {
+  color: var(--ink);
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='24'%3E%3Cpath d='M0 12 Q20 1 40 12 T80 12 T120 12 T160 12' fill='none' stroke='%23F2A93B' stroke-width='3.5'/%3E%3C/svg%3E") 0 76px / 160px 24px repeat-x,
+    linear-gradient(var(--navy), var(--navy)) 0 0 / 100% 88px no-repeat,
+    linear-gradient(#E6EAF2 1px, transparent 1px) 0 0 / 32px 32px,
+    linear-gradient(90deg, #E6EAF2 1px, transparent 1px) 0 0 / 32px 32px,
+    #FBFCFE;
+}
+body[data-theme="ppt"] section.slide[data-sec]::before {
+  left: auto; right: 40px; top: 16px; height: 48px; padding: 0 22px; border-radius: 10px;
+  border: 3px solid var(--amber); background: #0D1428; color: var(--amber); font-size: 23px; letter-spacing: 0;
+}
+body[data-theme="ppt"] section.slide > h2:first-of-type {
+  position: absolute; top: 0; left: 56px; right: 290px; height: 80px; margin: 0; padding: 0; width: auto;
+  display: flex; align-items: center; border: 0; color: #FFFFFF; font-size: 38px; line-height: 1.15; text-wrap: balance;
+}
+.key { color: var(--indigo); font-weight: 800; }
+.sw-c { color: var(--swing); font-weight: 800; }
+.pu-c { color: var(--push); font-weight: 800; }
+.m { font-family: "Times New Roman", serif; font-style: italic; }
+
+/* 표지 */
+body[data-theme="ppt"] section.slide.cover { background: var(--navy); color: #fff; }
+body[data-theme="ppt"] section.slide.cover::after { color: #C9D0E0; }
+.cv { display: grid; grid-template-columns: 1fr 440px; gap: 30px; align-items: center; margin-top: 20px; }
+.cv-k { margin: 0 0 22px; font-size: 28px; font-weight: 700; color: var(--amber); }
+section.slide.cover h1 { margin: 0; font-size: 76px; line-height: 1.18; color: #fff; }
+.cv-s { margin: 28px 0 0; padding-top: 22px; border-top: 4px solid var(--amber); font-size: 34px; font-weight: 600; color: #fff; width: fit-content; }
+
+/* 학습 목표 */
+.goals { list-style: none; margin: 34px 0 0; padding: 0; counter-reset: g; }
+.goals li { counter-increment: g; display: grid; grid-template-columns: 58px 1fr; gap: 22px; align-items: start; margin: 0 0 30px; font-size: 32px; line-height: 1.45; }
+.goals li::before { content: counter(g); width: 52px; height: 52px; border-radius: 10px; background: var(--navy); color: var(--amber); font-weight: 800; font-size: 28px; display: grid; place-items: center; margin-top: 2px; }
+
+/* 생각 열기 */
+.open { display: grid; grid-template-columns: 1fr 420px; gap: 40px; align-items: start; margin-top: 18px; }
+.open .lead { margin: 0 0 20px; font-size: 31px; line-height: 1.55; }
+.open .poll p { font-size: 28px; }
+
+/* 개념 */
+.defs { margin: 6px 0 0; }
+.defs > div { display: grid; grid-template-columns: 170px 1fr; gap: 22px; align-items: baseline; padding: 14px 0; border-bottom: 2px solid var(--line); }
+.defs dt { font-size: 30px; font-weight: 800; color: var(--indigo); }
+.defs dd { margin: 0; font-size: 28px; line-height: 1.45; }
+.ask { margin: 24px 0 0; padding: 16px 24px; border-left: 10px solid var(--amber); background: #FFF6E4; border-radius: 0 14px 14px 0; font-size: 30px; font-weight: 800; line-height: 1.45; }
+.law { margin: 22px 0 0; padding: 16px 24px; border-radius: 14px; background: var(--soft); font-size: 28px; line-height: 1.5; }
+.law b { color: var(--indigo); }
+
+/* 익스플로라그램 공통 */
+.px { display: grid; gap: 22px; align-items: start; }
+.px p { margin: 0; }
+.px-ctrl { display: flex; flex-direction: column; gap: 8px; }
+.px-lab { font-size: 25px; font-weight: 700; line-height: 1.35; }
+.px-say { font-size: 24px; line-height: 1.4; font-weight: 700; color: var(--indigo); }
+.px-note { font-size: 21px; line-height: 1.4; color: var(--mute); }
+.px-box { font-size: 23px; line-height: 1.5; padding: 8px 14px; border-radius: 12px; background: var(--soft); }
+.px-box b { font-size: 26px; }
+.px-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+section.slide .px button[data-set] { min-height: 56px; padding: 6px 16px; font-size: 22px; font-weight: 700; border-radius: 12px; }
+.px svg text { font-family: inherit; }
+.px .ch-play { flex-wrap: wrap; }
+#period .px { grid-template-columns: 250px 1fr 370px; }
+#swing .px { grid-template-columns: 240px 1fr 370px; }
+#curve .px { grid-template-columns: 250px 1fr 360px; }
+.formula { margin-top: 4px; padding: 10px 16px; border-radius: 12px; background: #FFF6E4; font-size: 26px; font-weight: 800; }
+
+/* 확인 문제 */
+.q-wrap .q { font-size: 30px; line-height: 1.45; }
+
+/* 정리 */
+.sum { list-style: none; margin: 14px 0 0; padding: 0; }
+.sum li { position: relative; padding: 14px 0 14px 40px; font-size: 30px; line-height: 1.45; border-bottom: 2px solid var(--line); }
+.sum li::before { content: ""; position: absolute; left: 6px; top: 28px; width: 16px; height: 6px; border-radius: 3px; background: var(--amber); }
+.back { margin-top: 20px; padding: 16px 24px; border-left: 10px solid var(--swing); background: #E9F5F3; border-radius: 0 14px 14px 0; font-size: 28px; line-height: 1.5; }
+.back b { color: var(--swing); }
+</style>
+</head>
+<body data-theme="ppt">
+
+<!-- 1 표지 -->
+<section class="slide cover" id="cover" data-title="표지">
+  <div class="cv">
+    <div>
+      <p class="cv-k">고등학교 물리학 · 진동과 공명</p>
+      <h1>박자를 맞추면<br>커진다</h1>
+      <p class="cv-s">진자의 주기와 공명</p>
+    </div>
+    <svg width="440" height="440" viewBox="0 0 440 440" aria-label="천장에 매달려 좌우로 흔들리는 진자와 지나간 자리">
+      <path d="M100 30 H340" stroke="#C9D0E0" stroke-width="10" stroke-linecap="round"/>
+      <g opacity=".22" stroke="#FFFFFF" stroke-width="5"><path d="M220 34 L110 300"/><path d="M220 34 L160 330"/><path d="M220 34 L280 330"/><path d="M220 34 L330 300"/></g>
+      <g opacity=".22" fill="#FFFFFF"><circle cx="110" cy="300" r="26"/><circle cx="160" cy="330" r="26"/><circle cx="280" cy="330" r="26"/></g>
+      <path d="M220 34 L330 300" stroke="#FFFFFF" stroke-width="6"/>
+      <circle cx="330" cy="300" r="30" fill="#F2A93B"/>
+      <path d="M96 318 A300 300 0 0 0 344 318" fill="none" stroke="#F2A93B" stroke-width="4" stroke-dasharray="10 9"/>
+      <path d="M20 400 Q55 370 90 400 T160 400 T230 400 T300 400 T370 400 T440 400" fill="none" stroke="#5FB8B0" stroke-width="5"/>
+    </svg>
+  </div>
+</section>
+
+<!-- 2 학습 목표 -->
+<section class="slide" id="goal" data-sec="학습 목표" data-title="학습 목표">
+  <h2>학습 목표</h2>
+  <ol class="goals">
+    <li>진자의 주기가 길이에 따라 어떻게 달라지는지 설명할 수 있다.</li>
+    <li>고유 진동수와 강제 진동의 뜻을 말할 수 있다.</li>
+    <li>미는 진동수가 고유 진동수와 같을 때 진폭이 커지는<br>공명 현상을 설명할 수 있다.</li>
+  </ol>
+</section>
+
+<!-- 3 생각 열기 -->
+<section class="slide" id="open" data-sec="생각 열기" data-title="그네를 높이 올리려면">
+  <h2>그네를 높이 올리려면 언제 밀어야 할까?</h2>
+  <div class="open">
+    <div>
+      <p class="lead">동생이 탄 그네를 뒤에서 민다.<br>힘을 많이 들이지 않고<br>그네를 높이 올리고 싶다.</p>
+      <div class="poll" data-options="아무 때나 세게 민다|그네가 돌아왔다가 멀어질 때마다 민다|그네가 가장 낮은 곳을 지날 때마다 민다">
+        <p>어떻게 밀면 좋을까?</p>
+      </div>
+    </div>
+    <svg width="420" height="400" viewBox="0 0 420 400" aria-label="뒤에서 미는 사람과 그네">
+      <path d="M40 30 H380" stroke="#586174" stroke-width="12" stroke-linecap="round"/>
+      <path d="M40 30 L20 390 M380 30 L400 390" stroke="#586174" stroke-width="10"/>
+      <path d="M210 36 L270 290 M240 36 L300 290" stroke="#1E8079" stroke-width="5"/>
+      <rect x="252" y="286" width="70" height="16" rx="6" fill="#1E8079"/>
+      <circle cx="292" cy="222" r="20" fill="#F2A93B"/>
+      <path d="M288 244 L292 284 M292 256 L262 262" stroke="#F2A93B" stroke-width="10" stroke-linecap="round"/>
+      <path d="M176 318 A290 290 0 0 0 330 318" fill="none" stroke="#1E8079" stroke-width="3" stroke-dasharray="8 8"/>
+      <circle cx="110" cy="200" r="24" fill="#3446B4"/>
+      <path d="M110 226 V320 M110 320 L90 384 M110 320 L132 384 M110 248 L180 262" stroke="#3446B4" stroke-width="12" stroke-linecap="round"/>
+      <path d="M186 250 L226 258 M216 248 L228 258 L214 266" stroke="#D9502B" stroke-width="6" fill="none" stroke-linecap="round"/>
+    </svg>
+  </div>
+</section>
+
+<!-- 4 주기와 진동수 -->
+<section class="slide" id="terms" data-sec="1. 진자의 주기" data-title="주기, 진동수, 진폭">
+  <h2>주기, 진동수, 진폭</h2>
+  <dl class="defs">
+    <div><dt>주기 <span class="m">T</span></dt><dd>한 번 왕복하는 데 걸리는 시간. 단위는 초(s)다.</dd></div>
+    <div><dt>진동수 <span class="m">f</span></dt><dd>1초 동안 왕복하는 횟수. 단위는 헤르츠(Hz)다.<br><span class="m">f</span> = 1 / <span class="m">T</span>. 주기가 2초면 진동수는 0.5 Hz다.</dd></div>
+    <div><dt>진폭</dt><dd>가운데에서 가장 멀리 벗어난 정도.<br>진자에서는 가장 크게 기울어진 각도로 나타낸다.</dd></div>
+  </dl>
+  <p class="ask">진자의 주기를 정하는 것은 무엇일까?<br>길이일까, 추의 질량일까?</p>
+</section>
+
+<!-- 5 익스플로라그램 A: 진자 길이와 주기 -->
+<section class="slide" id="period" data-sec="1. 진자의 주기" data-title="진자 길이와 주기">
+  <h2>진자를 길게 하면 한 번 왕복하는 시간은?</h2>
+  <div class="calc px" data-ai="단진자 주기 익스플로라그램(진폭 12°)" data-const="g = 9.8"
+       data-let="T = 2 * pi * sqrt(L / g); a = 12 * cos(2 * pi * t / T); n = 8 / T; R = 120 * L; sx = R * sin(rad(12)); cy = 24 + R * cos(rad(12))">
+    <svg width="250" height="330" viewBox="0 0 250 330" aria-label="길이를 바꿀 수 있는 진자">
+      <path d="M60 22 H190" stroke="#586174" stroke-width="8" stroke-linecap="round"/>
+      <path fill="none" stroke="#3446B4" stroke-width="3" stroke-dasharray="8 7" data-attr="d: 'M ' + (125 - sx) + ' ' + cy + ' A ' + R + ' ' + R + ' 0 0 0 ' + (125 + sx) + ' ' + cy"/>
+      <g data-attr="transform: 'rotate(' + a + ' 125 24)'">
+        <line x1="125" y1="24" x2="125" stroke="#1C2333" stroke-width="4" data-attr="y2: 24 + R"/>
+        <circle cx="125" fill="#1E8079" stroke="#0F4F4A" stroke-width="3" data-attr="cy: 24 + R; r: m == 200 ? 19 : 12"/>
+      </g>
+      <circle cx="125" cy="24" r="7" fill="#1C2333"/>
+    </svg>
+    <div>
+    <figure class="plot" data-x="0, 8" data-y="-15, 15" data-xstep="1" data-ystep="5" data-height="300" data-xlabel="시간(초)" data-ylabel="기울어진 각(°)" aria-label="시간에 따른 진자의 각도 그래프">
+      <i data-line="12 * cos(2 * pi * x / T)" data-x="0, max(t, 0.01)" data-color="#1E8079"></i>
+      <i data-point="t, a" data-color="#1E8079"></i>
+    </figure>
+      <p class="formula step" style="margin-top:10px">길이를 4배로 하면 주기는 2배다.<br><span class="m">T</span> = 2π√(<span class="m">L</span> / <span class="m">g</span>). 추의 질량과는 관계없다.</p>
+    </div>
+    <div class="px-ctrl">
+      <p class="px-lab">진자의 길이 <output data-expr="L" data-digits="2"></output> m</p>
+      <input type="range" name="L" min="0.25" max="2.25" step="0.25" value="1" aria-label="진자의 길이">
+      <div class="px-row"><span class="px-lab">추의 질량</span>
+        <button data-set="m" data-value="50" aria-pressed="true">50 g</button>
+        <button data-set="m" data-value="200">200 g</button></div>
+      <input type="range" name="t" min="0" max="8" step="0.04" value="0" data-play="8" aria-label="흐른 시간">
+      <p class="px-box">주기 <span class="m">T</span> = <b data-expr="T" data-digits="2"></b>초<br>8초 동안 <b data-expr="n" data-digits="1"></b>번 왕복</p>
+      <p class="px-say" data-show="t == 0">「재생」을 누르고 왕복 시간을 세어 보자.</p>
+      <p class="px-say" data-show="t > 0 && L < 1">1 m보다 짧아 더 빨리 왕복한다.</p>
+      <p class="px-say" data-show="t > 0 && L == 1">약 2초에 한 번 왕복한다.</p>
+      <p class="px-say" data-show="t > 0 && L > 1">1 m보다 길어 더 느리게 왕복한다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 6 확인 문제 1 -->
+<section class="slide" id="check-1" data-sec="1. 진자의 주기" data-title="확인 문제 1">
+  <h2>확인 문제 1</h2>
+  <div class="q-wrap">
+    <p class="q" data-n="1" data-ai="문항">길이 1 m인 진자의 주기가 약 2초이다.<br>진자의 길이를 4 m로 바꾸면 주기는 약 몇 초가 될까?</p>
+    <div class="quiz" data-cols="2" data-ai="보기와 풀이">
+      <button class="opt" data-why="길이를 늘리면 주기는 길어진다. 줄어들지 않는다.">약 1초</button>
+      <button class="opt" data-why="주기는 길이에 따라 달라진다. 그대로가 아니다.">약 2초</button>
+      <button class="opt" data-ok data-why="맞다. 주기는 길이의 제곱근에 비례한다. 길이가 4배면 주기는 √4 = 2배다.">약 4초</button>
+      <button class="opt" data-why="주기는 길이에 비례하지 않고 길이의 제곱근에 비례한다.">약 8초</button>
+    </div>
+  </div>
+</section>
+
+<!-- 7 강제 진동과 공명 -->
+<section class="slide" id="resonance" data-sec="2. 공명" data-title="고유 진동수, 강제 진동, 공명">
+  <h2>고유 진동수, 강제 진동, 공명</h2>
+  <dl class="defs">
+    <div><dt>고유 진동수</dt><dd>물체가 바깥 힘 없이 스스로 진동할 때의 진동수.<br>진자는 길이로 정해진다. 길이 1 m면 약 0.50 Hz다.</dd></div>
+    <div><dt>강제 진동</dt><dd>바깥에서 주기적으로 힘을 받아 하는 진동</dd></div>
+    <div><dt>공명</dt><dd>바깥 힘의 진동수가 고유 진동수와 같을 때<br>진폭이 크게 커지는 현상</dd></div>
+  </dl>
+  <p class="law step">그네를 미는 사람의 손이 <b>바깥 힘</b>이다.<br>미는 진동수를 바꾸면 그네의 흔들림은 어떻게 달라질까?</p>
+</section>
+
+<!-- 8 익스플로라그램 B: 그네 밀기 -->
+<section class="slide" id="swing" data-sec="2. 공명" data-title="미는 박자와 그네의 흔들림">
+  <h2>미는 박자에 따라 그네는 얼마나 흔들릴까?</h2>
+  <div class="calc px" data-ai="강제 감쇠 진동 모형(길이 1 m, 고유 진동수 약 0.50 Hz, 정지 상태에서 시작)"
+       data-const="w0 = sqrt(9.8); f0 = w0 / (2 * pi); gm = 0.08; F = 10; w1 = sqrt(w0 ^ 2 - gm ^ 2)"
+       data-let="w = 2 * pi * f; D = sqrt((w0 ^ 2 - w ^ 2) ^ 2 + (2 * gm * w) ^ 2); A = F / D; ph = acos((w0 ^ 2 - w ^ 2) / D); C1 = -A * cos(ph); C2 = (gm * C1 - A * w * sin(ph)) / w1; q = A * cos(w * t - ph) + exp(-gm * t) * (C1 * cos(w1 * t) + C2 * sin(w1 * t)); qv = -A * w * sin(w * t - ph) + exp(-gm * t) * ((-gm * C1 + w1 * C2) * cos(w1 * t) + (-gm * C2 - w1 * C1) * sin(w1 * t)); fr = cos(w * t); hp = fr * qv > 0; bx = 120 + 230 * sin(rad(q)); by = 20 + 230 * cos(rad(q))">
+    <svg width="240" height="300" viewBox="0 0 240 300" aria-label="미는 힘을 받는 그네">
+      <defs>
+        <marker id="sw-ah-g" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#1E8079"/></marker>
+        <marker id="sw-ah-r" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#D9502B"/></marker>
+      </defs>
+      <path d="M40 18 H200" stroke="#586174" stroke-width="8" stroke-linecap="round"/>
+      <g data-attr="transform: 'rotate(' + (-q) + ' 120 20)'">
+        <line x1="120" y1="20" x2="120" y2="250" stroke="#1C2333" stroke-width="4"/>
+        <rect x="96" y="246" width="48" height="12" rx="5" fill="#1E8079"/>
+      </g>
+      <g data-attr="transform: 'translate(' + bx + ' ' + (by - 26) + ')'">
+        <line x1="0" y1="0" y2="0" stroke="#1E8079" stroke-width="7" marker-end="url(#sw-ah-g)" data-attr="x2: 50 * fr; opacity: hp ? 1 : 0"/>
+        <line x1="0" y1="0" y2="0" stroke="#D9502B" stroke-width="7" marker-end="url(#sw-ah-r)" data-attr="x2: 50 * fr; opacity: hp ? 0 : 1"/>
+      </g>
+      <circle cx="120" cy="20" r="7" fill="#1C2333"/>
+      <text x="120" y="292" font-size="20" text-anchor="middle" fill="#586174">길이 1 m</text>
+    </svg>
+    <figure class="plot" data-x="0, 30" data-y="-25, 25" data-xstep="5" data-ystep="10" data-height="330" data-xlabel="시간(초)" data-ylabel="기울어진 각(°)" aria-label="시간에 따른 그네의 각도 그래프">
+      <i data-line="A" data-dash data-label="오래 밀면 닿는 폭" data-color="#9AA3B5"></i>
+      <i data-line="-A" data-dash data-color="#9AA3B5"></i>
+      <i data-line="A * cos(w * x - ph) + exp(-gm * x) * (C1 * cos(w1 * x) + C2 * sin(w1 * x))" data-x="0, max(t, 0.01)" data-color="#1E8079"></i>
+      <i data-point="t, q" data-color="#1E8079"></i>
+    </figure>
+    <div class="px-ctrl">
+      <p class="px-lab">미는 진동수 <output data-expr="f" data-digits="2"></output> Hz</p>
+      <input type="range" name="f" min="0.3" max="0.7" step="0.02" value="0.3" aria-label="미는 진동수">
+      <p class="px-note">그네의 고유 진동수는 약 0.50 Hz다.</p>
+      <input type="range" name="t" min="0" max="30" step="0.1" value="0" data-play="12" aria-label="흐른 시간">
+      <p class="px-box" data-ai="모형 수치">지금 <b data-expr="t" data-digits="1"></b>초, 각 <b data-expr="q" data-digits="1"></b>°<br>오래 밀면 닿는 폭 <b data-expr="A" data-digits="1"></b>° (모형)</p>
+      <p class="px-note"><span class="sw-c">초록 화살표</span>: 미는 힘이 움직임을 돕는다.<br><span class="pu-c">빨간 화살표</span>: 미는 힘이 움직임을 거스른다.</p>
+      <p class="px-say" data-show="t == 0">「재생」을 누르고 흔들림을 지켜보자.</p>
+      <p class="px-say" data-show="t > 0 && abs(f - f0) < 0.015">박자가 맞아 밀 때마다 돕는다.<br>흔들림이 점점 커진다(공명).</p>
+      <p class="px-say" data-show="t > 0 && abs(f - f0) >= 0.015">박자가 어긋나 돕다가 거스르기를 되풀이한다.<br>흔들림이 크게 자라지 않는다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 9 익스플로라그램 C: 공명 곡선 -->
+<section class="slide" id="curve" data-sec="2. 공명" data-title="공명 곡선">
+  <h2>어느 진동수로 밀 때 진폭이 가장 클까?</h2>
+  <div class="calc px" data-ai="강제 진동의 진폭 곡선(오래 민 뒤의 진폭, 모형)"
+       data-const="w0 = sqrt(9.8); f0 = w0 / (2 * pi); F = 10"
+       data-let="w = 2 * pi * f; Af = F / sqrt((w0 ^ 2 - w ^ 2) ^ 2 + (2 * gm * w) ^ 2); a0 = F / sqrt((w0 ^ 2 - (2 * pi * 0.2) ^ 2) ^ 2 + (2 * gm * 2 * pi * 0.2) ^ 2)">
+    <svg width="250" height="300" viewBox="0 0 250 300" aria-label="진자가 흔들리는 폭">
+      <path d="M45 18 H205" stroke="#586174" stroke-width="8" stroke-linecap="round"/>
+      <path fill="#1E8079" fill-opacity=".14" stroke="#1E8079" stroke-width="3" data-attr="d: 'M 125 20 L ' + (125 - 230 * sin(rad(Af))) + ' ' + (20 + 230 * cos(rad(Af))) + ' A 230 230 0 0 0 ' + (125 + 230 * sin(rad(Af))) + ' ' + (20 + 230 * cos(rad(Af))) + ' Z'"/>
+      <g opacity=".45" data-attr="transform: 'rotate(' + Af + ' 125 20)'"><line x1="125" y1="20" x2="125" y2="250" stroke="#1C2333" stroke-width="3"/><circle cx="125" cy="250" r="12" fill="#1E8079"/></g>
+      <g data-attr="transform: 'rotate(' + (-Af) + ' 125 20)'"><line x1="125" y1="20" x2="125" y2="250" stroke="#1C2333" stroke-width="4"/><circle cx="125" cy="250" r="14" fill="#1E8079"/></g>
+      <circle cx="125" cy="20" r="7" fill="#1C2333"/>
+      <text x="125" y="292" font-size="20" text-anchor="middle" fill="#586174">흔들리는 폭</text>
+    </svg>
+    <figure class="plot" data-x="0.2, 0.8" data-y="0, 25" data-xstep="0.1" data-ystep="5" data-height="330" data-xlabel="미는 진동수(Hz)" data-ylabel="진폭(°)" aria-label="미는 진동수에 따른 진폭 그래프">
+      <i data-vline="f0"></i>
+      <i data-line="F / sqrt((w0 ^ 2 - (2 * pi * x) ^ 2) ^ 2 + (2 * gm * 2 * pi * x) ^ 2)" data-x="0.2, max(f, 0.201)" data-color="#3446B4"></i>
+      <i data-point="f, Af" data-color="#3446B4"></i>
+    </figure>
+    <div class="px-ctrl">
+      <p class="px-lab">미는 진동수 <output data-expr="f" data-digits="2"></output> Hz</p>
+      <input type="range" name="f" min="0.2" max="0.8" step="0.01" value="0.2" aria-label="미는 진동수">
+      <div class="px-row"><span class="px-lab">저항</span>
+        <button data-set="gm" data-value="0.08" aria-pressed="true">작다</button>
+        <button data-set="gm" data-value="0.25">크다</button></div>
+      <p class="px-box" data-ai="모형 수치">진폭 <b data-expr="Af" data-digits="1"></b>° (모형)<br>0.2 Hz로 밀 때의 <b data-expr="Af / a0" data-digits="1"></b>배</p>
+      <p class="px-note">세로 선은 고유 진동수(약 0.50 Hz)다.</p>
+      <p class="px-say" data-show="abs(f - f0) < 0.012">고유 진동수와 같다.<br>진폭이 가장 크다(공명).</p>
+      <p class="px-say" data-show="f < f0 - 0.012">고유 진동수보다 느리게 민다.</p>
+      <p class="px-say" data-show="f > f0 + 0.012">고유 진동수보다 빠르게 민다.</p>
+      <p class="px-note" data-show="gm == 0.25">저항이 크면 공명이 일어나도<br>진폭이 덜 커지고 봉우리가 낮아진다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 10 확인 문제 2 -->
+<section class="slide" id="check-2" data-sec="2. 공명" data-title="확인 문제 2">
+  <h2>확인 문제 2</h2>
+  <div class="q-wrap">
+    <p class="q" data-n="2" data-ai="문항">공명으로 설명할 수 있는 현상을 모두 고르자.</p>
+    <div class="quiz" data-multi data-ai="보기와 풀이" data-why="라디오, 소리굽쇠, 그네 모두 진동수가 같을 때 진동이 크게 커진다.">
+      <button class="opt" data-ok data-why="라디오는 회로의 고유 진동수를 방송 주파수에 맞춰 그 방송만 크게 받는다.">라디오 다이얼을 돌려 듣고 싶은 방송의 주파수에 맞춘다.</button>
+      <button class="opt" data-why="주기는 추의 질량과 관계없다. 공명과도 상관없다.">무거운 추를 매단 진자일수록 빨리 왕복한다.</button>
+      <button class="opt" data-ok data-why="두 소리굽쇠의 고유 진동수가 같아 한쪽의 소리가 다른 쪽을 울린다.">진동수가 같은 소리굽쇠 두 개 가운데 하나를 치면 다른 하나도 울린다.</button>
+      <button class="opt" data-ok data-why="그네의 고유 진동수에 맞춰 밀어 진폭이 커진다.">그네가 돌아오는 박자에 맞춰 밀면 그네가 높이 올라간다.</button>
+    </div>
+  </div>
+</section>
+
+<!-- 11 정리 -->
+<section class="slide" id="summary" data-sec="정리" data-title="정리">
+  <h2>정리</h2>
+  <ul class="sum">
+    <li>진자의 주기는 <b class="key">길이의 제곱근에 비례</b>한다. 추의 질량과는 관계없다.</li>
+    <li>물체가 스스로 진동하는 진동수가 <b class="key">고유 진동수</b>다.</li>
+    <li>바깥 힘의 진동수가 고유 진동수와 같으면 진폭이 크게 커진다(<b class="key">공명</b>).</li>
+    <li>박자가 맞으면 미는 힘이 늘 움직임을 도와 작은 힘으로도 크게 흔들린다.</li>
+  </ul>
+  <p class="back step" data-ai="생각 열기 답"><b>다시 그네로</b> 그네가 돌아왔다가 멀어지기 시작할 때마다 민다.<br>그네의 박자에 맞춰 움직이는 쪽으로 밀면 흔들림이 쌓여 높이 올라간다.</p>
+</section>
+
+</body>
+</html>

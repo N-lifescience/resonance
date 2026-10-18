@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="ko" data-deck="v3-mid-tech">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>우리 집 전기 사용 · 전력, 전류, 전력량</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/engine/exploragram.css">
+<script defer src="https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/engine/exploragram.js"></script>
+<style>
+body[data-theme="ppt"] {
+  --accent: #0B5563; --tab: #0B5563; --tab-ink: #FFFFFF;
+  --teal: #0B5563; --amber: #F2A541; --amber-soft: #FDEBD0; --red: #D7263D; --red-soft: #FBE0E3; --green: #2E8B57;
+  --ink: #1D2A30; --gray: #56666C; --line: #D9DEDB; --warm: #FFFDF8;
+}
+
+/* ── 얼굴: 왼쪽 청록 세로 띠 + 제목 아래 주황 전선 + 차단기 이름표 같은 꼬리표 ── */
+body[data-theme="ppt"] section.slide {
+  background:
+    linear-gradient(var(--teal), var(--teal)) 0 0 / 16px 100% no-repeat,
+    repeating-linear-gradient(90deg, var(--amber) 0 26px, transparent 26px 34px) 60px 94px / 1160px 6px no-repeat,
+    var(--warm);
+  color: var(--ink);
+}
+body[data-theme="ppt"] section.slide[data-sec]::before {
+  left: auto; right: 44px; top: 22px; height: 48px; line-height: 48px; min-width: 150px; padding: 0 22px; box-sizing: border-box;
+  display: flex; align-items: center; justify-content: center; border-radius: 6px; background: var(--teal); color: #FFFFFF;
+  border-left: 8px solid var(--amber); font-size: 23px; font-weight: 800;
+}
+body[data-theme="ppt"] section.slide > h2:first-child {
+  position: absolute; top: 16px; left: 60px; right: 240px; height: 66px; margin: 0; padding: 0; border: 0; background: none; width: auto;
+  display: flex; align-items: center; color: var(--teal); font-size: 40px; line-height: 1.2; text-wrap: balance;
+}
+.key { color: var(--teal); font-weight: 800; }
+.hot { color: var(--red); font-weight: 800; }
+
+/* 표지 */
+body[data-theme="ppt"] section.slide#cover { background: var(--teal); color: #fff; }
+body[data-theme="ppt"] section.slide#cover::after { color: #fff; }
+.cv { display: grid; grid-template-columns: 1fr 440px; gap: 30px; align-items: center; height: 100%; }
+.cv p, .cv h1 { margin: 0; color: #fff; }
+.cv-k { font-size: 30px; opacity: .9; }
+.cv h1 { margin: 22px 0 24px; font-size: 72px; line-height: 1.15; }
+.cv-s { display: inline-block; padding: 6px 18px; border-radius: 6px; background: var(--amber); color: var(--ink) !important; font-size: 32px; font-weight: 800; }
+
+/* 학습 목표 */
+.goals { margin: 36px 0 0; padding: 0; list-style: none; counter-reset: g; }
+.goals li { counter-increment: g; position: relative; padding: 0 0 0 64px; margin: 0 0 26px; font-size: 31px; line-height: 1.45; }
+.goals li::before { content: counter(g); position: absolute; left: 0; top: 0; width: 46px; height: 46px; border-radius: 8px; background: var(--amber); color: var(--ink); font-weight: 800; font-size: 26px; text-align: center; line-height: 46px; }
+
+/* 생각 열기 */
+.think { display: grid; grid-template-columns: 520px 1fr; gap: 36px; align-items: center; }
+.think .ask { font-size: 30px; line-height: 1.5; }
+
+/* 개념: 명판과 식 */
+.plate-row { display: grid; grid-template-columns: 500px 1fr; gap: 40px; align-items: start; margin-top: 4px; }
+.formula { padding: 16px 22px; border-radius: 14px; background: #fff; border: 4px solid var(--teal); font-size: 32px; font-weight: 800; text-align: center; color: var(--teal); }
+.formula small { display: block; margin-top: 6px; font-size: 25px; font-weight: 700; color: var(--ink); }
+.explain { margin: 18px 0 0; font-size: 28px; line-height: 1.5; }
+.calcline { margin: 16px 0 0; padding: 12px 18px; border-radius: 12px; background: var(--amber-soft); font-size: 28px; line-height: 1.5; font-weight: 700; }
+
+/* ── 익스플로라그램 공통 ── */
+.ex { display: grid; grid-template-columns: 1fr 400px; gap: 0 30px; align-items: start; }
+.ex svg { display: block; width: 100%; height: auto; }
+.ex .plot { margin: 0; background: #fff; }
+.ctl { display: flex; flex-direction: column; gap: 8px; }
+.ctl > p { margin: 0; }
+.lab { font-size: 23px; font-weight: 700; color: var(--gray); }
+.lab b { color: var(--ink); }
+.seg { display: flex; gap: 8px; }
+section.slide .seg button { flex: 1; min-height: 56px; margin: 0; padding: 2px 6px; font: inherit; font-size: 23px; font-weight: 700; line-height: 1.15; border: 3px solid var(--line); border-radius: 10px; background: #fff; color: var(--ink); cursor: pointer; }
+section.slide .seg button[aria-pressed="true"] { background: var(--teal); border-color: var(--teal); color: #fff; }
+.read { font-size: 25px; font-weight: 700; line-height: 1.4; }
+.read output { color: var(--teal); }
+.say { margin: 0; font-size: 24px; line-height: 1.45; font-weight: 700; text-wrap: pretty; }
+.model { font-size: 20px; color: var(--gray); font-weight: 500; }
+.nw { white-space: nowrap; font-size: 21px; }
+
+/* 멀티탭: 켜기 단추 */
+.tgs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.tg { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 6px; min-height: 56px; padding: 4px 12px; box-sizing: border-box;
+  border: 3px solid var(--line); border-radius: 10px; background: #fff; font-size: 22px; font-weight: 700; cursor: pointer; transition: background .3s, border-color .3s; }
+.tg input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.tg small { font-size: 20px; color: var(--gray); font-weight: 600; }
+.tg:has(input:checked) { background: var(--amber-soft); border-color: var(--amber); }
+.tg:has(input:focus-visible) { outline: 3px solid var(--teal); outline-offset: 2px; }
+.amp { display: grid; grid-template-columns: 1fr 96px; gap: 10px; align-items: center; }
+.amp .bar { height: 26px; }
+.amp output { text-align: right; font-size: 24px; font-weight: 800; }
+.amp .bar.is-hot { --bar-c: #D7263D !important; }
+.tap { transition: fill .5s, stroke .5s; }
+.tap.is-over { fill: #FBE0E3; stroke: #D7263D; }
+.heat { opacity: 0; transition: opacity .6s; }
+.heat.is-over { opacity: 1; }
+.cord { transition: stroke .4s; }
+
+/* 아침 일정 */
+.gantt text { font-size: 21px; }
+
+/* 정리 */
+.sort .bin { min-height: 92px; }
+.sort > span { font-size: 23px; }
+.sum { margin: 22px 0 0; padding: 0; list-style: none; }
+.sum li { position: relative; padding-left: 40px; margin: 0 0 20px; font-size: 29px; line-height: 1.45; }
+.sum li::before { content: ""; position: absolute; left: 4px; top: 12px; width: 20px; height: 20px; border-radius: 4px; background: var(--amber); border: 3px solid var(--teal); box-sizing: border-box; }
+</style>
+</head>
+<body data-theme="ppt">
+
+<!-- 1 표지 -->
+<section class="slide" id="cover" data-title="표지">
+  <div class="cv">
+    <div>
+      <p class="cv-k">중학교 2학년 기술·가정</p>
+      <h1>우리 집<br>전기 사용</h1>
+      <p class="cv-s">전력, 전류, 전력량 계산하기</p>
+    </div>
+    <svg width="440" height="380" viewBox="0 0 440 380" aria-label="멀티탭과 전류계">
+      <path d="M60 300 A 160 160 0 0 1 380 300" fill="none" stroke="#FFFFFF" stroke-opacity=".35" stroke-width="22"/>
+      <path d="M318 182 A 160 160 0 0 1 380 300" fill="none" stroke="#F2A541" stroke-width="22"/>
+      <path d="M220 300 L120 205" stroke="#FFFFFF" stroke-width="9" stroke-linecap="round"/>
+      <circle cx="220" cy="300" r="16" fill="#FFFFFF"/>
+      <rect x="40" y="330" width="360" height="40" rx="12" fill="#FFFFFF"/>
+      <g fill="#0B5563"><circle cx="100" cy="350" r="9"/><circle cx="170" cy="350" r="9"/><circle cx="240" cy="350" r="9"/><circle cx="310" cy="350" r="9"/></g>
+      <circle cx="372" cy="350" r="7" fill="#F2A541"/>
+    </svg>
+  </div>
+</section>
+
+<!-- 2 학습 목표 -->
+<section class="slide" id="goal" data-sec="학습 목표" data-title="학습 목표">
+  <h2>학습 목표</h2>
+  <ol class="goals">
+    <li>가전제품의 정격 표시를 읽고 전력과 전류를 계산할 수 있다.</li>
+    <li>멀티탭에 여러 가전을 꽂을 때 허용 한도를 넘지 않게 쓸 수 있다.</li>
+    <li>전력량과 전기 요금을 계산해 전기를 아끼는 방법을 찾을 수 있다.</li>
+  </ol>
+</section>
+
+<!-- 3 생각 열기 -->
+<section class="slide" id="think" data-sec="생각 열기" data-title="멀티탭 하나에 모두 꽂으면">
+  <h2>멀티탭 하나에 모두 꽂아 켜면?</h2>
+  <div class="think">
+    <svg viewBox="0 0 520 380" aria-label="멀티탭 하나에 전기난로, 전기포트, 헤어드라이어 플러그가 모두 꽂혀 있는 그림" data-ai="생각 열기 그림">
+      <path d="M30 330 C 60 330, 60 280, 100 280" stroke="#1D2A30" stroke-width="7" fill="none"/>
+      <rect x="10" y="300" width="40" height="60" rx="6" fill="#FFFFFF" stroke="#1D2A30" stroke-width="4"/>
+      <rect x="100" y="250" width="380" height="64" rx="14" fill="#FFFFFF" stroke="#1D2A30" stroke-width="5"/>
+      <g fill="#1D2A30"><circle cx="160" cy="282" r="9"/><circle cx="240" cy="282" r="9"/><circle cx="320" cy="282" r="9"/><circle cx="400" cy="282" r="9"/></g>
+      <g stroke="#F2A541" stroke-width="7" fill="none" stroke-linecap="round">
+        <path d="M160 262 C 160 200, 90 170, 90 110"/><path d="M240 262 C 240 190, 230 150, 230 70"/><path d="M320 262 C 320 200, 380 160, 380 110"/>
+      </g>
+      <g fill="#0B5563" font-size="22" font-weight="800" text-anchor="middle">
+        <rect x="40" y="58" width="100" height="52" rx="10"/><rect x="170" y="18" width="120" height="52" rx="10"/><rect x="320" y="58" width="120" height="52" rx="10"/>
+      </g>
+      <g fill="#FFFFFF" font-size="22" font-weight="800" text-anchor="middle"><text x="90" y="92">난로</text><text x="230" y="52">전기포트</text><text x="380" y="92">드라이어</text></g>
+    </svg>
+    <div class="short" data-ph="내 생각을 한 문장으로 적어 보자">
+      <p class="ask">멀티탭 하나에 전기난로, 전기포트, 헤어드라이어를 모두 꽂았다.<br>셋을 함께 켜면 어떤 일이 생길까?</p>
+    </div>
+  </div>
+</section>
+
+<!-- 4 개념: 정격 표시와 전력 -->
+<section class="slide" id="rating" data-sec="개념" data-title="정격 표시 읽기">
+  <h2>가전제품 뒤의 정격 표시를 읽어 보자</h2>
+  <div class="plate-row">
+    <svg viewBox="0 0 470 300" aria-label="헤어드라이어의 정격 표시: 정격 전압 220 볼트 60 헤르츠, 정격 소비 전력 1500 와트" data-ai="정격 표시 예시(가상 제품)">
+      <rect x="6" y="6" width="458" height="288" rx="16" fill="#E9EEEC" stroke="#56666C" stroke-width="4"/>
+      <g fill="#9AA6A2"><circle cx="30" cy="30" r="7"/><circle cx="440" cy="30" r="7"/><circle cx="30" cy="270" r="7"/><circle cx="440" cy="270" r="7"/></g>
+      <text x="235" y="66" font-size="28" font-weight="800" text-anchor="middle" fill="#1D2A30">헤어드라이어</text>
+      <path d="M40 86 H430" stroke="#9AA6A2" stroke-width="2"/>
+      <g font-size="25" fill="#1D2A30">
+        <text x="44" y="132">정격 전압</text><text x="426" y="132" text-anchor="end" font-weight="800">220 V~ 60 Hz</text>
+        <text x="44" y="184">정격 소비 전력</text><text x="426" y="184" text-anchor="end" font-weight="800" fill="#D7263D">1500 W</text>
+        <text x="44" y="236">제조 연월</text><text x="426" y="236" text-anchor="end">2026년 3월</text>
+      </g>
+    </svg>
+    <div>
+      <p class="formula">전력(W) = 전압(V) × 전류(A)<small>그래서 전류(A) = 전력(W) ÷ 전압(V)</small></p>
+      <p class="explain">우리나라 가정의 전압은 <span class="key">220 V</span>다.<br>소비 전력이 클수록 전류가 많이 흐른다.</p>
+      <p class="calcline step">1500 W ÷ 220 V ≈ <span class="hot">6.8 A</span><br>이 드라이어를 켜면 약 6.8 A가 흐른다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 5 익스플로라그램: 멀티탭 -->
+<section class="slide" id="tap" data-sec="개념" data-title="멀티탭에 무엇을 함께 켤까">
+  <h2>멀티탭에 무엇을 함께 켤 수 있을까?</h2>
+  <div class="calc ex" data-ai="멀티탭 전류 합계와 허용 전류(가전 소비 전력은 대표값)"
+       data-let="P = (ht ? 2000 : 0) + (kt ? 1800 : 0) + (dr ? 1500 : 0) + (mw ? 1200 : 0) + (tv ? 100 : 0) + (nb ? 65 : 0);
+                 I = P / 220; over = I > L; ang = min(I, 25) / 25 * 180">
+    <svg viewBox="0 0 640 452" aria-label="멀티탭에 꽂힌 플러그와 전류계">
+      <!-- 플러그(켜면 내려와 꽂힌다) -->
+      <g font-size="21" font-weight="800" text-anchor="middle" fill="#1D2A30">
+        <text x="95" y="24">난로</text><text x="185" y="24">포트</text><text x="275" y="24">드라이어</text><text x="365" y="24">레인지</text><text x="455" y="24">TV</text><text x="545" y="24">노트북</text>
+      </g>
+      <g data-attr="transform: 'translate(0 ' + (ht ? 0 : -44) + ')'" data-style="opacity: ht ? 1 : 0.35"><path class="cord" d="M95 40 V120" stroke-width="7" data-attr="stroke: ht ? '#F2A541' : '#9AA6A2'"/><rect x="77" y="118" width="36" height="40" rx="6" fill="#1D2A30"/><path d="M87 158 V176 M103 158 V176" stroke="#56666C" stroke-width="5"/></g>
+      <g data-attr="transform: 'translate(0 ' + (kt ? 0 : -44) + ')'" data-style="opacity: kt ? 1 : 0.35"><path class="cord" d="M185 40 V120" stroke-width="7" data-attr="stroke: kt ? '#F2A541' : '#9AA6A2'"/><rect x="167" y="118" width="36" height="40" rx="6" fill="#1D2A30"/><path d="M177 158 V176 M193 158 V176" stroke="#56666C" stroke-width="5"/></g>
+      <g data-attr="transform: 'translate(0 ' + (dr ? 0 : -44) + ')'" data-style="opacity: dr ? 1 : 0.35"><path class="cord" d="M275 40 V120" stroke-width="7" data-attr="stroke: dr ? '#F2A541' : '#9AA6A2'"/><rect x="257" y="118" width="36" height="40" rx="6" fill="#1D2A30"/><path d="M267 158 V176 M283 158 V176" stroke="#56666C" stroke-width="5"/></g>
+      <g data-attr="transform: 'translate(0 ' + (mw ? 0 : -44) + ')'" data-style="opacity: mw ? 1 : 0.35"><path class="cord" d="M365 40 V120" stroke-width="7" data-attr="stroke: mw ? '#F2A541' : '#9AA6A2'"/><rect x="347" y="118" width="36" height="40" rx="6" fill="#1D2A30"/><path d="M357 158 V176 M373 158 V176" stroke="#56666C" stroke-width="5"/></g>
+      <g data-attr="transform: 'translate(0 ' + (tv ? 0 : -44) + ')'" data-style="opacity: tv ? 1 : 0.35"><path class="cord" d="M455 40 V120" stroke-width="7" data-attr="stroke: tv ? '#F2A541' : '#9AA6A2'"/><rect x="437" y="118" width="36" height="40" rx="6" fill="#1D2A30"/><path d="M447 158 V176 M463 158 V176" stroke="#56666C" stroke-width="5"/></g>
+      <g data-attr="transform: 'translate(0 ' + (nb ? 0 : -44) + ')'" data-style="opacity: nb ? 1 : 0.35"><path class="cord" d="M545 40 V120" stroke-width="7" data-attr="stroke: nb ? '#F2A541' : '#9AA6A2'"/><rect x="527" y="118" width="36" height="40" rx="6" fill="#1D2A30"/><path d="M537 158 V176 M553 158 V176" stroke="#56666C" stroke-width="5"/></g>
+      <!-- 멀티탭 -->
+      <g class="heat" data-class="is-over: over" stroke="#D7263D" stroke-width="4" fill="none" stroke-linecap="round">
+        <path d="M70 262 q 8 -8 0 -16 q -8 -8 0 -16"/><path d="M590 262 q 8 -8 0 -16 q -8 -8 0 -16"/>
+      </g>
+      <rect class="tap" x="50" y="176" width="560" height="64" rx="16" fill="#FFFFFF" stroke="#1D2A30" stroke-width="5" data-class="is-over: over"/>
+      <g fill="#1D2A30"><circle cx="87" cy="208" r="6"/><circle cx="103" cy="208" r="6"/><circle cx="177" cy="208" r="6"/><circle cx="193" cy="208" r="6"/><circle cx="267" cy="208" r="6"/><circle cx="283" cy="208" r="6"/>
+        <circle cx="357" cy="208" r="6"/><circle cx="373" cy="208" r="6"/><circle cx="447" cy="208" r="6"/><circle cx="463" cy="208" r="6"/><circle cx="537" cy="208" r="6"/><circle cx="553" cy="208" r="6"/></g>
+      <!-- 전류계 -->
+      <path d="M180 430 A 140 140 0 0 1 460 430" fill="none" stroke="#D9DEDB" stroke-width="26"/>
+      <path fill="none" stroke="#D7263D" stroke-width="26" data-attr="d: 'M ' + (320 - 140 * cos(pi * L / 25)) + ' ' + (430 - 140 * sin(pi * L / 25)) + ' A 140 140 0 0 1 460 430'"/>
+      <g font-size="20" fill="#56666C" text-anchor="middle"><text x="152" y="436">0</text><text x="320" y="270">12.5</text><text x="488" y="436">25 A</text></g>
+      <text x="500" y="352" font-size="22" font-weight="700" fill="#56666C">지금 전류</text>
+      <text x="500" y="392" font-size="36" font-weight="800" fill="#1D2A30" data-expr="I" data-digits="1" data-unit="A"></text>
+      <g data-attr="transform: 'rotate(' + ang + ' 320 430)'"><path d="M320 430 H200" stroke="#1D2A30" stroke-width="8" stroke-linecap="round"/></g>
+      <circle cx="320" cy="430" r="14" fill="#1D2A30"/>
+    </svg>
+    <div class="ctl">
+      <p class="lab">멀티탭이 견디는 전류(허용 전류)</p>
+      <div class="seg"><button data-set="L" data-value="10">10 A</button><button data-set="L" data-value="16" aria-pressed="true">16 A</button></div>
+      <p class="lab" style="margin-top:4px">켤 가전 <span class="model">(소비 전력은 대표값)</span></p>
+      <div class="tgs">
+        <label class="tg"><input type="checkbox" name="ht" autocomplete="off">난로 <small>2000 W</small></label>
+        <label class="tg"><input type="checkbox" name="kt" autocomplete="off">포트 <small>1800 W</small></label>
+        <label class="tg"><input type="checkbox" name="dr" autocomplete="off">드라이어 <small>1500 W</small></label>
+        <label class="tg"><input type="checkbox" name="mw" autocomplete="off">레인지 <small>1200 W</small></label>
+        <label class="tg"><input type="checkbox" name="tv" autocomplete="off">TV <small>100 W</small></label>
+        <label class="tg"><input type="checkbox" name="nb" autocomplete="off">노트북 <small>65 W</small></label>
+      </div>
+      <p class="read">전력 합계 <output data-expr="P" data-comma data-unit="W"></output></p>
+      <p class="read">전류 <output data-expr="P" data-comma></output> ÷ 220 = <output data-expr="I" data-digits="1" data-unit="A"></output></p>
+      <div class="amp"><div class="bar" data-value="min(I, L)" data-max="L" data-class="is-hot: over" style="--bar-c:#F2A541"></div><output data-expr="L" data-unit="A"></output></div>
+      <p class="say" data-show="P == 0">가전을 하나씩 켜 보자.<br>켤 때마다 전류가 더해진다.</p>
+      <p class="say" data-show="P > 0 && !over && I < L * 0.8">한도까지 <output data-expr="L - I" data-digits="1" data-unit="A"></output> 남았다.</p>
+      <p class="say" data-show="!over && I >= L * 0.8" style="color:#B5651D">한도에 가깝다.<br>남은 여유는 <output data-expr="L - I" data-digits="1" data-unit="A"></output>다.</p>
+      <p class="say hot" data-show="over">한도를 넘었다! 멀티탭이<br>뜨거워져 불이 날 수 있다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 6 확인 문제 1 -->
+<section class="slide" id="check-1" data-sec="확인 문제" data-title="확인 문제 1">
+  <h2>확인 문제 1</h2>
+  <div>
+    <p class="q" data-n="1" data-ai="문항">정격 소비 전력이 1100 W인 전기밥솥을 220 V 콘센트에 꽂았다.<br>흐르는 전류는 얼마일까?</p>
+    <div class="quiz" data-cols="2">
+      <button class="opt" data-ai="풀이" data-why="전압을 전력으로 나눴다. 전류 = 전력 ÷ 전압이다.">0.2 A</button>
+      <button class="opt" data-ok data-ai="풀이" data-why="맞다. 1100 W ÷ 220 V = 5 A다.">5 A</button>
+      <button class="opt" data-ai="풀이" data-why="1100 ÷ 220을 다시 계산해 보자. 50이 아니다.">50 A</button>
+      <button class="opt" data-ai="풀이" data-why="전력과 전압을 더하면 안 된다. 전력을 전압으로 나눈다.">1320 A</button>
+    </div>
+  </div>
+</section>
+
+<!-- 7 익스플로라그램: 아침 준비 시간 -->
+<section class="slide" id="morning" data-sec="개념" data-title="아침 준비 시간의 전류">
+  <h2>켜는 시각이 겹치면 전류는 어떻게 될까?</h2>
+  <div class="calc ex" data-ai="아침 준비 시간 가전 일정과 전류(일정과 소비 전력은 모형)"
+       data-let="rc = t < 40 ? 1 : 0; kt = t >= 25 && t < 30 ? 1 : 0; mw = t >= 35 && t < 40 ? 1 : 0; dr = t >= ds && t < ds + 10 ? 1 : 0;
+                 P = 1000 * rc + 1800 * kt + 1200 * mw + 1500 * dr; I = P / 220;
+                 f0 = 1000 + (ds == 0 ? 1500 : 0);
+                 f25 = 2800 + (ds <= 25 && ds + 10 > 25 ? 1500 : 0);
+                 f35 = 2200 + (ds <= 35 && ds + 10 > 35 ? 1500 : 0);
+                 fd = 1500 + (ds < 40 ? 1000 : 0) + (ds >= 25 && ds < 30 ? 1800 : 0) + (ds >= 35 && ds < 40 ? 1200 : 0);
+                 pk = max(max(f0, f25), max(f35, fd)) / 220;
+                 om = max(0, min(ds + 10, 30) - max(ds, 25)) + max(0, min(ds + 10, 40) - max(ds, 35));
+                 hm = 30 + t; hh = 6 + floor(hm / 60); mm = hm % 60;
+                 dm = 30 + ds; dh = 6 + floor(dm / 60); dmm = dm % 60">
+    <div>
+      <svg class="gantt" viewBox="0 0 660 190" aria-label="6시 30분부터 7시 30분까지 가전이 켜지는 일정표">
+        <g font-weight="700" fill="#1D2A30">
+          <text x="0" y="31">밥솥</text><text x="0" y="71">전기포트</text><text x="0" y="111">레인지</text><text x="0" y="151" fill="#D7263D">드라이어</text>
+        </g>
+        <g stroke="#E3E7E5" stroke-width="2"><path d="M120 6 V166 M205 6 V166 M290 6 V166 M375 6 V166 M460 6 V166 M545 6 V166 M630 6 V166"/></g>
+        <rect x="120" y="10" width="340" height="28" rx="6" data-attr="fill: rc ? '#F2A541' : '#FBE3C4'"/>
+        <rect x="332.5" y="50" width="42.5" height="28" rx="6" data-attr="fill: kt ? '#F2A541' : '#FBE3C4'"/>
+        <rect x="417.5" y="90" width="42.5" height="28" rx="6" data-attr="fill: mw ? '#F2A541' : '#FBE3C4'"/>
+        <rect y="130" width="85" height="28" rx="6" data-attr="x: 120 + ds * 8.5; fill: dr ? '#D7263D' : '#F6C3CA'"/>
+        <g fill="#56666C" font-size="20" text-anchor="middle"><text x="120" y="188">6:30</text><text x="290" y="188">6:50</text><text x="460" y="188">7:10</text><text x="630" y="188">7:30</text></g>
+        <g data-attr="transform: 'translate(' + t * 8.5 + ' 0)'"><path d="M120 2 V170" stroke="#0B5563" stroke-width="4"/></g>
+      </svg>
+      <figure class="plot" data-x="0, 60" data-y="0, 24" data-xstep="10" data-ystep="4" data-height="268" data-xlabel="6시 30분부터 지난 시간(분)" data-ylabel="전류(A)" aria-label="시간에 따른 멀티탭 전류 그래프">
+        <i data-line="16" data-dash data-color="#D7263D" data-label="허용 전류 16 A"></i>
+        <i data-line="(1000 * (x < 40 ? 1 : 0) + 1800 * (x >= 25 && x < 30 ? 1 : 0) + 1200 * (x >= 35 && x < 40 ? 1 : 0) + 1500 * (x >= ds && x < ds + 10 ? 1 : 0)) / 220" data-x="0, max(t, 0.01)" data-color="#0B5563" data-label="전류"></i>
+        <i data-point="t, I" data-color="#0B5563" data-show="t > 0"></i>
+      </figure>
+    </div>
+    <div class="ctl">
+      <p class="lab">드라이어를 켜는 시각 <b data-expr="dh + ':' + (dmm < 10 ? '0' : '') + dmm"></b></p>
+      <input type="range" name="ds" min="0" max="50" step="5" value="20" aria-label="드라이어를 켜는 시각">
+      <p class="lab" style="margin-top:6px">지금 <b data-expr="hh + ':' + (mm < 10 ? '0' : '') + mm"></b></p>
+      <input type="range" name="t" min="0" max="60" step="1" value="0" data-play="12" aria-label="6시 30분부터 지난 시간">
+      <p class="read">지금 전류 <output data-expr="I" data-digits="1" data-unit="A"></output></p>
+      <div class="amp"><div class="bar" data-value="min(I, 16)" data-max="16" style="--bar-c:#F2A541"></div><output>16 A</output></div>
+      <p class="say" data-show="t == 0">드라이어 시각을 정하고<br>「▶ 재생」을 눌러 보자.</p>
+      <p class="say" data-show="t > 0 && t < 60 && P == 0">지금 켜진 가전이 없다.</p>
+      <p class="say" data-show="t > 0 && t < 60 && P > 0 && I <= 16">한도까지 <output data-expr="16 - I" data-digits="1" data-unit="A"></output> 남았다.</p>
+      <p class="say hot" data-show="t > 0 && t < 60 && I > 16">겹쳐 켜져서 한도 16 A를 넘었다!</p>
+      <p class="say" data-show="t == 60 && om > 0">가장 큰 전류 <output data-expr="pk" data-digits="1" data-unit="A"></output>.<br><span class="hot">한도를 <output data-expr="om" data-unit="분"></output> 동안 넘었다.</span></p>
+      <p class="say" data-show="t == 60 && om == 0">가장 큰 전류 <output data-expr="pk" data-digits="1" data-unit="A"></output>.<br>한도를 한 번도 넘지 않았다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 8 개념: 전력량 -->
+<section class="slide" id="energy" data-sec="개념" data-title="전력과 전력량">
+  <h2>전력과 전력량은 어떻게 다를까?</h2>
+  <div>
+    <div class="plate-row" style="grid-template-columns: 1fr 1fr; gap: 28px">
+      <p class="formula" style="margin:0">전력(W)<small>1초 동안 쓰는 전기 에너지.<br>가전마다 정해져 있다.</small></p>
+      <p class="formula" style="margin:0;border-color:var(--amber);color:#9A5B0B">전력량(Wh) = 전력 × 시간<small>일정한 시간 동안 쓴 전기 에너지.<br>1 kWh = 1000 Wh</small></p>
+    </div>
+    <p class="explain">1500 W 드라이어를 하루 10분(1/6시간) 쓰면<br>1500 W × 1/6 h = <span class="key">250 Wh</span>다.</p>
+    <p class="calcline step">30일이면 250 Wh × 30 = 7500 Wh = <span class="hot">7.5 kWh</span>다.<br>전기 요금은 한 달 동안 쓴 전력량(kWh)으로 매긴다.</p>
+  </div>
+</section>
+
+<!-- 9 익스플로라그램: 한 달 전력량과 요금 -->
+<section class="slide" id="month" data-sec="개념" data-title="한 달 전력량과 요금">
+  <h2>한 달이면 전력량과 요금은 얼마나 쌓일까?</h2>
+  <div class="calc ex" data-ai="한 달 전력량과 요금(소비 전력은 대표값, 요금은 1 kWh당 150원 모형)"
+       data-let="dayWh = W * h; E = W * h * day / 1000; fee = E * 150; save = W * 30 / 1000 * 150">
+    <div>
+      <svg viewBox="0 0 660 150" aria-label="전력량계 숫자와 한 달 30일 달력 띠">
+        <rect x="0" y="0" width="300" height="84" rx="14" fill="#1D2A30"/>
+        <text x="22" y="30" font-size="20" fill="#B9C6C2">전력량계</text>
+        <text x="282" y="70" font-size="40" font-weight="800" fill="#F2A541" text-anchor="end" font-family="Consolas, Menlo, monospace" data-expr="E" data-digits="1" data-unit="kWh"></text>
+        <text x="330" y="36" font-size="22" font-weight="700" fill="#1D2A30" data-expr="day == 0 ? '시작 전' : day + '일째'"></text>
+        <text x="330" y="70" font-size="22" fill="#56666C" data-expr="'하루 ' + dayWh / 1000 + ' kWh'"></text>
+        <g fill="#F2A541">
+          <rect x="0" y="100" width="18" height="30" rx="3" data-attr="fill-opacity: day >= 1 ? 1 : 0.15"/><rect x="22" y="100" width="18" height="30" rx="3" data-attr="fill-opacity: day >= 2 ? 1 : 0.15"/><rect x="44" y="100" width="18" height="30" rx="3" data-attr="fill-opacity: day >= 3 ? 1 : 0.15"/><rect x="66" y="100" width="18" height="30" rx="3" data-attr="fill-opacity: day >= 4 ? 1 : 0.15"/><rect x="88" y="100" width="18" height="30" rx="3" data-attr="fill-opacity: day >= 5 ? 1 : 0.15"/>
+          <rect x="110" y="100" width="18" height="30" rx="3" data-attr="fill-opacity: day >= 6 ? 1 : 0.15"/><rect x="132" y="100" width="18" height="30" rx="3" data-attr="fill-opacity: day >= 7 ? 1 : 0.15"/><rect x="154" y="100" width="18" height="30" rx="3" data-attr="fill-opacity: day >= 8 ? 1 : 0.15"/><rect x="176" y="100" width="18" height="30" rx="3" data-attr="fill-opacity: day >= 9 ? 1 : 0.15"/><rect x="198" y="100" width="18" height="30" rx="3" data-attr="fill-opacity: day >= 10 ? 1 : 0.15"/>
+          <rect x="220" y="100" width="18" height="30" rx="3" data-attr="fill-opacity: day >= 11 ? 1 : 0.15"/><rect x="242" y="100" width="18" height="30" rx="3" data-attr="fill-opacity: day >= 12 ? 1 : 0.15"/><rect x="264" y="100" width="18" height="30" rx="3" data-attr="fill-opacity: day >= 13 ? 1 : 0.15"/><rect x="286" y="100" width="18" height="30" rx="3" data-attr="fill-opacity: day >= 14 ? 1 : 0.15"/><rect x="308" y="100" width="18" height="30" rx="3" data-attr="fill-opacity: day >= 15 ? 1 : 0.15"/>
+          <rect x="330" y="100" width="18" height="30" rx="3" data-attr="fill-opacity: day >= 16 ? 1 : 0.15"/><rect x="352" y="100" width="18" height="30" rx="3" data-attr="fill-opacity: day >= 17 ? 1 : 0.15"/><rect x="374" y="100" width="18" height="30" rx="3" data-attr="fill-opacity: day >= 18 ? 1 : 0.15"/><rect x="396" y="100" width="18" height="30" rx="3" data-attr="fill-opacity: day >= 19 ? 1 : 0.15"/><rect x="418" y="100" width="18" height="30" rx="3" data-attr="fill-opacity: day >= 20 ? 1 : 0.15"/>
+          <rect x="440" y="100" width="18" height="30" rx="3" data-attr="fill-opacity: day >= 21 ? 1 : 0.15"/><rect x="462" y="100" width="18" height="30" rx="3" data-attr="fill-opacity: day >= 22 ? 1 : 0.15"/><rect x="484" y="100" width="18" height="30" rx="3" data-attr="fill-opacity: day >= 23 ? 1 : 0.15"/><rect x="506" y="100" width="18" height="30" rx="3" data-attr="fill-opacity: day >= 24 ? 1 : 0.15"/><rect x="528" y="100" width="18" height="30" rx="3" data-attr="fill-opacity: day >= 25 ? 1 : 0.15"/>
+          <rect x="550" y="100" width="18" height="30" rx="3" data-attr="fill-opacity: day >= 26 ? 1 : 0.15"/><rect x="572" y="100" width="18" height="30" rx="3" data-attr="fill-opacity: day >= 27 ? 1 : 0.15"/><rect x="594" y="100" width="18" height="30" rx="3" data-attr="fill-opacity: day >= 28 ? 1 : 0.15"/><rect x="616" y="100" width="18" height="30" rx="3" data-attr="fill-opacity: day >= 29 ? 1 : 0.15"/><rect x="638" y="100" width="18" height="30" rx="3" data-attr="fill-opacity: day >= 30 ? 1 : 0.15"/>
+        </g>
+      </svg>
+      <figure class="plot" data-x="0, 30" data-y="0, 500" data-xstep="5" data-ystep="100" data-height="290" data-xlabel="날짜(일)" data-ylabel="쌓인 전력량(kWh)" aria-label="날짜에 따라 쌓인 전력량 그래프">
+        <i data-line="W * h * x / 1000" data-x="0, max(day, 0.01)" data-color="#0B5563"></i>
+        <i data-point="day, E" data-color="#F2A541" data-show="day > 0"></i>
+      </figure>
+    </div>
+    <div class="ctl">
+      <p class="lab">가전</p>
+      <div class="seg"><button data-set="W" data-value="2000" aria-pressed="true">난로<br><span class="nw">2000 W</span></button><button data-set="W" data-value="250">컴퓨터<br><span class="nw">250 W</span></button><button data-set="W" data-value="100">TV<br><span class="nw">100 W</span></button><button data-set="W" data-value="10">LED<br><span class="nw">10 W</span></button></div>
+      <p class="lab" style="margin-top:4px">하루 사용 시간 <b data-expr="h + '시간'"></b></p>
+      <input type="range" name="h" min="1" max="8" step="1" value="4" aria-label="하루 사용 시간">
+      <input type="range" name="day" min="0" max="30" step="1" value="0" data-play="10" aria-label="날짜">
+      <p class="read">쌓인 전력량 <output data-expr="E" data-digits="1" data-unit="kWh"></output></p>
+      <p class="read" data-ai="모형 수치">요금 <output data-expr="round(fee)" data-comma data-unit="원"></output> <span class="model">(모형: 1 kWh당 150원)</span></p>
+      <p class="say" data-show="day == 0">「▶ 재생」을 눌러 한 달을 흘려 보자.</p>
+      <p class="say" data-show="day > 0 && day < 30">하루 <output data-expr="W"></output> W × <output data-expr="h"></output> h<br>= <output data-expr="dayWh"></output> Wh씩 쌓인다.</p>
+      <p class="say" data-show="day == 30 && h > 1">하루 1시간만 줄이면 한 달에<br><output data-expr="round(save)" data-comma data-unit="원"></output>을 아낀다 (모형).</p>
+      <p class="say" data-show="day == 30 && h == 1">하루 1시간씩 한 달 동안<br><output data-expr="E" data-digits="1" data-unit="kWh"></output>를 썼다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 10 확인 문제 2 -->
+<section class="slide" id="check-2" data-sec="확인 문제" data-title="확인 문제 2">
+  <h2>확인 문제 2</h2>
+  <div>
+    <p class="q" data-n="2" data-ai="문항">소비 전력이 100 W인 TV를 하루 3시간씩 30일 동안 보았다.<br>쓴 전력량은 얼마일까?</p>
+    <div class="quiz" data-cols="2">
+      <button class="opt" data-ai="풀이" data-why="하루 전력량은 100 W × 3 h = 300 Wh다. 30일을 곱해야 한다.">0.3 kWh</button>
+      <button class="opt" data-ai="풀이" data-why="100 × 3 × 30을 다시 계산해 보자.">3 kWh</button>
+      <button class="opt" data-ok data-ai="풀이" data-why="맞다. 100 W × 3 h × 30 = 9000 Wh = 9 kWh다.">9 kWh</button>
+      <button class="opt" data-ai="풀이" data-why="9000 Wh를 kWh로 바꾸면 1000으로 나눈 9 kWh다.">9000 kWh</button>
+    </div>
+  </div>
+</section>
+
+<!-- 11 확인 문제 3 -->
+<section class="slide" id="check-3" data-sec="확인 문제" data-title="확인 문제 3">
+  <h2>확인 문제 3</h2>
+  <div>
+    <p class="q" data-n="3">안전한 습관과 위험한 습관으로 나누어 보자.</p>
+    <div class="sort">
+      <div class="bin" data-bin="s"><h3 style="color:var(--green)">안전한 습관</h3></div>
+      <div class="bin" data-bin="d"><h3 class="hot">위험한 습관</h3></div>
+      <span data-bin="s" data-ai="풀이와 실마리" data-why="전기난로처럼 소비 전력이 큰 가전은 벽 콘센트에 따로 꽂는다." data-hint="소비 전력이 큰 가전을 멀티탭에 함께 꽂으면 어떻게 될까?">전기난로는 벽 콘센트에 따로 꽂는다.</span>
+      <span data-bin="d" data-ai="풀이와 실마리" data-why="멀티탭을 이어 꽂으면 한 콘센트로 전류가 몰려 한도를 넘기 쉽다." data-hint="이어 꽂은 멀티탭의 전류는 결국 어디로 모일까?">멀티탭에 멀티탭을 이어서 꽂는다.</span>
+      <span data-bin="s" data-ai="풀이와 실마리" data-why="정격 전류를 확인하고 켠 가전의 전류 합계가 넘지 않게 쓴다." data-hint="멀티탭에 적힌 숫자는 무엇을 알려 줄까?">멀티탭의 허용 전류를 확인하고 쓴다.</span>
+      <span data-bin="d" data-ai="풀이와 실마리" data-why="전선을 묶어 두면 열이 빠지지 않아 뜨거워진다." data-hint="전류가 흐르는 전선에서 생긴 열은 어디로 빠져나갈까?">긴 전선을 둘둘 묶은 채로 난로를 오래 켠다.</span>
+      <span data-bin="s" data-ai="풀이와 실마리" data-why="쓰지 않는 플러그를 뽑거나 스위치를 끄면 대기 전력도 아낀다." data-hint="꺼 두어도 꽂혀 있는 플러그는 전기를 쓸까?">쓰지 않는 가전은 플러그를 뽑거나 스위치를 끈다.</span>
+      <span data-bin="d" data-ai="풀이와 실마리" data-why="물은 전기가 잘 통해 감전될 수 있다." data-hint="물이 묻은 손과 전기는 어떤 관계일까?">젖은 손으로 플러그를 꽂는다.</span>
+    </div>
+  </div>
+</section>
+
+<!-- 12 정리 -->
+<section class="slide" id="summary" data-sec="정리" data-title="정리">
+  <h2>정리</h2>
+  <ul class="sum">
+    <li>전력(W) = 전압(V) × 전류(A). 가정의 전압은 <span class="blank">220 V</span>다.</li>
+    <li>전류(A) = 전력(W) ÷ <span class="blank">전압(V)</span></li>
+    <li>함께 켠 가전의 전류는 <span class="blank">더해진다</span>. 합계가 멀티탭의 허용 전류를 넘지 않게 쓴다.</li>
+    <li>켜는 시각이 <span class="blank">겹치지</span> 않게 나누어 쓰면 한도를 넘지 않는다.</li>
+    <li>전력량(Wh) = 전력(W) × <span class="blank">사용 시간(h)</span>. 요금은 전력량으로 매긴다.</li>
+  </ul>
+</section>
+
+</body>
+</html>
