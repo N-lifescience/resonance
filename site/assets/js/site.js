@@ -396,17 +396,17 @@
   $$('[data-ai]').forEach((card) => {
     const info = AI[card.dataset.ai];
     if (!info) return;
-    const failed = `${info.name}를 여는 중이에요. 1단계에서 복사한 문장을 붙여 넣어 주세요.`;
+    const failed = `${info.name}를 여는 중입니다. 1단계에서 복사한 문장을 붙여 넣어 주세요.`;
     $('[data-ai-web]', card)?.addEventListener('click', () => {
       // 새 탭으로 넘어가기 전에 복사를 시작한다(링크 이동은 막지 않는다).
-      copyPrompt().then((ok) => say([ok ? `문장을 복사해 두었어요. 새 탭의 ${info.name}에 수업 자료를 올리고 붙여 넣으세요.` : failed]));
+      copyPrompt().then((ok) => say([ok ? `문장을 복사해 두었습니다. 새 탭의 ${info.name}에 수업 자료를 올리고 붙여 넣으세요.` : failed]));
     });
     const app = $('[data-ai-app]', card);
     app?.addEventListener('click', async (event) => {
       if (app.tagName === 'A') {
         // 앱 주소로 이동한다. 1.5초 뒤에도 이 창에 머물러 있으면 앱이 없는 것으로 보고 내려받기를 안내한다.
         copyPrompt().then((ok) => {
-          say([ok ? `문장을 복사해 두었어요. ${info.name} 앱에서 수업 자료를 올리고 붙여 넣으세요.` : failed]);
+          say([ok ? `문장을 복사해 두었습니다. ${info.name} 앱에서 수업 자료를 올리고 붙여 넣으세요.` : failed]);
           setTimeout(() => {
             if (document.visibilityState === 'visible' && document.hasFocus()) say([`${info.name} 앱이 열리지 않았다면 `, { href: info.download, text: '앱 내려받기' }, '를 이용하거나 웹에서 열어 주세요.']);
           }, 1500);
@@ -416,7 +416,7 @@
       event.preventDefault();
       const ok = await copyPrompt();
       say(ok
-        ? [`문장을 복사해 두었어요. ${info.name} 앱을 열고 수업 자료를 올린 뒤 붙여 넣으세요. 앱이 없다면 `, { href: info.download, text: '앱 내려받기' }, '를 이용해 주세요.']
+        ? [`문장을 복사해 두었습니다. ${info.name} 앱을 열고 수업 자료를 올린 뒤 붙여 넣으세요. 앱이 없다면 `, { href: info.download, text: '앱 내려받기' }, '를 이용해 주세요.']
         : [`1단계에서 복사한 문장을 ${info.name} 앱에 붙여 넣어 주세요. 앱이 없다면 `, { href: info.download, text: '앱 내려받기' }, '를 이용해 주세요.']);
     });
   });

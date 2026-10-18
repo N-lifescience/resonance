@@ -30,7 +30,7 @@
     steps: [
       { at: [0.04, 0.5], words: [['①', 1], ['PPT', 0], ['한', 0], ['장을', 0], ['AI에', 0], ['건네면', 0]] },
       { at: [0.62, 1.08], words: [['②', 1], ['AI가', 0], ['수업', 0], ['HTML로', 0], ['바꾸고', 0]] },
-      { at: [1.2, 1.82], words: [['③', 1], ['「편집」으로', 0], ['바로', 0], ['고쳐요', 0]] }
+      { at: [1.2, 1.82], words: [['③', 1], ['「편집」으로', 0], ['바로', 0], ['고칩니다', 0]] }
     ],
     cap1: [['학생마다', 1], ['다른', 0], ['진동수', 0]],
     cap2: [['하나로', 1], ['맞춰지는', 0], ['순간', 0]],
@@ -1108,29 +1108,45 @@
 
   function drawFinale(ctx, t, L, extra) {
     var s = t - T.end, F = L.fin; if (!F) return;
-    var W = L.W, r0 = Math.max(2.8, L.u * 0.46);
+    var W = L.W, r0 = Math.max(2.8, L.u * 0.46), G = F.ring;
     var bloom = 0.32 * Math.exp(-Math.pow((s - 0.66) / 0.13, 2)) + 0.1 * E.outC(seg(s, 0.55, 1.2)) * (1 - 0.35 * seg(s, 1.5, 3.75));
     glow(ctx, F.nc.x, F.nc.y, F.fs * 2.2, 'clay', bloom);
     var A = lerp(F.a0, F.af, E.ioC(seg(s, 1.4, 3.75))), ph = PHI_E(t) + (extra || 0);
     var lineA = E.outC(seg(s, 0.95, 1.6)), rev = E.outC(seg(s, 0.9, 1.6));
-    function wy(x) { return F.wy + A * Math.sin(F.k * x - ph); }
+    // 2.0~3.4초(장면 시각): 가로 파동의 양 끝이 위로 감겨 올라가 「공명」을 두르는 고리가 된다.
+    var m = E.ioC(seg(s, 2.0, 3.4));
+    var half = W * 0.56 * rev, xa = W / 2 - half, xb = W / 2 + half;
+    var breathe = 0.85 + 0.15 * Math.sin(ph * 0.45);
+    function pt(u, j) {
+      var x = lerp(xa, xb, u), y = F.wy + A * (1 - j * 0.18) * Math.sin(F.k * x - ph - j * 0.35);
+      if (m <= 0) return [x, y];
+      var th = Math.PI / 2 + TAU * u + ph * 0.05;
+      var r = G.R + G.amp * breathe * (1 - j * 0.12) * Math.sin(G.n * th - ph - j * 2.09) * m;
+      return [lerp(x, G.cx + r * Math.cos(th), m), lerp(y, G.cy + r * Math.sin(th), m)];
+    }
     if (lineA > 0) {
-      var half = W * 0.56 * rev, xa = W / 2 - half, xb = W / 2 + half;
-      for (var j = 2; j >= 0; j--) {
+      var cols = ['paper', 'clay', 'tideHi', 'peach'], N = m > 0 ? 4 : 3;
+      ctx.save();
+      if (m > 0) ctx.globalCompositeOperation = 'lighter';
+      for (var j = N - 1; j >= 0; j--) {
         ctx.beginPath();
-        for (var i = 0; i <= 120; i++) { var x = lerp(xa, xb, i / 120), y = F.wy + A * (1 - j * 0.18) * Math.sin(F.k * x - ph - j * 0.35); if (i) ctx.lineTo(x, y); else ctx.moveTo(x, y); }
-        ctx.lineWidth = j ? Math.max(1, L.u * 0.1) : Math.max(1.2, L.u * 0.16);
-        ctx.strokeStyle = j ? rgba(j === 1 ? 'clay' : 'tideHi', 0.22 * lineA) : rgba('paper', 0.42 * lineA);
+        for (var i = 0; i <= 180; i++) { var P = pt(i / 180, j); if (i) ctx.lineTo(P[0], P[1]); else ctx.moveTo(P[0], P[1]); }
+        var base = j === 0 ? 0.42 : 0.22, ringBoost = j === 0 ? 0.4 : 0.5;
+        ctx.lineWidth = Math.max(1.2, L.u * (j ? 0.1 : 0.16) * (1 + m * 0.9));
+        ctx.strokeStyle = rgba(cols[j], (base + ringBoost * m) * lineA);
+        ctx.shadowColor = rgba(cols[j], 0.8 * m); ctx.shadowBlur = 14 * m;
         ctx.stroke();
       }
+      ctx.restore();
     }
     if (s > 0.6) {
       F.dots.forEach(function (d, i) {
-        var b = E.outExpo(seg(s, 0.6, 1.05)), m = E.ioQuint(seg(s, 0.88 + d.o * 0.3, 1.7 + d.o * 0.3));
+        var b = E.outExpo(seg(s, 0.6, 1.05)), mm = E.ioQuint(seg(s, 0.88 + d.o * 0.3, 1.7 + d.o * 0.3));
         var bx = F.nc.x + Math.cos(d.ang) * d.dist * b, by = F.nc.y + Math.sin(d.ang) * d.dist * b * 0.62;
-        var X = lerp(bx, d.x, m), Y = lerp(by, wy(d.x), m);
+        var P = pt(clamp((d.x - xa) / Math.max(1, xb - xa), 0, 1), 0);
+        var X = lerp(bx, P[0], mm), Y = lerp(by, P[1], mm);
         var col = i % 2 ? 'tideHi' : 'clay';
-        glow(ctx, X, Y, r0 * 3.4, col, 0.22);
+        glow(ctx, X, Y, r0 * (3.4 + m * 1.6), col, 0.22 + 0.12 * m);
         circle(ctx, X, Y, r0 * E.outBack(seg(s, 0.6, 0.85))); ctx.fillStyle = HEX[col]; ctx.fill();
       });
     }
@@ -1294,15 +1310,23 @@
         c.style.fontSize = sfs + 'px'; c.style.left = L.S.x + 'px'; c.style.width = L.S.w + 'px'; c.style.maxWidth = 'none'; c.style.top = sTop + 'px';
       });
       // 끝 화면 로고 묶음
-      var nfs = L.land ? Math.min(L.C.h * 0.27, L.W * 0.15) : Math.min(L.W * 0.3, L.C.h * 0.19);
+      var nfs = L.land ? Math.min(L.C.h * 0.2, L.W * 0.13) : Math.min(L.W * 0.26, L.C.h * 0.16);
       nfs = clamp(nfs, 64, 560);
       var tfs = clamp(nfs * 0.17, 19, 96), gap = nfs * 0.46, ctaH = 56, ctaGap = Math.max(28, nfs * 0.24);
       nameEl.style.fontSize = nfs + 'px'; tagEl.style.fontSize = tfs + 'px';
       enEl.style.fontSize = clamp(nfs * 0.15, 16, 72) + 'px'; enEl.style.marginTop = (nfs * 0.06) + 'px';
       nameEl.style.transform = 'none'; nameEl._t = null;
       tagEl.style.marginTop = gap + 'px';
-      var blockH = lock.offsetHeight + ctaGap + ctaH;
-      var top = L.C.y + Math.max(0, (L.C.h - blockH) * 0.46);
+      // 끝 장면 고리: 「공명」과 resonance를 감싸고, 한 줄 소개는 고리 바깥 아래에 둔다.
+      var nW = nameEl.offsetWidth, blockTop = nameEl.offsetTop, blockBot = enEl.offsetTop + enEl.offsetHeight;
+      var ringR = Math.min(Math.max(nW * 0.72, (blockBot - blockTop) * 0.82), L.W * 0.44);
+      var ringAmp = ringR * 0.13;
+      var ringCy = (blockTop + blockBot) / 2;
+      gap = Math.max(gap, ringCy + ringR + ringAmp + nfs * 0.2 - blockBot);
+      tagEl.style.marginTop = gap + 'px';
+      var ringAbove = Math.max(0, ringR + ringAmp - (ringCy - blockTop));
+      var blockH = ringAbove + lock.offsetHeight + ctaGap + ctaH;
+      var top = L.C.y + ringAbove + Math.max(0, (L.C.h - blockH) * 0.46);
       lock.style.top = top + 'px';
       var rr0 = root.getBoundingClientRect(), nr = nameEl.getBoundingClientRect(), tr = tagEl.getBoundingClientRect(), er = enEl.getBoundingClientRect();
       var tagTop = tr.top - rr0.top, nameTop = nr.top - rr0.top;
@@ -1314,7 +1338,8 @@
       var wy = (enBottom + tagGlyphTop) / 2;
       var rnd = rng(31), dots = [];
       for (var i = 0; i < 28; i++) dots.push({ x: lerp(-L.W * 0.02, L.W * 1.02, i / 27), ang: (i / 28) * TAU + rnd() * 0.5, dist: (0.16 + rnd() * 0.3) * Math.min(L.W, L.H), o: Math.abs(i / 27 - 0.5) * 2 * 0.5 + rnd() * 0.15 });
-      L.fin = { nb: nb, nc: { x: nb.x + nb.w / 2, y: nb.y + nb.h / 2 }, fs: nfs, wy: wy, k: TAU / (L.land ? L.W * 0.42 : L.W * 0.9), a0: (tagGlyphTop - enBottom) * 0.36, af: (tagGlyphTop - enBottom) * 0.2, dots: dots };
+      L.fin = { nb: nb, nc: { x: nb.x + nb.w / 2, y: nb.y + nb.h / 2 }, fs: nfs, wy: wy, k: TAU / (L.land ? L.W * 0.42 : L.W * 0.9), a0: (tagGlyphTop - enBottom) * 0.36, af: (tagGlyphTop - enBottom) * 0.2, dots: dots,
+        ring: { cx: nr.left - rr0.left + nr.width / 2, cy: nameTop + (enBottom - nameTop) / 2, R: ringR, amp: ringAmp, n: 6 } };
       api.ctaTop = Math.round(tr.bottom - rr0.top + ctaGap);
       el.style.setProperty('--ri-cta-top', api.ctaTop + 'px');
       // 손가락 길

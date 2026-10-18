@@ -48,7 +48,7 @@
   async function join(code) {
     if (close) close();
     clearTimeout(timer);
-    say('선생님을 찾는 중… (5초쯤 걸려요)');
+    say('선생님을 찾는 중… (5초쯤 걸립니다)');
     try {
       close = await listen(code, (p) => {
         if (!p || typeof p !== 'object') return;
@@ -57,14 +57,14 @@
         if (typeof p.site === 'string' && /^[\w-]{1,60}$/.test(p.site)) {
           location.href = `lessons/${p.site}.html?join=${code}${forceLocal ? '&live=local' : ''}`;
         } else {
-          say('이 수업은 선생님이 웨일 클래스에 올린 학생용 파일로 들어가요. 그 파일을 열고 같은 코드를 넣어 주세요.');
+          say('이 수업은 선생님이 웨일 클래스에 올린 학생용 파일로 들어갑니다. 그 파일을 열고 같은 코드를 넣어 주세요.');
         }
       });
     } catch (err) {
-      say('연결하지 못했어요. 인터넷 연결을 확인해 주세요.', true);
+      say('연결하지 못했습니다. 인터넷 연결을 확인해 주세요.', true);
       return;
     }
-    timer = setTimeout(() => say('선생님을 찾지 못했어요. 코드와, 선생님 화면에서 실시간이 켜져 있는지 확인해 주세요.', true), 12000);
+    timer = setTimeout(() => say('선생님을 찾지 못했습니다. 코드와, 선생님 화면에서 실시간이 켜져 있는지 확인해 주세요.', true), 12000);
   }
 
   form.addEventListener('submit', (e) => {
