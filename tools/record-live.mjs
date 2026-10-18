@@ -1,4 +1,4 @@
-// 첫 화면 체험 덱 3장의 실시간 수업 영상을 녹화한다: site/media/live.mp4, live-poster.jpg.
+// 첫 화면 체험 덱 3장의 실시간 수업 영상을 녹화한다: site/assets/video/live.mp4, live-poster.jpg.
 // tools/record-live.html(선생님 전자칠판 + 학생 디벗 + 보이지 않는 학생 7명)을 헤드리스 크롬 1600×900으로 열고,
 // 화면 변화를 그대로 받아(Page.startScreencast) ffmpeg로 묶는다. 실시간은 같은 PC 방식(live=local)이라 서버가 필요 없다.
 // 사용: node tools/build.mjs && node tools/site.mjs && node tools/record-live.mjs   (ffmpeg 필요, npm 패키지 없음)
@@ -11,7 +11,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const site = join(root, '_site');
-const outDir = join(root, 'site/media');
+const outDir = join(root, 'site/assets/video');
 const W = 1600, H = 900, FPS = 30;
 if (!existsSync(join(site, 'index.html'))) { console.error('먼저 node tools/build.mjs && node tools/site.mjs'); process.exit(2); }
 
