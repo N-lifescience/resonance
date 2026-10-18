@@ -8,3 +8,7 @@ _site/
 
 # v3 에셋 원본(기계가 만든 고해상 원본·녹화·내려받은 원본)은 SSD에만
 site/assets/_src/
+
+# A4 PDF build outputs
+docs/print/out/
+docs/print/*.html
