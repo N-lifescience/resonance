@@ -356,6 +356,56 @@
     } catch { if (version === counterVersion) countLine.hidden = true; }
   }
   if (countLine) counter('get_counter');
+  const promptText = () => $('#prompt')?.textContent.trim() || '';
+
+  // 쓰던 AI 열기: 부탁 문장을 먼저 복사하고 웹이나 데스크톱 앱을 연다. 로그인은 교사가 각자 한다.
+  // 데스크톱 앱 주소 형식은 Claude(claude://)만 공식으로 쓸 수 있어, 나머지는 붙여 넣는 방법과 내려받기 링크를 보여 준다.
+  const AI = {
+    chatgpt: { name: 'ChatGPT', download: 'https://openai.com/chatgpt/download/' },
+    gemini: { name: 'Gemini', download: 'https://gemini.google/desktop/' },
+    claude: { name: 'Claude', download: 'https://claude.ai/download' }
+  };
+  const aiStatus = $('[data-ai-status]');
+  function say(parts) {
+    if (!aiStatus) return;
+    aiStatus.replaceChildren(...parts.map((part) => {
+      if (typeof part === 'string') return document.createTextNode(part);
+      const link = document.createElement('a');
+      link.href = part.href; link.textContent = part.text; link.target = '_blank'; link.rel = 'noopener noreferrer';
+      return link;
+    }));
+  }
+  async function copyPrompt() {
+    try { await navigator.clipboard.writeText(promptText()); counter('bump_counter'); return true; } catch { return false; }
+  }
+  $$('[data-ai]').forEach((card) => {
+    const info = AI[card.dataset.ai];
+    if (!info) return;
+    const failed = `복사하지 못했어요. 2단계의 문장을 직접 복사해 ${info.name}에 붙여 넣어 주세요.`;
+    $('[data-ai-web]', card)?.addEventListener('click', () => {
+      // 새 탭으로 넘어가기 전에 복사를 시작한다(링크 이동은 막지 않는다).
+      copyPrompt().then((ok) => say([ok ? `문장을 복사했어요. 새 탭의 ${info.name}에 PPT를 올리고 붙여 넣으세요.` : failed]));
+    });
+    const app = $('[data-ai-app]', card);
+    app?.addEventListener('click', async (event) => {
+      if (app.tagName === 'A') {
+        // 앱 주소로 이동한다. 1.5초 뒤에도 이 창에 머물러 있으면 앱이 없는 것으로 보고 내려받기를 안내한다.
+        copyPrompt().then((ok) => {
+          say([ok ? `문장을 복사했어요. ${info.name} 앱에서 PPT를 올리고 붙여 넣으세요.` : failed]);
+          setTimeout(() => {
+            if (document.visibilityState === 'visible' && document.hasFocus()) say([`${info.name} 앱이 열리지 않았다면 `, { href: info.download, text: '앱 내려받기' }, '를 이용하거나 웹에서 열어 주세요.']);
+          }, 1500);
+        });
+        return;
+      }
+      event.preventDefault();
+      const ok = await copyPrompt();
+      say(ok
+        ? [`문장을 복사했어요. ${info.name} 앱을 열고 PPT를 올린 뒤 붙여 넣으세요. 앱이 없다면 `, { href: info.download, text: '앱 내려받기' }, '를 이용해 주세요.']
+        : [failed]);
+    });
+  });
+
   $$('[data-copy]').forEach((button) => {
     let reset = 0;
     const label = $('span', button);

@@ -1,13 +1,14 @@
-/*! 공명 인트로 — 15초 모션그래픽 (Canvas 2D + DOM, 외부 라이브러리 없음)
+/*! 공명 인트로 — 15초 시간표를 0.5배 속도(30초)로 재생하는 모션그래픽 (Canvas 2D + DOM, 외부 라이브러리 없음)
  *  ResonanceIntro.mount(el, { onEnd, safeTop = 72, startAt = 0, autoplay = true, controls = true })
  *    → { skip(), destroy(), play(), pause(), replay(), seek(t), time(), ctaTop, ready }
  *  그림은 시간의 순수 함수 render(t)다. 같은 t면 같은 그림이 나온다(프레임 캡처용 window.__intro.seek).
- *  시간표는 128 BPM 한 박(15/32초)에 맞췄다: 1막 0~4박, 2막 4~8박, 기능 넷 각 4박, 끝 장면 8박. */
+ *  시간표는 128 BPM 한 박(15/32초)에 맞췄다: 1막 0~4박, 2막 4~8박, 기능 넷 각 4박, 끝 장면 8박.
+ *  재생은 SPEED배로 한다. 끝난 뒤에는 끝 장면 파동만 천천히 계속 흐른다(움직임 멈춤이면 멈춘다). */
 (function () {
   'use strict';
   if (window.ResonanceIntro) return;
 
-  var DUR = 15, BEAT = DUR / 32;
+  var DUR = 15, BEAT = DUR / 32, SPEED = 0.5, IDLE_W = Math.PI * 2 * 0.22;
   var T = { a2: 4 * BEAT, f1: 8 * BEAT, f2: 12 * BEAT, f3: 16 * BEAT, f4: 20 * BEAT, end: 24 * BEAT };
   var FSTART = [T.f1, T.f2, T.f3, T.f4, T.end];
 
@@ -20,6 +21,7 @@
     cap1: [['학생마다', 1], ['다른', 0], ['진동수', 0]],
     cap2: [['하나로', 1], ['맞춰지는', 0], ['순간', 0]],
     name: '공명',
+    en: 'resonance',
     tag: [['교실의', 1], ['진동수를', 0], ['맞추다', 0]],
     summary: '공명, 교실의 진동수를 맞추다. 핵심 기능 넷은 HTML 자동 생성 및 편집, 익스플로라그램 탑재, 실시간 수업, 전자칠판 기능 탑재입니다.',
     skip: '건너뛰기', pause: '멈춤', play: '재생'
@@ -1089,12 +1091,12 @@
     ctx.restore();
   }
 
-  function drawFinale(ctx, t, L) {
+  function drawFinale(ctx, t, L, extra) {
     var s = t - T.end, F = L.fin; if (!F) return;
     var W = L.W, r0 = Math.max(2.8, L.u * 0.46);
     var bloom = 0.32 * Math.exp(-Math.pow((s - 0.66) / 0.13, 2)) + 0.1 * E.outC(seg(s, 0.55, 1.2)) * (1 - 0.35 * seg(s, 1.5, 3.75));
     glow(ctx, F.nc.x, F.nc.y, F.fs * 2.2, 'clay', bloom);
-    var A = lerp(F.a0, F.af, E.ioC(seg(s, 1.4, 3.75))), ph = PHI_E(t);
+    var A = lerp(F.a0, F.af, E.ioC(seg(s, 1.4, 3.75))), ph = PHI_E(t) + (extra || 0);
     var lineA = E.outC(seg(s, 0.95, 1.6)), rev = E.outC(seg(s, 0.9, 1.6));
     function wy(x) { return F.wy + A * Math.sin(F.k * x - ph); }
     if (lineA > 0) {
@@ -1211,6 +1213,7 @@
     for (var pi = 0; pi < 4; pi++) prog4i.push(mk('i', '', mk('span', '', prog4)));
     var lock = mk('div', 'ri-lock', root);
     var nameEl = mk('p', 'ri-name', lock, TXT.name);
+    var enEl = mk('p', 'ri-en', lock, TXT.en);
     var tagEl = mk('p', 'ri-tag', lock), tagW = words(tagEl, TXT.tag);
     lock.setAttribute('aria-hidden', 'true');
     mk('p', 'ri-sr', root, TXT.summary);
@@ -1221,6 +1224,7 @@
     var bar = mk('i', '', mk('span', 'ri-bar', bSkip));
 
     var L = null, t = clamp(+opts.startAt || 0, 0, DUR), playing = false, userPaused = !autoplay, ended = false, raf = 0, last = 0, dead = false, ready = false;
+    var extraPh = 0, idleRaf = 0, idleLast = 0;
     var api = {};
     function setPauseUi() {
       bPause.textContent = '';
@@ -1271,20 +1275,23 @@
       nfs = clamp(nfs, 64, 560);
       var tfs = clamp(nfs * 0.17, 19, 96), gap = nfs * 0.46, ctaH = 56, ctaGap = Math.max(28, nfs * 0.24);
       nameEl.style.fontSize = nfs + 'px'; tagEl.style.fontSize = tfs + 'px';
+      enEl.style.fontSize = clamp(nfs * 0.15, 16, 72) + 'px'; enEl.style.marginTop = (nfs * 0.06) + 'px';
       nameEl.style.transform = 'none'; nameEl._t = null;
       tagEl.style.marginTop = gap + 'px';
       var blockH = lock.offsetHeight + ctaGap + ctaH;
       var top = L.C.y + Math.max(0, (L.C.h - blockH) * 0.46);
       lock.style.top = top + 'px';
-      var rr0 = root.getBoundingClientRect(), nr = nameEl.getBoundingClientRect(), tr = tagEl.getBoundingClientRect();
+      var rr0 = root.getBoundingClientRect(), nr = nameEl.getBoundingClientRect(), tr = tagEl.getBoundingClientRect(), er = enEl.getBoundingClientRect();
       var tagTop = tr.top - rr0.top, nameTop = nr.top - rr0.top;
       var tspan = tagEl.querySelector('.ri-w');
       var tagGlyphTop = tspan ? tspan.getBoundingClientRect().top - rr0.top : tagTop;
       var nb = { x: nr.left - rr0.left + nr.width * 0.02, y: nameTop + nr.height * 0.1, w: nr.width * 0.96, h: nr.height * 0.82 };
-      var wy = (nameTop + nr.height + tagGlyphTop) / 2;
+      // 파동은 영어 이름 아래와 한 줄 소개 사이에 둔다.
+      var enBottom = er.bottom - rr0.top;
+      var wy = (enBottom + tagGlyphTop) / 2;
       var rnd = rng(31), dots = [];
       for (var i = 0; i < 28; i++) dots.push({ x: lerp(-L.W * 0.02, L.W * 1.02, i / 27), ang: (i / 28) * TAU + rnd() * 0.5, dist: (0.16 + rnd() * 0.3) * Math.min(L.W, L.H), o: Math.abs(i / 27 - 0.5) * 2 * 0.5 + rnd() * 0.15 });
-      L.fin = { nb: nb, nc: { x: nb.x + nb.w / 2, y: nb.y + nb.h / 2 }, fs: nfs, wy: wy, k: TAU / (L.land ? L.W * 0.42 : L.W * 0.9), a0: (tagGlyphTop - nameTop - nr.height) * 0.36, af: (tagGlyphTop - nameTop - nr.height) * 0.2, dots: dots };
+      L.fin = { nb: nb, nc: { x: nb.x + nb.w / 2, y: nb.y + nb.h / 2 }, fs: nfs, wy: wy, k: TAU / (L.land ? L.W * 0.42 : L.W * 0.9), a0: (tagGlyphTop - enBottom) * 0.36, af: (tagGlyphTop - enBottom) * 0.2, dots: dots };
       api.ctaTop = Math.round(tr.bottom - rr0.top + ctaGap);
       el.style.setProperty('--ri-cta-top', api.ctaTop + 'px');
       // 손가락 길
@@ -1323,6 +1330,7 @@
       var fv = blur > 0.05 ? 'blur(' + blur.toFixed(2) + 'px)' : 'none';
       if (nameEl._f !== fv) { nameEl.style.filter = fv; nameEl._f = fv; }
       setT(nameEl, 'scale(' + lerp(1.05, 1, na).toFixed(4) + ')');
+      setO(enEl, E.outC(seg(s, 0.8, 1.2)));
       wordAnim(tagW, t, T.end + 0.98, 0.09, 0.6);
       var fr = Math.floor(t * 24), gx = ((fr * 73) % 61) - 30, gy = ((fr * 41) % 53) - 26;
       setT(grain, 'translate3d(' + gx + 'px,' + gy + 'px,0)');
@@ -1342,7 +1350,7 @@
       if (tt >= T.f2 && tt < T.f3) drawF2(ctx, tt, L);
       if (tt >= T.f3 && tt < T.f4) drawF3(ctx, tt, L);
       if (tt >= T.f4 && tt < T.end + 0.7) drawF4(ctx, tt, L);
-      if (tt >= T.end) drawFinale(ctx, tt, L);
+      if (tt >= T.end) drawFinale(ctx, tt, L, tt >= DUR ? extraPh : 0);
       if (tt >= T.f4 + 1.0 && tt < T.end + 0.9) drawHand(ctx, tt, L);
       var pen = tt >= T.f4 ? penAt(tt, L) : null;
       if (pen && pen.a > 0) drawPen(ctx, pen, L);
@@ -1354,7 +1362,7 @@
       raf = 0;
       if (!playing || dead) return;
       var dt = (now - last) / 1000; last = now;
-      t += clamp(dt, 0, 0.1);
+      t += clamp(dt, 0, 0.1) * SPEED;
       if (t >= DUR) { t = DUR; render(t); finish(); return; }
       render(t);
       raf = requestAnimationFrame(frame);
@@ -1375,7 +1383,24 @@
       playing = false; if (raf) cancelAnimationFrame(raf); raf = 0;
       root.classList.add('ri-done'); setPauseUi();
       if (!ended) { ended = true; if (onEnd) { try { onEnd(); } catch (e) { setTimeout(function () { throw e; }); } } }
+      startIdle();
     }
+    // 끝 장면 파동만 계속 흐르게 한다. 사이트의 「움직임 멈춤」(html.motion-paused)이면 멈춘다.
+    function idleOk() { return !document.documentElement.classList.contains('motion-paused'); }
+    function startIdle() {
+      if (idleRaf || dead || !ended || !idleOk()) return;
+      idleLast = performance.now(); idleRaf = requestAnimationFrame(idleFrame);
+    }
+    function stopIdle() { if (idleRaf) cancelAnimationFrame(idleRaf); idleRaf = 0; }
+    function idleFrame(now) {
+      idleRaf = 0;
+      if (dead || !ended || !idleOk()) return;
+      var dt = clamp((now - idleLast) / 1000, 0, 0.1); idleLast = now;
+      extraPh = (extraPh + dt * IDLE_W) % (TAU * 64);
+      render(DUR);
+      idleRaf = requestAnimationFrame(idleFrame);
+    }
+    function onMotion(e) { if (e && e.detail && e.detail.paused) stopIdle(); else startIdle(); }
     function skip() {
       if (dead || ended) return;
       root.classList.remove('ri-flash'); void root.offsetWidth; root.classList.add('ri-flash');
@@ -1383,6 +1408,7 @@
     }
     function replay() {
       if (dead) return;
+      stopIdle(); extraPh = 0;
       ended = false; root.classList.remove('ri-done', 'ri-flash'); t = 0; render(t); playing = false; play();
     }
     function seek(v) { t = clamp(+v || 0, 0, DUR); render(t); return t; }
@@ -1393,6 +1419,7 @@
     bPause.addEventListener('click', function () { if (playing) pause(); else play(); });
     bSkip.addEventListener('click', skip);
     document.addEventListener('visibilitychange', onVis);
+    document.addEventListener('gm:motion-change', onMotion);
     var ro = typeof ResizeObserver === 'function' ? new ResizeObserver(function () { relayout(); }) : null;
     if (ro) ro.observe(root); else window.addEventListener('resize', relayout);
     setPauseUi();
@@ -1409,8 +1436,9 @@
     api.duration = DUR;
     api.destroy = function () {
       if (dead) return;
-      dead = true; playing = false; if (raf) cancelAnimationFrame(raf);
+      dead = true; playing = false; if (raf) cancelAnimationFrame(raf); stopIdle();
       document.removeEventListener('visibilitychange', onVis);
+      document.removeEventListener('gm:motion-change', onMotion);
       if (ro) ro.disconnect(); else window.removeEventListener('resize', relayout);
       root.remove();
       if (window.__intro === api) delete window.__intro;
