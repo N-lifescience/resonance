@@ -215,7 +215,7 @@ export function renderDocument(markdown, document) {
   <header class="masthead">
     <div class="brand-row">
       <div class="brand"><svg class="brand-wave" viewBox="0 0 64 32" fill="none" aria-hidden="true"><path d="M2 16h8c5 0 5-12 10-12s5 24 10 24S35 4 40 4s5 12 10 12h12" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><span>공명</span></div>
-      <span class="site-address">n-lifescience.github.io/exploragram</span>
+      <span class="site-address">n-lifescience.github.io/resonance</span>
     </div>
     <p class="tagline">교실의 진동수를 맞추다</p>
     <h1>${renderInline(title)}</h1>
