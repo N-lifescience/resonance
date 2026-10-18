@@ -29,6 +29,7 @@ const demote = (md) => md.replace(/^# .*\n+/, '').replace(/^(#+) /gm, '#$1 ');  
 const title = (rel) => (/^# (.+)$/m.exec(read(rel)) || [, rel])[1];
 const parts = [
   ['절차와 기준', 'SKILL.md'],
+  ['기능 목록', 'references/feature-menu.md'],
   ['익스플로라그램', 'references/exploragram.md'],
   ['화면과 원본 모양', 'references/design.md'],
   ['부품 사전', 'references/components.md'],
