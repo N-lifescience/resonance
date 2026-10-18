@@ -288,7 +288,10 @@ export async function encodeCapture(capture, stem) {
 export async function encodeCompanions(stem, poster = null) {
   await run('ffmpeg', ['-y', '-loglevel', 'error', '-i', `${stem}.mp4`, '-an', '-c:v', 'libvpx-vp9', '-b:v', '0', '-crf', '32', '-row-mt', '1', '-pix_fmt', 'yuv420p', `${stem}.webm`]);
   const input = poster ? ['-i', poster] : ['-ss', '2', '-i', `${stem}.mp4`];
-  await run('ffmpeg', ['-y', '-loglevel', 'error', ...input, '-frames:v', '1', '-vf', `scale=${WIDTH}:${HEIGHT}:flags=lanczos`, '-c:v', 'libwebp', '-quality', '88', `${stem}-poster.webp`]);
+  // ffmpeg에 libwebp가 없는 판이 많아 PNG로 뽑은 뒤 cwebp로 바꾼다
+  await run('ffmpeg', ['-y', '-loglevel', 'error', ...input, '-frames:v', '1', '-vf', `scale=${WIDTH}:${HEIGHT}:flags=lanczos`, `${stem}-poster.png`]);
+  await run('cwebp', ['-quiet', '-q', '88', `${stem}-poster.png`, '-o', `${stem}-poster.webp`]);
+  rmSync(`${stem}-poster.png`, { force: true });
 }
 export function printSizes(stem) {
   for (const suffix of ['.mp4', '.webm', '-poster.webp']) {

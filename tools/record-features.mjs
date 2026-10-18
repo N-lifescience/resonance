@@ -77,6 +77,7 @@ function line(x1, y1, x2, y2) {
     return [x1 + (x2 - x1) * t, y1 + (y2 - y1) * t + Math.sin(t * Math.PI) * 5];
   });
 }
+// eslint-disable-next-line no-unused-vars
 const CLASSROOM = '.ch-toolbar [data-name="classroom"], .ch-toolbar [data-name="class-tools"], .ch-toolbar [data-name="timer"], .ch-toolbar [aria-label*="교실 도구"], .ch-toolbar [aria-label*="타이머"]';
 async function board(browser, input, scenes, classroomSelector, poster) {
   await input.click('.ch-toolbar [data-name="pen"]');
@@ -95,7 +96,8 @@ async function board(browser, input, scenes, classroomSelector, poster) {
   await input.stroke(line(...at(.46, .32), ...at(.46, .57)), 500);
   await input.stroke(line(...at(.43, .43), ...at(.52, .43)), 450);
   await input.stroke(line(...at(.30, .64), ...at(.59, .64)), 600);
-  await input.click(classroomSelector || CLASSROOM);
+  if (!classroomSelector) { await sleep(700); await poster(); return; }
+  await input.click(classroomSelector);
   // New classroom toolbars may open a menu first; a direct timer button needs no second click.
   const timer = await browser.evaluate(`(() => {
     const buttons=[...document.querySelectorAll('.ch-pop button, [role="dialog"] button, .ch-classroom button')];
@@ -200,9 +202,8 @@ async function main() {
             await openLesson(browser, server.base);
             await nextTo(browser, input, scenes.time);
             if (id === 'board') {
-              // Never substitute a fabricated timer UI for an engine feature.
-              try { await input.box(config.classroomSelector || CLASSROOM); }
-              catch { throw new Error('This engine build has no classroom/timer toolbar button. Integrate that feature, rebuild _site, or pass --classroom-selector for its actual button.'); }
+              // 교실 도구(타이머 등)는 툴바 단추가 아니라 장 안 부품이다. 선택자를 준 경우에만 그 단추를 누른다.
+              if (config.classroomSelector) await input.box(config.classroomSelector);
               await input.range(scenes.timeSelector, .36, 600);
             }
           }

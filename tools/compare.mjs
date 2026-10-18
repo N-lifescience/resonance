@@ -157,7 +157,7 @@ async function main() {
       const png = join(screenshots, `${String(state.slide).padStart(2, '0')}-${stateName}.png`);
       if (existsSync(png)) {
         const target = join(config.out, `${id}.webp`);
-        await run('ffmpeg', ['-y', '-loglevel', 'error', '-i', png, '-vf', 'scale=960:-2:flags=lanczos', '-frames:v', '1', '-c:v', 'libwebp', '-quality', '85', target]);
+        await run('cwebp', ['-quiet', '-q', '85', '-resize', '960', '0', png, '-o', target]);   // ffmpeg에 libwebp가 없는 판이 많다
         shot = publicFile(`${id}.webp`);
       } else notes.push('미리보기 없음');
     } catch (error) {
