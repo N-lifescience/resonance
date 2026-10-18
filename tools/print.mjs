@@ -35,7 +35,7 @@ const FEATURES = [
 const ASSETS = [
   ...FEATURES.map(([slug]) => `site/assets/video/feature-${slug}-poster.webp`),
   'site/assets/img/sci-before.png',
-  'site/assets/img/sci-after.png',
+  'site/assets/img/sci-after-live.webp',
 ];
 
 const escapeHtml = (text) => String(text).replace(/[&<>"']/g, (char) => ({
@@ -176,7 +176,7 @@ ${FEATURES.map(([slug, title], i) => `<figure class="feature-card feature-${slug
   return `<figure class="comparison" aria-label="PPT와 공명 수업 화면 비교">
   <div class="comparison-panel"><img src="../../site/assets/img/sci-before.png" alt="변환 전 PPT 수업 화면" width="1280" height="720"><p class="image-label">변환 전 <strong>PPT</strong></p></div>
   <span class="comparison-arrow" aria-hidden="true">→</span>
-  <div class="comparison-panel"><img src="../../site/assets/img/sci-after.png" alt="변환 후 공명 수업 화면" width="1280" height="720"><p class="image-label">변환 후 <strong>공명</strong></p></div>
+  <div class="comparison-panel"><img src="../../site/assets/img/sci-after-live.webp" alt="변환 후 공명 수업 화면: 시간 막대를 밀어 입자가 퍼지고 아래에 판서 툴바가 있는 화면" width="1600" height="1000"><p class="image-label">변환 후 <strong>공명</strong></p></div>
   <figcaption class="sr-only">PPT에서 공명 수업 화면으로</figcaption>
 </figure>`;
 }
@@ -215,7 +215,7 @@ export function renderDocument(markdown, document) {
   <header class="masthead">
     <div class="brand-row">
       <div class="brand"><svg class="brand-wave" viewBox="0 0 64 32" fill="none" aria-hidden="true"><path d="M2 16h8c5 0 5-12 10-12s5 24 10 24S35 4 40 4s5 12 10 12h12" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><span>공명</span></div>
-      <span class="site-address">n-lifescience.github.io/resonance</span>
+      <span class="site-address">엔의생명과학.한국/공명</span>
     </div>
     <p class="tagline">교실의 진동수를 맞추다</p>
     <h1>${renderInline(title)}</h1>
