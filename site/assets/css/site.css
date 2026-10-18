@@ -32,6 +32,8 @@ h3 { font-size:clamp(1.4rem,2.2vw,1.9rem); }
 .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip-path:inset(50%); border:0; }
 /* 의미 단위: 줄은 단위 사이에서만 바뀐다. 단위가 줄보다 길면 단위 안에서 어절 단위로 접힌다. */
 .u { display:inline-block; max-inline-size:100%; }
+/* 문장 단위: 안내문의 문장마다 줄을 바꾼다. */
+.sent { display:block; }
 .wrap { width:min(100%,1328px); padding-inline:clamp(16px,5vw,64px); margin-inline:auto; }
 .section { padding-block:clamp(72px,9vw,128px); }
 .eyebrow { margin:0 0 14px; color:var(--clay-deep); font-size:16px; font-weight:750; letter-spacing:.02em; }

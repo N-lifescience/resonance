@@ -1310,23 +1310,29 @@
         c.style.fontSize = sfs + 'px'; c.style.left = L.S.x + 'px'; c.style.width = L.S.w + 'px'; c.style.maxWidth = 'none'; c.style.top = sTop + 'px';
       });
       // 끝 화면 로고 묶음
-      var nfs = L.land ? Math.min(L.C.h * 0.2, L.W * 0.13) : Math.min(L.W * 0.26, L.C.h * 0.16);
-      nfs = clamp(nfs, 64, 560);
-      var tfs = clamp(nfs * 0.17, 19, 96), gap = nfs * 0.46, ctaH = 56, ctaGap = Math.max(28, nfs * 0.24);
-      nameEl.style.fontSize = nfs + 'px'; tagEl.style.fontSize = tfs + 'px';
-      enEl.style.fontSize = clamp(nfs * 0.15, 16, 72) + 'px'; enEl.style.marginTop = (nfs * 0.06) + 'px';
-      nameEl.style.transform = 'none'; nameEl._t = null;
-      tagEl.style.marginTop = gap + 'px';
-      // 끝 장면 고리: 「공명」과 resonance를 감싸고, 한 줄 소개는 고리 바깥 아래에 둔다.
-      var nW = nameEl.offsetWidth, blockTop = nameEl.offsetTop, blockBot = enEl.offsetTop + enEl.offsetHeight;
-      var ringR = Math.min(Math.max(nW * 0.72, (blockBot - blockTop) * 0.82), L.W * 0.44);
-      var ringAmp = ringR * 0.13;
-      var ringCy = (blockTop + blockBot) / 2;
-      gap = Math.max(gap, ringCy + ringR + ringAmp + nfs * 0.2 - blockBot);
-      tagEl.style.marginTop = gap + 'px';
-      var ringAbove = Math.max(0, ringR + ringAmp - (ringCy - blockTop));
-      var blockH = ringAbove + lock.offsetHeight + ctaGap + ctaH;
-      var top = L.C.y + ringAbove + Math.max(0, (L.C.h - blockH) * 0.46);
+      // 끝 장면 고리는 「공명」, resonance, 한 줄 소개를 모두 감싸고, 단추는 고리 아래에 둔다.
+      // 화면에 다 들어가지 않으면 글자를 조금씩 줄여 다시 잰다.
+      var nfs0 = L.land ? Math.min(L.C.h * 0.18, L.W * 0.12) : Math.min(L.W * 0.22, L.C.h * 0.15);
+      var nfs, tfs, gap, ctaH = 56, ctaGap, ringR, ringAmp, ringCy, blockTop, tagBot, ringAbove, needH, rg = document.createRange();
+      for (var pass = 0; pass < 6; pass++) {
+        nfs = clamp(nfs0, 48, 560); tfs = clamp(nfs * 0.19, 18, 96); gap = nfs * 0.5; ctaGap = Math.max(28, nfs * 0.3);
+        nameEl.style.fontSize = nfs + 'px'; tagEl.style.fontSize = tfs + 'px';
+        enEl.style.fontSize = clamp(nfs * 0.15, 16, 72) + 'px'; enEl.style.marginTop = (nfs * 0.06) + 'px';
+        nameEl.style.transform = 'none'; nameEl._t = null;
+        tagEl.style.marginTop = gap + 'px';
+        rg.selectNodeContents(tagEl);
+        var nW = nameEl.offsetWidth, tW = rg.getBoundingClientRect().width;
+        blockTop = nameEl.offsetTop; tagBot = tagEl.offsetTop + tagEl.offsetHeight;
+        ringCy = (blockTop + tagBot) / 2;
+        var halfH = (tagBot - blockTop) / 2;
+        ringR = Math.max(nW * 0.95, (Math.hypot(tW / 2, halfH) + nfs * 0.12) / 0.88);
+        ringAmp = ringR * 0.1;
+        ringAbove = ringR + ringAmp - halfH;
+        needH = 2 * (ringR + ringAmp) + ctaGap + ctaH + 56;
+        if ((needH <= L.C.h && ringR + ringAmp <= L.W * 0.48) || pass === 5) break;
+        nfs0 = nfs * Math.min(0.92, Math.sqrt(L.C.h / needH), (L.W * 0.48) / (ringR + ringAmp));
+      }
+      var top = L.C.y + ringAbove + Math.max(0, (L.C.h - needH) * 0.46);
       lock.style.top = top + 'px';
       var rr0 = root.getBoundingClientRect(), nr = nameEl.getBoundingClientRect(), tr = tagEl.getBoundingClientRect(), er = enEl.getBoundingClientRect();
       var tagTop = tr.top - rr0.top, nameTop = nr.top - rr0.top;
@@ -1339,8 +1345,8 @@
       var rnd = rng(31), dots = [];
       for (var i = 0; i < 28; i++) dots.push({ x: lerp(-L.W * 0.02, L.W * 1.02, i / 27), ang: (i / 28) * TAU + rnd() * 0.5, dist: (0.16 + rnd() * 0.3) * Math.min(L.W, L.H), o: Math.abs(i / 27 - 0.5) * 2 * 0.5 + rnd() * 0.15 });
       L.fin = { nb: nb, nc: { x: nb.x + nb.w / 2, y: nb.y + nb.h / 2 }, fs: nfs, wy: wy, k: TAU / (L.land ? L.W * 0.42 : L.W * 0.9), a0: (tagGlyphTop - enBottom) * 0.36, af: (tagGlyphTop - enBottom) * 0.2, dots: dots,
-        ring: { cx: nr.left - rr0.left + nr.width / 2, cy: nameTop + (enBottom - nameTop) / 2, R: ringR, amp: ringAmp, n: 6 } };
-      api.ctaTop = Math.round(tr.bottom - rr0.top + ctaGap);
+        ring: { cx: nr.left - rr0.left + nr.width / 2, cy: nameTop + (tr.bottom - rr0.top - nameTop) / 2, R: ringR, amp: ringAmp, n: 6 } };
+      api.ctaTop = Math.round(L.fin.ring.cy + ringR + ringAmp + ctaGap);
       el.style.setProperty('--ri-cta-top', api.ctaTop + 'px');
       // 손가락 길
       var K = L.f1.K, tb = L.f1.tb, g2 = panelGeom(L.S);
