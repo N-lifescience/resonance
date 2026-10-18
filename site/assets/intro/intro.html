@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>공명 인트로</title>
+<meta name="description" content="공명 첫 화면의 15초 인트로 데모. 사이트가 인트로를 이어받는 방식을 보여 줍니다.">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="intro.css">
+<style>
+  :root {
+    --clay: #D97757; --clay-deep: #C15F3C; --char: #141413; --char-2: #1F1E1C; --paper: #F4F1EA; --mute: #A8A49B; --tide: #2B6E69;
+    --font: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--char); color: var(--paper); font: 17px/1.5 var(--font); word-break: keep-all; overflow-wrap: anywhere; }
+  body { overflow: hidden; }
+
+  /* 인트로 자리: 화면 전체. 사이트에서는 첫 화면 영역에 그대로 쓴다 */
+  #intro { position: fixed; inset: 0; }
+
+  /* 가짜 헤더 자리(위 72px). 인트로가 도는 동안에도 수업 코드를 바로 넣을 수 있어야 한다 */
+  .hd { position: fixed; top: 0; left: 0; right: 0; z-index: 10; height: 72px; display: flex; align-items: center; gap: 12px; padding: 0 max(16px, 3vw); }
+  .hd::before { content: ''; position: absolute; inset: 0; background: linear-gradient(rgba(20, 20, 19, .82), rgba(20, 20, 19, 0)); pointer-events: none; }
+  .logo { position: relative; font-weight: 900; font-size: 22px; letter-spacing: -.03em; color: var(--paper); text-decoration: none; }
+  .nav { position: relative; display: flex; gap: 4px; margin: 0 auto; padding: 4px; border: 1px solid rgba(244, 241, 234, .14); border-radius: 999px; background: rgba(244, 241, 234, .07); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
+  .nav a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border-radius: 999px; color: var(--paper); font-size: 16px; font-weight: 600; text-decoration: none; }
+  .nav a:hover { background: rgba(244, 241, 234, .1); }
+  .join { position: relative; display: flex; gap: 6px; margin-left: auto; }
+  .nav + .join { margin-left: 0; }
+  .join input { width: 7.2em; min-height: 44px; padding: 0 14px; border: 1px solid rgba(244, 241, 234, .24); border-radius: 999px; background: rgba(31, 30, 28, .72); color: var(--paper); font: 600 16px var(--font); }
+  .join input::placeholder { color: var(--mute); }
+  .join button { min-height: 44px; padding: 0 16px; border: 0; border-radius: 999px; background: var(--paper); color: var(--char); font: 700 16px var(--font); cursor: pointer; }
+  .hd a:focus-visible, .hd input:focus-visible, .hd button:focus-visible, .cta a:focus-visible, .cta button:focus-visible { outline: 3px solid var(--clay); outline-offset: 2px; }
+  @media (max-width: 760px) { .nav { display: none; } .join { margin-left: auto; } }
+
+  /* 끝나면 사이트가 얹는 단추 자리. 인트로가 알려 주는 --ri-cta-top 높이에 놓는다 */
+  .cta { position: absolute; left: 0; right: 0; top: var(--ri-cta-top, 68%); z-index: 3; display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; padding: 0 16px; opacity: 0; transform: translateY(16px); visibility: hidden; transition: opacity .7s cubic-bezier(.16, 1, .3, 1), transform .7s cubic-bezier(.16, 1, .3, 1), visibility 0s .7s; }
+  .cta.on { opacity: 1; transform: none; visibility: visible; transition-delay: 0s; }
+  .cta a { display: inline-flex; align-items: center; justify-content: center; min-width: 9.5em; min-height: 56px; padding: 0 26px; border-radius: 999px; font-size: 18px; font-weight: 700; text-decoration: none; transition: background .15s, border-color .15s; }
+  .cta .primary { background: var(--clay); color: #fff; }
+  .cta .primary:hover { background: var(--clay-deep); }
+  .cta .ghost { border: 1.5px solid rgba(244, 241, 234, .36); background: rgba(31, 30, 28, .5); color: var(--paper); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+  .cta .ghost:hover { border-color: var(--paper); }
+  .cta .again { flex-basis: 100%; display: flex; justify-content: center; }
+  .cta .again button { min-height: 44px; padding: 0 14px; border: 0; background: none; color: var(--mute); font: 600 15px var(--font); text-decoration: underline; text-underline-offset: .25em; cursor: pointer; }
+  .cta .again button:hover { color: var(--paper); }
+
+  .capture .hd, .capture .cta { display: none; }
+</style>
+</head>
+<body>
+<header class="hd">
+  <a class="logo" href="#" aria-label="공명 처음 화면">공명</a>
+  <nav class="nav" aria-label="주 메뉴"><a href="#">살펴보기</a><a href="#">제작하기</a></nav>
+  <form class="join" id="join" aria-label="수업 입장">
+    <input id="code" inputmode="numeric" autocomplete="off" placeholder="수업 코드" aria-label="수업 코드">
+    <button type="submit">입장</button>
+  </form>
+</header>
+
+<main id="intro">
+  <div class="cta" id="cta">
+    <a class="primary" href="#">살펴보기</a>
+    <a class="ghost" href="#">제작하기</a>
+    <div class="again"><button type="button" id="again">처음부터 다시 보기</button></div>
+  </div>
+</main>
+
+<script src="intro.js"></script>
+<script>
+  // 주소 뒤에 ?t=3.2 를 붙이면 그 시각에 멈춘다. ?capture=1 은 영상 캡처용(헤더·단추 없이, 위 여백 0)
+  (function () {
+    var q = new URLSearchParams(location.search);
+    var cap = q.get('capture') === '1', hasT = q.has('t');
+    if (cap) document.documentElement.classList.add('capture');
+    var cta = document.getElementById('cta');
+    var intro = window.ResonanceIntro.mount(document.getElementById('intro'), {
+      safeTop: q.has('safeTop') ? +q.get('safeTop') : (cap ? 0 : 72),
+      startAt: hasT ? +q.get('t') : 0,
+      autoplay: !hasT && !cap,
+      controls: !cap,
+      onEnd: function () { if (!cap) cta.classList.add('on'); }
+    });
+    document.getElementById('again').addEventListener('click', function () { cta.classList.remove('on'); intro.replay(); });
+    document.getElementById('join').addEventListener('submit', function (e) { e.preventDefault(); document.getElementById('code').focus(); });
+  })();
+</script>
+</body>
+</html>
