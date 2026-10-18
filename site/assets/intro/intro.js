@@ -1242,8 +1242,12 @@
         c.style.fontSize = L.capFs + 'px'; c.style.left = L.C.x + 'px'; c.style.top = '';
         c.style.maxWidth = (L.land ? L.C.w * 0.6 : L.C.w) + 'px';
       });
-      var capH = cap1.offsetHeight;
-      cap1.style.top = cap2.style.top = (L.C.y + L.C.h - capH) + 'px';
+      // 세로 화면은 실제 조작 단추 위에 여백을 두고, 자막마다 높이를 잰다.
+      var capBottom = L.C.y + L.C.h;
+      if (!L.land && opts.controls !== false) capBottom = Math.min(capBottom, ctrl.offsetTop - 20);
+      [cap1, cap2].forEach(function (c) {
+        c.style.top = Math.max(L.C.y, capBottom - c.offsetHeight) + 'px';
+      });
       // 기능 목록
       list.style.display = L.land ? '' : 'none'; pt.style.display = L.land ? 'none' : '';
       if (L.land) {

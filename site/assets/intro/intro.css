@@ -32,14 +32,14 @@
 .ri-list { position: absolute; margin: 0; padding: 0 0 0 1.1em; }
 .ri-li { position: relative; margin: 0 0 .62em; color: rgba(168, 164, 155, .4); will-change: color; }
 .ri-li:last-child { margin-bottom: 0; }
-.ri-num { display: block; margin: 0 0 .32em; font: 600 max(11px, .34em)/1.2 var(--ri-mono); letter-spacing: .1em; }
+.ri-num { display: block; margin: 0 0 .32em; font: 600 max(14px, .34em)/1.2 var(--ri-mono); letter-spacing: .1em; }
 .ri-tt { display: block; font-weight: 800; letter-spacing: -.025em; line-height: 1.12; text-wrap: balance; }
 .ri-mark { position: absolute; left: 0; top: 0; width: 3px; height: 100px; border-radius: 3px; background: var(--ri-clay); transform-origin: 0 0; box-shadow: 0 0 14px rgba(217, 119, 87, .55); }
 
 /* 기능 넷: 세로 화면은 지금 기능만 크게 + 진행 막대 */
 .ri-pt { position: absolute; }
 .ri-pti { position: absolute; left: 0; right: 0; top: 0; }
-.ri-pti .ri-num { color: var(--ri-mute); font-size: max(13px, .4em); margin-bottom: .45em; }
+.ri-pti .ri-num { color: var(--ri-mute); font-size: max(14px, .4em); margin-bottom: .45em; }
 .ri-pti .ri-tt { color: var(--ri-paper); }
 .ri-prog4 { position: absolute; left: 0; right: 0; display: flex; gap: 6px; }
 .ri-prog4 > span { flex: 1; height: 3px; border-radius: 3px; background: rgba(244, 241, 234, .16); overflow: hidden; }
