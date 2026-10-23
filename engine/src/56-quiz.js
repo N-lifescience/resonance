@@ -79,7 +79,7 @@ const Quiz = {
     item.fb.className = `ch-fb ${ok ? 'is-ok' : 'is-bad'}`;
     if (!ok) shake(o);
     else this.solve(item);
-    if (o.tagName === 'BUTTON') o.blur();
+    o.blur();   // div 보기(role=button)도: 포커스가 남으면 Space·Enter가 넘기기 대신 그 보기를 다시 누른다
   },
 
   toggle(item, o) {
@@ -89,7 +89,7 @@ const Quiz = {
     o.classList.toggle('is-pick', on);
     item.fb.textContent = '';
     item.fb.className = 'ch-fb';
-    if (o.tagName === 'BUTTON') o.blur();
+    o.blur();
   },
 
   // 여러 개 고르기에서 잘못 고른 것·놓친 것 아래에 그 보기의 이유(data-why)를 보인다
@@ -150,9 +150,16 @@ const Short = {
     }
   },
 
+  // 교사 화면(전자칠판)은 입력칸에 포커스를 두지 않는다. 두면 화면 키보드가 뜨고 리모컨 넘기기가 그 칸으로 간다.
   send(item) {
     const t = LiveCore.tidy(item.input.value);
-    if (!t) { item.fb.textContent = '먼저 적어 주세요.'; item.fb.className = 'ch-fb is-bad'; item.input.focus(); return; }
+    if (!t) {
+      item.fb.textContent = '먼저 적어 주세요.';
+      item.fb.className = 'ch-fb is-bad';
+      if (Live.role === 'student') item.input.focus();
+      return;
+    }
+    item.input.blur();   // 단추를 눌러도 포커스가 칸에 남는 브라우저(사파리)가 있다
     item.fb.textContent = Live.role === 'student' ? '보냈어요. 고쳐서 다시 보내도 돼요.' : '적었어요.';
     item.fb.className = 'ch-fb is-ok';
     emit('short-answer', item, t);

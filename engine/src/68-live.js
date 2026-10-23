@@ -136,6 +136,14 @@ const LiveCore = {
     return { put, more, del, sent: next };
   },
 
+  // 한 장에 답한 학생 수. maps는 그 장 활동마다의 Map(sid → 값)(없으면 null), alive(sid)는 지금 접속 중인지.
+  // 여러 활동에 답한 학생도 한 명으로 센다. 나간 학생은 빼서 '접속 m명 중 n명'의 n이 m을 넘지 않는다.
+  answered(maps, alive) {
+    const sids = new Set();
+    for (const m of maps) if (m) for (const sid of m.keys()) if (alive(sid)) sids.add(sid);
+    return sids.size;
+  },
+
   // 학생이 받아 둔 판(have)이 교사가 알린 판(rev)만큼 새것인가. 판 번호는 늘기만 하고, 0은 '아무것도 안 쓴 빈 쪽'이다.
   inkFresh(have, rev) { return have === rev || (rev > 0 && have > rev); },
 
@@ -220,6 +228,9 @@ const LiveCore = {
           ? { ep: p.ink.ep, pg: p.ink.pg, rev: p.ink.rev } : null,
         board: p.board && typeof p.board === 'object' && int(p.board.i, 0, 199) && int(p.board.n, 1, 200) && p.board.i < p.board.n && BOARD_BGS.includes(p.board.bg)
           ? { i: p.board.i, n: p.board.n, bg: p.board.bg } : null,
+        // 툴바 타이머가 떠 있을 때만: 남은 ms, 처음 정한 초, 가는 중인지
+        timer: p.timer && typeof p.timer === 'object' && int(p.timer.left, 0, 1e8) && int(p.timer.total, 1, 1e5) && typeof p.timer.run === 'boolean'
+          ? { left: p.timer.left, total: p.timer.total, run: p.timer.run } : null,
       };
     }
     return null;
@@ -315,6 +326,7 @@ const Live = {
   peek: null,          // 칠판에 띄운 학생 값 { input, before }
   panel: null,
   ui: null,
+  tallyEl: null,       // 오른쪽 위 응답 현황(접속 m명 중 n명 제출)
   dist: null,
   distOn: false,
   distRaf: 0,
@@ -355,6 +367,10 @@ const Live = {
   joinUi: null,
   bar: null,
   barKey: '',
+  timerEl: null,       // 교사 툴바 타이머의 남은 시간
+  timerTick: 0,
+  timerEnd: 0,         // 가는 중이면 이 기기 시계로 끝나는 시각, 멈춤이면 0
+  timerLeft: 0,        // 멈춤일 때 남은 ms
 
   init() {
     const q = new URLSearchParams(location.search);
@@ -369,6 +385,8 @@ const Live = {
     on('ink-dirty', () => this.inkDirty());
     on('session', () => { this.inkEp++; this.sendState(); });   // 반을 바꿨다: 학생은 받아 둔 판서를 버리고 새로 받는다
     on('board-mode', () => this.sendState());   // 칠판을 열고 닫거나 칠판 쪽·바탕을 바꾸면 학생 화면도 맞춘다
+    on('pop-timer', () => { this.sendState(); this.renderTally(); });   // 툴바 타이머를 띄우거나 멈추면 학생 화면의 남은 시간도 맞춘다
+    on('pop-timer-moved', () => this.renderTally());
     on('features', () => this.onFeatures());
     // 점검(D)·인쇄는 단계 막대를 잠깐 모두 연다. 그 상태가 학생에게 가거나 연 범위로 남지 않게 한다.
     on('print-before', () => { this.frozen = true; });
@@ -470,6 +488,7 @@ const Live = {
       tid: this.tid, slide, shown, steps, reach: this.reach,
       lesson: { key: Session.deck, n: Stage.slides.length, title: document.title.slice(0, 120) },
       site: this.siteName(),
+      timer: PopTimer.wire(),
     };
     const cur = this.inkLive() && this.inkCur();
     if (cur) {
@@ -613,6 +632,7 @@ const Live = {
     this.track();
     this.sendState();
     this.renderDist();
+    this.renderCount();
   },
 
   onInbox(event, raw) {
@@ -682,10 +702,56 @@ const Live = {
     return n;
   },
 
+  // 지금 장의 응답 현황 { n: 답한 학생, of: 접속 학생, word }. 학생이 답하는 활동이 없는 장이면 null.
+  // 퀴즈·투표·단답이 있으면 '제출', 슬라이더만 있으면 '참여'(값을 바꾼 학생)로 쓴다.
+  tally() {
+    const i = Nav.state.slide;
+    const answer = [...this.quizzes(i).map((it) => [this.picks, this.partKey(it, i, 'q')]),
+      ...this.polls(i).map((it) => [this.picks, this.partKey(it, i, 'p')]),
+      ...this.shorts(i).map((it) => [this.texts, this.partKey(it, i, 's')])];
+    const parts = [...answer, ...this.ranges(i).map((el) => [this.vals, this.keyOf(el, i)])];
+    if (!parts.length) return null;
+    const of = this.count();
+    const now = Date.now();
+    const n = LiveCore.answered(parts.map(([store, key]) => store.get(`${i}|${key}`)), (sid) => now - (this.seen.get(sid) || 0) <= LIVE_GONE_MS);
+    return { n, of, word: answer.length ? '제출' : '참여' };
+  },
+
+  tallyText(t) { return t.of > 0 && t.n === t.of ? `접속 ${t.of}명 모두 ${t.word}` : `접속 ${t.of}명 중 ${t.n}명 ${t.word}`; },
+
+  // 교사 화면 오른쪽 위: 응답을 받는 장에서만 보인다. 누르면 「학생 보기」를 연다(실시간 창이 열려 있으면 그 창에 같은 줄이 있다).
+  renderTally() {
+    const t = this.role === 'teacher' && this.main ? this.tally() : null;
+    if (!this.tallyEl) {
+      if (!t) return;
+      this.tallyEl = h('button', {
+        type: 'button', class: 'ch-live-tally ch-live-ui', 'data-no-ink': '', hidden: true,
+        onclick: (e) => { this.toggleDist(true); e.currentTarget.blur(); },
+      });
+      document.body.append(this.tallyEl);
+    }
+    const el = this.tallyEl;
+    el.hidden = !t || (!!this.panel && !this.panel.hidden);
+    if (el.hidden) return;
+    // 툴바 타이머와 겹치면(좁은 화면, 옮긴 타이머) 타이머 아래로 내린다
+    el.style.top = '';
+    if (PopTimer.shown()) {
+      const p = PopTimer.el.getBoundingClientRect();
+      const r = el.getBoundingClientRect();
+      if (r.left < p.right && r.right > p.left && r.top < p.bottom && r.bottom > p.top) el.style.top = `${Math.round(p.bottom + 8)}px`;
+    }
+    const text = this.tallyText(t);
+    if (el.textContent === text) return;   // 학생 값이 몰려 와도 글이 같으면 그대로 둔다
+    el.textContent = text;
+    el.classList.toggle('is-all', t.of > 0 && t.n === t.of);
+    el.setAttribute('aria-label', `${text}. 학생 보기 열기`);
+  },
+
   showPanel(open) {
     if (!this.panel) this.buildPanel();
     this.panel.hidden = !open;
     if (open) this.renderPanel();
+    else this.renderTally();
   },
 
   buildPanel() {
@@ -747,7 +813,11 @@ const Live = {
   },
 
   renderCount() {
-    if (this.ui) this.ui.count.textContent = this.role === 'teacher' && this.main ? `참여 ${this.count()}명` : '';
+    if (this.ui) {
+      const t = this.role === 'teacher' && this.main ? this.tally() : null;
+      this.ui.count.textContent = this.role === 'teacher' && this.main ? (t ? this.tallyText(t) : `접속 ${this.count()}명`) : '';
+    }
+    this.renderTally();
   },
 
   toggleDist(force) {
@@ -1080,6 +1150,7 @@ const Live = {
     }
     this.teacher = p;
     this.heard = Date.now();
+    this.timerShow(p.timer);
     this.inkState(p);
     // 교사가 학생이 보던 장으로 오면 다시 따라간다
     if (this.follow || p.slide === Nav.state.slide) this.showSlide(p.slide);
@@ -1177,9 +1248,36 @@ const Live = {
     this.join.hidden = false;
     clearTimeout(this.needTimer);
     this.needTimer = 0;
+    this.timerShow(null);
     this.inkOn = false;
     this.inkReset(0);
     this.inkShow();
+  },
+
+  // 교사 툴바 타이머의 남은 시간(학생 화면 오른쪽 아래). 기기마다 시계가 달라 받은 남은 시간으로 이 기기의 끝 시각을 다시 잡는다.
+  // 교사 상태가 올 때마다(5초) 다시 맞춘다.
+  timerShow(w) {
+    clearInterval(this.timerTick);
+    this.timerTick = 0;
+    if (!w) { if (this.timerEl) this.timerEl.hidden = true; return; }
+    if (!this.timerEl) {
+      this.timerEl = h('div', { class: 'ch-live-timer ch-live-ui', 'data-no-ink': '', role: 'timer' }, h('span'), h('b'));
+      document.body.append(this.timerEl);
+    }
+    this.timerEnd = w.run ? Date.now() + w.left : 0;
+    this.timerLeft = w.left;
+    this.timerEl.hidden = false;
+    if (w.run) this.timerTick = setInterval(() => this.timerDraw(), 250);
+    this.timerDraw();
+  },
+
+  timerDraw() {
+    const left = this.timerEnd ? Math.max(0, this.timerEnd - Date.now()) : this.timerLeft;
+    const done = left <= 0;
+    this.timerEl.firstChild.textContent = done ? '시간' : this.timerEnd ? '남은 시간' : '멈춤';
+    this.timerEl.lastChild.textContent = done ? '끝' : Timer.fmt(left / 1000);
+    this.timerEl.classList.toggle('is-done', done);
+    if (done) { clearInterval(this.timerTick); this.timerTick = 0; }
   },
 
   // ---- 실시간 판서(학생) ----

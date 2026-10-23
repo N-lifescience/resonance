@@ -57,10 +57,30 @@ test('clean: 모양이 맞는 메시지만 받는다', () => {
     tid: 'tttt0000', slide: 1, shown: 0, steps: [2], reach: [null, { shown: 1, steps: [2, 'x'] }], lesson: { key: 'd', n: 2, title: 't' }, site: '../x',
   }, 2);
   assert.deepStrictEqual(plain(s), {
-    tid: 'tttt0000', slide: 1, shown: 0, steps: [2], reach: [null, { shown: 1, steps: [] }], lesson: { key: 'd', n: 2, title: 't' }, site: null, ink: null, board: null,
+    tid: 'tttt0000', slide: 1, shown: 0, steps: [2], reach: [null, { shown: 1, steps: [] }], lesson: { key: 'd', n: 2, title: 't' }, site: null, ink: null, board: null, timer: null,
   });
   assert.equal(LiveCore.clean('state', { tid: 'tttt0000', slide: -1, shown: 0, reach: [] }, 2), null);
   assert.equal(LiveCore.clean('state', { slide: 0, shown: 0, reach: [] }, 2), null, '교사 표시 없는 상태는 버린다');
+});
+
+test('clean: 상태의 툴바 타이머는 모양이 맞을 때만', () => {
+  const base = { tid: 'tttt0000', slide: 0, shown: 0, reach: [null] };
+  const timer = (t) => plain(LiveCore.clean('state', { ...base, timer: t }, 1)).timer;
+  assert.deepStrictEqual(timer({ left: 90500, total: 180, run: true, x: 1 }), { left: 90500, total: 180, run: true });
+  assert.deepStrictEqual(timer({ left: 0, total: 60, run: false }), { left: 0, total: 60, run: false }, '끝난 타이머');
+  for (const bad of [{ left: -1, total: 60, run: true }, { left: 1.5, total: 60, run: true }, { left: 1000, total: 0, run: true },
+    { left: 1000, total: 60, run: 'yes' }, { left: 1e9, total: 60, run: true }, 'x', null]) {
+    eq(timer(bad), null, JSON.stringify(bad));
+  }
+});
+
+test('answered: 장의 활동 여럿에 답한 학생은 한 명, 나간 학생은 빼고 센다', () => {
+  const quiz = new Map([['aaaaaaaa', [1]], ['bbbbbbbb', [0]]]);
+  const short = new Map([['aaaaaaaa', { t: '물' }], ['cccccccc', { t: '빛' }], ['dddddddd', { t: '열' }]]);
+  const alive = (sid) => sid !== 'dddddddd';
+  eq(LiveCore.answered([quiz, short, null], alive), 3);
+  eq(LiveCore.answered([null, undefined], alive), 0);
+  eq(LiveCore.answered([short], () => true), 3);
 });
 
 test('inkEnc·inkDec: 앞 점에서 뺀 정수로 보내고 되살린다', () => {

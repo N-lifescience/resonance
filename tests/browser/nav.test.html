@@ -51,11 +51,60 @@ test('onShow 훅이 불린다', () => {
   Exploragram.go(1);
   eq(got, 1);
 });
-test('입력칸에서 친 키는 넘기지 않는다', () => {
+test('입력칸에서 친 글쇠는 넘기지 않는다', () => {
+  const f = document.getElementById('field');
   Exploragram.go(0);
-  key('ArrowRight', document.getElementById('field'));
+  f.value = '물';
+  for (const k of ['ArrowRight', 'ArrowLeft', ' ', 'Enter', 'Backspace']) key(k, f);
   eq(active(), 0);
-  assert(!shown('a1'), 'no step');
+  assert(!shown('a1'), '글이 있는 칸의 화살표·Space·Enter·Backspace는 글쓰기');
+  f.value = '';
+  for (const k of [' ', 'Enter', 'Backspace']) key(k, f);
+  assert(!shown('a1'), '빈 칸이어도 Space·Enter·Backspace는 글쓰기');
+});
+test('입력칸에 포커스가 있어도 리모컨(PageDown·PageUp)은 넘기고 칸을 놓는다', () => {
+  const f = document.getElementById('field');
+  Exploragram.go(0);
+  f.value = '물';
+  f.focus();
+  key('PageDown', f);
+  assert(shown('a1'), 'PageDown은 다음 단계');
+  assert(document.activeElement !== f, '칸을 놓는다');
+  f.focus();
+  key('PageUp', f);
+  assert(!shown('a1'), 'PageUp은 이전 단계');
+  eq(f.value, '물', '적은 글은 그대로');
+});
+test('빈 입력칸의 화살표는 넘기고, Esc는 칸만 놓는다', () => {
+  const f = document.getElementById('field');
+  Exploragram.go(0);
+  f.value = '';
+  f.focus();
+  key('ArrowRight', f);
+  assert(shown('a1') && !shown('a2'), '빈 칸의 → 는 다음 단계');
+  f.value = '물';
+  f.focus();
+  key('Escape', f);
+  assert(document.activeElement !== f, 'Esc는 칸을 놓는다');
+  assert(!shown('a2'), 'Esc는 넘기지 않는다');
+  key('ArrowRight');
+  assert(shown('a2'), '칸을 놓은 뒤 → 는 넘기기');
+  f.value = '';
+});
+test('장을 떠나면 그 장 입력칸의 포커스를 놓는다', () => {
+  const f = document.getElementById('field');
+  Exploragram.go(0);
+  f.focus();
+  Exploragram.go(1);
+  assert(document.activeElement !== f, '숨은 장의 칸에 포커스가 남지 않는다');
+});
+test('장 밖 입력칸(엔진 창)에서는 PageDown도 넘기지 않는다', () => {
+  const f = document.body.appendChild(document.createElement('input'));
+  Exploragram.go(1);
+  f.focus();
+  key('PageDown', f);
+  eq(active(), 1);
+  f.remove();
 });
 test('Home · End', () => { key('End'); eq(active(), 2); key('Home'); eq(active(), 0); });
 test('처리하지 않은 키는 key 이벤트로 넘긴다', () => {

@@ -34,7 +34,7 @@ function boot() {
   Exploragram.next = () => Nav.next();
   Exploragram.prev = () => Nav.prev();
   Exploragram.audit = () => Audit.run();
-  Exploragram._internal = { on, emit, Stage, Fit, Nav, Steps, Panels, Ask, InkGeom, InkModel, Store, Session, Tools, Ink, Toolbar, icon, Board, Settings, KeepWords, Print, Audit, Parts, TocSlide, Answer, Blank, Zoom, Expr, Stepper, MapReveal, Yearline, Sort, Quiz, Short, Order, Calc, Plot, Zip, Pptx, Source, PptFill, Timer, Picker, Score, Checklist, Hotspots, Poll, Labeling, Media, Anim, MathTex, Particles, Play, Editor, Live, LiveCore };
+  Exploragram._internal = { on, emit, Stage, Fit, Nav, Steps, Panels, Ask, InkGeom, InkModel, Store, Session, Tools, Ink, Toolbar, icon, Board, Settings, KeepWords, Print, Audit, Parts, TocSlide, Answer, Blank, Zoom, Expr, Stepper, MapReveal, Yearline, Sort, Quiz, Short, Order, Calc, Plot, Zip, Pptx, Source, PptFill, Timer, PopTimer, Picker, Score, Checklist, Hotspots, Poll, Labeling, Media, Anim, MathTex, Particles, Play, Editor, Live, LiveCore };
   start().then(() => readyResolve(Exploragram), (err) => {
     console.error('[exploragram]', err);
     readyResolve(Exploragram);

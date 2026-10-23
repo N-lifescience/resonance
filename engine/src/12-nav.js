@@ -1,4 +1,7 @@
 // 넘기기: 단계 공개, 키보드, 손 모드 스와이프, 주소 #쪽, 진행 막대.
+// 장 안의 글 입력칸(단답·서답). 여기에 포커스가 있어도 리모컨 넘기기(PageDown·PageUp)와 빈 칸의 화살표는 넘기기로 받는다.
+const NAV_TEXT = 'textarea, input:not([type]), input[type="text"], input[type="search"], input[type="url"], input[type="email"], input[type="tel"]';
+
 const Nav = {
   state: { slide: 0, shown: 0 },
   groups: [],
@@ -75,6 +78,9 @@ const Nav = {
     this.groups[slide].forEach((g, gi) => g.forEach((el) => el.classList.toggle('is-shown', gi < shown)));
     this.progress.firstChild.style.transform = `scaleX(${(slide + 1) / Stage.slides.length})`;
     if (before !== slide) {
+      // 떠나는 장의 입력칸에 포커스가 남으면 다음 장에서도 넘기기 키가 그 칸으로 가서 막힌다
+      const a = document.activeElement;
+      if (before >= 0 && a && a.blur && Stage.slides[before] && Stage.slides[before].contains(a)) a.blur();
       Stepper.enter(slide, this.enterAll);
       if (before >= 0) emit('hide', Stage.slides[before], before);
       emit('show', Stage.slides[slide], slide);
@@ -86,7 +92,8 @@ const Nav = {
   onKey(e) {
     if (e.defaultPrevented || e.isComposing) return;
     const t = e.target;
-    if (t && t.closest && t.closest('input, textarea, select, [contenteditable=""], [contenteditable="true"]')) return;
+    const field = t && t.closest && t.closest('input, textarea, select, [contenteditable=""], [contenteditable="true"]');
+    if (field && !this.fieldNav(e, field)) return;
     if (e.ctrlKey || e.metaKey || e.altKey) { emit('key', e); return; }
     const k = e.key;
     if (/^[0-9]$/.test(k)) {
@@ -118,6 +125,19 @@ const Nav = {
     } else {
       emit('key', e);   // 나머지 글자 키는 각 모듈(목차, 툴바, 칠판, 점검)이 처리
     }
+  },
+
+  // 장 안 글 입력칸에 포커스가 있을 때 넘기기로 보낼 키인가. 글을 쓰는 키(글자, Space, Enter, 글이 있는 칸의 화살표)는 칸에 둔다.
+  // 보낼 때는 칸을 놓는다(전자칠판 화면 키보드도 닫힌다). Esc는 칸만 놓는다. 엔진 창(반 이름, 코드 입력)의 칸은 건드리지 않는다.
+  fieldNav(e, field) {
+    if (e.ctrlKey || e.metaKey || e.altKey || !field.matches(NAV_TEXT) || !field.closest('section.slide')) return false;
+    const k = e.key;
+    if (k === 'Escape') { field.blur(); return false; }
+    const remote = k === 'PageDown' || k === 'PageUp';
+    const empty = /^Arrow(Right|Left|Up|Down)$/.test(k) && field.value === '';
+    if (!remote && !empty) return false;
+    field.blur();
+    return true;
   },
 
   // 손 모드에서 손가락으로 좌우로 밀면 넘긴다.

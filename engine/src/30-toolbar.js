@@ -26,6 +26,7 @@ const ICONS = {
   zoom: 'M10.5 4a6.5 6.5 0 1 1 0 13a6.5 6.5 0 1 1 0-13M15.5 15.5L21 21M10.5 7.5v6M7.5 10.5h6',
   check: 'M5 12.5l4.5 4.5L19 7',
   edit: 'M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z',
+  timer: 'M10 2h4M12 2v2M12 4a9 9 0 1 1 0 18a9 9 0 1 1 0-18M12 9v4l3 2',
   live: 'M12 11a1.5 1.5 0 1 1 0 3a1.5 1.5 0 1 1 0-3M8.5 8.5a5 5 0 0 0 0 7M15.5 8.5a5 5 0 0 1 0 7M5.5 5.5a9.2 9.2 0 0 0 0 13M18.5 5.5a9.2 9.2 0 0 1 0 13',
 };
 
@@ -63,6 +64,8 @@ const Toolbar = {
   styleBtn: null,
   huds: {},
   classBtn: null,
+  noticeEl: null,
+  noticeTimer: 0,
   prefs: { dock: 'bottom', collapsed: false, hud: { left: { x: 0, y: 0.5 }, right: { x: 1, y: 0.5 } }, hudFloat: {} },
 
   async init() {
@@ -95,6 +98,13 @@ const Toolbar = {
     document.body.append(this.el, this.handle);
     on('tool', () => this.sync());
     on('session', () => this.sync());
+    // 반을 바꾸면(목록에서 고르기, 지금 반 삭제) 어느 반 판서인지 화면에 잠깐 알린다
+    let shownClass = Session.current;
+    on('session', () => {
+      if (Session.current === shownClass) return;
+      shownClass = Session.current;
+      this.notice(h('b', { text: Session.current }), ' 판서로 바꿨어요');
+    });
     on('key', (e) => this.onKey(e));
     on('panels-close', () => this.closePop());
     document.addEventListener('pointerdown', (e) => {
@@ -117,6 +127,19 @@ const Toolbar = {
       icon(name), h('span', { text: label }));
     b.addEventListener('click', (e) => { onclick(e); b.blur(); });
     return b;
+  },
+
+  // 화면 가운데에 2초쯤 떴다가 사라지는 알림
+  notice(...kids) {
+    if (!this.noticeEl) {
+      this.noticeEl = h('div', { class: 'ch-notice', role: 'status', 'aria-live': 'polite' });
+      document.body.append(this.noticeEl);
+    }
+    const el = this.noticeEl;
+    el.replaceChildren(...kids);
+    el.classList.add('is-on');
+    clearTimeout(this.noticeTimer);
+    this.noticeTimer = setTimeout(() => el.classList.remove('is-on'), 2000);
   },
 
   menuItem(label, onclick) { return h('button', { type: 'button', class: 'ch-menu-item', text: label, onclick }); },
@@ -142,6 +165,7 @@ const Toolbar = {
     this.classBtn = this.btn('class', '반', (e) => this.togglePop(e.currentTarget, () => this.classPanel()));
     S.class.append(this.classBtn);
     S.misc.append(
+      this.btn('timer', '타이머', (e) => this.togglePop(e.currentTarget, () => PopTimer.panel())),
       this.btn('toc', '목차', () => Panels.toggle(Panels.toc)),
       this.btn('full', '전체 화면', () => Panels.fullscreen()),
       this.btn('dock', '위치', () => this.cycleDock()),
@@ -286,6 +310,8 @@ const Toolbar = {
     for (const b of qsa('.ch-toolbar [data-tool], .ch-hud [data-tool]')) b.setAttribute('aria-pressed', String(b.dataset.tool === Tools.current));
     this.styleBtn.style.setProperty('--swatch', Tools.current === 'hl' ? Tools.hlColor : Tools.penColor);
     this.classBtn.querySelector('span').textContent = Session.current;
+    this.classBtn.title = `반: ${Session.current}`;   // 툴바 알약에서 말줄임된 긴 반 이름도 다 보이게
+    this.classBtn.setAttribute('aria-label', `반: ${Session.current}`);
   },
 
   togglePop(anchor, makeContent) {

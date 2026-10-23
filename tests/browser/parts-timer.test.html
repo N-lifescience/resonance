@@ -14,6 +14,7 @@
   <div class="timer" id="tm" data-sec="2" data-label="남은 시간"></div>
   <div class="timer" id="long" data-sec="300"></div>
 </section>
+<section class="slide" id="t2"><h2>둘째 장</h2></section>
 <pre id="results" data-summary="pending"></pre>
 <script>
 const I = () => Exploragram._internal;
@@ -63,6 +64,80 @@ test('펜을 든 채로 시작 단추를 톡 누르면 작동한다', () => {
   eq(x.run.textContent, '멈춤');
   eq(I().Ink.page.length, 0);
   x.reset.click();
+  I().Tools.set('hand');
+});
+
+// 툴바 타이머(PopTimer)
+const tb = (name) => document.querySelector(`.ch-toolbar [data-name="${name}"]`);
+const pop = () => document.querySelector('.ch-ptimer');
+const popBtn = (text) => [...document.querySelectorAll('.ch-pop button')].find((b) => b.textContent === text);
+test('툴바 「타이머」: 시간을 고르면 화면 위에 떠서 바로 간다', async () => {
+  assert(tb('timer'), '툴바 단추');
+  tb('timer').click();
+  const names = [...document.querySelectorAll('.ch-ptimer-presets button')].map((b) => b.textContent);
+  eq(names, ['30초', '1분', '2분', '3분', '5분', '10분']);
+  popBtn('1분').click();
+  assert(!document.querySelector('.ch-pop'), '창은 닫힌다');
+  assert(pop() && !pop().hidden, '타이머가 뜬다');
+  assert(pop().classList.contains('is-running'), '바로 간다');
+  await wait(1100);
+  assert(/^0:5\d$/.test(pop().querySelector('.ch-timer-face').textContent), pop().querySelector('.ch-timer-face').textContent);
+  const r = pop().getBoundingClientRect();
+  assert(r.top >= 0 && r.top < 40 && Math.abs(r.left + r.width / 2 - innerWidth / 2) < 2, '위 가운데');
+  for (const b of pop().querySelectorAll('button')) assert(b.getBoundingClientRect().height >= 44, `${b.textContent} 44px`);
+});
+test('장을 넘겨도 남고, 멈춤·+1분·다시·닫기', async () => {
+  const P = I().PopTimer;
+  I().Nav.go(1);
+  assert(!pop().hidden, '다른 장에서도');
+  const run = pop().querySelector('.ch-timer-run');
+  run.click();
+  eq(run.textContent, '이어서');
+  const left = P.t.left;
+  [...pop().querySelectorAll('button')].find((b) => b.textContent === '+1분').click();
+  eq(Math.round(P.t.left - left), 60, '1분 늘었다');
+  eq(P.wire().run, false);
+  assert(P.wire().left > 100000, `wire ${JSON.stringify(P.wire())}`);
+  [...pop().querySelectorAll('button')].find((b) => b.textContent === '다시').click();
+  eq(pop().querySelector('.ch-timer-face').textContent, '2:00', '처음 정한 시간 + 늘린 시간');
+  pop().querySelector('.ch-ptimer-x').click();
+  assert(pop().hidden, '닫힌다');
+  eq(P.wire(), null);
+});
+test('직접 정하기: − + 로 분을 바꿔 시작, 끝나면 끝', async () => {
+  tb('timer').click();
+  eq(document.querySelector('.ch-ptimer-pick').textContent, '4분');
+  popBtn('+').click();
+  eq(document.querySelector('.ch-ptimer-pick').textContent, '5분');
+  for (let i = 0; i < 10; i++) popBtn('−').click();
+  eq(document.querySelector('.ch-ptimer-pick').textContent, '1분', '1분보다 줄지 않는다');
+  popBtn('시작').click();
+  eq(pop().querySelector('.ch-timer-face').textContent, '1:00');
+  I().Timer.add(I().PopTimer.t, -59);   // 끝 직전으로
+  await wait(1500);
+  eq(pop().querySelector('.ch-timer-face').textContent, '끝');
+  assert(pop().classList.contains('is-done'));
+  tb('timer').click();
+  assert([...document.querySelectorAll('.ch-pop .ch-menu-item')].some((b) => b.textContent === '타이머 닫기'), '떠 있으면 창에 닫기');
+  [...document.querySelectorAll('.ch-pop .ch-menu-item')].find((b) => b.textContent === '타이머 닫기').click();
+  assert(pop().hidden);
+  tb('timer').click();
+  assert(![...document.querySelectorAll('.ch-pop .ch-menu-item')].some((b) => b.textContent === '타이머 닫기'), '닫은 뒤에는 창에 닫기가 없다');
+  I().Toolbar.closePop();
+});
+test('펜을 든 채로 타이머를 끌면 옮겨지고 판서가 되지 않는다', () => {
+  I().Tools.set('pen');
+  I().PopTimer.open(60);
+  const face = pop().querySelector('.ch-timer-face');
+  const r = face.getBoundingClientRect();
+  const at = (type, dx) => ptr(type, face, 0, 0, { clientX: r.left + 10 + dx, clientY: r.top + 10 + dx });
+  at('pointerdown', 0);
+  at('pointermove', 60);
+  at('pointerup', 60);
+  const r2 = face.getBoundingClientRect();
+  eq([Math.round(r2.left - r.left), Math.round(r2.top - r.top)], [60, 60]);
+  eq(I().Ink.page.length, 0);
+  I().PopTimer.close();
   I().Tools.set('hand');
 });
 </script>

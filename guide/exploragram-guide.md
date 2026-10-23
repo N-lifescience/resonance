@@ -4,7 +4,7 @@
 > **AI에게**: 이 파일 하나가 Exploragram 지침 전체다. 선생님이 수업 PPT를 주면 이 지침대로 수업용 HTML을 만든다.
 > **반드시**: `<head>`에 아래 엔진 css·js 두 줄을 넣는다(지금 환경에서 안 열려도 그대로 둔다). 넘기기·툴바를 직접 짜지 않고, PPT 장을 통째로 그림으로 넣지 않는다(1절 기준 8·9).
 > 본문의 `references/…`는 이 파일의 해당 절을, `scripts/…`는 저장소 https://github.com/N-lifescience/resonance 의 `skills/exploragram/scripts/`를 가리킨다.
-> 엔진: `https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/engine/exploragram.css`·`.js` (v2.2.1)
+> 엔진: `https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/engine/exploragram.css`·`.js` (v2.3.0)
 > 레퍼런스 완성본(`references/examples/`): https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/skills/exploragram/references/examples/elem-shadow.html · https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/skills/exploragram/references/examples/eth-exploragram.html · https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/skills/exploragram/references/examples/mid-linear.html · https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/skills/exploragram/references/examples/sci-diffusion.html · https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/skills/exploragram/references/examples/soc-supply-demand.html
 
 ## 차례
@@ -169,11 +169,11 @@ PPT를 HTML로 옮기는 일이 아니다. PPT로는 못 하는 수업을 만든
 
 ### 4. 전자칠판 기능
 
-판서와 칠판은 늘 들어간다. 장 안에 넣는 교실 도구를 고른다.
+판서와 칠판, 툴바 「타이머」는 늘 들어간다. 장 안에 넣는 교실 도구를 고른다.
 
 | 기능 | 이럴 때 추천 | 쓰는 것 |
 |---|---|---|
-| 타이머 | 제한 시간 활동, 모둠 토의 | 교실 도구 타이머 |
+| 타이머 | 그 장의 활동 시간을 미리 정해 둘 때. 툴바 「타이머」는 어느 장에서나 쓸 수 있다 | 교실 도구 타이머 |
 | 발표자 뽑기 | 발표·질문 순서 정하기 | `.picker` |
 | 모둠 점수판 | 모둠 활동, 퀴즈 대항 | `.score` |
 | 체크리스트 | 실험 준비물, 활동 절차 확인 | 교실 도구 체크리스트 |

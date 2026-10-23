@@ -267,6 +267,67 @@ test('투표: 학생이 고른 것(바꾸면 마지막 것)이 모이고, 「칠
   eq(p.n.join(), '1,0,2');
 });
 
+test('응답 현황: 응답을 받는 장에서만 교사 화면 오른쪽 위에 "접속 m명 중 n명 제출"', async () => {
+  const chip = () => doc('t').querySelector('.ch-live-tally');
+  T.Live.showPanel(false);
+  T.Live.toggleDist(false);
+  T.Live.seen.delete('zzzz9999');   // 앞 시험이 보낸 가짜 학생
+  T.Nav.go(5);
+  await until(() => chip() && !chip().hidden && chip().textContent === '접속 2명 모두 제출');
+  assert(chip().classList.contains('is-all'), '모두 내면 초록');
+  T.Live.texts.get('5|s0').delete(B.Live.sid);
+  T.Live.renderCount();
+  eq(chip().textContent, '접속 2명 중 1명 제출');
+  assert(!chip().classList.contains('is-all'));
+  T.Live.seen.set(A.Live.sid, Date.now() - 31000);   // A가 30초 넘게 소식이 없다: 접속에서도, 제출에서도 뺀다
+  T.Live.renderCount();
+  eq(chip().textContent, '접속 1명 중 0명 제출');
+  T.Live.seen.set(A.Live.sid, Date.now());
+  T.Nav.go(3);
+  await until(() => chip().textContent === '접속 2명 모두 참여');   // 슬라이더만 있는 장
+  T.Nav.go(0);
+  await until(() => chip().hidden);   // 학생이 답하는 활동이 없는 장
+  T.Nav.go(4);
+  await until(() => !chip().hidden && chip().textContent === '접속 2명 모두 제출');
+  T.Live.showPanel(true);
+  assert(chip().hidden, '실시간 창이 열려 있으면 창 안에 같은 줄');
+  eq(doc('t').querySelector('.ch-live-count').textContent, '접속 2명 모두 제출');
+  T.Live.showPanel(false);
+  assert(!chip().hidden);
+  chip().click();
+  assert(T.Live.distOn && !doc('t').querySelector('.ch-live-dist').hidden, '누르면 「학생 보기」');
+  T.Live.toggleDist(false);
+  // 툴바 타이머를 칩 자리로 옮기면 칩은 타이머 아래로 내려간다
+  T.PopTimer.open(60);
+  T.PopTimer.pos = { x: 9999, y: 0 };
+  T.PopTimer.place();
+  T.emit('pop-timer-moved');
+  const p = doc('t').querySelector('.ch-ptimer').getBoundingClientRect();
+  assert(chip().getBoundingClientRect().top >= p.bottom, `칩 ${chip().getBoundingClientRect().top} / 타이머 아래 ${p.bottom}`);
+  T.PopTimer.close();
+  T.PopTimer.pos = null;
+  eq(chip().style.top, '', '타이머를 닫으면 제자리');
+});
+
+test('툴바 타이머: 실시간 수업 중이면 학생 화면에도 남은 시간이 보인다', async () => {
+  const tm = (n) => doc(n).querySelector('.ch-live-timer');
+  T.PopTimer.open(90);
+  await until(() => tm('a') && !tm('a').hidden && /^1:(30|29|28)$/.test(tm('a').lastChild.textContent));
+  eq(tm('a').firstChild.textContent, '남은 시간');
+  assert(tm('b') && !tm('b').hidden, '학생 둘 다');
+  doc('t').querySelector('.ch-ptimer .ch-timer-run').click();   // 멈춤
+  await until(() => tm('a').firstChild.textContent === '멈춤');
+  const at = tm('a').lastChild.textContent;
+  await wait(1200);
+  eq(tm('a').lastChild.textContent, at, '멈추면 학생 화면도 멈춘다');
+  T.PopTimer.t.left = 0;   // 멈춘 채 남은 시간을 0으로
+  T.Timer.render(T.PopTimer.t);
+  T.PopTimer.changed();
+  await until(() => tm('a').lastChild.textContent === '끝');
+  doc('t').querySelector('.ch-ptimer .ch-ptimer-x').click();
+  await until(() => tm('a').hidden && tm('b').hidden);
+});
+
 test('코드 없이 학생 역할이면 입장 화면에서 코드를 넣고 들어간다', async () => {
   const C = await open('c', '&join=');
   assert(visible(doc('c').querySelector('.ch-live-join')), '입장 화면');

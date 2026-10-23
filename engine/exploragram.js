@@ -1,7 +1,7 @@
-/*! exploragram engine v2.2.1 | © N-lifescience | https://github.com/N-lifescience/resonance */
+/*! exploragram engine v2.3.0 | © N-lifescience | https://github.com/N-lifescience/resonance */
 (function () {
 'use strict';
-const VERSION = '2.2.1';
+const VERSION = '2.3.0';
 const LIVE_CONFIG = {"url":"https://qtwigpxinccudhprrdnb.supabase.co","key":"sb_publishable_-3KCWch7Q7sBQbcdVzxR4g_imovkZv5","site":"https://n-lifescience.github.io/resonance/"};
 /* ---- 00-core.js ---- */
 // 공통 상수, 작은 DOM 도우미, 이벤트 훅, 공개 객체 Exploragram.
@@ -142,6 +142,9 @@ const Stage = {
 
 /* ---- 12-nav.js ---- */
 // 넘기기: 단계 공개, 키보드, 손 모드 스와이프, 주소 #쪽, 진행 막대.
+// 장 안의 글 입력칸(단답·서답). 여기에 포커스가 있어도 리모컨 넘기기(PageDown·PageUp)와 빈 칸의 화살표는 넘기기로 받는다.
+const NAV_TEXT = 'textarea, input:not([type]), input[type="text"], input[type="search"], input[type="url"], input[type="email"], input[type="tel"]';
+
 const Nav = {
   state: { slide: 0, shown: 0 },
   groups: [],
@@ -218,6 +221,9 @@ const Nav = {
     this.groups[slide].forEach((g, gi) => g.forEach((el) => el.classList.toggle('is-shown', gi < shown)));
     this.progress.firstChild.style.transform = `scaleX(${(slide + 1) / Stage.slides.length})`;
     if (before !== slide) {
+      // 떠나는 장의 입력칸에 포커스가 남으면 다음 장에서도 넘기기 키가 그 칸으로 가서 막힌다
+      const a = document.activeElement;
+      if (before >= 0 && a && a.blur && Stage.slides[before] && Stage.slides[before].contains(a)) a.blur();
       Stepper.enter(slide, this.enterAll);
       if (before >= 0) emit('hide', Stage.slides[before], before);
       emit('show', Stage.slides[slide], slide);
@@ -229,7 +235,8 @@ const Nav = {
   onKey(e) {
     if (e.defaultPrevented || e.isComposing) return;
     const t = e.target;
-    if (t && t.closest && t.closest('input, textarea, select, [contenteditable=""], [contenteditable="true"]')) return;
+    const field = t && t.closest && t.closest('input, textarea, select, [contenteditable=""], [contenteditable="true"]');
+    if (field && !this.fieldNav(e, field)) return;
     if (e.ctrlKey || e.metaKey || e.altKey) { emit('key', e); return; }
     const k = e.key;
     if (/^[0-9]$/.test(k)) {
@@ -261,6 +268,19 @@ const Nav = {
     } else {
       emit('key', e);   // 나머지 글자 키는 각 모듈(목차, 툴바, 칠판, 점검)이 처리
     }
+  },
+
+  // 장 안 글 입력칸에 포커스가 있을 때 넘기기로 보낼 키인가. 글을 쓰는 키(글자, Space, Enter, 글이 있는 칸의 화살표)는 칸에 둔다.
+  // 보낼 때는 칸을 놓는다(전자칠판 화면 키보드도 닫힌다). Esc는 칸만 놓는다. 엔진 창(반 이름, 코드 입력)의 칸은 건드리지 않는다.
+  fieldNav(e, field) {
+    if (e.ctrlKey || e.metaKey || e.altKey || !field.matches(NAV_TEXT) || !field.closest('section.slide')) return false;
+    const k = e.key;
+    if (k === 'Escape') { field.blur(); return false; }
+    const remote = k === 'PageDown' || k === 'PageUp';
+    const empty = /^Arrow(Right|Left|Up|Down)$/.test(k) && field.value === '';
+    if (!remote && !empty) return false;
+    field.blur();
+    return true;
   },
 
   // 손 모드에서 손가락으로 좌우로 밀면 넘긴다.
@@ -1537,6 +1557,7 @@ const ICONS = {
   zoom: 'M10.5 4a6.5 6.5 0 1 1 0 13a6.5 6.5 0 1 1 0-13M15.5 15.5L21 21M10.5 7.5v6M7.5 10.5h6',
   check: 'M5 12.5l4.5 4.5L19 7',
   edit: 'M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z',
+  timer: 'M10 2h4M12 2v2M12 4a9 9 0 1 1 0 18a9 9 0 1 1 0-18M12 9v4l3 2',
   live: 'M12 11a1.5 1.5 0 1 1 0 3a1.5 1.5 0 1 1 0-3M8.5 8.5a5 5 0 0 0 0 7M15.5 8.5a5 5 0 0 1 0 7M5.5 5.5a9.2 9.2 0 0 0 0 13M18.5 5.5a9.2 9.2 0 0 1 0 13',
 };
 
@@ -1574,6 +1595,8 @@ const Toolbar = {
   styleBtn: null,
   huds: {},
   classBtn: null,
+  noticeEl: null,
+  noticeTimer: 0,
   prefs: { dock: 'bottom', collapsed: false, hud: { left: { x: 0, y: 0.5 }, right: { x: 1, y: 0.5 } }, hudFloat: {} },
 
   async init() {
@@ -1606,6 +1629,13 @@ const Toolbar = {
     document.body.append(this.el, this.handle);
     on('tool', () => this.sync());
     on('session', () => this.sync());
+    // 반을 바꾸면(목록에서 고르기, 지금 반 삭제) 어느 반 판서인지 화면에 잠깐 알린다
+    let shownClass = Session.current;
+    on('session', () => {
+      if (Session.current === shownClass) return;
+      shownClass = Session.current;
+      this.notice(h('b', { text: Session.current }), ' 판서로 바꿨어요');
+    });
     on('key', (e) => this.onKey(e));
     on('panels-close', () => this.closePop());
     document.addEventListener('pointerdown', (e) => {
@@ -1628,6 +1658,19 @@ const Toolbar = {
       icon(name), h('span', { text: label }));
     b.addEventListener('click', (e) => { onclick(e); b.blur(); });
     return b;
+  },
+
+  // 화면 가운데에 2초쯤 떴다가 사라지는 알림
+  notice(...kids) {
+    if (!this.noticeEl) {
+      this.noticeEl = h('div', { class: 'ch-notice', role: 'status', 'aria-live': 'polite' });
+      document.body.append(this.noticeEl);
+    }
+    const el = this.noticeEl;
+    el.replaceChildren(...kids);
+    el.classList.add('is-on');
+    clearTimeout(this.noticeTimer);
+    this.noticeTimer = setTimeout(() => el.classList.remove('is-on'), 2000);
   },
 
   menuItem(label, onclick) { return h('button', { type: 'button', class: 'ch-menu-item', text: label, onclick }); },
@@ -1653,6 +1696,7 @@ const Toolbar = {
     this.classBtn = this.btn('class', '반', (e) => this.togglePop(e.currentTarget, () => this.classPanel()));
     S.class.append(this.classBtn);
     S.misc.append(
+      this.btn('timer', '타이머', (e) => this.togglePop(e.currentTarget, () => PopTimer.panel())),
       this.btn('toc', '목차', () => Panels.toggle(Panels.toc)),
       this.btn('full', '전체 화면', () => Panels.fullscreen()),
       this.btn('dock', '위치', () => this.cycleDock()),
@@ -1797,6 +1841,8 @@ const Toolbar = {
     for (const b of qsa('.ch-toolbar [data-tool], .ch-hud [data-tool]')) b.setAttribute('aria-pressed', String(b.dataset.tool === Tools.current));
     this.styleBtn.style.setProperty('--swatch', Tools.current === 'hl' ? Tools.hlColor : Tools.penColor);
     this.classBtn.querySelector('span').textContent = Session.current;
+    this.classBtn.title = `반: ${Session.current}`;   // 툴바 알약에서 말줄임된 긴 반 이름도 다 보이게
+    this.classBtn.setAttribute('aria-label', `반: ${Session.current}`);
   },
 
   togglePop(anchor, makeContent) {
@@ -3774,7 +3820,7 @@ const Quiz = {
     item.fb.className = `ch-fb ${ok ? 'is-ok' : 'is-bad'}`;
     if (!ok) shake(o);
     else this.solve(item);
-    if (o.tagName === 'BUTTON') o.blur();
+    o.blur();   // div 보기(role=button)도: 포커스가 남으면 Space·Enter가 넘기기 대신 그 보기를 다시 누른다
   },
 
   toggle(item, o) {
@@ -3784,7 +3830,7 @@ const Quiz = {
     o.classList.toggle('is-pick', on);
     item.fb.textContent = '';
     item.fb.className = 'ch-fb';
-    if (o.tagName === 'BUTTON') o.blur();
+    o.blur();
   },
 
   // 여러 개 고르기에서 잘못 고른 것·놓친 것 아래에 그 보기의 이유(data-why)를 보인다
@@ -3845,9 +3891,16 @@ const Short = {
     }
   },
 
+  // 교사 화면(전자칠판)은 입력칸에 포커스를 두지 않는다. 두면 화면 키보드가 뜨고 리모컨 넘기기가 그 칸으로 간다.
   send(item) {
     const t = LiveCore.tidy(item.input.value);
-    if (!t) { item.fb.textContent = '먼저 적어 주세요.'; item.fb.className = 'ch-fb is-bad'; item.input.focus(); return; }
+    if (!t) {
+      item.fb.textContent = '먼저 적어 주세요.';
+      item.fb.className = 'ch-fb is-bad';
+      if (Live.role === 'student') item.input.focus();
+      return;
+    }
+    item.input.blur();   // 단추를 눌러도 포커스가 칸에 남는 브라우저(사파리)가 있다
     item.fb.textContent = Live.role === 'student' ? '보냈어요. 고쳐서 다시 보내도 돼요.' : '적었어요.';
     item.fb.className = 'ch-fb is-ok';
     emit('short-answer', item, t);
@@ -5278,6 +5331,132 @@ const Timer = {
     t.face.setAttribute('aria-live', 'off');
     this.render(t);
   },
+
+  // 남은 시간(초)을 늘린다. 끝난 타이머도 다시 이어 갈 수 있게 된다.
+  add(t, sec) {
+    t.total += sec;
+    if (t.timer) t.end += sec * 1000;
+    else t.left = Math.max(0, t.left) + sec;
+    t.face.setAttribute('aria-live', 'off');
+    this.render(t);
+  },
+
+  // 실시간 수업이 학생에게 보낼 모양 { left: 남은 ms, total: 초, run }. 기기마다 시계가 달라 끝 시각 대신 남은 시간을 보낸다.
+  wire(t) {
+    const left = t.timer ? t.end - performance.now() : t.left * 1000;
+    return { left: Math.max(0, Math.round(left)), total: t.total, run: !!t.timer && left > 0 };
+  },
+};
+
+// 툴바 「타이머」: 어느 장에서나 시간을 골라 화면 위에 띄운다(익스플로라그램을 다룰 시간 주기 등).
+// 장을 넘기거나 칠판을 열어도 떠 있고, 끌어서 옮길 수 있다. 실시간 수업 중이면 학생 화면에도 남은 시간이 보인다(68-live).
+const POP_TIMER_PRESETS = [30, 60, 120, 180, 300, 600];
+const PopTimer = {
+  t: null,          // Timer와 같은 모양. 떠 있지 않으면 null
+  el: null,
+  pick: 240,        // 창의 「직접 정하기」 값(초)
+  pos: null,        // 끌어 옮긴 자리 { x, y }(px). 없으면 위 가운데
+
+  label(sec) { return sec < 60 ? `${sec}초` : `${sec / 60}분`; },
+
+  // 툴바 창 내용
+  panel() {
+    const go = (sec) => { Toolbar.closePop(); this.open(sec); };
+    const value = h('output', { class: 'ch-ptimer-pick', text: this.label(this.pick) });
+    const step = (d) => { this.pick = clamp(this.pick + d, 60, 3600); value.textContent = this.label(this.pick); };
+    return h('div', { class: 'ch-pop-timer' },
+      h('h3', { text: '타이머' }),
+      h('div', { class: 'ch-ptimer-presets' }, POP_TIMER_PRESETS.map((sec) => h('button', {
+        type: 'button', class: 'ch-class', text: this.label(sec), onclick: () => go(sec),
+      }))),
+      h('div', { class: 'ch-ptimer-own' },
+        h('button', { type: 'button', class: 'ch-class', text: '−', 'aria-label': '1분 줄이기', onclick: () => step(-60) }),
+        value,
+        h('button', { type: 'button', class: 'ch-class', text: '+', 'aria-label': '1분 늘리기', onclick: () => step(60) }),
+        h('button', { type: 'button', class: 'ch-class ch-ptimer-start', text: '시작', onclick: () => go(this.pick) })),
+      this.shown() ? Toolbar.menuItem('타이머 닫기', () => { Toolbar.closePop(); this.close(); }) : null);
+  },
+
+  build() {
+    const btn = (cls, text, fn, label) => h('button', {
+      type: 'button', class: cls, text, 'aria-label': label || null, onclick: (e) => { fn(); e.currentTarget.blur(); this.changed(); },
+    });
+    const face = h('output', { class: 'ch-timer-face', 'aria-live': 'off' });
+    const t = { el: null, total: 60, left: 60, face, run: null, reset: null, timer: 0, end: 0 };
+    t.run = btn('ch-timer-run', '', () => Timer.toggle(t));
+    t.reset = btn('ch-reset', '다시', () => Timer.reset(t));
+    this.el = h('div', { class: 'ch-ptimer', 'data-no-ink': '', role: 'group', 'aria-label': '타이머' },
+      face, h('span', { class: 'ch-timer-btns' }, t.run, t.reset,
+        btn('ch-reset', '+1분', () => Timer.add(t, 60), '1분 늘리기'),
+        btn('ch-ptimer-x', '×', () => this.close(), '타이머 닫기')));
+    t.el = this.el;
+    this.t = t;
+    this.bindDrag();
+    document.body.append(this.el);
+    on('resize', () => { this.place(); emit('pop-timer-moved'); });
+  },
+
+  // sec초로 맞추고 바로 시작한다
+  open(sec) {
+    if (!this.el) this.build();
+    const t = this.t;
+    clearInterval(t.timer);
+    t.timer = 0;
+    t.total = sec;
+    t.left = sec;
+    t.face.setAttribute('aria-live', 'off');
+    this.el.hidden = false;
+    this.place();
+    Timer.toggle(t);
+    this.changed();
+  },
+
+  close() {
+    if (!this.el || this.el.hidden) return;
+    clearInterval(this.t.timer);
+    this.t.timer = 0;
+    this.el.hidden = true;
+    this.changed();
+  },
+
+  shown() { return !!this.el && !this.el.hidden; },
+  wire() { return this.shown() ? Timer.wire(this.t) : null; },
+  changed() { emit('pop-timer', this.wire()); },
+
+  // 처음에는 위 가운데. 왼쪽을 0에 두고 너비를 잰 뒤 옮긴다(left: 50%면 화면 절반 너비에서 줄이 바뀐다).
+  place() {
+    if (!this.shown()) return;
+    const s = this.el.style;
+    s.left = '0px';
+    const r = this.el.getBoundingClientRect();
+    const at = this.pos || { x: (window.innerWidth - r.width) / 2, y: 16 };
+    s.left = `${clamp(at.x, 0, Math.max(0, window.innerWidth - r.width))}px`;
+    s.top = `${clamp(at.y, 0, Math.max(0, window.innerHeight - r.height))}px`;
+  },
+
+  // 단추가 아닌 곳을 끌면 옮긴다(펜을 든 채로도: data-no-ink)
+  bindDrag() {
+    let d = null;
+    this.el.addEventListener('pointerdown', (e) => {
+      if (e.target.closest('button') || (e.pointerType === 'mouse' && e.button !== 0)) return;
+      const r = this.el.getBoundingClientRect();
+      d = { id: e.pointerId, x: e.clientX - r.left, y: e.clientY - r.top };
+      try { this.el.setPointerCapture(e.pointerId); } catch (err) { /* 합성 이벤트 */ }
+    });
+    this.el.addEventListener('pointermove', (e) => {
+      if (!d || e.pointerId !== d.id) return;
+      e.preventDefault();
+      this.pos = { x: e.clientX - d.x, y: e.clientY - d.y };
+      this.place();
+    });
+    const end = (e) => {
+      if (!d || e.pointerId !== d.id) return;
+      d = null;
+      emit('pop-timer-moved');   // 응답 현황처럼 위에 붙은 것이 자리를 다시 잡는다
+    };
+    this.el.addEventListener('pointerup', end);
+    this.el.addEventListener('pointercancel', end);
+  },
 };
 
 /* ---- 63-classroom.js ---- */
@@ -6671,6 +6850,14 @@ const LiveCore = {
     return { put, more, del, sent: next };
   },
 
+  // 한 장에 답한 학생 수. maps는 그 장 활동마다의 Map(sid → 값)(없으면 null), alive(sid)는 지금 접속 중인지.
+  // 여러 활동에 답한 학생도 한 명으로 센다. 나간 학생은 빼서 '접속 m명 중 n명'의 n이 m을 넘지 않는다.
+  answered(maps, alive) {
+    const sids = new Set();
+    for (const m of maps) if (m) for (const sid of m.keys()) if (alive(sid)) sids.add(sid);
+    return sids.size;
+  },
+
   // 학생이 받아 둔 판(have)이 교사가 알린 판(rev)만큼 새것인가. 판 번호는 늘기만 하고, 0은 '아무것도 안 쓴 빈 쪽'이다.
   inkFresh(have, rev) { return have === rev || (rev > 0 && have > rev); },
 
@@ -6755,6 +6942,9 @@ const LiveCore = {
           ? { ep: p.ink.ep, pg: p.ink.pg, rev: p.ink.rev } : null,
         board: p.board && typeof p.board === 'object' && int(p.board.i, 0, 199) && int(p.board.n, 1, 200) && p.board.i < p.board.n && BOARD_BGS.includes(p.board.bg)
           ? { i: p.board.i, n: p.board.n, bg: p.board.bg } : null,
+        // 툴바 타이머가 떠 있을 때만: 남은 ms, 처음 정한 초, 가는 중인지
+        timer: p.timer && typeof p.timer === 'object' && int(p.timer.left, 0, 1e8) && int(p.timer.total, 1, 1e5) && typeof p.timer.run === 'boolean'
+          ? { left: p.timer.left, total: p.timer.total, run: p.timer.run } : null,
       };
     }
     return null;
@@ -6850,6 +7040,7 @@ const Live = {
   peek: null,          // 칠판에 띄운 학생 값 { input, before }
   panel: null,
   ui: null,
+  tallyEl: null,       // 오른쪽 위 응답 현황(접속 m명 중 n명 제출)
   dist: null,
   distOn: false,
   distRaf: 0,
@@ -6890,6 +7081,10 @@ const Live = {
   joinUi: null,
   bar: null,
   barKey: '',
+  timerEl: null,       // 교사 툴바 타이머의 남은 시간
+  timerTick: 0,
+  timerEnd: 0,         // 가는 중이면 이 기기 시계로 끝나는 시각, 멈춤이면 0
+  timerLeft: 0,        // 멈춤일 때 남은 ms
 
   init() {
     const q = new URLSearchParams(location.search);
@@ -6904,6 +7099,8 @@ const Live = {
     on('ink-dirty', () => this.inkDirty());
     on('session', () => { this.inkEp++; this.sendState(); });   // 반을 바꿨다: 학생은 받아 둔 판서를 버리고 새로 받는다
     on('board-mode', () => this.sendState());   // 칠판을 열고 닫거나 칠판 쪽·바탕을 바꾸면 학생 화면도 맞춘다
+    on('pop-timer', () => { this.sendState(); this.renderTally(); });   // 툴바 타이머를 띄우거나 멈추면 학생 화면의 남은 시간도 맞춘다
+    on('pop-timer-moved', () => this.renderTally());
     on('features', () => this.onFeatures());
     // 점검(D)·인쇄는 단계 막대를 잠깐 모두 연다. 그 상태가 학생에게 가거나 연 범위로 남지 않게 한다.
     on('print-before', () => { this.frozen = true; });
@@ -7005,6 +7202,7 @@ const Live = {
       tid: this.tid, slide, shown, steps, reach: this.reach,
       lesson: { key: Session.deck, n: Stage.slides.length, title: document.title.slice(0, 120) },
       site: this.siteName(),
+      timer: PopTimer.wire(),
     };
     const cur = this.inkLive() && this.inkCur();
     if (cur) {
@@ -7148,6 +7346,7 @@ const Live = {
     this.track();
     this.sendState();
     this.renderDist();
+    this.renderCount();
   },
 
   onInbox(event, raw) {
@@ -7217,10 +7416,56 @@ const Live = {
     return n;
   },
 
+  // 지금 장의 응답 현황 { n: 답한 학생, of: 접속 학생, word }. 학생이 답하는 활동이 없는 장이면 null.
+  // 퀴즈·투표·단답이 있으면 '제출', 슬라이더만 있으면 '참여'(값을 바꾼 학생)로 쓴다.
+  tally() {
+    const i = Nav.state.slide;
+    const answer = [...this.quizzes(i).map((it) => [this.picks, this.partKey(it, i, 'q')]),
+      ...this.polls(i).map((it) => [this.picks, this.partKey(it, i, 'p')]),
+      ...this.shorts(i).map((it) => [this.texts, this.partKey(it, i, 's')])];
+    const parts = [...answer, ...this.ranges(i).map((el) => [this.vals, this.keyOf(el, i)])];
+    if (!parts.length) return null;
+    const of = this.count();
+    const now = Date.now();
+    const n = LiveCore.answered(parts.map(([store, key]) => store.get(`${i}|${key}`)), (sid) => now - (this.seen.get(sid) || 0) <= LIVE_GONE_MS);
+    return { n, of, word: answer.length ? '제출' : '참여' };
+  },
+
+  tallyText(t) { return t.of > 0 && t.n === t.of ? `접속 ${t.of}명 모두 ${t.word}` : `접속 ${t.of}명 중 ${t.n}명 ${t.word}`; },
+
+  // 교사 화면 오른쪽 위: 응답을 받는 장에서만 보인다. 누르면 「학생 보기」를 연다(실시간 창이 열려 있으면 그 창에 같은 줄이 있다).
+  renderTally() {
+    const t = this.role === 'teacher' && this.main ? this.tally() : null;
+    if (!this.tallyEl) {
+      if (!t) return;
+      this.tallyEl = h('button', {
+        type: 'button', class: 'ch-live-tally ch-live-ui', 'data-no-ink': '', hidden: true,
+        onclick: (e) => { this.toggleDist(true); e.currentTarget.blur(); },
+      });
+      document.body.append(this.tallyEl);
+    }
+    const el = this.tallyEl;
+    el.hidden = !t || (!!this.panel && !this.panel.hidden);
+    if (el.hidden) return;
+    // 툴바 타이머와 겹치면(좁은 화면, 옮긴 타이머) 타이머 아래로 내린다
+    el.style.top = '';
+    if (PopTimer.shown()) {
+      const p = PopTimer.el.getBoundingClientRect();
+      const r = el.getBoundingClientRect();
+      if (r.left < p.right && r.right > p.left && r.top < p.bottom && r.bottom > p.top) el.style.top = `${Math.round(p.bottom + 8)}px`;
+    }
+    const text = this.tallyText(t);
+    if (el.textContent === text) return;   // 학생 값이 몰려 와도 글이 같으면 그대로 둔다
+    el.textContent = text;
+    el.classList.toggle('is-all', t.of > 0 && t.n === t.of);
+    el.setAttribute('aria-label', `${text}. 학생 보기 열기`);
+  },
+
   showPanel(open) {
     if (!this.panel) this.buildPanel();
     this.panel.hidden = !open;
     if (open) this.renderPanel();
+    else this.renderTally();
   },
 
   buildPanel() {
@@ -7282,7 +7527,11 @@ const Live = {
   },
 
   renderCount() {
-    if (this.ui) this.ui.count.textContent = this.role === 'teacher' && this.main ? `참여 ${this.count()}명` : '';
+    if (this.ui) {
+      const t = this.role === 'teacher' && this.main ? this.tally() : null;
+      this.ui.count.textContent = this.role === 'teacher' && this.main ? (t ? this.tallyText(t) : `접속 ${this.count()}명`) : '';
+    }
+    this.renderTally();
   },
 
   toggleDist(force) {
@@ -7615,6 +7864,7 @@ const Live = {
     }
     this.teacher = p;
     this.heard = Date.now();
+    this.timerShow(p.timer);
     this.inkState(p);
     // 교사가 학생이 보던 장으로 오면 다시 따라간다
     if (this.follow || p.slide === Nav.state.slide) this.showSlide(p.slide);
@@ -7712,9 +7962,36 @@ const Live = {
     this.join.hidden = false;
     clearTimeout(this.needTimer);
     this.needTimer = 0;
+    this.timerShow(null);
     this.inkOn = false;
     this.inkReset(0);
     this.inkShow();
+  },
+
+  // 교사 툴바 타이머의 남은 시간(학생 화면 오른쪽 아래). 기기마다 시계가 달라 받은 남은 시간으로 이 기기의 끝 시각을 다시 잡는다.
+  // 교사 상태가 올 때마다(5초) 다시 맞춘다.
+  timerShow(w) {
+    clearInterval(this.timerTick);
+    this.timerTick = 0;
+    if (!w) { if (this.timerEl) this.timerEl.hidden = true; return; }
+    if (!this.timerEl) {
+      this.timerEl = h('div', { class: 'ch-live-timer ch-live-ui', 'data-no-ink': '', role: 'timer' }, h('span'), h('b'));
+      document.body.append(this.timerEl);
+    }
+    this.timerEnd = w.run ? Date.now() + w.left : 0;
+    this.timerLeft = w.left;
+    this.timerEl.hidden = false;
+    if (w.run) this.timerTick = setInterval(() => this.timerDraw(), 250);
+    this.timerDraw();
+  },
+
+  timerDraw() {
+    const left = this.timerEnd ? Math.max(0, this.timerEnd - Date.now()) : this.timerLeft;
+    const done = left <= 0;
+    this.timerEl.firstChild.textContent = done ? '시간' : this.timerEnd ? '남은 시간' : '멈춤';
+    this.timerEl.lastChild.textContent = done ? '끝' : Timer.fmt(left / 1000);
+    this.timerEl.classList.toggle('is-done', done);
+    if (done) { clearInterval(this.timerTick); this.timerTick = 0; }
   },
 
   // ---- 실시간 판서(학생) ----
@@ -8427,7 +8704,7 @@ function boot() {
   Exploragram.next = () => Nav.next();
   Exploragram.prev = () => Nav.prev();
   Exploragram.audit = () => Audit.run();
-  Exploragram._internal = { on, emit, Stage, Fit, Nav, Steps, Panels, Ask, InkGeom, InkModel, Store, Session, Tools, Ink, Toolbar, icon, Board, Settings, KeepWords, Print, Audit, Parts, TocSlide, Answer, Blank, Zoom, Expr, Stepper, MapReveal, Yearline, Sort, Quiz, Short, Order, Calc, Plot, Zip, Pptx, Source, PptFill, Timer, Picker, Score, Checklist, Hotspots, Poll, Labeling, Media, Anim, MathTex, Particles, Play, Editor, Live, LiveCore };
+  Exploragram._internal = { on, emit, Stage, Fit, Nav, Steps, Panels, Ask, InkGeom, InkModel, Store, Session, Tools, Ink, Toolbar, icon, Board, Settings, KeepWords, Print, Audit, Parts, TocSlide, Answer, Blank, Zoom, Expr, Stepper, MapReveal, Yearline, Sort, Quiz, Short, Order, Calc, Plot, Zip, Pptx, Source, PptFill, Timer, PopTimer, Picker, Score, Checklist, Hotspots, Poll, Labeling, Media, Anim, MathTex, Particles, Play, Editor, Live, LiveCore };
   start().then(() => readyResolve(Exploragram), (err) => {
     console.error('[exploragram]', err);
     readyResolve(Exploragram);

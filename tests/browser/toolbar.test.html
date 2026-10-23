@@ -130,6 +130,27 @@ test('반 메뉴: 반을 추가하면 그 반으로 바뀌고 이름이 보인�
   eq(I().Session.current, '3반');
   eq(btn('class').querySelector('span').textContent, '3반');
 });
+test('반 단추: 지금 반 이름이 색 알약으로 보이고, 반을 바꾸면 화면에 잠깐 알린다', async () => {
+  const pill = getComputedStyle(btn('class').querySelector('span'));
+  assert(pill.backgroundColor !== 'rgba(0, 0, 0, 0)' && parseFloat(pill.fontSize) >= 13, `알약 ${pill.backgroundColor} ${pill.fontSize}`);
+  eq(btn('class').getAttribute('aria-label'), '반: 3반', '말줄임돼도 단추 이름에 반 이름 전체');
+  const note = () => document.querySelector('.ch-notice');
+  assert(note() && note().classList.contains('is-on'), '3반을 추가하며 바꿨을 때 알림');
+  eq(note().textContent, '3반 판서로 바꿨어요');
+  eq(note().getAttribute('role'), 'status');
+  await I().Session.switchTo('기본');
+  eq(note().textContent, '기본 판서로 바꿨어요');
+  await wait(2200);
+  assert(!note().classList.contains('is-on'), '2초쯤 뒤 사라진다');
+  btn('dock').click();   // 왼쪽 붙임에서도 반 이름은 보인다(다른 단추 이름은 숨김)
+  eq(document.querySelector('.ch-toolbar').dataset.dock, 'left');
+  assert(getComputedStyle(btn('class').querySelector('span')).display !== 'none', '반 이름');
+  eq(getComputedStyle(btn('next').querySelector('span')).display, 'none');
+  btn('dock').click();
+  btn('dock').click();
+  eq(document.querySelector('.ch-toolbar').dataset.dock, 'bottom');
+  await I().Session.switchTo('3반');
+});
 test('툴바 설정은 저장된다', async () => {
   await wait(100);
   const saved = await I().Store.get('toolbar');

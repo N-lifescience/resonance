@@ -16,6 +16,14 @@
 .ch-tb-btn[aria-pressed="true"] { background: var(--accent); color: #fff; }
 .ch-toolbar[data-dock="left"] .ch-tb-btn, .ch-toolbar[data-dock="right"] .ch-tb-btn { min-width: 52px; height: 52px; }
 .ch-toolbar[data-dock="left"] .ch-tb-btn span, .ch-toolbar[data-dock="right"] .ch-tb-btn span { display: none; }
+/* 「반」 단추: 지금 반 이름을 색 알약으로(판서는 반마다 따로 저장된다). 옆 붙임에서도 이름은 보인다 */
+.ch-tb-btn[data-name="class"] span { max-width: 6em; overflow: hidden; text-overflow: ellipsis; padding: 2px 8px; border-radius: 999px; background: var(--accent); color: #fff; font-size: 13px; font-weight: 800; line-height: 1.1; }
+.ch-toolbar[data-dock="left"] .ch-tb-btn[data-name="class"] span, .ch-toolbar[data-dock="right"] .ch-tb-btn[data-name="class"] span { display: block; max-width: 46px; padding: 1px 4px; font-size: 11px; }
+/* 반을 바꾸면 화면 가운데에 잠깐: 「B반 판서로 바꿨어요」 */
+.ch-notice { position: fixed; z-index: 85; left: 16px; right: 16px; top: 40%; box-sizing: border-box; width: fit-content; margin: 0 auto; padding: 16px 28px; border-radius: 18px; background: var(--ch-ui); color: var(--ch-ui-fg); font: 700 28px/1.35 var(--ch-font); text-align: center; word-break: keep-all; overflow-wrap: anywhere; box-shadow: 0 16px 40px rgba(0, 0, 0, .4); pointer-events: none; transform: translateY(-50%); opacity: 0; visibility: hidden; transition: opacity .25s, visibility 0s .25s; }
+.ch-notice.is-on { opacity: 1; visibility: visible; transition: opacity .2s; }
+.ch-notice b { color: var(--accent); font-weight: 900; }
+@media print { .ch-notice { display: none !important; } }
 .ch-icon { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .ch-icon-style path { fill: var(--swatch, currentColor); stroke: rgba(255, 255, 255, .6); stroke-width: 1.5; }
 .ch-tb-handle { position: fixed; z-index: 50; background: var(--ch-ui); box-shadow: 0 8px 24px rgba(0, 0, 0, .3); }
