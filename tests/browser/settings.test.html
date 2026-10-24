@@ -25,7 +25,8 @@
 <pre id="results" data-summary="pending"></pre>
 <script>
 const I = () => Exploragram._internal;
-const btn = (name) => document.querySelector(`.ch-toolbar [data-name="${name}"]`);
+// 「실시간」은 툴바 밖 오른쪽 아래에 따로 뜬다
+const btn = (name) => document.querySelector(`.ch-toolbar [data-name="${name}"], .ch-live-fab[data-name="${name}"]`);
 const sw = (k) => document.querySelector(`.ch-pop input[data-key="${k}"]`);
 const clean = (text) => text.replace(/\u2060/g, '');
 

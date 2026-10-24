@@ -171,7 +171,7 @@
     window.__ready = true;   // 여기서부터 녹화
     await sleep(1200);
 
-    const liveBtn = T.querySelector('.ch-toolbar button[data-name="live"]');
+    const liveBtn = T.querySelector('button[data-name="live"]');
     await press(teacher, liveBtn, 200);
     const code = await until(() => { const el = T.querySelector('.ch-live-code'); const c = el ? el.textContent.replace(/\D/g, '') : ''; return /^\d{6}$/.test(c) && c; });
     log(`code ${code}`);

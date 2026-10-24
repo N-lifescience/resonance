@@ -49,9 +49,13 @@ const visible = (el) => !!el && !el.hidden && getComputedStyle(el).display !== '
 test('교사가 실시간을 켜면 6자리 코드가 생긴다(로컬 전송)', async () => {
   T = await open('t');
   assert(T.Live.local, '설정이 없으면 로컬 전송');
-  assert(doc('t').querySelector('.ch-tb-btn[data-name="live"]'), '툴바에 「실시간」');
+  const fab = doc('t').querySelector('.ch-live-fab[data-name="live"]');
+  assert(fab && !fab.closest('.ch-toolbar'), '「실시간」은 툴바 밖 오른쪽 아래에 따로 뜬다');
+  eq(getComputedStyle(fab).position, 'fixed');
   T.Live.startTeacher();
   await until(() => /^\d{6}$/.test(T.Live.code), 5000);
+  assert(fab.classList.contains('is-on'), '켜지면 단추가 수업 중임을 알린다');
+  eq(fab.textContent, '실시간 켜짐');
 });
 
 test('학생 둘이 코드로 들어와 교사 장을 따라간다', async () => {

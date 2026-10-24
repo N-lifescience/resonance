@@ -2,7 +2,7 @@
 <html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#141413"><title>제작하기 — 공명</title><meta name="description" content="수업 PPT와 한 줄로 시작하세요. 만드는 법, 예시 수업, 모델별 결과를 확인할 수 있습니다."><link rel="stylesheet" href="assets/css/site.css"></head>
 <body class=""><a class="skip-link" href="#main">본문으로 건너뛰기</a>
 <header class="site-header">
-  <a class="logo" href="./" aria-label="공명 첫 화면"><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M2 16c4-16 10 16 14 0s10 16 14 0" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg><span class="brand-lockup"><span>공명</span><span class="brand-tagline">교실의 진동수를 맞추다</span></span></a>
+  <a class="logo" href="./" aria-label="공명 첫 화면"><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M2 16c4-16 10 16 14 0s10 16 14 0" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg><span class="brand-lockup"><span>공명</span><span class="brand-tagline">PPT를 실시간 수업 HTML로</span></span></a>
   <nav class="pill-nav" aria-label="주 메뉴"><a href="explore.html" >살펴보기</a><a href="make.html" aria-current="page">제작하기</a></nav>
   <div class="join-area"><button class="join-trigger" type="button" data-join-toggle aria-expanded="false" aria-controls="join-popover">수업 코드</button>
     <section id="join-popover" class="join-popover" aria-labelledby="join-h" hidden>
@@ -13,25 +13,17 @@
   </div>
 </header>
 <main id="main">
-<section class="photo-hero hero-make" data-shrink-card>
-<div class="hero-content wrap">
-<h1 class="split-title"><span>준비는 가볍게</span><strong>수업은 생생하게</strong></h1>
-<div class="hero-bottom"><div>
-<p class="lead"><span class="sent"><span class="u">평소 쓰던 AI와</span> <span class="u">수업 자료만 있으면 됩니다.</span></span> <span class="sent"><span class="u">AI의 질문에 답하고</span> <span class="u">설계표를 확인하면</span> <span class="u">수업 파일이 나옵니다.</span></span></p>
-<ul class="copy-points"><li>쓰던 AI 그대로</li><li>PPT나 교과서 PDF</li><li>질문 몇 개에 답하기</li><li>HTML 파일 하나</li></ul>
-</div></div>
-</div>
+<section class="page-head wrap" aria-labelledby="make-title">
+<h1 id="make-title">수업 HTML 만들기</h1>
+<p class="start-lead">쓰던 AI와 수업 자료만 있으면 됩니다.</p>
 </section>
 <section class="how section wrap" id="how" aria-labelledby="how-title">
-<div class="section-intro">
-<p class="eyebrow">만드는 법</p>
-<h2 class="split-title" id="how-title"><span>세 단계면 충분합니다</span><strong>쓰던 AI로 수업 만들기</strong></h2>
-</div>
+<h2 class="sr-only" id="how-title">세 단계로 만들기</h2>
 <ol class="make-steps">
 <li class="make-step" data-reveal>
 <div class="step-head"><span class="step-num" aria-hidden="true">1</span><div>
 <h3>프롬프트 복사하기</h3>
-<p><span class="u">아래 문장을 복사하세요.</span> <span class="u">쓰던 AI에게</span> <span class="u"><strong class="hl">공명 지침대로</strong> <strong class="hl">수업을 만들어 달라는</strong></span> <span class="u">부탁입니다.</span></p>
+<p>아래 문장을 복사하세요.</p>
 </div></div>
 <div class="prompt-box">
 <code id="prompt"><span class="u">https://github.com/N-lifescience/resonance</span> <span class="u">지침대로</span> <span class="u">이 자료를 수업 HTML로 바꿔줘</span></code>
@@ -43,7 +35,7 @@
 <li class="make-step" data-reveal>
 <div class="step-head"><span class="step-num" aria-hidden="true">2</span><div>
 <h3>쓰던 AI에 수업 자료 올리고 문장 붙여 넣기</h3>
-<p><span class="u">아래에서 쓰던 AI를 여세요.</span> <span class="u">대화창에 <strong class="hl">수업 자료</strong>를 올리고</span> <span class="u"><strong class="hl">복사한 문장을 붙여 넣어</strong> 보내세요.</span> <span class="u">PPT뿐 아니라</span> <span class="u">교사용 교과서 PDF도 됩니다.</span> <span class="u">로그인은 각자 계정으로 해 주세요.</span></p>
+<p><span class="u">PPT나 교사용 교과서 PDF를 올리고</span> <span class="u">복사한 문장을 붙여 넣으세요.</span></p>
 </div></div>
 <div class="ai-grid"><article class="ai-card" data-ai="chatgpt"><h4><svg class="ai-logo" viewBox="0 0 24 24" aria-hidden="true" fill="#0D0D0D" fill-rule="evenodd"><path d="M9.205 8.658v-2.26c0-.19.072-.333.238-.428l4.543-2.616c.619-.357 1.356-.523 2.117-.523 2.854 0 4.662 2.212 4.662 4.566 0 .167 0 .357-.024.547l-4.71-2.759a.797.797 0 00-.856 0l-5.97 3.473zm10.609 8.8V12.06c0-.333-.143-.57-.429-.737l-5.97-3.473 1.95-1.118a.433.433 0 01.476 0l4.543 2.617c1.309.76 2.189 2.378 2.189 3.948 0 1.808-1.07 3.473-2.76 4.163zM7.802 12.703l-1.95-1.142c-.167-.095-.239-.238-.239-.428V5.899c0-2.545 1.95-4.472 4.591-4.472 1 0 1.927.333 2.712.928L8.23 5.067c-.285.166-.428.404-.428.737v6.898zM12 15.128l-2.795-1.57v-3.33L12 8.658l2.795 1.57v3.33L12 15.128zm1.796 7.23c-1 0-1.927-.332-2.712-.927l4.686-2.712c.285-.166.428-.404.428-.737v-6.898l1.974 1.142c.167.095.238.238.238.428v5.233c0 2.545-1.974 4.472-4.614 4.472zm-5.637-5.303l-4.544-2.617c-1.308-.761-2.188-2.378-2.188-3.948A4.482 4.482 0 014.21 6.327v5.423c0 .333.143.571.428.738l5.947 3.449-1.95 1.118a.432.432 0 01-.476 0zm-.262 3.9c-2.688 0-4.662-2.021-4.662-4.519 0-.19.024-.38.047-.57l4.686 2.71c.286.167.571.167.856 0l5.97-3.448v2.26c0 .19-.07.333-.237.428l-4.543 2.616c-.619.357-1.356.523-2.117.523zm5.899 2.83a5.947 5.947 0 005.827-4.756C22.287 18.339 24 15.84 24 13.296c0-1.665-.713-3.282-1.998-4.448.119-.5.19-.999.19-1.498 0-3.401-2.759-5.947-5.946-5.947-.642 0-1.26.095-1.88.31A5.962 5.962 0 0010.205 0a5.947 5.947 0 00-5.827 4.757C1.713 5.447 0 7.945 0 10.49c0 1.666.713 3.283 1.998 4.448-.119.5-.19 1-.19 1.499 0 3.401 2.759 5.946 5.946 5.946.642 0 1.26-.095 1.88-.309a5.96 5.96 0 004.162 1.713z"/></svg><span>ChatGPT</span></h4><p class="ai-rec"><b>추천</b> Codex에서 모델 GPT-6.1-Sol, 노력 Extra High</p><div class="ai-actions"><a class="button ai-web" href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer" data-ai-web>웹에서 열기 <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg></a><button class="button ai-app" type="button" data-ai-app>데스크톱 앱에서 쓰기</button></div></article><article class="ai-card" data-ai="gemini"><h4><svg class="ai-logo" viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="gm-grad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4285F4"/><stop offset=".55" stop-color="#9B72CB"/><stop offset="1" stop-color="#D96570"/></linearGradient></defs><path fill="url(#gm-grad)" d="M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81"/></svg><span>Gemini</span></h4><p class="ai-rec"><b>추천</b> 모델 4 Argon, 사고 수준 최고</p><div class="ai-actions"><a class="button ai-web" href="https://gemini.google.com/app" target="_blank" rel="noopener noreferrer" data-ai-web>웹에서 열기 <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg></a><button class="button ai-app" type="button" data-ai-app>데스크톱 앱에서 쓰기</button></div></article><article class="ai-card" data-ai="claude"><h4><svg class="ai-logo" viewBox="0 0 24 24" aria-hidden="true" fill="#D97757"><path d="m4.7144 15.9555 4.7174-2.6471.079-.2307-.079-.1275h-.2307l-.7893-.0486-2.6956-.0729-2.3375-.0971-2.2646-.1214-.5707-.1215-.5343-.7042.0546-.3522.4797-.3218.686.0608 1.5179.1032 2.2767.1578 1.6514.0972 2.4468.255h.3886l.0546-.1579-.1336-.0971-.1032-.0972L6.973 9.8356l-2.55-1.6879-1.3356-.9714-.7225-.4918-.3643-.4614-.1578-1.0078.6557-.7225.8803.0607.2246.0607.8925.686 1.9064 1.4754 2.4893 1.8336.3643.3035.1457-.1032.0182-.0728-.164-.2733-1.3539-2.4467-1.445-2.4893-.6435-1.032-.17-.6194c-.0607-.255-.1032-.4674-.1032-.7285L6.287.1335 6.6997 0l.9957.1336.419.3642.6192 1.4147 1.0018 2.2282 1.5543 3.0296.4553.8985.2429.8318.091.255h.1579v-.1457l.1275-1.706.2368-2.0947.2307-2.6957.0789-.7589.3764-.9107.7468-.4918.5828.2793.4797.686-.0668.4433-.2853 1.8517-.5586 2.9021-.3643 1.9429h.2125l.2429-.2429.9835-1.3053 1.6514-2.0643.7286-.8196.85-.9046.5464-.4311h1.0321l.759 1.1293-.34 1.1657-1.0625 1.3478-.8804 1.1414-1.2628 1.7-.7893 1.36.0729.1093.1882-.0183 2.8535-.607 1.5421-.2794 1.8396-.3157.8318.3886.091.3946-.3278.8075-1.967.4857-2.3072.4614-3.4364.8136-.0425.0304.0486.0607 1.5482.1457.6618.0364h1.621l3.0175.2247.7892.522.4736.6376-.079.4857-1.2142.6193-1.6393-.3886-3.825-.9107-1.3113-.3279h-.1822v.1093l1.0929 1.0686 2.0035 1.8092 2.5075 2.3314.1275.5768-.3218.4554-.34-.0486-2.2039-1.6575-.85-.7468-1.9246-1.621h-.1275v.17l.4432.6496 2.3436 3.5214.1214 1.0807-.17.3521-.6071.2125-.6679-.1214-1.3721-1.9246L14.38 17.959l-1.1414-1.9428-.1397.079-.674 7.2552-.3156.3703-.7286.2793-.6071-.4614-.3218-.7468.3218-1.4753.3886-1.9246.3157-1.53.2853-1.9004.17-.6314-.0121-.0425-.1397.0182-1.4328 1.9672-2.1796 2.9446-1.7243 1.8456-.4128.164-.7164-.3704.0667-.6618.4008-.5889 2.386-3.0357 1.4389-1.882.929-1.0868-.0062-.1579h-.0546l-6.3385 4.1164-1.1293.1457-.4857-.4554.0608-.7467.2307-.2429 1.9064-1.3114Z"/></svg><span>Claude</span></h4><p class="ai-rec"><b>추천</b> 모델 Opus 5.5, 노력 수준 Extra High</p><div class="ai-actions"><a class="button ai-web" href="https://claude.ai/new" target="_blank" rel="noopener noreferrer" data-ai-web>웹에서 열기 <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg></a><a class="button ai-app" href="claude://claude.ai/new" data-ai-app>데스크톱 앱에서 열기</a></div></article></div>
 <p class="ai-status" data-ai-status role="status" aria-live="polite"></p>
@@ -51,7 +43,7 @@
 <li class="make-step" data-reveal>
 <div class="step-head"><span class="step-num" aria-hidden="true">3</span><div>
 <h3>질문에 답하고 HTML 생성하기</h3>
-<p><span class="u">AI가 교과와 차시,</span> <span class="u">넣을 기능을 묻습니다.</span> <span class="u">답하고 설계표를 확인하면</span> <span class="u">HTML 파일이 생깁니다.</span> <span class="u">내려받은 파일을 더블클릭하면</span> <span class="u">수업이 열립니다.</span></p>
+<p><span class="u">AI의 질문에 답하면 HTML 파일이 나옵니다.</span> <span class="u">내려받은 파일을 더블클릭하면</span> <span class="u">수업이 열립니다.</span></p>
 </div></div>
 <div class="before-after">
 <div class="ba-item ba-before"><span class="ba-tag">바꾸기 전 · PPT</span><figure class="ba-card"><img src="assets/img/sci-before.png" width="1280" height="720" loading="lazy" alt="바꾸기 전: 처음, 1분 뒤, 5분 뒤 그림 세 장으로 확산을 설명하는 PPT 한 장"><figcaption><strong><span class="u">그림 세 장을</span> <span class="u">넘기며 설명합니다</span></strong><span><span class="u">학생은</span> <span class="u">바라보기만 합니다</span></span></figcaption></figure></div>
@@ -61,12 +53,12 @@
 </li>
 </ol>
 </section>
-<section class="catalog section" id="lessons" aria-labelledby="lessons-title">
+<section class="catalog fold-section" id="lessons" aria-labelledby="lessons-title">
 <div class="wrap" data-rail-section>
+<details class="fold">
+<summary><h2 class="fold-title" id="lessons-title">예시 수업 열어 보기</h2></summary>
 <div class="section-head">
 <div>
-<p class="eyebrow">예시 자료</p>
-<h2 class="split-title" id="lessons-title"><span>미리 열어 보는</span><strong>교과별 수업 HTML</strong></h2>
 <p><span class="u">학교급과 교과를 골라</span> <span class="u">예시 파일을 열어 보세요.</span> <span class="u">모두 Claude Opus 5.5(xhigh)로</span> <span class="u">만들었습니다.</span></p>
 </div>
 <div class="rail-controls"><button type="button" data-rail-prev aria-label="이전 카드"><svg class="icon" style="transform:rotate(180deg)" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6"/></svg></button><button type="button" data-rail-next aria-label="다음 카드"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6"/></svg></button></div>
@@ -79,19 +71,21 @@
 <p class="status-line" data-lessons-status data-count="예시 수업 {n}개" role="status" aria-live="polite"></p>
 <template id="lesson-card-template"><article class="lesson-card"><img width="640" height="360" loading="lazy" alt=""><div class="card-body"><p class="card-meta" data-card-meta></p><h3 data-card-title></h3><p data-card-question></p><div class="tag-list" data-card-tags></div><span class="model-badge" data-card-model>Claude Opus 5.5 · xhigh</span><a class="button" data-card-link>수업 열기 <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6"/></svg></a></div></article></template>
 <template id="lessons-empty-template"><article class="lesson-card empty-card"><h3>준비 중</h3><p>선택한 학교급과 교과의 수업을 준비하고 있습니다. 다른 항목을 골라 보세요.</p></article></template>
+</details>
 </div>
 </section>
-<section class="comparisons section wrap" id="comparison" aria-labelledby="comparison-title" data-rail-section>
+<section class="comparisons fold-section wrap" id="comparison" aria-labelledby="comparison-title" data-rail-section>
+<details class="fold">
+<summary><h2 class="fold-title" id="comparison-title">AI별 결과 비교하기</h2></summary>
 <div class="section-head">
 <div>
-<p class="eyebrow">모델별 비교</p>
-<h2 class="split-title" id="comparison-title"><span>같은 자료를 건네면</span><strong>AI마다 어떻게 다를까?</strong></h2>
 <p><span class="u">똑같은 PPT와 지침을</span> <span class="u">AI마다 한 번씩 건넸습니다.</span> <span class="u">화면 구성과 학생 활동이</span> <span class="u">어떻게 다른지 견주어 보세요.</span></p><p class="as-of">2026. 10. 19.(월) 기준</p>
 </div>
 <div class="rail-controls"><button type="button" data-rail-prev aria-label="이전 카드"><svg class="icon" style="transform:rotate(180deg)" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6"/></svg></button><button type="button" data-rail-next aria-label="다음 카드"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6"/></svg></button></div>
 </div>
 <div class="rail" data-comparison-rail tabindex="0" role="region" aria-label="모델별 비교 카드"><article class="compare-card empty-card"><h3>Gemini</h3><p>비교 결과 준비 중</p></article><article class="compare-card empty-card"><h3>ChatGPT</h3><p>비교 결과 준비 중</p></article><article class="compare-card empty-card"><h3>Claude</h3><p>비교 결과 준비 중</p></article></div>
 <template id="comparison-card-template"><article class="compare-card"><img width="640" height="360" loading="lazy" alt=""><div class="card-body"><p class="card-meta" data-compare-platform></p><h3 data-compare-model></h3><span class="model-badge" data-compare-mode></span><dl class="metrics"><div><dt>엔진 적용</dt><dd data-metric="engine" data-yes="적용" data-no="미적용"></dd></div><div><dt>익스플로라그램</dt><dd data-metric="exploragrams"></dd></div><div><dt>점검 오류</dt><dd data-metric="auditErrors"></dd></div><div><dt>슬라이드</dt><dd data-metric="slides"></dd></div><div><dt>제작 시간</dt><dd data-metric="minutes" data-unit="분"></dd></div></dl><p data-compare-note></p><a class="button" data-compare-link target="_blank" rel="noopener noreferrer">비교 결과 보기 <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6"/></svg></a></div></article></template>
+</details>
 </section>
 </main>
 <footer class="site-footer wrap"><button class="maker-button" type="button" data-maker-open>Made by 엔의 생명과학</button><p>공명은 평소 쓰던 PPT를 학생이 직접 참여하는 수업으로 바꿔 주는 도구입니다.</p></footer>
