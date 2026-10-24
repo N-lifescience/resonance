@@ -111,8 +111,8 @@ test('가장 높은 버전의 정식 Flash를 고른다', () => {
 
 test('요청 본문에 영상과 구간(초)을 넣는다', () => {
   const body = plain(L.requestBody('p', { url: 'https://youtu.be/RcU-7lx8EDU', start: '1:00', end: '2:30' }));
-  assert.deepEqual(body.contents[0].parts[0], { fileData: { fileUri: 'https://youtu.be/RcU-7lx8EDU' }, videoMetadata: { startOffset: '60s', endOffset: '150s' } });
-  assert.equal(plain(L.requestBody('p', { url: 'u', start: '', end: '' })).contents[0].parts[0].videoMetadata, undefined);
+  assert.deepEqual(body.contents[0].parts[0], { fileData: { fileUri: 'https://www.youtube.com/watch?v=RcU-7lx8EDU' }, videoMetadata: { startOffset: '60s', endOffset: '150s' } });
+  assert.equal(plain(L.requestBody('p', { url: 'https://m.youtube.com/shorts/RcU-7lx8EDU', start: '', end: '' })).contents[0].parts[0].videoMetadata, undefined);
 });
 
 test('응답에서 생각 토큰을 빼고 글만 읽으며, 잘린 응답은 실패로 본다', () => {
@@ -140,4 +140,42 @@ test('class-helper의 _cards/*.json을 받고, 멈춘 분석은 실패로 바꾼
   assert.equal(L.recoverInterrupted(c), true);
   assert.equal(c.sources[0].status, 'error');
   assert.equal(L.doneSources(c).length, 1);
+});
+
+test('주소 없는 영상이 있어도 열쇠를 만들고, 유튜브가 아닌 주소는 버린다', () => {
+  assert.doesNotThrow(() => L.sourceKey({ url: '', text: '가져온 분석' }));
+  assert.notEqual(L.sourceKey({ url: '', text: '가' }), L.sourceKey({ url: '', text: '나' }));
+  const [c] = L.parseImport(JSON.stringify({ app: 'resonance-cards', version: 1, cards: [{ id: 'x', instructor: '김', sources: [{ id: 'a', url: 'javascript:alert(1)', status: 'done', text: '글' }, { id: 'b', url: 'https://example.com/v', status: 'done', text: '글2' }] }] }), 'b.json');
+  assert.deepEqual(plain(c.sources.map((s) => s.url)), ['', '']);
+});
+
+test('합치기는 양쪽 영상 분석을 모두 남기고, 고친 시각이 없는 class-helper 카드는 로컬을 덮지 않는다', () => {
+  const local = { ...card('로컬 이름', ['가'.repeat(30), '나'.repeat(30)]), id: 'k', updatedAt: '2026-10-20T00:00:00Z' };
+  local.sources[1].url = 'https://youtu.be/RcU-7lx8EDU';
+  const [imported] = L.parseImport(JSON.stringify({ file: 'k', instructor: '옛 이름', sources: [{ id: 'z', url: 'https://youtu.be/RcU-7lx8EDV', status: 'done', text: '다'.repeat(30) }] }), 'k.json');
+  assert.equal(imported.updatedAt, '');
+  const merged = L.mergeCards([local], [imported]);
+  assert.equal(merged.cards[0].instructor, '로컬 이름');
+  assert.equal(merged.cards[0].sources.length, 3);
+  assert.equal(merged.updated, 1);
+  assert.equal(L.mergeCards(merged.cards, [imported]).updated, 0, '같은 것을 다시 불러오면 바뀌지 않는다');
+});
+
+test('같은 class-helper 카드의 .json과 .md를 함께 불러와도 분석이 겹치지 않는다', () => {
+  const text = '# 강사 카드: 김 — 시간\n## 1. 배경지식\n' + '내용 '.repeat(60);
+  const name = '강사_931ab8d1-0fa1-4972-a0e8-0c736c17617d.md';
+  const [fromJson] = L.parseImport(JSON.stringify({ file: name, instructor: '김', sources: [{ id: 'e', url: 'https://youtu.be/RcU-7lx8EDU', start: '1:00', status: 'done', text }] }), name + '.json');
+  const [fromMd] = L.parseImport(L.cardMarkdown({ instructor: '김', sources: [{ url: 'https://youtu.be/RcU-7lx8EDU', status: 'done', text }] }), name);
+  const merged = L.mergeCards(L.mergeCards([], [fromJson]).cards, [fromMd]).cards;
+  assert.equal(merged.length, 1);
+  assert.equal(merged[0].sources.length, 1);
+  assert.equal(merged[0].sources[0].start, '1:00');
+});
+
+test('다른 탭이 방금 시작한 분석은 실패로 바꾸지 않는다', () => {
+  const c = L.newCard('김');
+  const now = Date.parse('2026-10-25T10:00:00Z');
+  c.sources.push({ id: 'a', url: '', status: 'running', startedAt: '2026-10-25T09:55:00Z', text: '' }, { id: 'b', url: '', status: 'running', startedAt: '2026-10-25T09:00:00Z', text: '' });
+  assert.equal(L.recoverInterrupted(c, now), true);
+  assert.deepEqual(plain(c.sources.map((s) => s.status)), ['running', 'error']);
 });

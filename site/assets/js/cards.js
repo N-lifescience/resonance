@@ -34,7 +34,13 @@
     return parts.reduce((a, b) => a * 60 + b, 0);
   }
 
-  function sourceKey(s) { return [videoId(s.url), s.start || '', s.end || '', s.focus || ''].join('|'); }
+  // 같은 영상·구간·초점이면 같은 열쇠. 주소가 없는 영상(가져온 카드)은 분석 글로 구분한다.
+  function sourceKey(s) {
+    let v;
+    try { v = videoId(s.url); } catch { v = `text:${String(s.text || s.id || '').trim().slice(0, 200)}`; }
+    return [v, s.start || '', s.end || '', s.focus || ''].join('|');
+  }
+  const youtubeOnly = (url) => { try { videoId(url); return String(url).trim(); } catch { return ''; } };
   const isDone = (s) => s.status === 'done' && typeof s.text === 'string' && s.text.trim() !== '';
   const doneSources = (card) => (card.sources || []).filter(isDone);
   const thumb = (url) => { try { return `https://i.ytimg.com/vi/${videoId(url)}/hqdefault.jpg`; } catch { return null; } };
@@ -57,14 +63,16 @@
       photo: typeof raw.photo === 'string' && PHOTO_RE.test(raw.photo) && raw.photo.length <= PHOTO_MAX * 1.4 ? raw.photo : null,
       deletedAt: typeof raw.deletedAt === 'string' ? raw.deletedAt : null,
       createdAt: str(raw.createdAt, 40) || now,
-      updatedAt: str(raw.updatedAt, 40) || now,
+      // 고친 시각이 없는 카드(class-helper 파일)는 가장 오래된 것으로 본다. 다시 불러와도 로컬 카드를 덮지 않는다.
+      updatedAt: str(raw.updatedAt, 40),
       sources: [],
     };
     for (const s of Array.isArray(raw.sources) ? raw.sources.slice(0, MAX_SOURCES) : []) {
       if (!s || typeof s !== 'object') continue;
       card.sources.push({
         id: str(s.id, 100) || uid(),
-        url: str(s.url, 500),
+        url: youtubeOnly(str(s.url, 500)),
+        startedAt: str(s.startedAt, 40),
         start: str(s.start, 12),
         end: str(s.end, 12),
         focus: str(s.focus, 200),
@@ -89,12 +97,12 @@
     const parts = body.split(/^## 영상 \d+ · (.*)$/m);
     if (parts.length > 1) {
       for (let i = 1; i < parts.length; i += 2) {
-        const url = /^https:\/\//.test(parts[i].trim()) ? parts[i].trim() : '';
+        const url = youtubeOnly(parts[i]);
         const t = parts[i + 1].trim();
         if (t) card.sources.push({ id: uid(), url, start: '', end: '', focus: '', status: 'done', text: t, error: '', model: '가져온 카드', at: card.createdAt });
       }
     } else {
-      const url = (/https:\/\/(?:www\.|m\.)?(?:youtube\.com|youtu\.be)\/[^\s·)\]]+/.exec(body) || [''])[0];
+      const url = youtubeOnly((/https:\/\/(?:www\.|m\.)?(?:youtube\.com|youtu\.be)\/[^\s·)\]]+/.exec(body) || [''])[0]);
       card.sources.push({ id: uid(), url, start: '', end: '', focus: '', status: 'done', text: body.trim(), error: '', model: '가져온 카드', at: card.createdAt });
     }
     if (!doneSources(card).length) throw new Error('카드 내용이 비어 있습니다.');
@@ -189,7 +197,8 @@
 
   // class-helper scripts/gemini_video.mjs와 같은 요청. 생각 토큰도 출력 한도에 들어가 넉넉히 둔다.
   function requestBody(prompt, { url, start, end }) {
-    const video = { fileData: { fileUri: url } };
+    // shorts·모바일·공유(?si=) 주소도 Gemini가 받는 표준 주소로 바꿔 보낸다.
+    const video = { fileData: { fileUri: `https://www.youtube.com/watch?v=${videoId(url)}` } };
     const a = toSec(start), b = toSec(end);
     if (a != null || b != null) video.videoMetadata = { ...(a != null ? { startOffset: `${a}s` } : {}), ...(b != null ? { endOffset: `${b}s` } : {}) };
     return { contents: [{ role: 'user', parts: [video, { text: prompt }] }], generationConfig: { maxOutputTokens: 16384, temperature: 0.3 } };
@@ -210,13 +219,20 @@
     return `Gemini 오류(HTTP ${status}). 잠시 뒤 다시 시도해 주세요.`;
   }
 
-  // 백업: 같은 id는 더 늦게 고친 쪽을 남긴다.
+  // 백업 합치기: 같은 id는 더 늦게 고친 쪽의 이름·사진을 남기고, 영상 분석은 양쪽을 모두 모은다(어느 쪽도 잃지 않게).
   function mergeCards(existing, incoming) {
     const map = new Map(existing.map((c) => [c.id, c]));
     let added = 0, updated = 0;
     for (const c of incoming) {
       const old = map.get(c.id);
-      if (!old) { map.set(c.id, c); added++; } else if (String(c.updatedAt) > String(old.updatedAt)) { map.set(c.id, c); updated++; }
+      if (!old) { map.set(c.id, c); added++; continue; }
+      const [base, extra] = String(c.updatedAt) > String(old.updatedAt) ? [c, old] : [old, c];
+      const keys = new Set(base.sources.map(sourceKey));
+      const texts = new Set(base.sources.map((s) => (s.text || '').trim()).filter(Boolean));
+      const more = extra.sources.filter((s) => !keys.has(sourceKey(s)) && !texts.has((s.text || '').trim()));
+      if (base === old && !more.length) continue;
+      map.set(c.id, { ...base, sources: [...base.sources, ...more] });
+      updated++;
     }
     return { cards: [...map.values()], added, updated };
   }
@@ -235,13 +251,22 @@
       if (data && Array.isArray(data.sources)) return [normalizeCard({ ...data, id: data.id || data.file })];
       throw new Error(`${name || '파일'}: 강사 카드 백업이 아닙니다.`);
     }
-    return [parseCardMarkdown(t, name)];
+    const card = parseCardMarkdown(t, name);
+    card.updatedAt = '';
+    return [card];
   }
 
   // 분석 도중 탭을 닫았던 영상은 다시 열 때 실패로 바꿔 다시 분석할 수 있게 한다.
-  function recoverInterrupted(card) {
+  // 다른 탭이 지금 분석 중일 수 있으니 시작한 지 15분이 안 된 영상은 건드리지 않는다.
+  // ponytail: 시각으로만 가른다. 탭끼리 실제로 알리려면 BroadcastChannel을 쓴다.
+  const STALE_MS = 15 * 60 * 1000;
+  function recoverInterrupted(card, now = Date.now()) {
     let changed = false;
-    for (const s of card.sources) if (s.status === 'queued' || s.status === 'running') { s.status = 'error'; s.error = '분석 도중 탭이 닫혀 멈췄습니다.'; changed = true; }
+    for (const s of card.sources) {
+      if (s.status !== 'queued' && s.status !== 'running') continue;
+      if (s.startedAt && now - Date.parse(s.startedAt) < STALE_MS) continue;
+      s.status = 'error'; s.error = '분석 도중 탭이 닫혀 멈췄습니다.'; changed = true;
+    }
     return changed;
   }
 
@@ -270,6 +295,8 @@
     return el;
   }
   const say = (id, text, bad = false) => { const el = $(id); el.textContent = text; el.classList.toggle('is-bad', bad); };
+  // 단추 처리 중 실패(저장 공간 부족 등)를 조용히 삼키지 않고 알린다.
+  const guard = (fn, where = 'add-status') => (...args) => Promise.resolve().then(() => fn(...args)).catch((e) => say(where, `하지 못했습니다: ${e && e.message ? e.message : e}`, true));
 
   /* 저장: IndexedDB. 막힌 환경이면 메모리로만 쓰고 알린다. */
   const db = {
@@ -335,8 +362,9 @@
     renderTrash();
     renderMix();
     $('add-name-field').hidden = !!$('add-target').value;
-    $('analyze').disabled = busy;
-    $('paste-add').disabled = busy;
+    // 분석하는 동안은 카드를 바꾸는 다른 일을 막는다(오래된 카드 사본이 새 내용을 덮지 않게).
+    for (const id of ['analyze', 'paste-add', 'import', 'trash-empty']) $(id).disabled = busy;
+    $('import').closest('label').classList.toggle('is-disabled', busy);
   }
 
   function renderTargets() {
@@ -405,8 +433,9 @@
     const tpl = await template();
     let ok = 0;
     for (const [i, s] of list.entries()) {
+      if (!card.sources.includes(s)) continue;
       say('add-status', `${card.instructor}: ${list.length}개 가운데 ${i + 1}번째 영상을 분석하는 중입니다. 영상 길이에 따라 1~5분 걸립니다. 이 탭을 닫지 마세요.`);
-      s.status = 'running'; s.error = ''; await save(card);
+      s.status = 'running'; s.error = ''; s.startedAt = new Date().toISOString(); await save(card);
       try {
         const m = await model(key);
         const prompt = buildPrompt(tpl, { url: s.url, instructor: card.instructor, focus: s.focus, start: s.start, end: s.end });
@@ -452,6 +481,7 @@
   async function pasteAdd() {
     const text = $('paste').value.trim();
     if (text.length < 200) return say('add-status', '분석 결과 전체를 붙여 넣어 주세요(200자 이상).', true);
+    if (text.length > 60000) return say('add-status', '분석 결과가 6만 자를 넘습니다. 영상 하나의 분석만 붙여 넣어 주세요.', true);
     let form;
     try { form = readForm(); } catch (e) { return say('add-status', e.message, true); }
     const parsed = parseCardMarkdown(text);
@@ -474,10 +504,15 @@
   /* 보관함 */
   const STATUS_TEXT = { queued: '기다림', running: '분석 중', done: '완료', error: '실패' };
 
+  // 다시 그려도 키보드 초점과 펼쳐 둔 「분석 보기」를 그대로 둔다.
   function renderList() {
     const list = live();
+    const focusKey = document.activeElement && document.activeElement.dataset ? document.activeElement.dataset.key : null;
+    const openTexts = new Set([...document.querySelectorAll('#card-list details[open]')].map((d) => d.dataset.key));
     $('card-empty').hidden = list.length > 0;
     $('card-list').replaceChildren(...list.map(cardView));
+    for (const d of document.querySelectorAll('#card-list details[data-key]')) if (openTexts.has(d.dataset.key)) d.open = true;
+    if (focusKey) { const el = [...document.querySelectorAll('#card-list [data-key]')].find((x) => x.dataset.key === focusKey); if (el) el.focus(); }
   }
 
   function cardView(card) {
@@ -485,9 +520,9 @@
     const first = card.sources.find((s) => thumb(s.url));
     const src = card.photo || (first && thumb(first.url));
     const open = openId === card.id;
-    const photoInput = h('input', { type: 'file', accept: 'image/png,image/jpeg,image/webp', class: 'sr-only', onchange: (e) => setPhoto(card, e.target) });
+    const photoInput = h('input', { type: 'file', accept: 'image/png,image/jpeg,image/webp', class: 'sr-only', disabled: busy, onchange: guard((e) => setPhoto(card, e.target)) });
     return h('article', { class: `vault-card${open ? ' is-open' : ''}` },
-      h('button', { class: 'vault-head', type: 'button', 'aria-expanded': String(open), onclick: () => { openId = open ? null : card.id; render(); } },
+      h('button', { class: 'vault-head', type: 'button', 'data-key': `head:${card.id}`, 'aria-expanded': String(open), onclick: () => { openId = open ? null : card.id; render(); } },
         src ? h('img', { src, alt: '', loading: 'lazy', referrerpolicy: 'no-referrer' }) : h('span', { class: 'vault-noimg', 'aria-hidden': 'true', text: card.instructor.slice(0, 1) }),
         h('span', { class: 'vault-name' }, h('strong', { text: card.instructor }), h('span', { text: `분석 ${done.length}개${card.sources.length > done.length ? ` · 미완료 ${card.sources.length - done.length}개` : ''}` }))),
       open && h('div', { class: 'vault-body' },
@@ -497,16 +532,16 @@
             h('span', { class: 'source-title', text: `영상 ${i + 1}${s.start || s.end ? ` · ${s.start || '0:00'}~${s.end || '끝'}` : ''}` }),
             s.url ? h('a', { href: s.url, target: '_blank', rel: 'noopener noreferrer', text: '영상 열기' }) : h('span', { class: 'source-muted', text: '가져온 카드' })),
           s.status === 'error' && h('p', { class: 'source-error', text: s.error || '실패했습니다.' }),
-          isDone(s) && h('details', { class: 'source-text' }, h('summary', { text: '분석 보기' }), h('pre', { text: s.text })),
+          isDone(s) && h('details', { class: 'source-text', 'data-key': `text:${s.id}` }, h('summary', { text: '분석 보기' }), h('pre', { text: s.text })),
           h('div', { class: 'source-actions' },
-            s.status === 'error' && s.url && h('button', { type: 'button', class: 'button', disabled: busy, onclick: () => retry(card, s), text: '다시 분석' }),
-            h('button', { type: 'button', class: 'button secondary', disabled: busy && s.status === 'running', onclick: () => removeSource(card, s), text: '영상 빼기' }))))),
+            s.status === 'error' && s.url && h('button', { type: 'button', class: 'button', disabled: busy, onclick: guard(() => retry(card, s)), text: '다시 분석' }),
+            h('button', { type: 'button', class: 'button secondary', disabled: busy, onclick: guard(() => removeSource(card, s)), text: '영상 빼기' }))))),
         h('div', { class: 'vault-actions' },
-          h('label', { class: 'button secondary file-button' }, '사진 바꾸기', photoInput),
-          card.photo && h('button', { type: 'button', class: 'button secondary', onclick: async () => { card.photo = null; await save(card); }, text: '기본 사진으로' }),
-          h('button', { type: 'button', class: 'button secondary', onclick: () => rename(card), text: '이름 바꾸기' }),
+          h('label', { class: `button secondary file-button${busy ? ' is-disabled' : ''}` }, '사진 바꾸기', photoInput),
+          card.photo && h('button', { type: 'button', class: 'button secondary', disabled: busy, onclick: guard(async () => { card.photo = null; await save(card); }), text: '기본 사진으로' }),
+          h('button', { type: 'button', class: 'button secondary', disabled: busy, onclick: guard(() => rename(card)), text: '이름 바꾸기' }),
           done.length > 0 && h('button', { type: 'button', class: 'button secondary', onclick: () => download(cardMarkdown(card), `강사카드-${safeName(card.instructor)}.md`, 'text/markdown'), text: '카드 파일로 저장' }),
-          h('button', { type: 'button', class: 'button danger', disabled: busy, onclick: () => trash(card), text: '카드 삭제' }))));
+          h('button', { type: 'button', class: 'button danger', disabled: busy, onclick: guard(() => trash(card)), text: '카드 삭제' }))));
   }
 
   const safeName = (s) => s.replace(/[\\/:*?"<>|\s]+/g, '_').slice(0, 40) || '강사';
@@ -549,7 +584,7 @@
     $('trash-empty').hidden = !list.length;
     $('trash-list').replaceChildren(...(list.length ? list.map((card) => h('div', { class: 'trash-row' },
       h('span', { text: `${card.instructor} · 분석 ${doneSources(card).length}개` }),
-      h('button', { type: 'button', class: 'button secondary', onclick: async () => { card.deletedAt = null; await save(card); }, text: '되살리기' }))) : [h('p', { class: 'cards-hint', text: '비어 있습니다.' })]));
+      h('button', { type: 'button', class: 'button secondary', disabled: busy, onclick: guard(async () => { card.deletedAt = null; await save(card); }), text: '되살리기' }))) : [h('p', { class: 'cards-hint', text: '비어 있습니다.' })]));
   }
 
   async function emptyTrash() {
@@ -625,8 +660,8 @@
     $('copy-prompt').addEventListener('click', copyPrompt);
     $('paste-add').addEventListener('click', () => pasteAdd().catch((e) => say('add-status', e.message, true)));
     $('add-form').addEventListener('submit', (e) => e.preventDefault());
-    $('trash-empty').addEventListener('click', emptyTrash);
-    $('bundle-save').addEventListener('click', saveBundle);
+    $('trash-empty').addEventListener('click', guard(emptyTrash));
+    $('bundle-save').addEventListener('click', guard(saveBundle, 'bundle-status'));
     $('script-prompt-copy').addEventListener('click', async () => {
       try { await navigator.clipboard.writeText($('script-prompt').textContent.trim()); say('bundle-status', '문장을 복사했습니다.'); } catch { say('bundle-status', '복사하지 못했습니다. 문장을 직접 선택해 복사해 주세요.', true); }
     });

@@ -29,7 +29,7 @@
 .field input:focus, .field select:focus, .field textarea:focus { outline:none; border-color:var(--tide); box-shadow:0 0 0 3px #2B6E6926; }
 .check { display:flex; align-items:center; gap:10px; min-height:44px; font-size:16px; }
 .check input { width:22px; height:22px; }
-.advanced summary { cursor:pointer; color:var(--mute); font-size:16px; min-height:44px; display:flex; align-items:center; }
+.advanced summary { cursor:pointer; color:var(--mute); font-size:16px; padding-block:10px; }
 
 .path-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin-top:6px; }
 .path { display:grid; gap:12px; align-content:start; padding:clamp(18px,2.6vw,28px); border-radius:var(--radius); background:var(--paper); }
@@ -41,6 +41,7 @@
 .file-button { position:relative; cursor:pointer; }
 .file-button input[type=file] { position:absolute; width:1px; height:1px; opacity:0; pointer-events:none; }
 .file-button:focus-within { outline:3px solid var(--tide); outline-offset:4px; }
+.file-button.is-disabled { opacity:.55; pointer-events:none; }
 
 .card-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr)); gap:14px; margin-top:8px; align-items:start; }
 .vault-card { border-radius:var(--radius); background:var(--paper); overflow:hidden; }
@@ -62,13 +63,13 @@
 .is-running .source-badge, .is-queued .source-badge { background:#D977572B; color:var(--clay-deep); }
 .is-error .source-badge { background:#C15F3C1F; color:var(--clay-deep); }
 .source-error { margin:0; color:var(--clay-deep); font-size:16px; }
-.source-text summary { cursor:pointer; color:var(--tide); font-weight:650; font-size:16px; min-height:44px; display:flex; align-items:center; }
+.source-text summary { cursor:pointer; color:var(--tide); font-weight:650; font-size:16px; padding-block:10px; }
 .source-text pre { margin:0; max-height:360px; overflow:auto; padding:14px; border-radius:12px; background:var(--paper); font:400 15px/1.7 var(--font); white-space:pre-wrap; }
 .source-actions, .vault-actions { display:flex; flex-wrap:wrap; gap:8px; }
 .source-actions .button, .vault-actions .button { min-height:44px; padding:8px 16px; font-size:16px; }
 
 .trash { margin-top:20px; }
-.trash summary { cursor:pointer; font-weight:700; min-height:44px; display:flex; align-items:center; gap:8px; }
+.trash summary { cursor:pointer; font-weight:700; padding-block:10px; }
 .trash-row { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:10px; padding:10px 0; border-top:1px solid var(--line); }
 .trash .button { min-height:44px; padding:8px 16px; font-size:16px; }
 
