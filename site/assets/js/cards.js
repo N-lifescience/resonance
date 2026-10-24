@@ -67,7 +67,8 @@
       updatedAt: str(raw.updatedAt, 40),
       sources: [],
     };
-    for (const s of Array.isArray(raw.sources) ? raw.sources.slice(0, MAX_SOURCES) : []) {
+    // 영상 개수 한도(MAX_SOURCES)는 새로 넣을 때만 건다. 합친 카드를 읽다가 잘라 내지 않는다.
+    for (const s of Array.isArray(raw.sources) ? raw.sources.slice(0, 500) : []) {
       if (!s || typeof s !== 'object') continue;
       card.sources.push({
         id: str(s.id, 100) || uid(),
@@ -226,12 +227,19 @@
     for (const c of incoming) {
       const old = map.get(c.id);
       if (!old) { map.set(c.id, c); added++; continue; }
-      const [base, extra] = String(c.updatedAt) > String(old.updatedAt) ? [c, old] : [old, c];
-      const keys = new Set(base.sources.map(sourceKey));
-      const texts = new Set(base.sources.map((s) => (s.text || '').trim()).filter(Boolean));
-      const more = extra.sources.filter((s) => !keys.has(sourceKey(s)) && !texts.has((s.text || '').trim()));
-      if (base === old && !more.length) continue;
-      map.set(c.id, { ...base, sources: [...base.sources, ...more] });
+      // 고친 시각이 같으면(둘 다 class-helper 파일 등) 주소·구간 정보가 더 많은 쪽을 기준으로 삼는다.
+      const info = (card) => card.sources.reduce((n, s) => n + !!s.url + !!s.start + !!s.end + !!s.focus, 0);
+      const newer = String(c.updatedAt) > String(old.updatedAt) || (String(c.updatedAt) === String(old.updatedAt) && info(c) > info(old));
+      const [base, extra] = newer ? [c, old] : [old, c];
+      const sources = base.sources.slice();
+      let changed = base !== old;
+      for (const s of extra.sources) {
+        const text = (s.text || '').trim();
+        const i = sources.findIndex((b) => sourceKey(b) === sourceKey(s) || (text && (b.text || '').trim() === text));
+        if (i < 0) { sources.push(s); changed = true; } else if (!isDone(sources[i]) && isDone(s)) { sources[i] = s; changed = true; }   // 실패한 쪽이 끝난 분석을 가리지 않게
+      }
+      if (!changed) continue;
+      map.set(c.id, { ...base, sources });
       updated++;
     }
     return { cards: [...map.values()], added, updated };
@@ -400,7 +408,7 @@
       const known = new Set(card.sources.filter(isDone).map(sourceKey));
       const fresh = [];
       for (const url of form.urls) {
-        const s = { id: uid(), url, start: form.start, end: form.end, focus: form.focus, status: 'queued', text: '', error: '', model: '', at: '' };
+        const s = { id: uid(), url, start: form.start, end: form.end, focus: form.focus, status: 'queued', startedAt: new Date().toISOString(), text: '', error: '', model: '', at: '' };
         if (known.has(sourceKey(s))) continue;
         known.add(sourceKey(s));
         fresh.push(s);

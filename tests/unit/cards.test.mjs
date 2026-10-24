@@ -179,3 +179,23 @@ test('다른 탭이 방금 시작한 분석은 실패로 바꾸지 않는다', (
   assert.equal(L.recoverInterrupted(c, now), true);
   assert.deepEqual(plain(c.sources.map((s) => s.status)), ['running', 'error']);
 });
+
+test('합친 영상이 30개를 넘어도 다시 읽을 때 잘리지 않는다', () => {
+  const big = (prefix) => ({ ...L.newCard('김'), id: 'm', sources: Array.from({ length: 30 }, (_, i) => ({ id: `${prefix}${i}`, url: '', status: 'done', text: `${prefix}${i} 분석` })) });
+  const merged = L.mergeCards([{ ...big('a'), updatedAt: '2026-10-01' }], [{ ...big('b'), updatedAt: '2026-10-02' }]).cards[0];
+  assert.equal(merged.sources.length, 60);
+  assert.equal(L.normalizeCard(merged).sources.length, 60);
+});
+
+test('고친 시각이 같으면 구간 정보가 많은 쪽을 남기고, 실패한 분석이 끝난 분석을 가리지 않는다', () => {
+  const name = '강사_931ab8d1-0fa1-4972-a0e8-0c736c17617d.md';
+  const text = '# 강사 카드: 김 — 시간\n## 1. 배경지식\n' + '내용 '.repeat(60);
+  const [fromMd] = L.parseImport(L.cardMarkdown({ instructor: '김', sources: [{ url: 'https://youtu.be/RcU-7lx8EDU', status: 'done', text }] }), name);
+  const [fromJson] = L.parseImport(JSON.stringify({ file: name, instructor: '김', sources: [{ id: 'e', url: 'https://youtu.be/RcU-7lx8EDU', start: '1:00', end: '2:00', status: 'done', text }] }), name + '.json');
+  const merged = L.mergeCards([fromMd], [fromJson]).cards[0];
+  assert.equal(merged.sources.length, 1);
+  assert.equal(merged.sources[0].start, '1:00');
+  const base = { ...L.newCard('이'), id: 'q', updatedAt: '2026-10-05', sources: [{ id: 's', url: 'https://youtu.be/RcU-7lx8EDU', status: 'error', text: '', error: '실패' }] };
+  const old = { ...base, updatedAt: '2026-10-01', sources: [{ id: 't', url: 'https://youtu.be/RcU-7lx8EDU', status: 'done', text: '끝난 분석' }] };
+  assert.equal(L.mergeCards([old], [base]).cards[0].sources[0].text, '끝난 분석');
+});

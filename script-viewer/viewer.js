@@ -88,7 +88,7 @@
       if (!t || /^<!--.*-->$/.test(t)) continue;
       if (/^#\s/.test(t)) { if (!slide && !meta.title) meta.title = t.replace(/^#\s+/, ''); else errors.push({ lineNo, msg: `대본 안에는 # 제목을 쓰지 않는다: ${t}` }); continue; }
       if (/^##\s/.test(t)) {
-        const m = /^##\s+([^\s·|]+)\s*(?:[·|]\s*(.*))?$/.exec(t);
+        const m = /^##\s+([^\s·|▶]+)\s*(?:[·|]\s*(.*))?$/.exec(t);
         if (!m) { errors.push({ lineNo, msg: `장 제목은 '## 장id · 제목'으로 쓴다: ${t}` }); slide = null; block = null; continue; }
         slide = { id: m[1], title: (m[2] || '').trim(), lineNo, blocks: [] };
         block = { step: 0, lineNo, lines: [] };
@@ -172,7 +172,7 @@
 
   // 단계 막대 칸 수: 엔진 51-stepper.js parseStops와 같다(첫 칸 '시작'은 빼고 센다).
   function stopCount(text) {
-    const list = String(text || '').split('|').map((s) => s.trim()).filter(Boolean);
+    const list = String(text || '').split('|').map((s) => s.replace(/<br\s*\/?>/gi, '\n').trim()).filter(Boolean);
     return list.length - (list[0] === '시작' ? 1 : 0);
   }
 
@@ -186,8 +186,14 @@
 
   // 수업 HTML(Document)에서 장 목록을 읽는다. 읽기만 하는 사본이라 고쳐도 된다.
   function deckFromDocument(html) {
-    // 엔진 43-parts.js Answer: 안에 .step이 없는 정답 상자는 내용 전체가 한 단계가 된다.
-    for (const box of html.querySelectorAll('.answer')) if (!box.querySelector('.step')) box.classList.add('step');
+    // 엔진 43-parts.js Answer와 똑같이: 안에 .step이 없는 정답 상자는 내용을 새 div.step으로 감싼다.
+    for (const box of html.querySelectorAll('.answer')) {
+      if (box.querySelector('.step')) continue;
+      const wrap = html.createElement('div');
+      wrap.className = 'step';
+      wrap.append(...box.childNodes);
+      box.append(wrap);
+    }
     const slides = [...html.querySelectorAll('section')].filter((s) => s.classList.contains('slide')).map((s) => ({
       id: s.id,
       title: s.dataset.title || (s.querySelector('h1,h2') || {}).textContent || '',

@@ -154,3 +154,13 @@ test('한글이나 점이 든 장 id도 읽는다', () => {
   assert.deepEqual(plain(d.errors), []);
   assert.deepEqual(plain(d.slides.map((s) => s.id)), ['도입-1', 'sec.2']);
 });
+
+test('단계 제목을 잘못 쓴 "## ▶1"은 장으로 읽지 않고 오류로 알린다', () => {
+  const d = S.parse('## a · 가\n말\n## ▶1\n말');
+  assert.equal(d.slides.length, 1);
+  assert.match(S.check(d).errors.join(), /장 제목은/);
+});
+
+test('단계 막대 칸 이름의 <br>은 엔진처럼 줄바꿈으로 본다', () => {
+  assert.equal(S.stopCount('시작<br>|가|<br>|나'), 2);
+});

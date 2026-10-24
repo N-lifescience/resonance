@@ -78,7 +78,7 @@ const scriptGuide = [
   '# 강사 화법 대본 합본 지침',
   '',
   '> **AI에게**: 이 파일 하나가 대본 지침 전체다. 선생님이 공명 수업 HTML과 강사 화법 묶음을 주면 이 지침대로 대본 HTML을 만든다.',
-  '> **반드시**: `<head>`에 아래 대본 뷰어 css·js 두 줄을 넣는다(지금 환경에서 안 열려도 그대로 둔다). 시간은 쓰지 않는다. 장 id와 ▶ 개수는 수업 HTML과 같게 쓴다.',
+  '> **반드시**: `<head>`에 아래 대본 뷰어 css·js 두 줄을 넣는다(지금 환경에서 안 열려도 그대로 둔다). 장의 예상 시간은 쓰지 않는다(뷰어가 센다. `@대기 N초`는 쓴다). 장 id와 ▶ 개수는 수업 HTML과 같게 쓴다.',
   `> 이 파일 안의 이름: \`SKILL.md\` = 1절 「절차와 기준」, \`references/format.md\` = 2절 「대본 형식」, \`references/performance.md\` = 3절 「화법 적용 기준」, \`assets/template.html\` = 4절 「대본 HTML 뼈대」. \`references/examples/\`의 레퍼런스 대본은 아래 주소로 연다.`,
   `> 대본 뷰어: \`${CDN}/script-viewer/viewer.css\`·\`.js\``,
   `> 레퍼런스 대본: ${CDN}/skills/lecture-script/references/examples/v3-high-bio-script.html (그 수업 HTML: ${CDN}/examples/v3/v3-high-bio.html)`,

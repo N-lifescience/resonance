@@ -74,7 +74,7 @@
 |---|---|---|
 | `class="step"` | → 키로 하나씩 연다 | `### ▶N` |
 | `div.answer` | 정답 상자. ✓ 단추나 → 키로 연다 | `### ▶N`(안에 `.step`이 없으면 상자 하나가 단계 하나) |
-| `.reveal[data-stops]`, `.switch[data-stops]`, `figure.map-reveal`, `ol.yearline` | 단계 막대. 막대·단추나 → 키로 한 칸씩 연다 | 칸마다 `@조작 → 키로 막대 한 칸(칸 이름)` |
+| `.reveal[data-stops]`, `.switch[data-stops]`, `figure.map-reveal`, `ol.yearline` | 단계 막대. 막대·단추나 → 키로 한 칸씩 연다 | 칸마다 `@조작 → 키로 막대 한 칸(칸 이름)`. 말없이 여러 칸을 넘기면 한 줄로 |
 | `.veil`, `data-veil` | 첫 조작 전까지 결과를 가린다 | 가림막을 여는 순간을 연출한다 |
 | `input[type=range]`가 든 `.calc` | 계산 상자. 값을 바꾸면 그림·수치가 함께 바뀐다 | 예측, `@대기`, `@조작`(어느 손잡이를 어디까지), 관찰 질문 |
 | `data-play` | 재생 단추. 시간이 흐르며 움직인다 | `@조작 「재생」을 누른다`, 움직이는 동안 `@대기` |
