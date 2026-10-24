@@ -56,3 +56,47 @@ const guide = [
 mkdirSync(join(root, 'guide'), { recursive: true });
 writeFileSync(join(root, 'guide/exploragram-guide.md'), `<!-- 자동 생성: node tools/build.mjs (손으로 고치지 않는다) -->\n${guide}`);
 console.log(`guide ${guide.length} chars`);
+
+// 대본 합본 지침: 채팅 AI가 주소 하나로 읽고, 강사 카드 탭이 대본 묶음 파일에 넣는다.
+const scriptSkill = join(root, 'skills/lecture-script');
+const readScript = (rel) => readFileSync(join(scriptSkill, rel), 'utf8').replace(/^---[\s\S]*?---\n/, '').trim();
+const scriptParts = [
+  ['절차와 기준', 'SKILL.md'],
+  ['대본 형식', 'references/format.md'],
+  ['화법 적용 기준', 'references/performance.md'],
+];
+const CDN = 'https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2';
+// 대본 형식 예시(코드 상자 안의 '## 장id', '### ▶1')는 제목이 아니므로 단계를 낮추지 않는다.
+const demoteOutsideFences = (md) => {
+  let fence = false;
+  return md.replace(/^# .*\n+/, '').split('\n').map((line) => {
+    if (/^\s*```/.test(line)) { fence = !fence; return line; }
+    return fence ? line : line.replace(/^(#+) /, '#$1 ');
+  }).join('\n');
+};
+const scriptGuide = [
+  '# 강사 화법 대본 합본 지침',
+  '',
+  '> **AI에게**: 이 파일 하나가 대본 지침 전체다. 선생님이 공명 수업 HTML과 강사 화법 묶음을 주면 이 지침대로 대본 HTML을 만든다.',
+  '> **반드시**: `<head>`에 아래 대본 뷰어 css·js 두 줄을 넣는다(지금 환경에서 안 열려도 그대로 둔다). 시간은 쓰지 않는다. 장 id와 ▶ 개수는 수업 HTML과 같게 쓴다.',
+  `> 본문의 \`references/…\`는 이 파일의 해당 절을, \`assets/template.html\`은 맨 끝 「대본 HTML 뼈대」 절을 가리킨다.`,
+  `> 대본 뷰어: \`${CDN}/script-viewer/viewer.css\`·\`.js\``,
+  `> 레퍼런스 대본: ${CDN}/skills/lecture-script/references/examples/v3-high-bio-script.html (그 수업 HTML: ${CDN}/examples/v3/v3-high-bio.html)`,
+  '',
+  '## 차례',
+  '',
+  ...scriptParts.map(([title], i) => `${i + 1}. ${title}`),
+  `${scriptParts.length + 1}. 대본 HTML 뼈대`,
+  '',
+  ...scriptParts.flatMap(([title, file], i) => ['---', '', `## ${i + 1}. ${title}`, '', demoteOutsideFences(readScript(file)), '']),
+  '---',
+  '',
+  `## ${scriptParts.length + 1}. 대본 HTML 뼈대`,
+  '',
+  '```html',
+  readFileSync(join(scriptSkill, 'assets/template.html'), 'utf8').trim(),
+  '```',
+  '',
+].join('\n');
+writeFileSync(join(root, 'guide/script-guide.md'), `<!-- 자동 생성: node tools/build.mjs (손으로 고치지 않는다) -->\n${scriptGuide}`);
+console.log(`script guide ${scriptGuide.length} chars`);

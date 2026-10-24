@@ -1,0 +1,92 @@
+/*! lecture-script viewer | © N-lifescience | https://github.com/N-lifescience/resonance */
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css');
+:root {
+  --ls-ink:#141413; --ls-mute:#6B6A65; --ls-paper:#F4F1EA; --ls-white:#FFFFFF; --ls-line:#DAD6CD;
+  --ls-clay:#D97757; --ls-clay-deep:#B5532F; --ls-tide:#2B6E69; --ls-gold:#8A6A16;
+  --ls-font:"Pretendard Variable",Pretendard,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+}
+* { box-sizing:border-box; }
+html { -webkit-text-size-adjust:100%; }
+body { margin:0; background:var(--ls-paper); color:var(--ls-ink); font:400 18px/1.75 var(--ls-font); word-break:keep-all; overflow-wrap:anywhere; }
+body.ls-drag { outline:4px dashed var(--ls-tide); outline-offset:-12px; }
+button, input { font:inherit; }
+:focus-visible { outline:3px solid var(--ls-tide); outline-offset:3px; }
+[hidden] { display:none !important; }
+
+.ls-app { width:min(100% - 32px, 920px); margin:0 auto; padding:84px 0 64px; }
+.ls-toolbar { position:fixed; top:0; inset-inline:0; z-index:10; display:flex; flex-wrap:wrap; justify-content:center; gap:8px; padding:10px 16px; background:#141413EE; }
+.ls-toolbar button, .ls-button { display:inline-flex; align-items:center; min-height:44px; padding:8px 18px; border:0; border-radius:999px; background:#FFFFFF1A; color:#FFF; font-weight:650; font-size:16px; cursor:pointer; }
+.ls-toolbar button:hover, .ls-button:hover { background:#FFFFFF33; }
+.ls-toolbar button.is-bad { background:var(--ls-clay); color:var(--ls-ink); }
+.ls-button { position:relative; }
+.ls-file { position:absolute; width:1px; height:1px; opacity:0; pointer-events:none; }
+.ls-button:focus-within { outline:3px solid #FFF; outline-offset:2px; }
+
+.ls-panel { margin:0 0 24px; padding:20px 24px; border-radius:18px; background:var(--ls-white); box-shadow:0 12px 40px -24px #14141366; }
+.ls-panel h2 { margin:0 0 6px; font-size:22px; }
+.ls-panel ul { margin:12px 0; padding-left:1.2em; }
+.ls-panel li { margin:4px 0; }
+.ls-panel li.is-error { color:var(--ls-clay-deep); font-weight:650; }
+.ls-panel li.is-warn { color:var(--ls-gold); }
+.ls-panel li.is-ok { color:var(--ls-tide); font-weight:650; list-style:none; margin-left:-1.2em; }
+.ls-note { margin:0; color:var(--ls-mute); font-size:16px; }
+.ls-primary { min-height:44px; padding:8px 18px; border:0; border-radius:999px; background:var(--ls-ink); color:#FFF; font-weight:650; cursor:pointer; }
+
+.ls-head { margin-bottom:28px; }
+.ls-kicker { margin:0; color:var(--ls-clay-deep); font-weight:750; font-size:16px; }
+.ls-head h1 { margin:4px 0 14px; font-size:clamp(28px,5vw,40px); line-height:1.2; letter-spacing:-.03em; }
+.ls-summary { display:flex; flex-wrap:wrap; gap:8px; }
+.ls-chip { padding:4px 12px; border-radius:999px; background:var(--ls-white); font-size:15px; font-weight:650; }
+.ls-mix { margin-top:16px; border-collapse:collapse; font-size:16px; background:var(--ls-white); border-radius:12px; overflow:hidden; }
+.ls-mix caption { text-align:left; font-weight:750; padding-bottom:6px; }
+.ls-mix th, .ls-mix td { padding:6px 14px; border-bottom:1px solid var(--ls-line); text-align:left; }
+.ls-mix th { font-weight:600; color:var(--ls-mute); }
+.ls-legend { margin:16px 0 0; color:var(--ls-mute); font-size:15px; }
+.ls-legend .ls-tag { margin:0 2px; }
+.ls-legend-cue { font-style:italic; }
+.ls-empty { padding:40px; text-align:center; color:var(--ls-mute); }
+
+.ls-slides { display:grid; gap:16px; }
+.ls-slide { padding:20px 24px 22px; border-radius:18px; background:var(--ls-white); }
+.ls-slide-head { display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 12px; padding-bottom:10px; margin-bottom:12px; border-bottom:1px solid var(--ls-line); }
+.ls-slide-head h2 { flex:1 1 12em; margin:0; font-size:22px; line-height:1.35; letter-spacing:-.02em; }
+.ls-no { font-weight:800; color:var(--ls-clay-deep); font-variant-numeric:tabular-nums; }
+.ls-id { font:500 14px/1.4 ui-monospace,Consolas,monospace; color:var(--ls-mute); background:var(--ls-paper); padding:2px 8px; border-radius:6px; }
+.ls-time { color:var(--ls-mute); font-size:15px; font-variant-numeric:tabular-nums; }
+.ls-sec { margin:-6px 0 10px; color:var(--ls-mute); font-size:15px; }
+.ls-step { margin-top:14px; padding-top:12px; border-top:1px dashed var(--ls-line); }
+.ls-step-chip { display:inline-block; margin-bottom:6px; padding:2px 12px; border-radius:999px; background:var(--ls-ink); color:#FFF; font-weight:750; font-size:15px; }
+
+.ls-line { margin:6px 0; }
+.ls-tag { display:inline-block; margin-right:8px; padding:0 9px; border-radius:6px; font-size:14px; font-weight:750; line-height:1.7; vertical-align:1px; background:#2B6E691F; color:var(--ls-tide); }
+.ls-q { font-weight:650; }
+.ls-a { margin-left:1.4em; color:var(--ls-mute); font-size:16px; }
+.ls-a .ls-tag { background:var(--ls-paper); color:var(--ls-mute); }
+.ls-wait { color:var(--ls-mute); font-size:16px; }
+.ls-wait .ls-tag, .ls-tag-wait { background:var(--ls-paper); color:var(--ls-mute); }
+.ls-cue { color:var(--ls-mute); font-style:italic; font-size:16px; }
+.ls-act .ls-tag, .ls-tag-act { background:#D9775733; color:var(--ls-clay-deep); }
+.ls-act { font-size:16px; }
+.ls-ref { margin:8px 0; padding:6px 12px; border-left:3px solid var(--ls-gold); background:#8A6A1612; font-size:15px; color:#5C4810; }
+.ls-ref .ls-tag { background:#8A6A1626; color:#5C4810; }
+.ls-opt { padding-left:12px; border-left:3px dashed var(--ls-line); }
+.ls-opt .ls-tag { background:var(--ls-paper); color:var(--ls-mute); }
+.ls-beat { color:var(--ls-clay-deep); }
+
+@media (max-width:560px) {
+  body { font-size:17px; }
+  .ls-slide { padding:16px; }
+  .ls-app { padding-top:128px; }
+}
+
+@media print {
+  @page { size:A4; margin:16mm 14mm; }
+  body { background:#FFF; font-size:11pt; line-height:1.6; }
+  .ls-toolbar, .ls-panel { display:none !important; }
+  .ls-app { width:auto; padding:0; }
+  .ls-slides { gap:0; }
+  .ls-slide { padding:10pt 0; border-radius:0; border-bottom:1px solid #CCC; break-inside:avoid-page; }
+  .ls-slide-head h2 { font-size:14pt; }
+  .ls-chip, .ls-mix { background:#FFF; border:1px solid #CCC; }
+  .ls-tag, .ls-step-chip { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+}

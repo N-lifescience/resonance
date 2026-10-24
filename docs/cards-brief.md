@@ -111,6 +111,57 @@ IndexedDB `resonance-cards`의 `cards` 저장소. 카드 모양은 class-helper�
 - `cards.js`의 순수 함수(유튜브 주소 읽기, 중복 열쇠, 줄이기, 옛 md 카드 읽기, 묶음 만들기)를 `tests/unit/cards.test.mjs`에서 `node --test`로 확인한다.
 - 화면은 `node tools/site.mjs`로 묶은 `_site/cards.html`을 브라우저로 열어 카드 추가(붙여넣기 경로)·사진·삭제·되살리기·백업·묶음 저장을 직접 해 본다. 키 경로는 사용자 키로 한 번 시험한다.
 
+## 2차: 대본 지침과 대본 뷰어
+
+### 자리
+
+- 스킬 `skills/lecture-script/`: `SKILL.md`(절차와 기준), `references/format.md`(대본 형식), `references/performance.md`(class-helper 대본 제작 기준을 수업 HTML에 맞게 고친 판), `assets/template.html`(대본 HTML 뼈대).
+- 합본 `guide/script-guide.md`: `tools/build.mjs`가 위 파일을 이어 붙여 만든다. 채팅 AI는 이 파일 하나만 읽는다. `tools/site.mjs`가 `_site/guide/`로 복사해 강사 카드 탭이 묶음에 넣는다.
+- 대본 뷰어 `script-viewer/viewer.js`·`viewer.css`. 엔진과 따로다. 대본 HTML은 jsDelivr `@2` 주소로 부른다.
+- 레퍼런스 대본 `skills/lecture-script/references/examples/v3-high-bio-script.html`: 직접 만든 예시 수업 `examples/v3/v3-high-bio.html`의 대본.
+
+### 묶음과 지침
+
+- 강사 카드 탭의 묶음 파일 맨 앞에 합본 지침 전체를 넣는다. 주소를 못 읽는 AI도 파일 하나로 따라 한다. 지침을 못 받으면 주소 한 줄만 넣는다.
+- 선생님이 쓰는 말: "이 묶음 파일의 지침대로 이 수업 HTML로 대본 써줘".
+
+### 대본 HTML
+
+```html
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>…</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/script-viewer/viewer.css">
+<script defer src="https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/script-viewer/viewer.js"></script>
+</head><body>
+<script type="text/markdown" id="lecture-script">
+(대본 MD)
+</script>
+</body></html>
+```
+
+### 대본 MD 형식
+
+- 머리말(`---`로 감쌈): `title`, `deck`(수업 HTML의 `data-deck`), `minutes`, `level`, `화법:` 아래에 `  항목: 강사 이름`.
+- `## <장 id> · <제목>`: 수업 HTML의 모든 장이 HTML 순서대로 한 번씩.
+- `### ▶N`: → 키로 N번째 단계를 연 뒤 할 말. 개수는 엔진 규칙과 같다(장 안의 `.step`, `data-step`이 같으면 한 번에 열림).
+- 줄 태그: 태그 없음(교사 대사), `@질문`, `@예상`, `@대기 N초`, `@연출`, `@조작`, `@참고 강사 | 기법`, `@생략가능(이유)`, `@비트`(뼈대용, 최종본에 남으면 오류).
+- 시간은 AI가 쓰지 않는다. 뷰어가 class-helper 시간 엔진과 같은 규칙(한글 음절·숫자·영문 1, 분당 290, 문장마다 0.4초)으로 대사·질문·생략가능을 세고 `@대기`를 더한다.
+
+### 대본 뷰어
+
+- 머리: 제목, 수업 HTML 덱, 목표 시간과 예상 시간, 화법 배정.
+- 장마다: 번호/전체, id, 제목, 예상 시간, 누적 시간. 태그마다 모양을 달리한다.
+- 「점검」: 형식 오류와 경고. 「수업 HTML 불러오기」(또는 끌어다 놓기)로 장 id·순서·▶ 개수를 수업 HTML과 맞춘다. 「AI에게 보낼 말 복사」.
+- 「인쇄」: A4 세로. PDF로 저장하면 대본 PDF.
+- 대본 글은 `textContent`로만 그린다. 불러온 수업 HTML은 `DOMParser`로 읽기만 하고 실행하지 않는다.
+
+### 시험
+
+- `tests/unit/script-viewer.test.mjs`: 읽기, 시간, 단계 묶음, 형식 점검, 덱 비교.
+- 레퍼런스 대본을 뷰어로 열어 `v3-high-bio.html`과 맞췄을 때 오류 0.
+- 실제 시범: 세포호흡 1차시 HTML과 김상욱1 카드 묶음을 지침만 받은 새 에이전트에게 주고 대본을 쓰게 해 본다(저장소 밖 `class/세포호흡/`).
+
 ### 합칠 때 주의
 
 - 맥미니 UI/UX 브랜치는 GitHub에 올라와 있지 않아 이 브랜치를 만들 때 비교하지 못했다. 두 브랜치가 함께 고치는 곳은 세 쪽의 머리 메뉴 줄로 예상한다. 합칠 때 그 줄만 손으로 맞춘다.
