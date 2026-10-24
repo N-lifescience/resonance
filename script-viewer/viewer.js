@@ -10,7 +10,7 @@
   const PAUSE = 0.4;
   const TAGS = { 질문: 'question', 예상: 'answer', 대기: 'wait', 연출: 'cue', 조작: 'action', 참고: 'ref', 생략가능: 'optional', 비트: 'beat' };
   const SPOKEN = new Set(['say', 'question', 'optional']);
-  const LONG_SLIDE = 300;
+  const LONG_SLIDE = 600;   // 활동 장은 5분을 넘기 쉽다. 10분을 넘으면 장을 나눌지 살핀다.
 
   function units(text) {
     let n = 0;
@@ -88,7 +88,7 @@
       if (!t || /^<!--.*-->$/.test(t)) continue;
       if (/^#\s/.test(t)) { if (!slide && !meta.title) meta.title = t.replace(/^#\s+/, ''); else errors.push({ lineNo, msg: `대본 안에는 # 제목을 쓰지 않는다: ${t}` }); continue; }
       if (/^##\s/.test(t)) {
-        const m = /^##\s+([A-Za-z0-9][\w-]*)\s*(?:[·|]\s*(.*))?$/.exec(t);
+        const m = /^##\s+([^\s·|]+)\s*(?:[·|]\s*(.*))?$/.exec(t);
         if (!m) { errors.push({ lineNo, msg: `장 제목은 '## 장id · 제목'으로 쓴다: ${t}` }); slide = null; block = null; continue; }
         slide = { id: m[1], title: (m[2] || '').trim(), lineNo, blocks: [] };
         block = { step: 0, lineNo, lines: [] };
@@ -170,13 +170,30 @@
     return groups.size;
   }
 
-  // 수업 HTML(Document)에서 장 목록을 읽는다.
+  // 단계 막대 칸 수: 엔진 51-stepper.js parseStops와 같다(첫 칸 '시작'은 빼고 센다).
+  function stopCount(text) {
+    const list = String(text || '').split('|').map((s) => s.trim()).filter(Boolean);
+    return list.length - (list[0] === '시작' ? 1 : 0);
+  }
+
+  // → 키가 .step보다 먼저 한 칸씩 여는 단계 막대(엔진 Stepper). data-nav="off"면 → 키와 따로다.
+  function barStops(slide) {
+    let n = 0;
+    for (const el of slide.querySelectorAll('.reveal[data-stops], .switch[data-stops], figure.map-reveal[data-stops]')) if (el.dataset.nav !== 'off') n += stopCount(el.dataset.stops);
+    for (const ol of slide.querySelectorAll('ol.yearline')) n += new Set([...ol.querySelectorAll(':scope > li[data-year]')].map((li) => Number(li.dataset.year)).filter(Number.isFinite)).size;
+    return n;
+  }
+
+  // 수업 HTML(Document)에서 장 목록을 읽는다. 읽기만 하는 사본이라 고쳐도 된다.
   function deckFromDocument(html) {
+    // 엔진 43-parts.js Answer: 안에 .step이 없는 정답 상자는 내용 전체가 한 단계가 된다.
+    for (const box of html.querySelectorAll('.answer')) if (!box.querySelector('.step')) box.classList.add('step');
     const slides = [...html.querySelectorAll('section')].filter((s) => s.classList.contains('slide')).map((s) => ({
       id: s.id,
       title: s.dataset.title || (s.querySelector('h1,h2') || {}).textContent || '',
       sec: s.dataset.sec || '',
       steps: groupCount([...s.querySelectorAll('.step')].map((el) => (el.dataset.step != null && el.dataset.step !== '' ? Number(el.dataset.step) : null))),
+      bars: barStops(s),
     }));
     return { deck: html.documentElement.dataset.deck || '', title: html.title || '', slides };
   }
@@ -198,7 +215,8 @@
       const d = byId.get(s.id);
       if (!d) continue;
       const k = s.blocks.length - 1;
-      if (k !== d.steps) errors.push(`${s.id}: 대본의 단계는 ▶${k}개인데 수업 HTML은 → 키로 ${d.steps}번 연다`);
+      if (k !== d.steps) errors.push(`${s.id}: 대본의 단계는 ▶${k}개인데 수업 HTML의 단계(.step)는 ${d.steps}개다`);
+      if (d.bars && !s.blocks.some((b) => b.lines.some((l) => l.kind === 'action'))) warnings.push(`${s.id}: 단계 막대가 → 키로 ${d.bars}칸 열린다. 막대를 여는 자리에 @조작을 쓴다`);
     }
     if (doc.meta.deck && deck.deck && doc.meta.deck !== deck.deck) warnings.push(`머리말 deck(${doc.meta.deck})과 수업 HTML의 data-deck(${deck.deck})이 다르다`);
     return { errors, warnings };
@@ -216,7 +234,7 @@
     return r ? `${m}분 ${r}초` : `${m}분`;
   }
 
-  const LectureScript = { parse, check, compare, groupCount, deckFromDocument, slideTime, totals, units, speechSeconds, parseDuration, aiMessage, fmt };
+  const LectureScript = { parse, check, compare, groupCount, stopCount, deckFromDocument, slideTime, totals, units, speechSeconds, parseDuration, aiMessage, fmt };
   globalThis.LectureScript = LectureScript;
   if (typeof document === 'undefined') return;
 
@@ -268,7 +286,8 @@
           h('span', { class: 'ls-no', text: `${k + 1}/${slides.length}` }),
           h('code', { class: 'ls-id', text: s.id }),
           h('h2', { text: s.title || (d && d.title) || s.id }),
-          h('span', { class: 'ls-time', text: `약 ${fmt(st)} · 누적 ${fmt(acc)}` })),
+          h('span', { class: 'ls-time', text: `약 ${fmt(st)} · 누적 ${fmt(acc)}` }),
+          d && d.steps + d.bars ? h('span', { class: 'ls-keys', text: `→ ${d.steps + d.bars}번${d.bars ? ` (단계 ${d.steps} · 막대 ${d.bars}칸)` : ''}` }) : null),
         d && d.sec ? h('p', { class: 'ls-sec', text: d.sec }) : null,
         ...s.blocks.map((b) => h('div', { class: b.step ? 'ls-step' : 'ls-open' },
           b.step ? h('span', { class: 'ls-step-chip', text: `▶${b.step}` }) : null,
@@ -303,12 +322,15 @@
       setTimeout(() => { ui.copyBtn.textContent = 'AI에게 보낼 말 복사'; }, 2000);
     };
     if (open) ui.panel.hidden = false;
+    ui.checkBtn.setAttribute('aria-expanded', String(!ui.panel.hidden));
   }
 
   async function loadDeck(file) {
     if (!file) return;
     if (!/\.html?$/i.test(file.name)) { ui.panelNote.textContent = 'HTML 파일을 골라 주세요.'; ui.panel.hidden = false; return; }
-    const html = new DOMParser().parseFromString(await file.text(), 'text/html');
+    let text;
+    try { text = await file.text(); } catch { ui.panelNote.textContent = '파일을 읽지 못했습니다.'; ui.panel.hidden = false; return; }
+    const html = new DOMParser().parseFromString(text, 'text/html');
     deck = deckFromDocument(html);
     if (!deck.slides.length) { deck = null; ui.panelNote.textContent = '이 파일에서 장(section.slide)을 찾지 못했습니다.'; ui.panel.hidden = false; return; }
     render();
@@ -323,7 +345,7 @@
     doc = parse(src.textContent);
     if (doc.meta.title && !document.title.trim()) document.title = doc.meta.title;
     const fileInput = h('input', { type: 'file', accept: '.html,.htm,text/html', class: 'ls-file', onchange: (e) => { loadDeck(e.target.files[0]); e.target.value = ''; } });
-    ui.checkBtn = h('button', { type: 'button', onclick: () => { ui.panel.hidden = !ui.panel.hidden; } });
+    ui.checkBtn = h('button', { type: 'button', 'aria-expanded': 'false', onclick: () => { ui.panel.hidden = !ui.panel.hidden; ui.checkBtn.setAttribute('aria-expanded', String(!ui.panel.hidden)); } });
     ui.copyBtn = h('button', { type: 'button', class: 'ls-primary', text: 'AI에게 보낼 말 복사' });
     ui.panelList = h('ul');
     ui.panelNote = h('p', { class: 'ls-note' });

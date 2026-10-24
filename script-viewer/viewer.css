@@ -52,7 +52,9 @@ button, input { font:inherit; }
 .ls-slide-head h2 { flex:1 1 12em; margin:0; font-size:22px; line-height:1.35; letter-spacing:-.02em; }
 .ls-no { font-weight:800; color:var(--ls-clay-deep); font-variant-numeric:tabular-nums; }
 .ls-id { font:500 14px/1.4 ui-monospace,Consolas,monospace; color:var(--ls-mute); background:var(--ls-paper); padding:2px 8px; border-radius:6px; }
-.ls-time { color:var(--ls-mute); font-size:15px; font-variant-numeric:tabular-nums; }
+.ls-time, .ls-keys { color:var(--ls-mute); font-size:15px; font-variant-numeric:tabular-nums; }
+.ls-keys { padding:0 8px; border-radius:6px; background:var(--ls-paper); }
+#lecture-script { display:none !important; }
 .ls-sec { margin:-6px 0 10px; color:var(--ls-mute); font-size:15px; }
 .ls-step { margin-top:14px; padding-top:12px; border-top:1px dashed var(--ls-line); }
 .ls-step-chip { display:inline-block; margin-bottom:6px; padding:2px 12px; border-radius:999px; background:var(--ls-ink); color:#FFF; font-weight:750; font-size:15px; }

@@ -124,7 +124,7 @@ test('수업 HTML과 맞추기: 없는 장, 빠진 장, 순서, 단계 수, deck
   const all = r.errors.join('\n');
   assert.match(all, /new: 대본에 없는 장/);
   assert.match(all, /장 순서가 수업 HTML과 다르다/);
-  assert.match(all, /goal: 대본의 단계는 ▶2개인데 수업 HTML은 → 키로 1번/);
+  assert.match(all, /goal: 대본의 단계는 ▶2개인데 수업 HTML의 단계\(\.step\)는 1개다/);
   assert.match(r.warnings.join(), /data-deck/);
   const extra = S.compare(S.parse('## ghost · 유령\n말'), ok);
   assert.match(extra.errors.join(), /ghost: 수업 HTML에 없는 장/);
@@ -134,4 +134,23 @@ test('AI에게 보낼 말에 오류와 확인 항목을 모두 담는다', () =>
   const msg = S.aiMessage({ errors: ['a: 오류'], warnings: ['b: 경고'] });
   assert.match(msg, /- \[오류\] a: 오류/);
   assert.match(msg, /- \[확인\] b: 경고/);
+});
+
+test('단계 막대 칸 수는 엔진처럼 첫 칸 시작을 빼고 센다', () => {
+  assert.equal(S.stopCount('시작|1단계|2단계'), 2);
+  assert.equal(S.stopCount('가|나|다'), 3);
+  assert.equal(S.stopCount(' 시작 | 가 |'), 1);
+  assert.equal(S.stopCount(''), 0);
+});
+
+test('막대가 있는 장에 @조작이 없으면 확인 항목으로 알린다', () => {
+  const deck = { deck: '', slides: [{ id: 'a', title: '가', steps: 0, bars: 6 }] };
+  assert.match(S.compare(S.parse('## a · 가\n말'), deck).warnings.join(), /막대가 → 키로 6칸/);
+  assert.equal(S.compare(S.parse('## a · 가\n@조작 → 키로 막대 한 칸\n말'), deck).warnings.length, 0);
+});
+
+test('한글이나 점이 든 장 id도 읽는다', () => {
+  const d = S.parse('## 도입-1 · 시작\n말\n## sec.2 · 둘\n말');
+  assert.deepEqual(plain(d.errors), []);
+  assert.deepEqual(plain(d.slides.map((s) => s.id)), ['도입-1', 'sec.2']);
 });
