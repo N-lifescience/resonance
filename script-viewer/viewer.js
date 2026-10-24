@@ -274,13 +274,14 @@
           b.step ? h('span', { class: 'ls-step-chip', text: `▶${b.step}` }) : null,
           ...b.lines.map(lineView))));
     }));
-    ui.summary.replaceChildren(
-      h('span', { class: 'ls-chip', text: `예상 ${fmt(t.total)}` }),
-      Number.isFinite(meta.minutes) ? h('span', { class: 'ls-chip', text: `목표 ${meta.minutes}분` }) : null,
-      t.optional ? h('span', { class: 'ls-chip', text: `생략 가능 대사를 빼면 ${fmt(t.total - t.optional)}` }) : null,
-      h('span', { class: 'ls-chip', text: `${slides.length}장` }),
-      meta.deck ? h('span', { class: 'ls-chip', text: `수업 HTML ${meta.deck}` }) : null,
-      meta.level ? h('span', { class: 'ls-chip', text: meta.level }) : null);
+    ui.summary.replaceChildren(...[
+      `예상 ${fmt(t.total)}`,
+      Number.isFinite(meta.minutes) && `목표 ${meta.minutes}분`,
+      t.optional > 0 && `생략 가능 대사를 빼면 ${fmt(t.total - t.optional)}`,
+      `${slides.length}장`,
+      meta.deck && `수업 HTML ${meta.deck}`,
+      meta.level,
+    ].filter(Boolean).map((text) => h('span', { class: 'ls-chip', text })));
     ui.mix.hidden = !mix.length;
     ui.mix.replaceChildren(h('caption', { text: '화법 배정' }), ...mix.map(([k, v]) => h('tr', {}, h('th', { scope: 'row', text: k }), h('td', { text: v }))));
     runCheck(false);

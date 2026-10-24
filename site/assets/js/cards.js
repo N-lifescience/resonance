@@ -125,6 +125,9 @@
     }).join('\n');
   }
 
+  // 파일 이름의 날짜는 선생님 기기의 날짜로 쓴다(UTC로 쓰면 한국 아침 9시 전에 하루 앞선다).
+  const localDay = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+
   // 제목 단계를 add만큼 낮춘다. 코드 상자 안(대본 형식 예시)은 그대로 둔다.
   function demote(md, add) {
     let fence = false;
@@ -146,7 +149,7 @@
     const names = new Map();
     for (const card of used) names.set(card.instructor, (names.get(card.instructor) || 0) + 1);
     if ([...names.values()].some((n) => n > 1)) throw new Error('같은 이름의 카드가 둘 이상 골라졌습니다. 카드 이름을 바꿔 구분해 주세요.');
-    const day = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    const day = localDay(date);
     const lines = [
       '# 강사 화법 대본 묶음',
       '',
@@ -582,7 +585,7 @@
     try {
       const { text, filename } = buildBundle({ cards: live(), mix, guide });
       download(text, filename, 'text/markdown');
-      say('bundle-status', guide ? `${filename}을 저장했습니다. 대본 지침이 파일 안에 들어 있습니다.` : `${filename}을 저장했습니다. 대본 지침은 주소로 넣었습니다(주소를 못 읽는 AI는 지침 파일을 따로 올려 주세요).`);
+      say('bundle-status', guide ? `묶음 파일을 저장했습니다(${filename}). 대본 지침이 파일 안에 들어 있습니다.` : `묶음 파일을 저장했습니다(${filename}). 대본 지침은 주소로만 넣었습니다. 주소를 못 읽는 AI에는 대본 지침 파일을 따로 올려 주세요.`);
     } catch (e) { say('bundle-status', e.message, true); }
   }
 
@@ -595,7 +598,8 @@
   }
 
   async function importFiles(input) {
-    const files = [...(input.files || [])];
+    // class-helper의 같은 카드를 .md와 .json으로 함께 고르면 구간·사진이 있는 .json을 남긴다.
+    const files = [...(input.files || [])].sort((a, b) => /\.json$/i.test(b.name) - /\.json$/i.test(a.name));
     input.value = '';
     const incoming = [];
     const errors = [];
@@ -626,7 +630,7 @@
     $('script-prompt-copy').addEventListener('click', async () => {
       try { await navigator.clipboard.writeText($('script-prompt').textContent.trim()); say('bundle-status', '문장을 복사했습니다.'); } catch { say('bundle-status', '복사하지 못했습니다. 문장을 직접 선택해 복사해 주세요.', true); }
     });
-    $('backup-save').addEventListener('click', () => download(backupText(cards), `강사카드-백업-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}.json`, 'application/json'));
+    $('backup-save').addEventListener('click', () => download(backupText(cards), `강사카드-백업-${localDay(new Date()).replace(/-/g, '')}.json`, 'application/json'));
     $('import').addEventListener('change', (e) => importFiles(e.target).catch((err) => say('settings-status', err.message, true)));
     window.addEventListener('beforeunload', (e) => { if (busy) { e.preventDefault(); e.returnValue = ''; } });
 
