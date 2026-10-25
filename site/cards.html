@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#141413">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://cdn.jsdelivr.net; font-src https://cdn.jsdelivr.net; img-src 'self' data: https://i.ytimg.com; connect-src 'self' https://generativelanguage.googleapis.com; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>강사 카드 — 공명</title><meta name="description" content="유명 강사의 화법을 강사 카드로 모으고, 화법 항목마다 골라 공명 수업에 맞는 대본을 만듭니다."><link rel="stylesheet" href="assets/css/site.css"><link rel="stylesheet" href="assets/css/cards.css"></head>
+<body class="cards-page"><a class="skip-link" href="#main">본문으로 건너뛰기</a>
+<header class="site-header">
+  <a class="logo" href="./" aria-label="공명 첫 화면"><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M2 16c4-16 10 16 14 0s10 16 14 0" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg><span class="brand-lockup"><span>공명</span><span class="brand-tagline">교실의 진동수를 맞추다</span></span></a>
+  <nav class="pill-nav" aria-label="주 메뉴"><a href="explore.html" >살펴보기</a><a href="make.html" >제작하기</a><a href="cards.html" aria-current="page"><span class="nav-long">강사 </span>카드</a></nav>
+</header>
+<main id="main">
+
+<section class="cards-hero wrap" aria-labelledby="cards-title">
+<p class="eyebrow">강사 카드</p>
+<h1 class="split-title" id="cards-title"><span>유명 강사의 화법을</span><strong>내 수업의 대본으로</strong></h1>
+<ol class="cards-flow">
+<li><b>강사 카드 만들기</b><span>유튜브 강의 영상을 Gemini가 보고, 설명·질문·비유·유머 방식을 카드로 정리합니다. 강사마다 한 번이면 됩니다.</span></li>
+<li><b>수업 HTML 만들기</b><span><a href="make.html">제작하기</a>에서 쓰던 AI로 수업 HTML을 만듭니다.</span></li>
+<li><b>대본 묶음 저장</b><span>아래 「대본 묶음」에서 화법 항목마다 카드를 고르고 파일 하나로 저장합니다.</span></li>
+<li><b>대본 받기</b><span>쓰던 AI에 수업 HTML과 묶음 파일을 올리고 부탁합니다. AI가 묻고 설계표를 확인받은 뒤 대본을 줍니다.</span></li>
+</ol>
+<p class="cards-note" id="storage-note">카드는 이 브라우저에만 저장됩니다. 이름·학교·연락처는 받지 않습니다. 학교 PC가 재부팅 때 기록을 지운다면 맨 아래 「보관함 백업 파일로 저장」을 쓰세요.</p>
+</section>
+
+<section class="cards-panel wrap" id="add" aria-labelledby="add-title">
+<h2 id="add-title">카드 만들기</h2>
+<form class="cards-form" id="add-form" novalidate>
+<div class="field-row">
+<label class="field"><span>추가할 카드</span><select id="add-target"><option value="">새 강사 카드 만들기</option></select></label>
+<label class="field" id="add-name-field"><span>강사 이름</span><input id="add-name" maxlength="100" placeholder="예: 김OO 선생님"></label>
+</div>
+<label class="field"><span>유튜브 주소 (한 줄에 하나, 한 번에 10개까지)</span><textarea id="add-urls" rows="3" placeholder="https://youtu.be/…"></textarea></label>
+<div class="field-row">
+<label class="field"><span>분석 시작 (비우면 처음)</span><input id="add-start" inputmode="numeric" placeholder="3:00"></label>
+<label class="field"><span>분석 끝 (비우면 끝까지)</span><input id="add-end" inputmode="numeric" placeholder="12:30"></label>
+</div>
+<label class="field"><span>특히 배우고 싶은 점 (선택)</span><input id="add-focus" maxlength="200" placeholder="예: 비유와 유머, 오개념을 바로잡는 문답"></label>
+<p class="cards-hint">유머가 잘 드러나는 3~10분 구간부터 분석해 보세요. 이미 분석한 영상과 구간은 다시 분석하지 않습니다.</p>
+
+<div class="path-grid">
+<section class="path" aria-labelledby="path-key-title">
+<h3 id="path-key-title">Gemini 키로 바로 분석</h3>
+<p>내 Gemini API 키로 영상을 차례로 분석합니다. 분석하는 동안 이 탭을 닫지 마세요. 사용량은 내 Google 계정 한도에서 나갑니다.</p>
+<label class="field"><span>Gemini API 키</span><input id="key" type="password" autocomplete="off" spellcheck="false" placeholder="AIza…"></label>
+<label class="check"><input id="key-save" type="checkbox"> 이 기기에 저장 (개인 기기에서만)</label>
+<details class="advanced"><summary>모델 직접 고르기</summary><label class="field"><span>모델 이름 (비우면 가장 최신 Flash)</span><input id="model" spellcheck="false" placeholder="gemini-…-flash"></label></details>
+<button class="button primary" type="button" id="analyze">Gemini로 분석</button>
+</section>
+<section class="path" aria-labelledby="path-paste-title">
+<h3 id="path-paste-title">AI Studio로 분석해 붙여넣기</h3>
+<p>키 없이 만듭니다. 요청문을 복사해 AI Studio에 영상과 함께 넣고, 나온 분석 전체를 아래에 붙여 넣으세요. 영상마다 한 번씩 합니다.</p>
+<div class="path-actions"><button class="button" type="button" id="copy-prompt">요청문 복사</button><a class="button secondary" href="https://aistudio.google.com/" target="_blank" rel="noopener noreferrer">AI Studio 열기</a></div>
+<label class="field"><span>분석 결과</span><textarea id="paste" rows="5" placeholder="# 강사 카드: (강사 이름) — (영상 주제) …"></textarea></label>
+<button class="button primary" type="button" id="paste-add">카드에 넣기</button>
+</section>
+</div>
+<p class="cards-status" id="add-status" role="status" aria-live="polite"></p>
+</form>
+</section>
+
+<section class="cards-panel wrap" id="vault" aria-labelledby="vault-title">
+<h2 id="vault-title">보관함</h2>
+<p class="cards-hint">카드 보기, 사진 바꾸기, 영상 빼기, 삭제에는 AI를 부르지 않습니다. 사진은 AI에 보내지 않습니다.</p>
+<div class="card-grid" id="card-list"></div>
+<p class="cards-empty" id="card-empty" hidden>아직 강사 카드가 없습니다. 위에서 첫 카드를 만들어 보세요.</p>
+<details class="trash" id="trash"><summary>휴지통 <span id="trash-count">0</span></summary><div id="trash-list"></div><button class="button secondary" type="button" id="trash-empty">휴지통 비우기</button></details>
+</section>
+
+<section class="cards-panel wrap" id="bundle" aria-labelledby="bundle-title">
+<h2 id="bundle-title">대본 묶음</h2>
+<p class="cards-hint">화법 항목마다 카드를 고르세요. 비워 두면 그 항목은 기본 화법으로 씁니다. 같은 카드를 여러 항목에 골라도 카드 내용은 한 번만 들어갑니다.</p>
+<div class="mix-grid" id="mix"></div>
+<div class="path-actions"><button class="button primary" type="button" id="bundle-save">대본 묶음 저장</button></div>
+<div class="prompt-box" id="script-prompt-box">
+<code id="script-prompt">이 묶음 파일의 지침대로 이 수업 HTML로 대본 써줘</code>
+<button type="button" id="script-prompt-copy">복사</button>
+</div>
+<p class="cards-hint">쓰던 AI에 수업 HTML과 묶음 파일을 함께 올리고 위 문장을 붙여 넣으세요. 대본이 길면 AI가 묶음마다 끊어 씁니다. 「계속」이라고 쓰면 이어서 씁니다.</p>
+<p class="cards-status" id="bundle-status" role="status" aria-live="polite"></p>
+</section>
+
+<section class="cards-panel wrap" id="settings" aria-labelledby="settings-title">
+<h2 id="settings-title">백업과 안내</h2>
+<div class="path-actions">
+<button class="button" type="button" id="backup-save">보관함 백업 파일로 저장</button>
+<label class="button secondary file-button">백업이나 카드 파일 불러오기<input id="import" type="file" accept=".json,.md,application/json,text/markdown,text/plain" multiple></label>
+</div>
+<p class="cards-hint">카드 파일(.md)은 수업자료제작기(class-helper)의 강사 카드도 불러옵니다.</p>
+<p class="cards-status" id="settings-status" role="status" aria-live="polite"></p>
+<h3>기기 밖으로 나가는 것</h3>
+<ul class="cards-list">
+<li>「Gemini로 분석」을 누르면 유튜브 주소와 분석 요청문이 내 키로 Google Gemini에 갑니다.</li>
+<li>카드의 기본 사진은 유튜브 이미지 서버에서 받습니다.</li>
+<li>이 쪽의 파일은 GitHub Pages에서 받습니다.</li>
+</ul>
+<p class="cards-hint">이 밖의 정보는 어디에도 보내지 않습니다. 카드와 묶음 파일에는 강사의 실제 말이 짧게 들어 있습니다. 개인 수업 참고용으로만 쓰고 인터넷에 공개하지 마세요.</p>
+</section>
+
+</main>
+<footer class="site-footer wrap"><button class="maker-button" type="button" data-maker-open>Made by 엔의 생명과학</button><p>공명은 평소 쓰던 PPT를 학생이 직접 참여하는 수업으로 바꿔 주는 도구입니다.</p></footer>
+<dialog class="maker-dialog" aria-labelledby="maker-title"><button class="dialog-close" type="button" data-maker-close aria-label="만든 사람 안내 닫기"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M6 18 18 6"/></svg></button><h2 id="maker-title">Made by 엔의 생명과학</h2><p>고등학교 생명과학 교사가 만들었습니다. 필요한 기능이나 궁금한 점은 아래 링크에 남겨 주세요. 이름과 학교, 연락처, 학생 정보는 적지 마세요.</p><div class="contact-links"><a data-form-link hidden target="_blank" rel="noopener noreferrer">기능 제안과 문의</a><span data-form-pending>문의와 기능 제안 창구를 준비하고 있습니다.</span><a data-github-link href="https://github.com/N-lifescience/resonance" target="_blank" rel="noopener noreferrer">GitHub <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6"/></svg></a></div><p>수업에는 자유롭게 쓰세요. 코드를 복제하거나 다시 배포할 때는 허락을 받아야 합니다.</p></dialog>
+
+<script src="assets/js/config.js"></script>
+<script defer src="assets/js/site.js"></script>
+<script defer src="assets/js/cards.js"></script>
+</body></html>

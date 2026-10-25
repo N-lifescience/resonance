@@ -67,6 +67,10 @@ writeFileSync(join(out, 'lessons/meta.json'), JSON.stringify(metadata, null, 2) 
 // 이미 나간 연수 슬라이드와 소개 덱 주소를 유지한다.
 cpSync(join(root, 'examples/assets'), join(out, 'examples/assets'), { recursive: true });
 for (const name of ['training.html', 'intro-story.html']) cpSync(join(root, 'examples', name), join(out, 'examples', name));
+// 강사 카드 탭이 대본 묶음에 합본 대본 지침을 넣는다. 대본 뷰어도 사이트에서 함께 연다.
+mkdirSync(join(out, 'guide'), { recursive: true });
+cpSync(join(root, 'guide/script-guide.md'), join(out, 'guide/script-guide.md'));
+cpSync(join(root, 'script-viewer'), join(out, 'script-viewer'), { recursive: true });
 const live = JSON.parse(readFileSync(join(root, 'live.config.json'), 'utf8'));
 writeFileSync(join(out, 'live-config.js'), `window.EXPLORAGRAM_LIVE = ${JSON.stringify(live)};\n`);
 writeFileSync(join(out, '.nojekyll'), '');

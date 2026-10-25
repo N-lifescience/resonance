@@ -335,3 +335,11 @@ h3 { font-size:clamp(1.4rem,2.2vw,1.9rem); }
   .demo-tabs button { padding-inline:16px; }
 }
 @media (min-width:1600px) { .photo-hero .hero-content { padding-bottom:110px; } }
+
+/* ── 머리 메뉴 세 칸(강사 카드 탭): 좁은 화면에서 두 줄로 접히지 않게 ── */
+.pill-nav a { white-space:nowrap; }
+@media (max-width:479px) {
+  .nav-long { display:none; }
+  .pill-nav { overflow-x:auto; scrollbar-width:none; }
+  .pill-nav::-webkit-scrollbar { display:none; }
+}
