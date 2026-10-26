@@ -9,7 +9,11 @@ const Session = {
   hist: null,
   timer: 0,
   queue: Promise.resolve(),
-  unsaved: new Map(),   // 저장에 실패한 반 문서: 창을 닫기 전까지는 반을 오가도, 백업에도 남는다
+  unsaved: new Map(),   // 저장에 실패한(또는 저장하지 않는) 반 문서: 창을 닫기 전까지는 반을 오가도, 백업에도 남는다
+  // false면 이 기기에 판서를 저장하지도 읽지도 않는다(<html data-save="off">, Store.persist). 이 기기에 남은
+  // 다른 사람의 판서도 보이지 않는다. 판서는 창을 닫을 때까지 메모리에만 있다.
+  keep: true,
+  warned: false,
 
   deckKey() {
     const raw = document.documentElement.dataset.deck || document.title || location.pathname;
@@ -18,7 +22,8 @@ const Session = {
 
   async init() {
     this.deck = this.deckKey();
-    const saved = await Store.get('classes');
+    this.keep = Store.persist;
+    const saved = this.keep ? await Store.get('classes') : null;
     if (saved && Array.isArray(saved.list)) {
       // 저장소 값은 믿지 않는다: 문자열, 20자 이하, 위험 키 아님, 중복 없음
       const ok = (c) => typeof c === 'string' && c.trim() && c.length <= 20 && !BAD_KEYS.includes(c);
@@ -37,11 +42,13 @@ const Session = {
 
   async load(cls) {
     if (this.unsaved.has(cls)) return this.unsaved.get(cls);
+    if (!this.keep) return InkModel.emptyDoc();
     return InkModel.sanitizeDoc(await Store.get(this.key(cls))) || InkModel.emptyDoc();
   },
 
   async save(cls, doc) {
-    if (await Store.set(this.key(cls), doc)) this.unsaved.delete(cls);
+    if (!this.keep) this.unsaved.set(cls, doc);
+    else if (await Store.set(this.key(cls), doc)) this.unsaved.delete(cls);
     else this.unsaved.set(cls, doc);
   },
 
@@ -64,6 +71,10 @@ const Session = {
   changed() {
     clearTimeout(this.timer);
     this.timer = setTimeout(() => this.flush(), 500);
+    if (!this.keep && !this.warned) {   // 저장하지 않는 화면이라는 것을 처음 쓸 때 한 번 알린다
+      this.warned = true;
+      Toolbar.notice('이 화면은 판서를 저장하지 않아요. 창을 닫으면 사라져요.');
+    }
   },
 
   async flush() {
@@ -71,7 +82,7 @@ const Session = {
     if (this.doc) await this.save(this.current, this.doc);
   },
 
-  async saveClasses() { await Store.set('classes', { list: this.classes, current: this.current }); },
+  async saveClasses() { if (this.keep) await Store.set('classes', { list: this.classes, current: this.current }); },
 
   switchTo(cls) {
     return this.run(async () => {
@@ -102,7 +113,7 @@ const Session = {
       // 현재 반이면 먼저 다른 반으로 옮긴 뒤 지운다(대기 중 저장은 swap이 버린다). 그래야 flush가 지운 키를 되살리지 못한다.
       if (cls === this.current) this.swap(this.classes[0], await this.load(this.classes[0]));
       this.unsaved.delete(cls);
-      await Store.del(this.key(cls));
+      if (this.keep) await Store.del(this.key(cls));   // 저장하지 않는 화면은 이 기기에 남은 다른 사람의 판서를 지우지 않는다
       await this.saveClasses();
       return true;
     });

@@ -1,8 +1,11 @@
 // 키-값 저장소. IndexedDB가 안 되면 localStorage, 그것도 안 되면 메모리(창을 닫으면 사라짐).
+// <html data-save="off">면 이 기기에 아무것도 쓰지 않는다(판서, ⚙ 설정, 툴바 위치). 수업을 누구나 여는 사이트가
+// 주인이 아닌 방문자의 판서·설정을 공용 기기(교실 전자칠판 PC 등)에 남기지 않을 때 쓴다. 판서는 Session이 메모리에 둔다.
 const Store = {
   backend: 'memory',
   db: null,
   mem: new Map(),
+  persist: true,   // 99-boot가 <html data-save>를 보고 정한다
 
   async init() {
     try {
@@ -57,6 +60,7 @@ const Store = {
 
   set(key, value) {
     return this.guard('쓰기', key, false, async () => {
+      if (!this.persist) return true;
       if (this.backend === 'idb') await this.tx('readwrite', (s) => s.put(value, key));
       else if (this.backend === 'local') localStorage.setItem(`exploragram:${key}`, JSON.stringify(value));
       else this.mem.set(key, value);
@@ -66,6 +70,7 @@ const Store = {
 
   del(key) {
     return this.guard('지우기', key, false, async () => {
+      if (!this.persist) return true;
       if (this.backend === 'idb') await this.tx('readwrite', (s) => s.delete(key));
       else if (this.backend === 'local') localStorage.removeItem(`exploragram:${key}`);
       else this.mem.delete(key);

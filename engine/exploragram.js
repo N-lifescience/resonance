@@ -1,7 +1,7 @@
-/*! exploragram engine v2.5.0 | © N-lifescience | https://github.com/N-lifescience/resonance */
+/*! exploragram engine v2.6.0 | © N-lifescience | https://github.com/N-lifescience/resonance */
 (function () {
 'use strict';
-const VERSION = '2.5.0';
+const VERSION = '2.6.0';
 const LIVE_CONFIG = {"url":"https://qtwigpxinccudhprrdnb.supabase.co","key":"sb_publishable_-3KCWch7Q7sBQbcdVzxR4g_imovkZv5","site":"https://n-lifescience.github.io/resonance/"};
 /* ---- 00-core.js ---- */
 // 공통 상수, 작은 DOM 도우미, 이벤트 훅, 공개 객체 Exploragram.
@@ -748,10 +748,13 @@ const InkModel = {
 
 /* ---- 22-store.js ---- */
 // 키-값 저장소. IndexedDB가 안 되면 localStorage, 그것도 안 되면 메모리(창을 닫으면 사라짐).
+// <html data-save="off">면 이 기기에 아무것도 쓰지 않는다(판서, ⚙ 설정, 툴바 위치). 수업을 누구나 여는 사이트가
+// 주인이 아닌 방문자의 판서·설정을 공용 기기(교실 전자칠판 PC 등)에 남기지 않을 때 쓴다. 판서는 Session이 메모리에 둔다.
 const Store = {
   backend: 'memory',
   db: null,
   mem: new Map(),
+  persist: true,   // 99-boot가 <html data-save>를 보고 정한다
 
   async init() {
     try {
@@ -806,6 +809,7 @@ const Store = {
 
   set(key, value) {
     return this.guard('쓰기', key, false, async () => {
+      if (!this.persist) return true;
       if (this.backend === 'idb') await this.tx('readwrite', (s) => s.put(value, key));
       else if (this.backend === 'local') localStorage.setItem(`exploragram:${key}`, JSON.stringify(value));
       else this.mem.set(key, value);
@@ -815,6 +819,7 @@ const Store = {
 
   del(key) {
     return this.guard('지우기', key, false, async () => {
+      if (!this.persist) return true;
       if (this.backend === 'idb') await this.tx('readwrite', (s) => s.delete(key));
       else if (this.backend === 'local') localStorage.removeItem(`exploragram:${key}`);
       else this.mem.delete(key);
@@ -835,7 +840,11 @@ const Session = {
   hist: null,
   timer: 0,
   queue: Promise.resolve(),
-  unsaved: new Map(),   // 저장에 실패한 반 문서: 창을 닫기 전까지는 반을 오가도, 백업에도 남는다
+  unsaved: new Map(),   // 저장에 실패한(또는 저장하지 않는) 반 문서: 창을 닫기 전까지는 반을 오가도, 백업에도 남는다
+  // false면 이 기기에 판서를 저장하지도 읽지도 않는다(<html data-save="off">, Store.persist). 이 기기에 남은
+  // 다른 사람의 판서도 보이지 않는다. 판서는 창을 닫을 때까지 메모리에만 있다.
+  keep: true,
+  warned: false,
 
   deckKey() {
     const raw = document.documentElement.dataset.deck || document.title || location.pathname;
@@ -844,7 +853,8 @@ const Session = {
 
   async init() {
     this.deck = this.deckKey();
-    const saved = await Store.get('classes');
+    this.keep = Store.persist;
+    const saved = this.keep ? await Store.get('classes') : null;
     if (saved && Array.isArray(saved.list)) {
       // 저장소 값은 믿지 않는다: 문자열, 20자 이하, 위험 키 아님, 중복 없음
       const ok = (c) => typeof c === 'string' && c.trim() && c.length <= 20 && !BAD_KEYS.includes(c);
@@ -863,11 +873,13 @@ const Session = {
 
   async load(cls) {
     if (this.unsaved.has(cls)) return this.unsaved.get(cls);
+    if (!this.keep) return InkModel.emptyDoc();
     return InkModel.sanitizeDoc(await Store.get(this.key(cls))) || InkModel.emptyDoc();
   },
 
   async save(cls, doc) {
-    if (await Store.set(this.key(cls), doc)) this.unsaved.delete(cls);
+    if (!this.keep) this.unsaved.set(cls, doc);
+    else if (await Store.set(this.key(cls), doc)) this.unsaved.delete(cls);
     else this.unsaved.set(cls, doc);
   },
 
@@ -890,6 +902,10 @@ const Session = {
   changed() {
     clearTimeout(this.timer);
     this.timer = setTimeout(() => this.flush(), 500);
+    if (!this.keep && !this.warned) {   // 저장하지 않는 화면이라는 것을 처음 쓸 때 한 번 알린다
+      this.warned = true;
+      Toolbar.notice('이 화면은 판서를 저장하지 않아요. 창을 닫으면 사라져요.');
+    }
   },
 
   async flush() {
@@ -897,7 +913,7 @@ const Session = {
     if (this.doc) await this.save(this.current, this.doc);
   },
 
-  async saveClasses() { await Store.set('classes', { list: this.classes, current: this.current }); },
+  async saveClasses() { if (this.keep) await Store.set('classes', { list: this.classes, current: this.current }); },
 
   switchTo(cls) {
     return this.run(async () => {
@@ -928,7 +944,7 @@ const Session = {
       // 현재 반이면 먼저 다른 반으로 옮긴 뒤 지운다(대기 중 저장은 swap이 버린다). 그래야 flush가 지운 키를 되살리지 못한다.
       if (cls === this.current) this.swap(this.classes[0], await this.load(this.classes[0]));
       this.unsaved.delete(cls);
-      await Store.del(this.key(cls));
+      if (this.keep) await Store.del(this.key(cls));   // 저장하지 않는 화면은 이 기기에 남은 다른 사람의 판서를 지우지 않는다
       await this.saveClasses();
       return true;
     });
@@ -7901,7 +7917,16 @@ const Live = {
     this.joinSay('연결하는 중…');
     let main = null;
     try {
-      main = await this.link().open(`ch-live-${code}`, (ev, p) => this.onMain(ev, p), true);
+      // 첫 웹소켓 연결이 가끔 바로 끊긴다(2026-10 운영 수업 주소에서 CHANNEL_ERROR). 바로 포기하지 않고 1초, 2초 뒤 다시 한다.
+      for (let n = 0; ; n++) {
+        try {
+          main = await this.link().open(`ch-live-${code}`, (ev, p) => this.onMain(ev, p), true);
+          break;
+        } catch (err) {
+          if (n >= 2 || this.attempt !== mine) throw err;
+          await new Promise((r) => setTimeout(r, 1000 * (n + 1)));
+        }
+      }
       const inbox = await this.link().open(`ch-live-${code}-in`, () => {}, false);
       if (this.attempt !== mine) { main.close(); inbox.close(); return; }   // 그사이 다른 코드를 넣었다
       this.attempt = null;
@@ -8171,6 +8196,11 @@ const Live = {
     const page = this.inkPage(p.pg);
     if (!page) return;
     this.fitTo(p.pg, p.z);
+    // 교사가 지금 칠판에 쓰고 있으면 지난 장을 보던 학생도 칠판으로 데려온다. 칠판 판서는 그 자리에서 보라고 쓰는 것이고,
+    // 손가락으로 밀다가 지난 장으로 넘어간 학생은 위 띠를 못 보고 칠판 판서를 놓친다.
+    const t = this.teacher;
+    const wrote = p.snap ? p.snap.length > 0 : p.put.length > 0 || p.more.length > 0;
+    if (!this.follow && wrote && t && t.board && p.pg === `b${t.board.i}`) this.showSlide(t.slide);
     const shown = () => Ink.page === page.arr && document.documentElement.classList.contains('ch-live-ink');
     if (p.snap) {
       for (const s of page.arr) this.inkPlay.delete(s);
@@ -8794,6 +8824,7 @@ async function start() {
   Nav.init();
   KeepWords.apply(Stage.deck);   // 목차 제목을 뽑은 뒤 어절을 감싼다
   Anim.init();     // 어절 보정 뒤: 세어 올리기 숫자를 글자로 다시 쓴다
+  Store.persist = document.documentElement.dataset.save !== 'off';   // 누구나 여는 사이트가 방문자 기기에 남기지 않게
   await Store.init();
   await Session.init();
   Ink.init();      // Session.doc이 있어야 한다

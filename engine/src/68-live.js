@@ -1122,7 +1122,16 @@ const Live = {
     this.joinSay('연결하는 중…');
     let main = null;
     try {
-      main = await this.link().open(`ch-live-${code}`, (ev, p) => this.onMain(ev, p), true);
+      // 첫 웹소켓 연결이 가끔 바로 끊긴다(2026-10 운영 수업 주소에서 CHANNEL_ERROR). 바로 포기하지 않고 1초, 2초 뒤 다시 한다.
+      for (let n = 0; ; n++) {
+        try {
+          main = await this.link().open(`ch-live-${code}`, (ev, p) => this.onMain(ev, p), true);
+          break;
+        } catch (err) {
+          if (n >= 2 || this.attempt !== mine) throw err;
+          await new Promise((r) => setTimeout(r, 1000 * (n + 1)));
+        }
+      }
       const inbox = await this.link().open(`ch-live-${code}-in`, () => {}, false);
       if (this.attempt !== mine) { main.close(); inbox.close(); return; }   // 그사이 다른 코드를 넣었다
       this.attempt = null;
@@ -1392,6 +1401,11 @@ const Live = {
     const page = this.inkPage(p.pg);
     if (!page) return;
     this.fitTo(p.pg, p.z);
+    // 교사가 지금 칠판에 쓰고 있으면 지난 장을 보던 학생도 칠판으로 데려온다. 칠판 판서는 그 자리에서 보라고 쓰는 것이고,
+    // 손가락으로 밀다가 지난 장으로 넘어간 학생은 위 띠를 못 보고 칠판 판서를 놓친다.
+    const t = this.teacher;
+    const wrote = p.snap ? p.snap.length > 0 : p.put.length > 0 || p.more.length > 0;
+    if (!this.follow && wrote && t && t.board && p.pg === `b${t.board.i}`) this.showSlide(t.slide);
     const shown = () => Ink.page === page.arr && document.documentElement.classList.contains('ch-live-ink');
     if (p.snap) {
       for (const s of page.arr) this.inkPlay.delete(s);

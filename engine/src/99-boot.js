@@ -13,6 +13,7 @@ async function start() {
   Nav.init();
   KeepWords.apply(Stage.deck);   // 목차 제목을 뽑은 뒤 어절을 감싼다
   Anim.init();     // 어절 보정 뒤: 세어 올리기 숫자를 글자로 다시 쓴다
+  Store.persist = document.documentElement.dataset.save !== 'off';   // 누구나 여는 사이트가 방문자 기기에 남기지 않게
   await Store.init();
   await Session.init();
   Ink.init();      // Session.doc이 있어야 한다

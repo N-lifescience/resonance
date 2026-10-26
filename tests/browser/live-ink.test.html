@@ -200,6 +200,18 @@ test('다른 장을 보던 학생도 교사가 칠판을 새로 열거나 다른
   await until(() => onBoard(0) && page(A).length === 1);
 });
 
+test('칠판이 열린 채 지난 장을 보던 학생도 교사가 칠판에 쓰면 칠판으로 데려온다', async () => {
+  A.Live.move(1);
+  await until(() => !A.Live.follow && A.Ink.ref.kind === 'slide');
+  await wait(600);
+  assert(!A.Live.follow, '쓰지 않으면 보던 장에 둔다');
+  draw([[300, 500], [420, 520]]);
+  await until(() => A.Live.follow && A.Ink.ref.kind === 'board' && page(A).length === 2 && A.Live.inkPlay.size === 0);
+  assert(visible(doc('a').querySelector('.ch-board')), '칠판이 보인다');
+  T.Ink.undo();
+  await until(() => page(A).length === 1);
+});
+
 test('칠판을 닫으면 학생도 슬라이드로 돌아온다', async () => {
   T.Board.close();
   await until(() => !visible(doc('a').querySelector('.ch-board')) && A.Ink.ref.kind === 'slide');

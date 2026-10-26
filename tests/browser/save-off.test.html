@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="ko" data-deck="test-save-off" data-save="off">
+<head>
+<meta charset="utf-8">
+<title>save off</title>
+<!-- <html data-save="off">: 수업을 누구나 여는 사이트가 주인이 아닌 방문자의 판서·설정을 이 기기에 남기지 않는다 -->
+<link rel="stylesheet" href="../../engine/exploragram.css">
+<script defer src="../../engine/exploragram.js"></script>
+<script src="harness.js"></script>
+</head>
+<body>
+<section class="slide" id="a"><h2>하나</h2></section>
+<pre id="results" data-summary="pending"></pre>
+<script>
+const I = () => Exploragram._internal;
+const stroke = () => ({ t: 'pen', c: '#000000', w: 3, p: [1, 1, 5, 5] });
+// 엔진을 거치지 않고 이 기기의 저장소(IndexedDB)를 직접 본다
+const raw = (mode, fn) => new Promise((resolve, reject) => {
+  const req = indexedDB.open('exploragram', 1);
+  req.onupgradeneeded = () => req.result.createObjectStore('kv');
+  req.onerror = () => reject(req.error);
+  req.onsuccess = () => {
+    const t = req.result.transaction('kv', mode);
+    const q = fn(t.objectStore('kv'));
+    t.oncomplete = () => { resolve(q.result); req.result.close(); };
+    t.onerror = () => reject(t.error);
+  };
+});
+const getRaw = (key) => raw('readonly', (s) => s.get(key));
+
+test('저장하지 않는 화면이다', () => {
+  eq(I().Store.persist, false);
+  eq(I().Session.keep, false);
+});
+
+test('판서는 쓸 수 있지만 이 기기에 저장하지 않고, 처음 쓸 때 한 번 알린다', async () => {
+  const { Session: S, InkModel: M } = I();
+  M.add(S.hist, M.page(S.doc, { kind: 'slide', key: 'a' }), stroke());
+  S.changed();
+  const note = document.querySelector('.ch-notice');
+  assert(note && note.classList.contains('is-on') && note.textContent.includes('저장하지 않아요'), '알림');
+  await wait(700);
+  eq(await getRaw('ink:test-save-off:기본'), undefined, '저장소에 없다');
+  eq(S.doc.slides.a.length, 1, '화면에는 남는다');
+});
+
+test('이 기기에 남아 있던 다른 사람의 판서는 읽지도 지우지도 않는다', async () => {
+  const S = I().Session;
+  const other = { v: 1, slides: { a: [stroke(), stroke()] }, boards: [{ bg: 'white', strokes: [] }], board: 0 };
+  await raw('readwrite', (s) => s.put(other, 'ink:test-save-off:2반'));
+  await S.addClass('2반');
+  await S.switchTo('2반');
+  eq(Object.values(S.doc.slides).flat().length, 0, '읽지 않는다');
+  await S.switchTo('기본');
+  eq(S.doc.slides.a.length, 1, '반을 오가도 메모리의 판서는 남는다');
+  await S.removeClass('2반');
+  eq((await getRaw('ink:test-save-off:2반')).slides.a.length, 2, '지우지 않는다');
+  eq(await getRaw('classes'), undefined, '반 목록도 저장하지 않는다');
+});
+
+test('⚙ 설정을 바꿔도 이 기기에 남기지 않는다', async () => {
+  await I().Settings.set('motionOff', true);
+  eq(I().Settings.values.motionOff, true, '이 화면에서는 바뀐다');
+  eq(await getRaw('settings'), undefined);
+  await I().Settings.set('motionOff', false);
+});
+</script>
+</body>
+</html>
