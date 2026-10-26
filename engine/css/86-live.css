@@ -17,9 +17,21 @@
 .ch-live .ch-live-count { font-size: 15px; font-weight: 700; color: var(--ch-ui-fg); }
 .ch-live-code { font: 800 44px/1.1 var(--ch-mono); letter-spacing: .06em; text-align: center; }
 .ch-live-code:empty, .ch-live-qr:empty, .ch-live :is(.ch-live-how, .ch-live-count):empty { display: none; }
-.ch-live-qr { align-self: center; padding: 8px; border-radius: 8px; background: #fff; }
+/* QR은 단추: 누르면 화면 가득 크게 */
+.ch-live-ui .ch-live-qr { align-self: center; display: flex; flex-direction: column; align-items: center; gap: 4px; min-height: 0; padding: 8px 8px 6px; border: 2px solid transparent; border-radius: 8px; background: #fff; cursor: zoom-in; }
+.ch-live-ui .ch-live-qr:empty { display: none; }
 .ch-live-qr img { display: block; width: 164px; height: 164px; image-rendering: pixelated; }
+.ch-live-qr span { font-size: 13px; font-weight: 700; color: #1F2328; }
 .ch-live-qr small { display: block; max-width: 220px; color: #1F2328; word-break: break-all; }
+
+/* QR 크게 보기: 교실 뒷자리에서도 찍히게 화면 가득. 아무 데나 누르면 닫힌다 */
+.ch-live-big { position: fixed; z-index: 9000; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2vh; padding: 16px; background: rgba(10, 12, 16, .94); text-align: center; cursor: zoom-out; }
+.ch-live-big-qr { padding: 2vmin; border-radius: 12px; background: #fff; }
+.ch-live-big-qr img { display: block; width: min(64vh, calc(100vw - 64px)); height: min(64vh, calc(100vw - 64px)); image-rendering: pixelated; }
+.ch-live-big-qr small { display: block; max-width: min(80vw, 640px); font-size: 24px; color: #1F2328; word-break: break-all; }
+.ch-live-big .ch-live-code { font-size: min(96px, 10vh, 14vw); color: #fff; }
+.ch-live-big p { max-width: 40em; margin: 0; font-size: min(24px, 3vh, 5vw); color: var(--ch-ui-mute); word-break: keep-all; overflow-wrap: anywhere; text-wrap: balance; }
+.ch-live-ui .ch-live-big-x { position: absolute; top: 16px; right: 16px; min-width: 88px; font-size: 18px; font-weight: 700; }
 .ch-live-btns { display: flex; flex-wrap: wrap; gap: 6px; }
 .ch-live .ch-switch { padding: 4px 0; }
 

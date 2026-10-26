@@ -183,6 +183,23 @@ test('다른 장을 보는 학생에게는 「선생님은 칠판 화면」 띠,
   await until(() => visible(doc('a').querySelector('.ch-board')) && A.Ink.ref.kind === 'board');
 });
 
+test('다른 장을 보던 학생도 교사가 칠판을 새로 열거나 다른 칠판 쪽으로 옮기면 칠판으로 데려온다', async () => {
+  const onBoard = (i) => A.Live.follow && visible(doc('a').querySelector('.ch-board')) && A.Ink.ref.kind === 'board' && A.Ink.ref.index === i;
+  A.Live.move(1);
+  await until(() => !A.Live.follow && !visible(doc('a').querySelector('.ch-board')));
+  T.Board.next();
+  await until(() => onBoard(1));
+  T.Board.prev();
+  await until(() => onBoard(0) && page(A).length === 1);
+  A.Live.move(1);
+  await until(() => !A.Live.follow);
+  T.Board.close();
+  await wait(600);
+  assert(!A.Live.follow && A.Nav.state.slide === 3, '칠판을 닫을 때는 보던 장에 둔다');
+  T.Board.open();
+  await until(() => onBoard(0) && page(A).length === 1);
+});
+
 test('칠판을 닫으면 학생도 슬라이드로 돌아온다', async () => {
   T.Board.close();
   await until(() => !visible(doc('a').querySelector('.ch-board')) && A.Ink.ref.kind === 'slide');
@@ -190,6 +207,37 @@ test('칠판을 닫으면 학생도 슬라이드로 돌아온다', async () => {
   assert(!doc('a').body.classList.contains('ch-dark-page'), '어두운 바탕을 걷는다');
   eq(A.Nav.state.slide, 0);
   eq(page(A).map((x) => wire(x.p)).join('|'), page(T).map((x) => wire(x.p)).join('|'), '1장의 판서');
+});
+
+test('교사 화면이 장을 더 줄였으면(글꼴 차이) 학생 화면도 그 배율로 맞춰 판서가 같은 자리에 놓인다', async () => {
+  const i = T.Nav.state.slide;
+  const slide = (X) => X.Stage.slides[i];
+  // 오른쪽에 붙은 이름표: 장을 줄이면 장 안 폭이 넓어져 자리가 바뀐다(그림 칸이 오른쪽에 있는 장)
+  for (const X of [T, A]) {
+    const tag = slide(X).ownerDocument.createElement('p');
+    Object.assign(tag, { id: 'tag', textContent: '이름표' });
+    tag.style.cssText = 'position: absolute; right: 80px; top: 300px; margin: 0';
+    slide(X).append(tag);
+  }
+  const at = (X) => {
+    const r = slide(X).ownerDocument.getElementById('tag').getBoundingClientRect();
+    return X.Stage.toStage(r.left, r.top).map(Math.round);
+  };
+  slide(T).style.zoom = '0.8';   // 교사 기기의 글꼴이 넓어 이 장을 0.8로 줄였다고 하자(학생 기기는 줄일 필요 없음)
+  T.emit('fit', slide(T));
+  await until(() => slide(A).style.zoom === '0.8');
+  eq(at(A), at(T), '이름표가 두 화면의 무대 같은 자리: 교사가 쓴 동그라미도 그 위에 놓인다');
+  // 학생 기기가 더 줄여야 하면(글꼴이 더 넓음) 글이 잘리지 않게 학생 배율을 둔다
+  const tall = slide(A).ownerDocument.createElement('div');
+  tall.style.height = '900px';
+  slide(A).append(tall);
+  await until(() => A.Fit.get(slide(A)) < 0.8);
+  tall.remove();
+  // 교사 화면 배율이 다시 1이 되면 학생도 제 배율로 다시 잰다
+  slide(T).style.zoom = '';
+  T.emit('fit', slide(T));
+  await until(() => slide(A).style.zoom === '');
+  for (const X of [T, A]) slide(X).ownerDocument.getElementById('tag').remove();
 });
 
 test('실시간 창의 「학생 화면에 판서 보이기」를 끄면 학생 화면에서 사라지고, 켜면 돌아온다', async () => {

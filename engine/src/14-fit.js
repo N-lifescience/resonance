@@ -8,6 +8,7 @@ const Fit = {
   slide: null,
   watch: null,
   timer: 0,
+  caps: new WeakMap(),   // 장 → 이보다 크게 보이지 않는 배율(실시간 학생 화면: 교사 화면의 배율)
 
   init() {
     const root = document.documentElement;
@@ -42,6 +43,23 @@ const Fit = {
     const root = document.documentElement;
     if (this.off || root.classList.contains('ch-auditing') || root.classList.contains('ch-editing')) return;
     if (slide.hasAttribute('data-allow-overflow') || slide.querySelector('[data-allow-overflow]')) return;
+    const was = this.get(slide);
+    this.shrink(slide, fresh);
+    const cap = this.caps.get(slide);
+    if (cap && cap < this.get(slide)) slide.style.zoom = String(cap);
+    if (this.get(slide) !== was) emit('fit', slide);   // 실시간 교사 화면: 바뀐 배율을 학생에게 알린다
+  },
+
+  // 실시간 학생 화면: 글꼴이 기기마다 달라 같은 장도 줄이는 배율이 다르다. 줄이면 장 안 배치 폭도 넓어져
+  // 그림·칸의 자리가 바뀌므로, 교사 화면이 더 줄였으면 학생도 그 배율로 맞춰 판서가 같은 자리에 놓이게 한다.
+  // 학생 기기가 더 줄여야 하면(글꼴이 더 넓음) 글이 잘리지 않게 학생 배율을 둔다.
+  capTo(slide, z) {
+    if (this.caps.get(slide) === z) return;
+    this.caps.set(slide, z);
+    if (slide === this.slide) this.apply(slide, z > this.get(slide));
+  },
+
+  shrink(slide, fresh) {
     if (fresh) slide.style.zoom = '';
     const over = () => Math.max(slide.scrollHeight / (slide.clientHeight || 1), slide.scrollWidth / (slide.clientWidth || 1));
     let r = over();

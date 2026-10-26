@@ -6,6 +6,7 @@ async function start() {
   Editor.tag();       // 원본 보관 전: 화면과 원본에 같은 편집 번호를 붙인다
   Source.capture();   // 엔진이 DOM을 바꾸기 전의 원본(저장할 때 쓴다)
   Stage.init();
+  Compat.init();    // 줄이기(Fit)·점검이 재기 전: 옛 브라우저에서 편집으로 옮긴 자리를 맞춘다
   MathTex.init();   // 어절 보정보다 먼저: $…$ 자리를 잡는다
   Parts.init();   // Nav보다 먼저: 정답 상자 내용을 단계로 묶는다
   Panels.init();   // Nav보다 먼저: 첫 show 이벤트로 목차 현재 위치를 표시
@@ -34,7 +35,7 @@ function boot() {
   Exploragram.next = () => Nav.next();
   Exploragram.prev = () => Nav.prev();
   Exploragram.audit = () => Audit.run();
-  Exploragram._internal = { on, emit, Stage, Fit, Nav, Steps, Panels, Ask, InkGeom, InkModel, Store, Session, Tools, Ink, Toolbar, icon, Board, Settings, KeepWords, Print, Audit, Parts, TocSlide, Answer, Blank, Zoom, Expr, Stepper, MapReveal, Yearline, Sort, Quiz, Short, Order, Calc, Plot, Zip, Pptx, Source, PptFill, Timer, PopTimer, Picker, Score, Checklist, Hotspots, Poll, Labeling, Media, Anim, MathTex, Particles, Play, Editor, Live, LiveCore };
+  Exploragram._internal = { on, emit, Stage, Fit, Compat, Nav, Steps, Panels, Ask, InkGeom, InkModel, Store, Session, Tools, Ink, Toolbar, icon, Board, Settings, KeepWords, Print, Audit, Parts, TocSlide, Answer, Blank, Zoom, Expr, Stepper, MapReveal, Yearline, Sort, Quiz, Short, Order, Calc, Plot, Zip, Pptx, Source, PptFill, Timer, PopTimer, Picker, Score, Checklist, Hotspots, Poll, Labeling, Media, Anim, MathTex, Particles, Play, Editor, Live, LiveCore };
   start().then(() => readyResolve(Exploragram), (err) => {
     console.error('[exploragram]', err);
     readyResolve(Exploragram);

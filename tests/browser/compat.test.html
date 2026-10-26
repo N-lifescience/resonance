@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="ko" data-deck="test-compat">
+<head>
+<meta charset="utf-8">
+<title>compat</title>
+<link rel="stylesheet" href="../../engine/exploragram.css">
+<script defer src="../../engine/exploragram.js"></script>
+<script src="harness.js"></script>
+</head>
+<body>
+<!-- 편집기가 옮긴 자리(style="translate: X Y")를 CSS translate를 모르는 옛 브라우저에서도 같게 보이는가 -->
+<section class="slide" id="c0">
+  <h2>편집으로 옮긴 장</h2>
+  <div class="cols" style="display: grid; grid-template-columns: 1fr 400px; gap: 20px">
+    <p id="flow" style="font-size: 32px; translate: 40px -12px">흐름 속 문단</p>
+    <div id="box" style="position: relative; left: 10px; height: 200px; translate: 68px -8px">
+      <p id="abs" style="position: absolute; left: 20px; top: 30px; margin: 0; translate: -15px 25px">떠 있는 이름표</p>
+      <p id="wide" style="position: absolute; left: 0; right: 0; bottom: 0; margin: 0; text-align: right; translate: 120px 5px">양옆을 붙인 그림 설명</p>
+      <svg id="svg" viewBox="0 0 400 200" width="400" height="200" style="translate: 0px">
+        <rect id="shape" x="10" y="10" width="40" height="40" style="translate: 30px 50px"></rect>
+      </svg>
+    </div>
+  </div>
+  <p id="after" style="font-size: 32px">뒤 문단(제자리)</p>
+  <p id="pct" style="translate: 10% 0">퍼센트는 그대로</p>
+</section>
+<pre id="results" data-summary="pending"></pre>
+<script>
+const I = () => Exploragram._internal;
+const $ = (id) => document.getElementById(id);
+const ids = ['flow', 'box', 'abs', 'wide', 'shape', 'after'];
+const rects = () => Object.fromEntries(ids.map((id) => {
+  const r = $(id).getBoundingClientRect();
+  return [id, [r.left, r.top, r.width, r.height].map(Math.round)];
+}));
+
+test('이 브라우저는 translate를 알아서 엔진이 손대지 않는다', () => {
+  assert(CSS.supports('translate', '1px 1px'));
+  eq($('flow').style.position, '', '그대로');
+  eq($('shape').getAttribute('transform'), null);
+});
+
+test('translate를 모르는 브라우저처럼 옮김을 걷고 맞추면 화면이 같다', () => {
+  const want = rects();
+  const off = document.createElement('style');
+  off.textContent = '.slide [style*="translate"] { translate: none !important; }';   // 옛 브라우저: 속성을 모른다
+  document.head.append(off);
+  assert(rects().flow[0] !== want.flow[0], '옮김이 빠지면 자리가 달라진다');
+  I().Compat.translate(I().Stage.deck);
+  eq(rects(), want, '같은 자리');
+  eq($('flow').style.position, 'relative', '흐름 속 요소는 상대 위치로');
+  eq($('box').style.left, '78px', '이미 상대 위치면 더한다');
+  eq([$('abs').style.marginLeft, $('abs').style.marginRight], ['-15px', '15px'], '떠 있는 요소는 여백으로(반대쪽은 빼서 폭은 그대로)');
+  eq($('shape').getAttribute('transform'), 'translate(30 50)', 'SVG 도형은 transform 속성으로');
+  eq($('pct').style.position, '', 'px가 아닌 값은 건드리지 않는다');
+  off.remove();
+});
+</script>
+</body>
+</html>

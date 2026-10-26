@@ -1,7 +1,7 @@
-/*! exploragram engine v2.4.0 | © N-lifescience | https://github.com/N-lifescience/resonance */
+/*! exploragram engine v2.5.0 | © N-lifescience | https://github.com/N-lifescience/resonance */
 (function () {
 'use strict';
-const VERSION = '2.4.0';
+const VERSION = '2.5.0';
 const LIVE_CONFIG = {"url":"https://qtwigpxinccudhprrdnb.supabase.co","key":"sb_publishable_-3KCWch7Q7sBQbcdVzxR4g_imovkZv5","site":"https://n-lifescience.github.io/resonance/"};
 /* ---- 00-core.js ---- */
 // 공통 상수, 작은 DOM 도우미, 이벤트 훅, 공개 객체 Exploragram.
@@ -450,6 +450,7 @@ const Fit = {
   slide: null,
   watch: null,
   timer: 0,
+  caps: new WeakMap(),   // 장 → 이보다 크게 보이지 않는 배율(실시간 학생 화면: 교사 화면의 배율)
 
   init() {
     const root = document.documentElement;
@@ -484,6 +485,23 @@ const Fit = {
     const root = document.documentElement;
     if (this.off || root.classList.contains('ch-auditing') || root.classList.contains('ch-editing')) return;
     if (slide.hasAttribute('data-allow-overflow') || slide.querySelector('[data-allow-overflow]')) return;
+    const was = this.get(slide);
+    this.shrink(slide, fresh);
+    const cap = this.caps.get(slide);
+    if (cap && cap < this.get(slide)) slide.style.zoom = String(cap);
+    if (this.get(slide) !== was) emit('fit', slide);   // 실시간 교사 화면: 바뀐 배율을 학생에게 알린다
+  },
+
+  // 실시간 학생 화면: 글꼴이 기기마다 달라 같은 장도 줄이는 배율이 다르다. 줄이면 장 안 배치 폭도 넓어져
+  // 그림·칸의 자리가 바뀌므로, 교사 화면이 더 줄였으면 학생도 그 배율로 맞춰 판서가 같은 자리에 놓이게 한다.
+  // 학생 기기가 더 줄여야 하면(글꼴이 더 넓음) 글이 잘리지 않게 학생 배율을 둔다.
+  capTo(slide, z) {
+    if (this.caps.get(slide) === z) return;
+    this.caps.set(slide, z);
+    if (slide === this.slide) this.apply(slide, z > this.get(slide));
+  },
+
+  shrink(slide, fresh) {
     if (fresh) slide.style.zoom = '';
     const over = () => Math.max(slide.scrollHeight / (slide.clientHeight || 1), slide.scrollWidth / (slide.clientWidth || 1));
     let r = over();
@@ -495,6 +513,53 @@ const Fit = {
       r = over();
       if (r <= 1.002 || k <= this.MIN) break;
       k = Math.max(this.MIN, Math.min(k - 0.01, k / r));
+    }
+  },
+};
+
+/* ---- 15-compat.js ---- */
+// 옛 브라우저 맞춤. 크로뮴 104·사파리 14.1보다 오래된 브라우저(업데이트를 막아 둔 학교 태블릿의 삼성 인터넷·웹뷰 등)는
+// CSS translate 속성을 모른다. 편집에서 옮긴 자리는 style="translate: X Y"로 저장되므로 그 브라우저에서는 옮김이 빠진다.
+// 그러면 교사 화면과 장 모양이 달라져 실시간 판서가 빗나간다(2026-10 수업: 그림과 ② 문장이 제자리로 돌아가 동그라미가 어긋남).
+// 그런 브라우저에서만 같은 거리를 상대 위치나 여백으로 옮긴다. 원본(Source)은 건드리지 않아 저장 파일은 그대로다.
+const Compat = {
+  done: new WeakSet(),
+
+  init() {
+    if (!window.CSS || !CSS.supports || CSS.supports('translate', '1px 1px')) return;
+    // 장이 보일 때 맞춘다: 숨은 장은 auto 여백을 px로 알려 주지 않는다. 줄이기(Fit)보다 먼저 듣는다.
+    on('show', (slide) => {
+      if (this.done.has(slide)) return;
+      this.done.add(slide);
+      this.translate(slide);
+    });
+  },
+
+  // root 안에서 style 속성에 translate를 px로 적은 요소를 그만큼 옮긴다. translate처럼 둘레 배치와 요소 폭은 바꾸지 않는다.
+  translate(root) {
+    const px = (v) => parseFloat(v) || 0;
+    for (const el of qsa('[style*="translate"]', root)) {
+      const m = /(?:^|;)\s*translate\s*:\s*([^;]+)/i.exec(el.getAttribute('style'));
+      const v = m ? m[1].trim().split(/\s+/) : [];
+      if (!v.length || v.length > 2 || !v.every((s) => /^-?(\d+\.?\d*|\.\d+)(px)?$/.test(s))) continue;   // 편집기가 적는 px만
+      const [x, y = 0] = v.map(parseFloat);
+      if (!x && !y) continue;
+      if (el instanceof SVGElement && el.ownerSVGElement) {   // 그림 속 도형: 사용자 단위가 CSS px와 같다
+        el.setAttribute('transform', `translate(${x} ${y}) ${el.getAttribute('transform') || ''}`.trim());
+        continue;
+      }
+      const cs = getComputedStyle(el);
+      if (cs.position === 'absolute' || cs.position === 'fixed') {
+        // 떠 있는 요소: 한쪽 여백에 더하고 반대쪽에서 빼면 폭·높이는 그대로 자리만 옮겨진다(left·right를 함께 준 요소도)
+        el.style.marginLeft = `${px(cs.marginLeft) + x}px`;
+        el.style.marginRight = `${px(cs.marginRight) - x}px`;
+        el.style.marginTop = `${px(cs.marginTop) + y}px`;
+        el.style.marginBottom = `${px(cs.marginBottom) - y}px`;
+      } else if (cs.position === 'static' || cs.position === 'relative') {
+        if (cs.position === 'static') el.style.position = 'relative';
+        el.style.left = `${px(cs.left) + x}px`;
+        el.style.top = `${px(cs.top) + y}px`;
+      }
     }
   },
 };
@@ -6886,6 +6951,8 @@ const LiveCore = {
       const m = typeof x === 'string' && /^([sb])(0|[1-9]\d{0,2})$/.exec(x);
       return !!m && Number(m[2]) < (m[1] === 's' ? n : 200);
     };
+    // 교사 화면에서 그 장을 줄여 보인 배율(Fit, 0.75~1). 옛 엔진 교사는 보내지 않는다.
+    const zoom = (x) => typeof x === 'number' && x >= 0.5 && x <= 1;
     if (event === 'need') {
       return sid(p.sid) && pg(p.pg) && int(p.have, -1, LIVE_ID_MAX) ? { sid: p.sid, pg: p.pg, have: p.have } : null;
     }
@@ -6910,6 +6977,7 @@ const LiveCore = {
         return out.every(Boolean) ? out : null;
       };
       const out = { tid: p.tid, ep: p.ep, pg: p.pg, rev: p.rev };
+      if (zoom(p.z)) out.z = p.z;
       if (p.snap != null) {
         out.snap = list(p.snap, 5000, stroke);
         return out.snap ? out : null;
@@ -6939,7 +7007,7 @@ const LiveCore = {
         site: typeof p.site === 'string' && /^[\w-]{1,60}$/.test(p.site) ? p.site : null,
         // 실시간 판서가 켜져 있을 때만: 교사가 보는 판서 쪽과 판 번호, 칠판을 열었으면 그 칠판
         ink: p.ink && typeof p.ink === 'object' && int(p.ink.ep, 0, 1e6) && pg(p.ink.pg) && int(p.ink.rev, 0, LIVE_ID_MAX)
-          ? { ep: p.ink.ep, pg: p.ink.pg, rev: p.ink.rev } : null,
+          ? Object.assign({ ep: p.ink.ep, pg: p.ink.pg, rev: p.ink.rev }, zoom(p.ink.z) ? { z: p.ink.z } : null) : null,
         board: p.board && typeof p.board === 'object' && int(p.board.i, 0, 199) && int(p.board.n, 1, 200) && p.board.i < p.board.n && BOARD_BGS.includes(p.board.bg)
           ? { i: p.board.i, n: p.board.n, bg: p.board.bg } : null,
         // 툴바 타이머가 떠 있을 때만: 남은 ms, 처음 정한 초, 가는 중인지
@@ -7099,6 +7167,7 @@ const Live = {
     on('ink-dirty', () => this.inkDirty());
     on('session', () => { this.inkEp++; this.sendState(); });   // 반을 바꿨다: 학생은 받아 둔 판서를 버리고 새로 받는다
     on('board-mode', () => this.sendState());   // 칠판을 열고 닫거나 칠판 쪽·바탕을 바꾸면 학생 화면도 맞춘다
+    on('fit', () => this.sendState());   // 늦게 뜬 글꼴·그림 때문에 장을 다시 줄였다: 학생 화면 배율도 맞춘다
     on('pop-timer', () => { this.sendState(); this.renderTally(); });   // 툴바 타이머를 띄우거나 멈추면 학생 화면의 남은 시간도 맞춘다
     on('pop-timer-moved', () => this.renderTally());
     on('features', () => this.onFeatures());
@@ -7207,7 +7276,7 @@ const Live = {
     const cur = this.inkLive() && this.inkCur();
     if (cur) {
       const rec = this.inkRec.get(cur.arr);
-      s.ink = { ep: this.inkEp, pg: cur.pg, rev: rec && rec.pg === cur.pg ? rec.rev : 0 };
+      s.ink = { ep: this.inkEp, pg: cur.pg, rev: rec && rec.pg === cur.pg ? rec.rev : 0, z: this.zoomOf(cur.pg) };
       const d = Session.doc;
       s.board = Board.active ? { i: d.board, n: d.boards.length, bg: d.boards[d.board].bg } : null;
     }
@@ -7267,6 +7336,12 @@ const Live = {
     const g = Ink.gesture;
     if (g && g.stroke && g.page === arr) strokes.push(g.stroke);
     return { pg, arr, strokes };
+  },
+
+  // 그 쪽을 교사 화면에서 줄여 보인 배율(Fit). 학생 기기는 글꼴이 달라 같은 장을 다르게 줄이므로 이 값에 맞춘다(Fit.capTo). 칠판은 1.
+  zoomOf(pg) {
+    const slide = pg[0] === 's' ? Stage.slides[Number(pg.slice(1))] : null;
+    return slide ? Fit.get(slide) : 1;
   },
 
   // 판서가 바뀌었다: 잠깐 모아서 보낸다
@@ -7329,7 +7404,7 @@ const Live = {
   },
 
   inkSend(pg, rev, body) {
-    this.main.send('ink', Object.assign({ tid: this.tid, ep: this.inkEp, pg, rev }, body));
+    this.main.send('ink', Object.assign({ tid: this.tid, ep: this.inkEp, pg, rev, z: this.zoomOf(pg) }, body));
     this.inkSentAt = Date.now();
   },
 
@@ -7475,7 +7550,7 @@ const Live = {
     this.ui = {
       status: h('p', { class: 'ch-live-status', role: 'status', 'aria-live': 'polite' }),
       code: h('b', { class: 'ch-live-code' }),
-      qr: h('div', { class: 'ch-live-qr' }),
+      qr: h('button', { type: 'button', class: 'ch-live-qr', 'aria-label': 'QR 코드 크게 보기', onclick: (e) => { this.showBig(true); e.currentTarget.blur(); } }),
       how: h('p', { class: 'ch-live-how' }),
       count: h('p', { class: 'ch-live-count' }),
       distBtn: btn('학생 보기', () => this.toggleDist(), 'ch-live-dist-btn'),
@@ -7520,10 +7595,32 @@ const Live = {
     try {
       const img = await qrImage(url);
       if (this.code !== code) return;   // 불러오는 사이에 끝냈거나 새 코드가 생겼다
-      this.ui.qr.replaceChildren(img);
+      this.ui.qr.replaceChildren(img, h('span', { text: '눌러서 크게 보기' }));
     } catch (err) {
       if (this.code === code) this.ui.qr.replaceChildren(h('small', { text: url }));   // QR을 못 그리면 주소라도
     }
+  },
+
+  // QR 크게 보기: 실시간 창의 QR은 작아서 뒷자리에서 찍히지 않는다. 화면 가득 띄우고 아무 데나 누르면 닫는다(Esc, 장 넘기기도).
+  showBig(open) {
+    const qr = open && this.code && this.ui && this.ui.qr.firstElementChild;
+    if (!qr) {
+      if (this.big) this.big.hidden = true;
+      return;
+    }
+    if (!this.big) {
+      this.big = h('div', { class: 'ch-live-big ch-live-ui', 'data-no-ink': '', role: 'dialog', 'aria-label': '실시간 수업 QR 코드', hidden: true,
+        onclick: () => this.showBig(false) });
+      document.body.append(this.big);
+      on('key', (e) => { if (keyName(e) === 'escape') this.showBig(false); });
+      on('show', () => this.showBig(false));
+    }
+    const close = h('button', { type: 'button', class: 'ch-live-big-x', text: '닫기' });
+    this.big.replaceChildren(close, h('div', { class: 'ch-live-big-qr' }, qr.cloneNode(true)),
+      h('b', { class: 'ch-live-code', text: this.ui.code.textContent }),
+      h('p', { text: this.ui.how.textContent }));
+    this.big.hidden = false;
+    close.focus();
   },
 
   renderCount() {
@@ -7724,6 +7821,7 @@ const Live = {
     this.inkRec = new WeakMap();
     this.inkWanted = false;
     this.toggleDist(false);
+    this.showBig(false);
     this.renderPanel();
     this.say('끝냈어요. 「실시간」을 다시 누르면 새 코드로 시작해요');
   },
@@ -7862,12 +7960,16 @@ const Live = {
       this.join.hidden = true;
       this.follow = true;
     }
+    const before = this.teacher && this.teacher.board;
     this.teacher = p;
     this.heard = Date.now();
     this.timerShow(p.timer);
     this.inkState(p);
+    // 교사가 칠판을 열거나 다른 칠판 쪽으로 옮기면 모두 보라는 뜻이다. 지난 장을 보던 학생도 칠판으로 데려온다.
+    // 위 띠의 「선생님 화면으로」만으로는 칠판에 쓰는 판서를 못 보고 지나치는 학생이 많다.
+    const toBoard = !!p.board && (!before || before.i !== p.board.i);
     // 교사가 학생이 보던 장으로 오면 다시 따라간다
-    if (this.follow || p.slide === Nav.state.slide) this.showSlide(p.slide);
+    if (this.follow || toBoard || p.slide === Nav.state.slide) this.showSlide(p.slide);
     else {
       this.renderBar();
       this.inkShow();
@@ -8014,7 +8116,15 @@ const Live = {
     this.inkOn = !!t.ink;
     if (!t.ink) return;
     if (t.ink.ep !== this.inkEp) this.inkReset(t.ink.ep);
+    this.fitTo(t.ink.pg, t.ink.z);
     this.inkCheck();
+  },
+
+  // 글꼴이 기기마다 달라 넘친 장을 줄이는 배율(Fit)도 다르다. 줄인 정도가 다르면 장 안 배치가 달라져 판서가 빗나간다.
+  // 교사 화면이 그 장을 더 줄였으면 학생 화면도 같은 배율로 맞춘다. 옛 엔진 교사는 배율을 보내지 않는다.
+  fitTo(pg, z) {
+    const slide = z && pg[0] === 's' ? Stage.slides[Number(pg.slice(1))] : null;
+    if (slide) Fit.capTo(slide, z);
   },
 
   inkHave(pg) {
@@ -8060,6 +8170,7 @@ const Live = {
     if (p.ep !== this.inkEp) this.inkReset(p.ep);
     const page = this.inkPage(p.pg);
     if (!page) return;
+    this.fitTo(p.pg, p.z);
     const shown = () => Ink.page === page.arr && document.documentElement.classList.contains('ch-live-ink');
     if (p.snap) {
       for (const s of page.arr) this.inkPlay.delete(s);
@@ -8676,6 +8787,7 @@ async function start() {
   Editor.tag();       // 원본 보관 전: 화면과 원본에 같은 편집 번호를 붙인다
   Source.capture();   // 엔진이 DOM을 바꾸기 전의 원본(저장할 때 쓴다)
   Stage.init();
+  Compat.init();    // 줄이기(Fit)·점검이 재기 전: 옛 브라우저에서 편집으로 옮긴 자리를 맞춘다
   MathTex.init();   // 어절 보정보다 먼저: $…$ 자리를 잡는다
   Parts.init();   // Nav보다 먼저: 정답 상자 내용을 단계로 묶는다
   Panels.init();   // Nav보다 먼저: 첫 show 이벤트로 목차 현재 위치를 표시
@@ -8704,7 +8816,7 @@ function boot() {
   Exploragram.next = () => Nav.next();
   Exploragram.prev = () => Nav.prev();
   Exploragram.audit = () => Audit.run();
-  Exploragram._internal = { on, emit, Stage, Fit, Nav, Steps, Panels, Ask, InkGeom, InkModel, Store, Session, Tools, Ink, Toolbar, icon, Board, Settings, KeepWords, Print, Audit, Parts, TocSlide, Answer, Blank, Zoom, Expr, Stepper, MapReveal, Yearline, Sort, Quiz, Short, Order, Calc, Plot, Zip, Pptx, Source, PptFill, Timer, PopTimer, Picker, Score, Checklist, Hotspots, Poll, Labeling, Media, Anim, MathTex, Particles, Play, Editor, Live, LiveCore };
+  Exploragram._internal = { on, emit, Stage, Fit, Compat, Nav, Steps, Panels, Ask, InkGeom, InkModel, Store, Session, Tools, Ink, Toolbar, icon, Board, Settings, KeepWords, Print, Audit, Parts, TocSlide, Answer, Blank, Zoom, Expr, Stepper, MapReveal, Yearline, Sort, Quiz, Short, Order, Calc, Plot, Zip, Pptx, Source, PptFill, Timer, PopTimer, Picker, Score, Checklist, Hotspots, Poll, Labeling, Media, Anim, MathTex, Particles, Play, Editor, Live, LiveCore };
   start().then(() => readyResolve(Exploragram), (err) => {
     console.error('[exploragram]', err);
     readyResolve(Exploragram);

@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="ko" data-deck="test-compat-old">
+<head>
+<meta charset="utf-8">
+<title>compat old browser</title>
+<!-- CSS translate를 모르는 옛 브라우저 흉내: 속성을 무시하고 CSS.supports도 false -->
+<style>.slide [style*="translate"] { translate: none !important; }</style>
+<script>
+const supports = CSS.supports.bind(CSS);
+CSS.supports = (p, v) => (String(p).trim() === 'translate' ? false : supports(p, v));
+</script>
+<link rel="stylesheet" href="../../engine/exploragram.css">
+<script defer src="../../engine/exploragram.js"></script>
+<script src="harness.js"></script>
+<style>.w { position: relative; height: 120px; margin: 0; } .w p { margin: 0; font-size: 32px; }</style>
+</head>
+<body>
+<!-- 같은 칸 둘: 하나는 편집기가 적는 translate, 하나는 같은 거리를 상대 위치로. 엔진이 맞추면 두 글이 같은 자리 -->
+<section class="slide" id="o0">
+  <h2>처음 장</h2>
+  <div class="w" id="w1"><p id="moved" style="translate: 40px -12px">옮긴 글</p></div>
+  <div class="w" id="w2"><p id="ref" style="position: relative; left: 40px; top: -12px">옮긴 글</p></div>
+</section>
+<section class="slide" id="o1">
+  <h2>다음 장</h2>
+  <div class="w" id="w3"><p id="later" style="translate: 0px 30px">나중에 보는 장</p></div>
+</section>
+<pre id="results" data-summary="pending"></pre>
+<script>
+const I = () => Exploragram._internal;
+const $ = (id) => document.getElementById(id);
+const off = (id, wid) => {
+  const r = $(id).getBoundingClientRect();
+  const w = $(wid).getBoundingClientRect();
+  return [Math.round(r.left - w.left), Math.round(r.top - w.top)];
+};
+
+test('옛 브라우저에서도 처음 장의 옮긴 글이 제자리에 놓인다', () => {
+  eq(off('moved', 'w1'), off('ref', 'w2'));
+  eq($('moved').style.position, 'relative');
+});
+
+test('나중에 보는 장은 그 장이 보일 때 맞춘다', () => {
+  eq($('later').style.position, '', '숨은 장은 아직 그대로');
+  I().Nav.go(1);
+  const s = I().Stage.scale;
+  eq(off('later', 'w3'), [0, Math.round(30 * s)]);
+  I().Nav.go(0);
+  I().Nav.go(1);
+  eq(off('later', 'w3'), [0, Math.round(30 * s)], '다시 와도 두 번 옮기지 않는다');
+});
+</script>
+</body>
+</html>

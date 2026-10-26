@@ -54,6 +54,28 @@ test('교사가 실시간을 켜면 6자리 코드가 생긴다(로컬 전송)',
   await until(() => /^\d{6}$/.test(T.Live.code), 5000);
 });
 
+test('실시간 창의 QR을 누르면 화면 가득 크게 뜨고, 아무 데나 누르거나 Esc로 닫는다', async () => {
+  // file:// 시험이라 QR을 그리지 않는다. QR 라이브러리를 흉내 내고 웹 주소인 셈 치고 그린다.
+  frames.t.contentWindow.qrcode = () => ({ addData() {}, make() {}, createDataURL: () => 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==' });
+  await T.Live.drawQr(`https://example.com/lesson.html?join=${T.Live.code}`);
+  const qr = doc('t').querySelector('.ch-live-qr');
+  assert(visible(qr) && qr.matches('button') && qr.querySelector('img'), '작은 QR은 누를 수 있다');
+  const big = () => doc('t').querySelector('.ch-live-big');
+  qr.click();
+  assert(visible(big()), '크게 뜬다');
+  eq(big().querySelector('.ch-live-code').textContent, `${T.Live.code.slice(0, 3)} ${T.Live.code.slice(3)}`, '코드도 크게');
+  const r = big().querySelector('img').getBoundingClientRect();
+  assert(r.width >= 360 * 0.6 && r.width === r.height, `QR 크기 ${r.width}×${r.height}`);
+  const p = big().getBoundingClientRect();
+  eq([p.width, p.height], [640, 360], '화면 가득');
+  big().click();
+  assert(!visible(big()), '누르면 닫힌다');
+  qr.click();
+  doc('t').body.dispatchEvent(new frames.t.contentWindow.KeyboardEvent('keydown', { key: 'Escape', code: 'Escape', bubbles: true }));
+  assert(!visible(big()), 'Esc로 닫는다');
+  T.Live.renderPanel();   // 흉내 낸 QR을 걷는다
+});
+
 test('학생 둘이 코드로 들어와 교사 장을 따라간다', async () => {
   A = await open('a', `&join=${T.Live.code}`);
   B = await open('b', `&join=${T.Live.code}`);

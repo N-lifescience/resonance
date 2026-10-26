@@ -172,6 +172,8 @@ const LiveCore = {
       const m = typeof x === 'string' && /^([sb])(0|[1-9]\d{0,2})$/.exec(x);
       return !!m && Number(m[2]) < (m[1] === 's' ? n : 200);
     };
+    // 교사 화면에서 그 장을 줄여 보인 배율(Fit, 0.75~1). 옛 엔진 교사는 보내지 않는다.
+    const zoom = (x) => typeof x === 'number' && x >= 0.5 && x <= 1;
     if (event === 'need') {
       return sid(p.sid) && pg(p.pg) && int(p.have, -1, LIVE_ID_MAX) ? { sid: p.sid, pg: p.pg, have: p.have } : null;
     }
@@ -196,6 +198,7 @@ const LiveCore = {
         return out.every(Boolean) ? out : null;
       };
       const out = { tid: p.tid, ep: p.ep, pg: p.pg, rev: p.rev };
+      if (zoom(p.z)) out.z = p.z;
       if (p.snap != null) {
         out.snap = list(p.snap, 5000, stroke);
         return out.snap ? out : null;
@@ -225,7 +228,7 @@ const LiveCore = {
         site: typeof p.site === 'string' && /^[\w-]{1,60}$/.test(p.site) ? p.site : null,
         // 실시간 판서가 켜져 있을 때만: 교사가 보는 판서 쪽과 판 번호, 칠판을 열었으면 그 칠판
         ink: p.ink && typeof p.ink === 'object' && int(p.ink.ep, 0, 1e6) && pg(p.ink.pg) && int(p.ink.rev, 0, LIVE_ID_MAX)
-          ? { ep: p.ink.ep, pg: p.ink.pg, rev: p.ink.rev } : null,
+          ? Object.assign({ ep: p.ink.ep, pg: p.ink.pg, rev: p.ink.rev }, zoom(p.ink.z) ? { z: p.ink.z } : null) : null,
         board: p.board && typeof p.board === 'object' && int(p.board.i, 0, 199) && int(p.board.n, 1, 200) && p.board.i < p.board.n && BOARD_BGS.includes(p.board.bg)
           ? { i: p.board.i, n: p.board.n, bg: p.board.bg } : null,
         // 툴바 타이머가 떠 있을 때만: 남은 ms, 처음 정한 초, 가는 중인지
@@ -385,6 +388,7 @@ const Live = {
     on('ink-dirty', () => this.inkDirty());
     on('session', () => { this.inkEp++; this.sendState(); });   // 반을 바꿨다: 학생은 받아 둔 판서를 버리고 새로 받는다
     on('board-mode', () => this.sendState());   // 칠판을 열고 닫거나 칠판 쪽·바탕을 바꾸면 학생 화면도 맞춘다
+    on('fit', () => this.sendState());   // 늦게 뜬 글꼴·그림 때문에 장을 다시 줄였다: 학생 화면 배율도 맞춘다
     on('pop-timer', () => { this.sendState(); this.renderTally(); });   // 툴바 타이머를 띄우거나 멈추면 학생 화면의 남은 시간도 맞춘다
     on('pop-timer-moved', () => this.renderTally());
     on('features', () => this.onFeatures());
@@ -493,7 +497,7 @@ const Live = {
     const cur = this.inkLive() && this.inkCur();
     if (cur) {
       const rec = this.inkRec.get(cur.arr);
-      s.ink = { ep: this.inkEp, pg: cur.pg, rev: rec && rec.pg === cur.pg ? rec.rev : 0 };
+      s.ink = { ep: this.inkEp, pg: cur.pg, rev: rec && rec.pg === cur.pg ? rec.rev : 0, z: this.zoomOf(cur.pg) };
       const d = Session.doc;
       s.board = Board.active ? { i: d.board, n: d.boards.length, bg: d.boards[d.board].bg } : null;
     }
@@ -553,6 +557,12 @@ const Live = {
     const g = Ink.gesture;
     if (g && g.stroke && g.page === arr) strokes.push(g.stroke);
     return { pg, arr, strokes };
+  },
+
+  // 그 쪽을 교사 화면에서 줄여 보인 배율(Fit). 학생 기기는 글꼴이 달라 같은 장을 다르게 줄이므로 이 값에 맞춘다(Fit.capTo). 칠판은 1.
+  zoomOf(pg) {
+    const slide = pg[0] === 's' ? Stage.slides[Number(pg.slice(1))] : null;
+    return slide ? Fit.get(slide) : 1;
   },
 
   // 판서가 바뀌었다: 잠깐 모아서 보낸다
@@ -615,7 +625,7 @@ const Live = {
   },
 
   inkSend(pg, rev, body) {
-    this.main.send('ink', Object.assign({ tid: this.tid, ep: this.inkEp, pg, rev }, body));
+    this.main.send('ink', Object.assign({ tid: this.tid, ep: this.inkEp, pg, rev, z: this.zoomOf(pg) }, body));
     this.inkSentAt = Date.now();
   },
 
@@ -761,7 +771,7 @@ const Live = {
     this.ui = {
       status: h('p', { class: 'ch-live-status', role: 'status', 'aria-live': 'polite' }),
       code: h('b', { class: 'ch-live-code' }),
-      qr: h('div', { class: 'ch-live-qr' }),
+      qr: h('button', { type: 'button', class: 'ch-live-qr', 'aria-label': 'QR 코드 크게 보기', onclick: (e) => { this.showBig(true); e.currentTarget.blur(); } }),
       how: h('p', { class: 'ch-live-how' }),
       count: h('p', { class: 'ch-live-count' }),
       distBtn: btn('학생 보기', () => this.toggleDist(), 'ch-live-dist-btn'),
@@ -806,10 +816,32 @@ const Live = {
     try {
       const img = await qrImage(url);
       if (this.code !== code) return;   // 불러오는 사이에 끝냈거나 새 코드가 생겼다
-      this.ui.qr.replaceChildren(img);
+      this.ui.qr.replaceChildren(img, h('span', { text: '눌러서 크게 보기' }));
     } catch (err) {
       if (this.code === code) this.ui.qr.replaceChildren(h('small', { text: url }));   // QR을 못 그리면 주소라도
     }
+  },
+
+  // QR 크게 보기: 실시간 창의 QR은 작아서 뒷자리에서 찍히지 않는다. 화면 가득 띄우고 아무 데나 누르면 닫는다(Esc, 장 넘기기도).
+  showBig(open) {
+    const qr = open && this.code && this.ui && this.ui.qr.firstElementChild;
+    if (!qr) {
+      if (this.big) this.big.hidden = true;
+      return;
+    }
+    if (!this.big) {
+      this.big = h('div', { class: 'ch-live-big ch-live-ui', 'data-no-ink': '', role: 'dialog', 'aria-label': '실시간 수업 QR 코드', hidden: true,
+        onclick: () => this.showBig(false) });
+      document.body.append(this.big);
+      on('key', (e) => { if (keyName(e) === 'escape') this.showBig(false); });
+      on('show', () => this.showBig(false));
+    }
+    const close = h('button', { type: 'button', class: 'ch-live-big-x', text: '닫기' });
+    this.big.replaceChildren(close, h('div', { class: 'ch-live-big-qr' }, qr.cloneNode(true)),
+      h('b', { class: 'ch-live-code', text: this.ui.code.textContent }),
+      h('p', { text: this.ui.how.textContent }));
+    this.big.hidden = false;
+    close.focus();
   },
 
   renderCount() {
@@ -1010,6 +1042,7 @@ const Live = {
     this.inkRec = new WeakMap();
     this.inkWanted = false;
     this.toggleDist(false);
+    this.showBig(false);
     this.renderPanel();
     this.say('끝냈어요. 「실시간」을 다시 누르면 새 코드로 시작해요');
   },
@@ -1148,12 +1181,16 @@ const Live = {
       this.join.hidden = true;
       this.follow = true;
     }
+    const before = this.teacher && this.teacher.board;
     this.teacher = p;
     this.heard = Date.now();
     this.timerShow(p.timer);
     this.inkState(p);
+    // 교사가 칠판을 열거나 다른 칠판 쪽으로 옮기면 모두 보라는 뜻이다. 지난 장을 보던 학생도 칠판으로 데려온다.
+    // 위 띠의 「선생님 화면으로」만으로는 칠판에 쓰는 판서를 못 보고 지나치는 학생이 많다.
+    const toBoard = !!p.board && (!before || before.i !== p.board.i);
     // 교사가 학생이 보던 장으로 오면 다시 따라간다
-    if (this.follow || p.slide === Nav.state.slide) this.showSlide(p.slide);
+    if (this.follow || toBoard || p.slide === Nav.state.slide) this.showSlide(p.slide);
     else {
       this.renderBar();
       this.inkShow();
@@ -1300,7 +1337,15 @@ const Live = {
     this.inkOn = !!t.ink;
     if (!t.ink) return;
     if (t.ink.ep !== this.inkEp) this.inkReset(t.ink.ep);
+    this.fitTo(t.ink.pg, t.ink.z);
     this.inkCheck();
+  },
+
+  // 글꼴이 기기마다 달라 넘친 장을 줄이는 배율(Fit)도 다르다. 줄인 정도가 다르면 장 안 배치가 달라져 판서가 빗나간다.
+  // 교사 화면이 그 장을 더 줄였으면 학생 화면도 같은 배율로 맞춘다. 옛 엔진 교사는 배율을 보내지 않는다.
+  fitTo(pg, z) {
+    const slide = z && pg[0] === 's' ? Stage.slides[Number(pg.slice(1))] : null;
+    if (slide) Fit.capTo(slide, z);
   },
 
   inkHave(pg) {
@@ -1346,6 +1391,7 @@ const Live = {
     if (p.ep !== this.inkEp) this.inkReset(p.ep);
     const page = this.inkPage(p.pg);
     if (!page) return;
+    this.fitTo(p.pg, p.z);
     const shown = () => Ink.page === page.arr && document.documentElement.classList.contains('ch-live-ink');
     if (p.snap) {
       for (const s of page.arr) this.inkPlay.delete(s);
