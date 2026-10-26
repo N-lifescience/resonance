@@ -30,15 +30,15 @@ const sw = (k) => document.querySelector(`.ch-pop input[data-key="${k}"]`);
 const clean = (text) => text.replace(/\u2060/g, '');
 
 test('기본 설정: 기능은 모두 켜져 있고, 그 밖에는 손등 지우기만 켜져 있다', () => {
-  eq(I().Settings.values, { ink: true, board: true, live: true, liveInk: true, motionOff: false, printInk: false, palmErase: true, palmSize: 0 });
+  eq(I().Settings.values, { ink: true, board: true, live: true, liveInk: true, motionOff: false, timerSound: true, printInk: false, palmErase: true, palmSize: 0 });
 });
-test('⚙ 설정 버튼과 이름이 있는 스위치 일곱 개(기능 넷, 화면 하나, 판서 둘)', () => {
+test('⚙ 설정 버튼과 이름이 있는 스위치 여덟 개(기능 넷, 화면과 소리 둘, 판서 둘)', () => {
   btn('gear').click();
-  eq(document.querySelectorAll('.ch-pop .ch-switch').length, 7);
-  eq([...document.querySelectorAll('.ch-pop .ch-set-group h4')].map((x) => x.textContent), ['기능 켜고 끄기', '화면', '판서']);
+  eq(document.querySelectorAll('.ch-pop .ch-switch').length, 8);
+  eq([...document.querySelectorAll('.ch-pop .ch-set-group h4')].map((x) => x.textContent), ['기능 켜고 끄기', '화면과 소리', '판서']);
   for (const input of document.querySelectorAll('.ch-pop .ch-switch input')) {
     assert(input.closest('label').textContent.trim(), 'accessible label');
-    eq(input.checked, ['ink', 'board', 'live', 'liveInk', 'palmErase'].includes(input.dataset.key), input.dataset.key);
+    eq(input.checked, ['ink', 'board', 'live', 'liveInk', 'timerSound', 'palmErase'].includes(input.dataset.key), input.dataset.key);
   }
 });
 test('움직임 끄기는 바로 적용되고 저장된다', async () => {
@@ -68,10 +68,10 @@ test('인쇄에 판서 포함 설정도 저장된다', async () => {
   eq((await I().Store.get('settings')).printInk, true);
 });
 test('설정 재초기화는 저장값을 적용하고 버튼을 중복 생성하지 않는다', async () => {
-  I().Settings.values = { ink: true, board: true, live: true, liveInk: true, motionOff: false, printInk: false, palmErase: false, palmSize: 0 };
+  I().Settings.values = { ink: true, board: true, live: true, liveInk: true, motionOff: false, timerSound: true, printInk: false, palmErase: false, palmSize: 0 };
   I().Settings.apply();
   await I().Settings.init();
-  eq(I().Settings.values, { ink: true, board: true, live: true, liveInk: true, motionOff: true, printInk: true, palmErase: true, palmSize: 0 });
+  eq(I().Settings.values, { ink: true, board: true, live: true, liveInk: true, motionOff: true, timerSound: true, printInk: true, palmErase: true, palmSize: 0 });
   eq(I().Ink.palmErase, true);
   assert(document.documentElement.classList.contains('ch-motion-off'), 'restored');
   eq(document.querySelectorAll('.ch-toolbar [data-name="gear"]').length, 1);
@@ -81,7 +81,7 @@ test('알 수 없는 설정 키는 저장되지 않는다', async () => {
   await I().Settings.set('unknown', true);
   await I().Settings.set('__proto__', true);
   eq(await I().Store.get('settings'), old);
-  eq(Object.keys(I().Settings.values), ['ink', 'board', 'live', 'liveInk', 'motionOff', 'printInk', 'palmErase', 'palmSize']);
+  eq(Object.keys(I().Settings.values), ['ink', 'board', 'live', 'liveInk', 'motionOff', 'timerSound', 'printInk', 'palmErase', 'palmSize']);
 });
 test('설정을 끄면 효과와 입력 UI가 함께 복원된다', async () => {
   await I().Settings.set('motionOff', false);
@@ -185,7 +185,7 @@ test('손상된 저장값은 설정을 켜지 않으며 모르는 키는 무시�
   await I().Settings.set('printInk', false);
   await I().Store.set('settings', { motionOff: 'false', printInk: null, palmErase: 1, palmSize: 'x', unknown: true });
   await I().Settings.init();
-  eq(I().Settings.values, { ink: true, board: true, live: true, liveInk: true, motionOff: false, printInk: false, palmErase: false, palmSize: 0 });
+  eq(I().Settings.values, { ink: true, board: true, live: true, liveInk: true, motionOff: false, timerSound: true, printInk: false, palmErase: false, palmSize: 0 });
   eq(I().Ink.palmErase, false);
   eq(document.documentElement.classList.contains('ch-motion-off'), false);
 });

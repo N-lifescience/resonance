@@ -45,10 +45,13 @@ test('시작하면 줄어들고, 멈추면 그대로, 이어서 하면 다시 �
 });
 test('시간이 다 되면 끝, 깜빡임, 다시 시작하면 처음부터', async () => {
   const x = t('tm');
+  const played = I().Chime.played;
   x.run.click();
+  assert(I().Chime.ctx, '시작을 누를 때 소리 장치를 깨운다');
   await wait(2400);
   eq(x.face.textContent, '끝');
   assert(x.el.classList.contains('is-done'), 'done');
+  eq(I().Chime.played, played + 1, '끝나면 한 번 울린다');
   eq(x.run.textContent, '시작');
   x.run.click();
   eq(x.left, 2);
@@ -114,9 +117,11 @@ test('직접 정하기: − + 로 분을 바꿔 시작, 끝나면 끝', async ()
   popBtn('시작').click();
   eq(pop().querySelector('.ch-timer-face').textContent, '1:00');
   I().Timer.add(I().PopTimer.t, -59);   // 끝 직전으로
+  const played = I().Chime.played;
   await wait(1500);
   eq(pop().querySelector('.ch-timer-face').textContent, '끝');
   assert(pop().classList.contains('is-done'));
+  eq(I().Chime.played, played + 1, '툴바 타이머도 끝나면 울린다');
   tb('timer').click();
   assert([...document.querySelectorAll('.ch-pop .ch-menu-item')].some((b) => b.textContent === '타이머 닫기'), '떠 있으면 창에 닫기');
   [...document.querySelectorAll('.ch-pop .ch-menu-item')].find((b) => b.textContent === '타이머 닫기').click();
@@ -139,6 +144,33 @@ test('펜을 든 채로 타이머를 끌면 옮겨지고 판서가 되지 않는
   eq(I().Ink.page.length, 0);
   I().PopTimer.close();
   I().Tools.set('hand');
+});
+test('⚙ 「타이머 끝 소리」를 끄면 끝나도 울리지 않는다', async () => {
+  await I().Settings.set('timerSound', false);
+  const x = t('tm');
+  const played = I().Chime.played;
+  x.run.click();
+  await wait(2400);
+  eq(x.face.textContent, '끝');
+  eq(I().Chime.played, played, '울리지 않는다');
+  x.reset.click();
+  await I().Settings.set('timerSound', true);
+});
+test('알림 소리는 실제로 들린다: 딩동댕 두 번, 4초 안에 끝난다', async () => {
+  const C = I().Chime;
+  const real = C.ctx;
+  const rate = 22050;
+  const off = new OfflineAudioContext(1, rate * 4, rate);
+  C.ctx = off;
+  C.play();
+  C.ctx = real;
+  const data = (await off.startRendering()).getChannelData(0);
+  const peak = (a, b) => { let m = 0; for (let i = Math.floor(a * rate); i < b * rate; i++) m = Math.max(m, Math.abs(data[i])); return m; };
+  assert(peak(0, 0.4) > 0.2, `첫 소리 ${peak(0, 0.4)}`);
+  assert(peak(0.4, 0.8) > 0.2 && peak(0.8, 1.2) > 0.2, '둘째·셋째 소리');
+  assert(peak(1.65, 2.05) > 0.2, `한 번 더 ${peak(1.65, 2.05)}`);
+  assert(peak(3.7, 4) < 0.01, `끝 ${peak(3.7, 4)}`);
+  assert(peak(0, 4) <= 1, '찌그러지지 않는다');
 });
 </script>
 </body>

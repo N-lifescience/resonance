@@ -1,7 +1,7 @@
-/*! exploragram engine v2.6.0 | © N-lifescience | https://github.com/N-lifescience/resonance */
+/*! exploragram engine v2.7.0 | © N-lifescience | https://github.com/N-lifescience/resonance */
 (function () {
 'use strict';
-const VERSION = '2.6.0';
+const VERSION = '2.7.0';
 const LIVE_CONFIG = {"url":"https://qtwigpxinccudhprrdnb.supabase.co","key":"sb_publishable_-3KCWch7Q7sBQbcdVzxR4g_imovkZv5","site":"https://n-lifescience.github.io/resonance/"};
 /* ---- 00-core.js ---- */
 // 공통 상수, 작은 DOM 도우미, 이벤트 훅, 공개 객체 Exploragram.
@@ -2081,7 +2081,7 @@ const Toolbar = {
 // 기능 스위치(판서·칠판·실시간 수업·학생 화면 판서)는 엔진이 늘 넣어 두는 기능을 이 기기에서 켜고 끈다.
 // 저장소 키가 수업과 상관없으므로 한 번 끄면 이 기기에서 여는 다른 수업 파일에서도 꺼져 있다. 편집 기능은 스위치가 없다.
 const Settings = {
-  values: { ink: true, board: true, live: true, liveInk: true, motionOff: false, printInk: false, palmErase: true, palmSize: 0 },
+  values: { ink: true, board: true, live: true, liveInk: true, motionOff: false, timerSound: true, printInk: false, palmErase: true, palmSize: 0 },
   button: null,
   extras: [],   // 다른 모듈이 설정 창 아래에 붙이는 묶음(그림 채우기·저장 등)
   ITEMS: {
@@ -2090,13 +2090,14 @@ const Settings = {
     live: ['실시간 수업', '학생 기기가 선생님 화면을 따라오고 학생 답이 선생님 화면에 모입니다'],
     liveInk: ['학생 화면에 판서 보이기', '실시간 수업 중 선생님 판서를 학생 기기에 그대로 보여 줍니다'],
     motionOff: ['움직임 끄기', '슬라이드 전환과 단계 효과를 끕니다'],
+    timerSound: ['타이머 끝 소리', '타이머가 끝나면 딩동댕 소리를 두 번 울립니다'],
     printInk: ['인쇄에 판서 포함', '지금 반의 판서와 칠판을 함께 인쇄합니다'],
     palmErase: ['손등·손바닥으로 지우기', '넓게 닿는 터치를 지우개로 씁니다. 잘 안 되면 「손으로 맞추기」'],
   },
   // [제목, 스위치들, 이 기능이 꺼지면 묶음을 숨김]
   GROUPS: [
     ['기능 켜고 끄기', ['ink', 'board', 'live', 'liveInk']],
-    ['화면', ['motionOff']],
+    ['화면과 소리', ['motionOff', 'timerSound']],
     ['판서', ['printInk', 'palmErase'], 'ink'],
   ],
   // 다른 기능이 켜져 있어야 쓸 수 있는 스위치. 막혀 있으면 꺼진 모양으로 잠그고 설명을 바꾼다.
@@ -5343,8 +5344,58 @@ const PptFill = {
 };
 
 /* ---- 62-timer.js ---- */
+// 타이머 끝 소리: 소리 파일 없이 Web Audio로 딩동댕을 두 번 울린다(약 3초). ⚙ 설정 「타이머 끝 소리」로 끈다.
+// 브라우저는 사람이 화면을 누른 뒤에만 소리를 내게 하므로, 「시작」 등을 누를 때 소리 장치를 깨워 둔다(prime).
+// 실시간 학생 화면의 남은 시간은 울리지 않는다(교실에서 학생 기기 30대가 한꺼번에 울리지 않게).
+const Chime = {
+  ctx: null,
+  played: 0,   // 울린 횟수(시험용)
+
+  prime() {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC || !Settings.enabled('timerSound')) return;
+    try {
+      if (!this.ctx) this.ctx = new AC();
+      if (this.ctx.state === 'suspended') this.ctx.resume().catch(() => {});
+    } catch (err) { /* 소리를 낼 수 없는 브라우저: 깜빡임만 */ }
+  },
+
+  play() {
+    if (!Settings.enabled('timerSound') || Live.role === 'student') return;
+    this.prime();
+    const ctx = this.ctx;
+    if (!ctx) return;
+    this.played += 1;
+    const t0 = ctx.currentTime + 0.05;
+    for (const round of [0, 1.6]) {
+      [[1046.5, 0], [830.6, 0.38], [659.3, 0.76]].forEach(([freq, at]) => this.tone(ctx, freq, t0 + round + at));
+    }
+  },
+
+  // 종소리 한 번: 바탕음과 배음 하나, 빠르게 올라갔다가 천천히 사라진다
+  tone(ctx, freq, at) {
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.0001, at);
+    gain.gain.exponentialRampToValueAtTime(0.5, at + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, at + 1.1);
+    gain.connect(ctx.destination);
+    for (const [mul, type] of [[1, 'sine'], [2, 'triangle']]) {
+      const osc = ctx.createOscillator();
+      osc.type = type;
+      osc.frequency.value = freq * mul;
+      if (mul > 1) {   // 배음은 작게
+        const soft = ctx.createGain();
+        soft.gain.value = 0.25;
+        osc.connect(soft).connect(gain);
+      } else osc.connect(gain);
+      osc.start(at);
+      osc.stop(at + 1.15);
+    }
+  },
+};
+
 // 타이머: 활동 시간을 잰다. <div class="timer" data-sec="300" data-label="모둠 활동"></div>
-// 「시작」·「멈춤」·「다시」 단추, 끝나면 '끝'과 함께 세 번 깜빡인다(1초에 세 번 넘게 번쩍이지 않는다).
+// 「시작」·「멈춤」·「다시」 단추, 끝나면 '끝'과 함께 세 번 깜빡이고 알림 소리를 울린다(1초에 세 번 넘게 번쩍이지 않는다).
 const Timer = {
   list: [],
 
@@ -5381,6 +5432,7 @@ const Timer = {
 
   toggle(t) {
     if (t.timer) { this.pause(t); return; }
+    Chime.prime();   // 누른 지금 깨워 두어야 끝날 때 소리가 난다
     if (t.left <= 0) t.left = t.total;
     t.end = performance.now() + t.left * 1000;
     t.timer = setInterval(() => this.tick(t), 250);
@@ -5394,6 +5446,7 @@ const Timer = {
       clearInterval(t.timer);
       t.timer = 0;
       t.face.setAttribute('aria-live', 'assertive');
+      Chime.play();
     }
     this.render(t);
   },
@@ -8847,7 +8900,7 @@ function boot() {
   Exploragram.next = () => Nav.next();
   Exploragram.prev = () => Nav.prev();
   Exploragram.audit = () => Audit.run();
-  Exploragram._internal = { on, emit, Stage, Fit, Compat, Nav, Steps, Panels, Ask, InkGeom, InkModel, Store, Session, Tools, Ink, Toolbar, icon, Board, Settings, KeepWords, Print, Audit, Parts, TocSlide, Answer, Blank, Zoom, Expr, Stepper, MapReveal, Yearline, Sort, Quiz, Short, Order, Calc, Plot, Zip, Pptx, Source, PptFill, Timer, PopTimer, Picker, Score, Checklist, Hotspots, Poll, Labeling, Media, Anim, MathTex, Particles, Play, Editor, Live, LiveCore };
+  Exploragram._internal = { on, emit, Stage, Fit, Compat, Nav, Steps, Panels, Ask, InkGeom, InkModel, Store, Session, Tools, Ink, Toolbar, icon, Board, Settings, KeepWords, Print, Audit, Parts, TocSlide, Answer, Blank, Zoom, Expr, Stepper, MapReveal, Yearline, Sort, Quiz, Short, Order, Calc, Plot, Zip, Pptx, Source, PptFill, Timer, PopTimer, Chime, Picker, Score, Checklist, Hotspots, Poll, Labeling, Media, Anim, MathTex, Particles, Play, Editor, Live, LiveCore };
   start().then(() => readyResolve(Exploragram), (err) => {
     console.error('[exploragram]', err);
     readyResolve(Exploragram);
