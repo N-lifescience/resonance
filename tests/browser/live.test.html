@@ -97,12 +97,12 @@ test('교사가 넘기면 장과 단계를 따라가고, 열지 않은 답은 �
   eq(A.Nav.state.slide, 1, '차례 단추·Exploragram.go로도 교사가 안 연 장에는 못 간다');
 });
 
-test('단계 막대도 따라가고, 학생은 막대를 못 움직인다', async () => {
+test('단계 막대도 따라가고, 학생도 막대를 직접 움직일 수 있다', async () => {
   T.Nav.go(2);
   T.Nav.next();
   eq(T.Stepper.bySlide[2][0].pos, 1, '교사 막대 한 칸');
   await until(() => A.Nav.state.slide === 2 && A.Stepper.bySlide[2][0].pos === 1);
-  assert(A.Stepper.bySlide[2][0].input.disabled, '학생 막대는 잠김');
+  assert(!A.Stepper.bySlide[2][0].input.disabled, '학생 막대는 잠기지 않는다');
 });
 
 test('교사가 점검(D)을 돌려도 단계 막대를 다 연 상태가 학생에게 가지 않는다', async () => {
@@ -111,6 +111,23 @@ test('교사가 점검(D)을 돌려도 단계 막대를 다 연 상태가 학생
   eq(T.Stepper.bySlide[2][0].pos, 1, '점검 뒤 교사 막대는 제자리');
   eq(T.Live.reach[2].steps[0], 1, '연 범위에 남지 않는다');
   eq(A.Stepper.bySlide[2][0].pos, 1, '학생 막대도 그대로');
+});
+
+test('학생이 움직인 막대는 교사가 막대를 옮길 때까지 그대로 둔다', async () => {
+  const a = A.Stepper.bySlide[2][0];
+  const b = B.Stepper.bySlide[2][0];
+  a.input.value = '2';
+  a.input.dispatchEvent(new Event('input', { bubbles: true }));
+  eq(a.pos, 2, '학생이 「나」까지 열었다');
+  eq(T.Stepper.bySlide[2][0].pos, 1, '교사 막대는 그대로');
+  T.Live.sendState();
+  await wait(300);
+  eq(a.pos, 2, '교사 소식이 그대로 오면 학생이 고른 칸을 둔다');
+  eq(b.pos, 1, '다른 학생은 교사 칸');
+  T.Stepper.bySlide[2][0].set(0, 'input');
+  await until(() => a.pos === 0 && b.pos === 0);
+  T.Stepper.bySlide[2][0].set(1, 'input');
+  await until(() => a.pos === 1 && b.pos === 1);
 });
 
 test('학생은 지난 장으로 갈 수 있고, 교사가 연 만큼만 보인다', async () => {

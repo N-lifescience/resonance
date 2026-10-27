@@ -1,4 +1,4 @@
-/*! exploragram engine v2.7.1 | © N-lifescience | https://github.com/N-lifescience/resonance */
+/*! exploragram engine v2.7.2 | © N-lifescience | https://github.com/N-lifescience/resonance */
 /* ---- 00-tokens.css ---- */
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css");
 
@@ -907,7 +907,7 @@ html:not(.ch-editing) .ch-ed-ui { display: none !important; }
 .ch-live-timer b { font: 800 34px/1 var(--ch-font); font-variant-numeric: tabular-nums; }
 .ch-live-timer.is-done b { color: #FF7A7A; animation: ch-timer-flash .6s ease-in-out 3; }
 
-/* 학생 모드: 판서·넘기기 도구는 없다. 단계 막대는 교사를 따라가므로 잠겨 있지만 흐리게 하지 않는다. */
+/* 학생 모드: 판서·넘기기 도구는 없다. 단계 막대는 학생도 직접 움직인다. */
 html.ch-live-student { --ch-reserve-left: 0px !important; --ch-reserve-right: 0px !important; --ch-reserve-bottom: 0px !important; }
 /* :is()를 쓰지 않는다: 크로뮴 88보다 오래된 학교 태블릿 브라우저는 :is()를 몰라 규칙 전체를 버린다.
    그러면 학생 화면에 판서 도구가 떠서 펜을 고른 학생은 익스플로라그램 슬라이더를 못 움직인다(2026-10 수업). */
@@ -915,7 +915,6 @@ html.ch-live-student .ch-toolbar, html.ch-live-student .ch-tb-handle, html.ch-li
 html.ch-live-student .ch-ink, html.ch-live-student .ch-ink-live, html.ch-live-student .ch-dropzone { display: none !important; }
 /* 선생님이 「학생 화면에 판서 보이기」를 켜면 받은 판서만 보인다(학생은 쓰지 못한다) */
 html.ch-live-student.ch-live-ink .ch-ink { display: block !important; }
-html.ch-live-student .ch-stops input:disabled, html.ch-live-student .ch-yearline input:disabled, html.ch-live-student .ch-switch-btn:disabled { opacity: 1; cursor: default; }
 
 @media print { .ch-live-ui { display: none !important; } }
 

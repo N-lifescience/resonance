@@ -18,7 +18,7 @@ const LIVE_JOIN_MS = 2000;    // 새 학생이 들어와서 보내는 상태는 
 const LIVE_FORGET_MS = 120000;   // 이만큼 소식이 없으면 그 학생 값을 분포에서 지운다(가려진 탭은 타이머가 1분까지 늦다)
 const LIVE_MAX = 300;         // 한 방이 기억하는 학생 수(새로 고침하면 새 sid라 반 인원보다 넉넉히)
 const LIVE_BINS = 20;         // 값이 40개를 넘는 슬라이더는 이만큼 칸으로 묶는다
-const LIVE_SKIP = '.ch-stops, .ch-yearline';   // 엔진의 단계 막대·연표 막대는 교사를 따라가는 것이라 모으지 않는다
+const LIVE_SKIP = '.ch-stops, .ch-yearline';   // 엔진의 단계 막대·연표 막대는 학생 값을 교사에게 모으지 않는다
 // 실시간 판서. 묶음 하나도 학생 수만큼 퍼지므로 학생이 많으면 간격을 늘린다(학생 수 × LIVE_INK_PER, LIVE_INK_MIN~LIVE_INK_MAX).
 const LIVE_INK_FIRST = 150;   // 판서가 바뀐 뒤 처음 보내기까지(획 첫머리를 조금 모은다)
 const LIVE_INK_MIN = 400;
@@ -363,6 +363,7 @@ const Live = {
   // 학생
   sid: '',
   teacher: null,       // 마지막으로 받은 교사 상태(clean을 거친 것)
+  stepSeen: new Map(), // 장 → 학생 단계 막대를 마지막으로 맞춘 교사 단계(교사가 막대를 옮겼는지 가린다)
   follow: true,
   heard: 0,
   pending: new Map(),  // '장|키' → 보내기 타이머
@@ -1066,11 +1067,7 @@ const Live = {
       const i = Math.round(Number(index));
       if (this.teacher && this.teacher.reach[i]) this.showSlide(i);
     };
-    for (const st of Stepper.all) {
-      if (st.input) st.input.disabled = true;
-      for (const b of st.buttons) b.disabled = true;
-    }
-    for (const el of qsa('.ch-yearline input', Stage.deck)) el.disabled = true;
+    // 단계 막대(연표·지도 막대 포함)는 학생도 직접 움직인다. 교사가 막대를 옮길 때만 교사 단계로 맞춘다(showSlide).
     // 넘기기 키만 받는다. 펜·칠판·목차·점검 같은 단축키는 학생 화면에서 쓰지 않는다.
     window.addEventListener('keydown', (e) => {
       if (this.role !== 'student') return;
@@ -1210,13 +1207,16 @@ const Live = {
   },
 
   // 학생 화면에 장 i를 연다. 교사가 있는 장이면 교사의 지금 단계, 지난 장이면 교사가 연 가장 먼 단계까지.
+  // 단계 막대는 이 장에 들어올 때와 교사가 막대를 옮겼을 때만 맞춘다. 교사 소식이 그대로 올 때는 학생이 움직인 칸을 그대로 둔다.
   showSlide(i) {
     const t = this.teacher;
     if (!t) return;
     const r = i === t.slide ? { shown: t.shown, steps: t.steps } : t.reach[i];
     if (!r) return;
+    const seen = Nav.state.slide === i ? this.stepSeen.get(i) || [] : [];
     Nav.set({ slide: i, shown: clamp(r.shown, 0, Nav.counts[i] || 0) }, false);
-    (Stepper.bySlide[i] || []).forEach((st, k) => { if (r.steps[k] >= 0) st.set(r.steps[k], 'live'); });
+    (Stepper.bySlide[i] || []).forEach((st, k) => { if (r.steps[k] >= 0 && r.steps[k] !== seen[k]) st.set(r.steps[k], 'live'); });
+    this.stepSeen.set(i, r.steps.slice());
     this.follow = i === t.slide;
     this.renderBar();
     this.inkShow();
