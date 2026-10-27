@@ -1055,6 +1055,9 @@ const Live = {
     // 학생 화면은 이 기기의 기능 설정과 상관없다. 판서층에는 이 기기의 판서 대신 교사에게서 받은 판서만 그린다(저장하지 않는다).
     document.documentElement.classList.remove('ch-off-ink', 'ch-off-board', 'ch-off-live');
     Ink.mirror = this.inkMirror();
+    // 학생은 판서하지 않는다: 손으로 두고 판서 도구를 숨긴다. CSS로도 숨기지만 그 규칙을 모르는 옛 브라우저가 있어 여기서도 숨긴다.
+    Tools.set('hand');
+    for (const el of qsa('.ch-toolbar, .ch-tb-handle, .ch-hud, .ch-progress, .ch-ink-live, .ch-dropzone')) el.style.setProperty('display', 'none', 'important');
     emit('live-role');   // 투표는 학생 화면에서 '세기'가 아니라 '고르기'가 된다
     Nav.override = { next: () => this.move(1), prev: () => this.move(-1), close() {} };
     Nav.revealTo = () => false;   // 정답 상자 ✓ 등이 교사보다 먼저 단계를 열지 않게

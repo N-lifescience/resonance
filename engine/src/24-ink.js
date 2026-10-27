@@ -22,6 +22,7 @@ const Tools = {
   hlColor: HL_COLORS[0],
   set(tool) {
     if (tool !== 'hand' && !Settings.enabled('ink')) tool = 'hand';   // 판서를 끈 기기에서는 손만
+    if (tool !== 'hand' && document.documentElement.classList.contains('ch-live-student')) tool = 'hand';   // 실시간 학생 화면은 늘 손: 슬라이더·카드를 직접 조작한다
     this.current = tool;
     document.body.dataset.tool = tool;
     emit('tool', tool);

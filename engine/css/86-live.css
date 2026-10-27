@@ -89,9 +89,12 @@
 
 /* 학생 모드: 판서·넘기기 도구는 없다. 단계 막대는 교사를 따라가므로 잠겨 있지만 흐리게 하지 않는다. */
 html.ch-live-student { --ch-reserve-left: 0px !important; --ch-reserve-right: 0px !important; --ch-reserve-bottom: 0px !important; }
-html.ch-live-student :is(.ch-toolbar, .ch-tb-handle, .ch-hud, .ch-progress, .ch-ink, .ch-ink-live, .ch-dropzone) { display: none !important; }
+/* :is()를 쓰지 않는다: 크로뮴 88보다 오래된 학교 태블릿 브라우저는 :is()를 몰라 규칙 전체를 버린다.
+   그러면 학생 화면에 판서 도구가 떠서 펜을 고른 학생은 익스플로라그램 슬라이더를 못 움직인다(2026-10 수업). */
+html.ch-live-student .ch-toolbar, html.ch-live-student .ch-tb-handle, html.ch-live-student .ch-hud, html.ch-live-student .ch-progress,
+html.ch-live-student .ch-ink, html.ch-live-student .ch-ink-live, html.ch-live-student .ch-dropzone { display: none !important; }
 /* 선생님이 「학생 화면에 판서 보이기」를 켜면 받은 판서만 보인다(학생은 쓰지 못한다) */
 html.ch-live-student.ch-live-ink .ch-ink { display: block !important; }
-html.ch-live-student :is(.ch-stops, .ch-yearline) input:disabled, html.ch-live-student .ch-switch-btn:disabled { opacity: 1; cursor: default; }
+html.ch-live-student .ch-stops input:disabled, html.ch-live-student .ch-yearline input:disabled, html.ch-live-student .ch-switch-btn:disabled { opacity: 1; cursor: default; }
 
 @media print { .ch-live-ui { display: none !important; } }
