@@ -157,7 +157,7 @@ test('넘기면 새 장의 판서를, 돌아오면 받아 둔 판서를 보여 �
 });
 
 test('교사가 칠판을 열면 따라가는 학생도 칠판, 칠판에 쓴 판서와 바탕이 보인다', async () => {
-  T.Nav.go(3);   // 4장 위에 칠판을 연다: 학생은 지난 장(1장)으로 갈 수 있다
+  T.Nav.go(3);   // 4장 위에 칠판을 연다: 학생은 지난 장(3장)으로 갈 수 있다
   await until(() => A.Nav.state.slide === 3);
   T.Board.open();
   await until(() => visible(doc('a').querySelector('.ch-board')) && A.Ink.ref.kind === 'board');
@@ -178,8 +178,8 @@ test('교사가 칠판을 열면 따라가는 학생도 칠판, 칠판에 쓴 �
 
 test('다른 장을 보는 학생에게는 「선생님은 칠판 화면」 띠, 누르면 칠판으로', async () => {
   eq(A.Live.teacher.slide, 3, '교사는 4장 위에 칠판을 열었다');
-  A.Live.move(-1);   // 교사가 연 지난 장(1장)으로
-  await until(() => !A.Live.follow && A.Nav.state.slide === 0 && !visible(doc('a').querySelector('.ch-board')));
+  A.Live.move(-1);   // 지난 장(3장, 교사가 건너뛴 장)으로
+  await until(() => !A.Live.follow && A.Nav.state.slide === 2 && !visible(doc('a').querySelector('.ch-board')));
   const bar = doc('a').querySelector('.ch-live-bar');
   await until(() => visible(bar) && bar.textContent.includes('선생님은 칠판 화면'));
   eq(A.Ink.ref.kind, 'slide', '지난 장의 판서');
@@ -199,7 +199,7 @@ test('다른 장을 보던 학생도 교사가 칠판을 새로 열거나 다른
   await until(() => !A.Live.follow);
   T.Board.close();
   await wait(600);
-  assert(!A.Live.follow && A.Nav.state.slide === 0, '칠판을 닫을 때는 보던 장에 둔다');
+  assert(!A.Live.follow && A.Nav.state.slide === 2, '칠판을 닫을 때는 보던 장에 둔다');
   T.Board.open();
   await until(() => onBoard(0) && page(A).length === 1);
 });

@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="ko" data-deck="test-compat-where">
+<head>
+<meta charset="utf-8">
+<title>compat :where</title>
+<!-- :where()·:is()를 모르는 옛 브라우저(크로뮴 88 미만) 흉내: 그 선택자는 문법 오류, 그런 규칙은 CSS를 읽을 때 버려진다(본문 끝 스크립트) -->
+<script>
+const qs = Document.prototype.querySelector;
+Document.prototype.querySelector = function (sel) {
+  if (/:(where|is)\(/.test(sel)) throw new DOMException(`'${sel}' is not a valid selector`, 'SyntaxError');
+  return qs.call(this, sel);
+};
+</script>
+<link rel="stylesheet" href="../../engine/exploragram.css">
+<script defer src="../../engine/exploragram.js"></script>
+<script src="harness.js"></script>
+<style>.big { font-size: 40px; } .lesson .kicker { font-size: 30px; } .w :is(b) { color: rgb(1, 2, 3); }</style>
+</head>
+<body>
+<section class="slide" id="w0">
+  <p class="kicker" id="k1">작은 머리글</p>
+  <h1 id="h1">제목</h1>
+  <h3 id="h3">작은 제목</h3>
+  <p id="p1">본문 문단</p>
+  <p class="big" id="big">수업 CSS가 키운 문단</p>
+  <div class="lesson"><p class="kicker" id="k2">수업 CSS가 바꾼 머리글</p></div>
+  <p class="w"><small id="sm">작은 글</small> <b id="b1">굵은 글</b></p>
+</section>
+<div id="ui"><p id="uip">슬라이드 밖 글</p></div>
+<pre id="results" data-summary="pending"></pre>
+<script>
+// 옛 브라우저는 :where·:is가 든 규칙을 읽지 않는다: 엔진이 돌기 전에 그 규칙을 지운다
+for (const sheet of document.styleSheets) {
+  for (let i = sheet.cssRules.length - 1; i >= 0; i--) {
+    const r = sheet.cssRules[i];
+    if (r.selectorText && /:(where|is)\(/.test(r.selectorText)) sheet.deleteRule(i);
+    else if (r.cssRules) for (let j = r.cssRules.length - 1; j >= 0; j--) if (r.cssRules[j].selectorText && /:(where|is)\(/.test(r.cssRules[j].selectorText)) r.cssRules[j].parentRule ? r.deleteRule(j) : 0;
+  }
+}
+const $ = (id) => document.getElementById(id);
+const cs = (id) => getComputedStyle($(id));
+
+test('엔진 CSS 바로 뒤에 옛 브라우저용 스타일이 들어가고, 장 글꼴 크기·줄 간격이 새 브라우저와 같다', () => {
+  const link = document.querySelector('link[href*="exploragram.css"]');
+  assert(link.nextElementSibling.matches('style[data-ch-compat]'), '엔진 CSS 바로 뒤');
+  eq(cs('h1').fontSize, '80px');
+  eq(cs('h3').fontSize, '27px');
+  eq(cs('p1').fontSize, '28px');
+  eq(cs('p1').lineHeight, '44.8px');
+  eq(cs('k1').fontSize, '20px');
+  eq(cs('sm').fontSize, '20px');
+});
+
+test('수업 CSS가 정한 크기는 그대로 이긴다(:where는 특정도가 0이다)', () => {
+  eq(cs('big').fontSize, '40px');
+  eq(cs('k2').fontSize, '30px');
+});
+
+test('수업 <style>의 :is() 규칙도 풀어 넣는다', () => {
+  eq(cs('b1').color, 'rgb(1, 2, 3)');
+});
+
+test('슬라이드 밖 글(엔진 창)은 장 글꼴 규칙을 받지 않는다', () => {
+  assert(cs('uip').fontSize !== '28px', `슬라이드 밖 문단 ${cs('uip').fontSize}`);
+});
+</script>
+</body>
+</html>

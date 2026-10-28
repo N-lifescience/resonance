@@ -3,7 +3,7 @@ import { mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const VERSION = '2.7.4';
+const VERSION = '2.7.5';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 
 function concat(dir, ext) {
@@ -19,7 +19,15 @@ const banner = `/*! exploragram engine v${VERSION} | © N-lifescience | https://
 const live = JSON.parse(readFileSync(join(root, 'live.config.json'), 'utf8'));
 writeFileSync(join(root, 'engine/exploragram.js'),
   `${banner}\n(function () {\n'use strict';\nconst VERSION = '${VERSION}';\nconst LIVE_CONFIG = ${JSON.stringify(live)};\n${concat('engine/src', '.js')}\n})();\n`);
-writeFileSync(join(root, 'engine/exploragram.css'), `${banner}\n${concat('engine/css', '.css')}`);
+// 크로뮴 87보다 오래된 브라우저(업데이트를 막은 학교 태블릿)는 inset을 몰라 장·칠판 자리가 무너진다. 같은 뜻의 top·right·bottom·left로 풀어 쓴다.
+const longhandInset = (css) => css.replace(/(^|[;{\s])inset\s*:\s*([^;}!()]+?)\s*(!important)?\s*(?=[;}])/g, (all, pre, v, imp) => {
+  const p = v.trim().split(/\s+/);
+  if (p.length > 4) return all;
+  const [t, r = t, b = t, l = r] = p;
+  const i = imp ? ' !important' : '';
+  return `${pre}top: ${t}${i}; right: ${r}${i}; bottom: ${b}${i}; left: ${l}${i}`;
+});
+writeFileSync(join(root, 'engine/exploragram.css'), longhandInset(`${banner}\n${concat('engine/css', '.css')}`));
 console.log(`built exploragram v${VERSION}`);
 
 // 채팅 AI용 합본 지침: 스킬 문서와 references를 파일 하나로 잇는다(주소 하나만 주면 되게).

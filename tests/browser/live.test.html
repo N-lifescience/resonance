@@ -197,6 +197,23 @@ test('교사가 지난 장으로 돌아가면 연 적이 있는 장이라도 교
   await until(() => A.Nav.state.slide === 3 && B.Nav.state.slide === 3);
 });
 
+test('교사가 건너뛴 지난 장도 학생 화면에서 사라지지 않고, 다 펼쳐 보인다', async () => {
+  T.Nav.go(5);   // 5장(퀴즈)을 건너뛰고 6장으로
+  await until(() => A.Nav.state.slide === 5 && B.Nav.state.slide === 5);
+  eq(T.Live.reach[4], null, '교사는 5장을 열지 않았다');
+  A.Nav.prev();
+  await until(() => A.Nav.state.slide === 4);
+  eq(A.Nav.state.shown, A.Nav.counts[4], '건너뛴 장은 다 펼친다');
+  A.Nav.go(0);
+  await until(() => A.Nav.state.slide === 0);
+  A.Nav.go(4);
+  await until(() => A.Nav.state.slide === 4);
+  bar('a').querySelector('button').click();
+  await until(() => A.Nav.state.slide === 5 && A.Live.follow);
+  T.Nav.go(3);
+  await until(() => A.Nav.state.slide === 3 && B.Nav.state.slide === 3);
+});
+
 // 학생 iframe 안 슬라이더를 손으로 움직인 것처럼
 function slide(name, id, v) {
   const el = doc(name).getElementById(id);

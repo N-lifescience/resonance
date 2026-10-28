@@ -42,13 +42,6 @@ const LiveCore = {
     return out;
   },
 
-  // dir(+1, -1) 쪽으로 가장 가까운 열린 장. 없으면 -1. last가 있으면 그 장보다 뒤로는 가지 않는다(학생은 교사보다 앞 장에 못 간다).
-  step(reach, from, dir, last) {
-    const end = last == null ? reach.length - 1 : Math.min(reach.length - 1, last);
-    for (let i = from + dir; i >= 0 && i < reach.length && (dir < 0 || i <= end); i += dir) if (reach[i] && i <= end) return i;
-    return -1;
-  },
-
   // 값 → 칸 [{ lo, hi, n, pick }]. 값이 40개 이하로 나뉘면 값마다 한 칸, 아니면 LIVE_BINS칸.
   // pick은 칸 안에서 가장 많은 값(같으면 작은 값)이다. 칠판에 띄울 때 이 값을 쓴다.
   bins(values, min, max, step) {
@@ -1101,11 +1094,11 @@ const Live = {
     emit('live-role');   // 투표는 학생 화면에서 '세기'가 아니라 '고르기'가 된다
     Nav.override = { next: () => this.move(1), prev: () => this.move(-1), close() {} };
     Nav.revealTo = () => false;   // 정답 상자 ✓ 등이 교사보다 먼저 단계를 열지 않게
-    // 차례 장의 단추·Exploragram.go도 교사가 연 장으로만, 교사가 있는 장까지만
+    // 차례 장의 단추·Exploragram.go도 교사가 있는 장까지만
     Nav.go = (index) => {
       const i = Math.round(Number(index));
       const t = this.teacher;
-      if (t && i <= t.slide && t.reach[i]) {
+      if (t && i >= 0 && i <= t.slide) {
         this.peekBd = -1;
         this.showSlide(i);
       }
@@ -1255,13 +1248,13 @@ const Live = {
     this.peekNeed();
   },
 
-  // 학생 화면에 장 i를 연다. 교사가 있는 장이면 교사의 지금 단계, 지난 장이면 교사가 연 가장 먼 단계까지.
+  // 학생 화면에 장 i를 연다. 교사가 있는 장이면 교사의 지금 단계, 교사가 연 지난 장이면 교사가 연 가장 먼 단계까지.
+  // 교사가 건너뛰었거나 실시간을 켜기 전에 지난 장은 다 펼친다(교사보다 앞 장이 아니면 학생 화면에서 장이 사라지지 않게).
   // 단계 막대는 이 장에 들어올 때와 교사가 막대를 옮겼을 때만 맞춘다. 교사 소식이 그대로 올 때는 학생이 움직인 칸을 그대로 둔다.
   showSlide(i) {
     const t = this.teacher;
-    if (!t) return;
-    const r = i === t.slide ? { shown: t.shown, steps: t.steps } : t.reach[i];
-    if (!r) return;
+    if (!t || i < 0 || i > t.slide || !Stage.slides[i]) return;
+    const r = i === t.slide ? { shown: t.shown, steps: t.steps } : t.reach[i] || { shown: Nav.counts[i] || 0, steps: [] };
     const seen = Nav.state.slide === i ? this.stepSeen.get(i) || [] : [];
     Nav.set({ slide: i, shown: clamp(r.shown, 0, Nav.counts[i] || 0) }, false);
     // 교사가 막대를 옮겼거나 학생 막대가 교사보다 앞 칸이면 교사 칸으로 맞춘다
@@ -1275,7 +1268,7 @@ const Live = {
     this.capMark();
   },
 
-  // ←·→·밀기: 지난 장으로는 가고, 교사가 있는 장보다 앞으로는 못 간다. 「칠판 보기」 중이면 칠판 쪽을 넘긴다.
+  // ←·→·밀기: 지난 장으로는 한 장씩 가고, 교사가 있는 장보다 앞으로는 못 간다. 「칠판 보기」 중이면 칠판 쪽을 넘긴다.
   move(dir) {
     const t = this.teacher;
     if (!t) return;
@@ -1284,17 +1277,18 @@ const Live = {
       if (p && p.i + dir >= 0 && p.i + dir < p.n) this.peek(p.i + dir);
       return;
     }
-    const i = LiveCore.step(t.reach, Nav.state.slide, dir, t.slide);
-    if (i >= 0) this.showSlide(i);
+    const i = Math.min(Nav.state.slide + dir, t.slide);
+    if (i !== Nav.state.slide) this.showSlide(i);
   },
 
-  // 학생 단계 막대가 열 수 있는 마지막 칸: 교사가 있는 장은 교사의 지금 칸, 지난 장은 교사가 연 가장 먼 칸. 교사가 없으면 막지 않는다.
+  // 학생 단계 막대가 열 수 있는 마지막 칸: 교사가 있는 장은 교사의 지금 칸, 지난 장은 교사가 연 가장 먼 칸(건너뛴 장은 끝 칸).
+  // 교사가 없으면 막지 않는다.
   stepCap(st) {
     const t = this.teacher;
     if (!t) return st.max;
     if (st.index > t.slide) return 0;
     const r = st.index === t.slide ? t.steps : t.reach[st.index] ? t.reach[st.index].steps : null;
-    if (!r) return 0;
+    if (!r) return st.max;   // 교사가 건너뛴 지난 장
     const k = (Stepper.bySlide[st.index] || []).indexOf(st);
     return r[k] >= 0 ? r[k] : st.max;
   },

@@ -1,4 +1,4 @@
-/*! exploragram engine v2.7.4 | © N-lifescience | https://github.com/N-lifescience/resonance */
+/*! exploragram engine v2.7.5 | © N-lifescience | https://github.com/N-lifescience/resonance */
 /* ---- 00-tokens.css ---- */
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css");
 
@@ -32,7 +32,7 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #1B1D21; }
 body { font-family: var(--ch-font); color: var(--ch-ink); word-break: keep-all; overflow-wrap: break-word; -webkit-text-size-adjust: 100%; }
 .ch-viewport { position: fixed; top: 0; left: var(--ch-reserve-left, 0px); right: var(--ch-reserve-right, 0px); bottom: var(--ch-reserve-bottom, 0px); display: flex; align-items: center; justify-content: center; overflow: hidden; }
 .ch-deck { position: relative; width: 1280px; height: 720px; flex: none; transform-origin: center center; touch-action: none; }
-.slide { position: absolute; inset: 0; box-sizing: border-box; padding: 72px 80px 64px; display: none; flex-direction: column; overflow: hidden; background: var(--ch-paper); color: var(--ch-ink); font-size: var(--ch-body); }
+.slide { position: absolute; top: 0; right: 0; bottom: 0; left: 0; box-sizing: border-box; padding: 72px 80px 64px; display: none; flex-direction: column; overflow: hidden; background: var(--ch-paper); color: var(--ch-ink); font-size: var(--ch-body); }
 .slide.is-active { display: flex; animation: ch-slide-in .3s var(--ch-ease-out); }
 /* 수업 CSS가 장에 display를 줘도(.section-cover { display: flex }) 보고 있지 않은 장은 숨긴다. 안 그러면 그 장이 앞 장들을 모두 덮는다. */
 @media screen { .ch-deck > .slide:not(.is-active):not(.ch-measure) { display: none !important; } }
@@ -50,7 +50,7 @@ body { font-family: var(--ch-font); color: var(--ch-ink); word-break: keep-all; 
 
 /* ---- 20-ink.css ---- */
 /* .ch-ink에는 z-index를 주지 않는다: 쌓임 맥락이 생기면 형광펜(multiply)이 슬라이드와 섞이지 못하고 글자를 흐린다 */
-.ch-ink { position: absolute; inset: 0; pointer-events: none; }
+.ch-ink { position: absolute; top: 0; right: 0; bottom: 0; left: 0; pointer-events: none; }
 .ch-ink canvas { position: absolute; left: 0; top: 0; width: 1280px; height: 720px; }
 .ch-ink-pen, .ch-ink-laser { z-index: 30; }
 .ch-ink-hl { z-index: 29; opacity: .45; mix-blend-mode: multiply; }
@@ -63,7 +63,7 @@ body:not([data-tool="hand"]) .ch-deck input[type="range"] { pointer-events: none
 .ch-ink-live { position: fixed; left: 0; top: 0; width: 100vw; height: 100vh; z-index: 45; pointer-events: none; }
 
 /* ---- 25-board.css ---- */
-.ch-board { position: absolute; inset: 0; z-index: 20; background: #fff; }
+.ch-board { position: absolute; top: 0; right: 0; bottom: 0; left: 0; z-index: 20; background: #fff; }
 .ch-board[hidden] { display: none; }
 .ch-board[data-bg="grid"] { background-color: #fff; background-image: linear-gradient(#E3E7EC 1px, transparent 1px), linear-gradient(90deg, #E3E7EC 1px, transparent 1px); background-size: 40px 40px; }
 .ch-board[data-bg="lines"] { background: #fff repeating-linear-gradient(transparent 0 55px, #C9D6E3 55px 56px); }
@@ -177,7 +177,7 @@ html.ch-off-board :is(.ch-tb-board, .ch-hud .ch-seg) { display: none !important;
 html.ch-off-live .ch-tb-btn[data-name="live"] { display: none !important; }
 .slide .w { white-space: nowrap; }
 /* 손등 지우개 맞추기: 화면 전체를 덮고 닿은 크기를 잰다 */
-.ch-calib { position: fixed; inset: 0; z-index: 95; display: grid; place-content: center; justify-items: center; gap: 18px; padding: 24px; background: rgba(22, 24, 29, .92); color: #fff; font-family: var(--ch-font); text-align: center; touch-action: none; user-select: none; -webkit-user-select: none; }
+.ch-calib { position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 95; display: grid; place-content: center; justify-items: center; gap: 18px; padding: 24px; background: rgba(22, 24, 29, .92); color: #fff; font-family: var(--ch-font); text-align: center; touch-action: none; user-select: none; -webkit-user-select: none; }
 .ch-calib-msg { margin: 0; font-size: 34px; font-weight: 800; line-height: 1.4; }
 .ch-calib-read { margin: 0; min-height: 1.4em; font-size: 22px; color: #C9D1DC; }
 .ch-calib-close { all: unset; box-sizing: border-box; margin-top: 12px; padding: 14px 32px; border-radius: 14px; background: var(--accent); color: #fff; font-size: 20px; font-weight: 700; cursor: pointer; }
@@ -200,12 +200,12 @@ html.ch-off-live .ch-tb-btn[data-name="live"] { display: none !important; }
 .ch-help dl { display: grid; grid-template-columns: max-content 1fr; gap: 10px 20px; margin: 0; font-size: 15px; }
 .ch-help dt { font-family: var(--ch-mono); color: var(--ch-hl); }
 .ch-help dd { margin: 0; }
-.ch-shade { position: fixed; inset: 0; z-index: 80; display: none; }
+.ch-shade { position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 80; display: none; }
 .ch-shade[data-mode="black"] { display: block; background: #000; }
 .ch-shade[data-mode="white"] { display: block; background: #fff; }
 @keyframes ch-pop { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 /* 화면 안 확인창(Ask): 칠판에서도 손가락으로 누르기 쉬운 큰 단추 */
-.ch-ask { position: fixed; inset: 0; z-index: 96; display: grid; place-items: center; padding: 16px; background: rgba(0, 0, 0, .45); font-family: var(--ch-font); }
+.ch-ask { position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 96; display: grid; place-items: center; padding: 16px; background: rgba(0, 0, 0, .45); font-family: var(--ch-font); }
 .ch-ask-card { width: min(460px, 100%); padding: 24px; border-radius: 18px; background: var(--ch-ui); color: var(--ch-ui-fg); box-shadow: 0 20px 60px rgba(0, 0, 0, .45); animation: ch-pop .2s var(--ch-ease-out); }
 .ch-ask-card p { margin: 0 0 18px; font-size: 20px; font-weight: 700; line-height: 1.5; }
 .ch-ask-input { box-sizing: border-box; width: 100%; margin-bottom: 18px; padding: 12px 14px; border: 2px solid var(--ch-ui-2); border-radius: 12px; background: var(--ch-ui-2); color: inherit; font: 600 20px/1.3 var(--ch-font); }
@@ -256,7 +256,7 @@ html.ch-off-live .ch-tb-btn[data-name="live"] { display: none !important; }
   .ch-print-hl { z-index: 29; opacity: .45; mix-blend-mode: multiply; }
   .ch-print-board[data-bg="green"] .ch-print-hl { opacity: .55; mix-blend-mode: screen; }
   .ch-print-board { padding: 0; }
-  .ch-print-board .ch-board { display: block !important; position: absolute; inset: 0; }
+  .ch-print-board .ch-board { display: block !important; position: absolute; top: 0; right: 0; bottom: 0; left: 0; }
 }
 
 /* ---- 60-content.css ---- */
@@ -318,7 +318,7 @@ html.ch-off-live .ch-tb-btn[data-name="live"] { display: none !important; }
 :where(.slide) .fig figcaption { display: flex; align-items: center; gap: 8px; margin-top: 12px; font-size: 22px; font-weight: 700; color: var(--ch-ink); }
 :where(.slide) .fig figcaption::before { content: "▲"; display: grid; place-items: center; flex: none; width: 24px; height: 24px; border-radius: 50%; background: #777; color: #fff; font-size: 11px; }
 :where(.slide) .ch-zoom-btn { position: absolute; right: 10px; top: 10px; z-index: 4; width: 56px; height: 56px; padding: 0; display: grid; place-items: center; border: 0; border-radius: 12px; background: rgba(22, 24, 29, .72); color: #fff; cursor: pointer; }
-.ch-zoom { position: fixed; inset: 0; z-index: 75; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 14px; background: rgba(10, 12, 16, .9); cursor: zoom-out; }
+.ch-zoom { position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 75; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 14px; background: rgba(10, 12, 16, .9); cursor: zoom-out; }
 .ch-zoom.is-open { display: flex; animation: ch-pop .25s var(--ch-ease-out); }
 .ch-zoom img { max-width: 96vw; max-height: 88vh; object-fit: contain; background: var(--ch-card); }
 .ch-zoom p { margin: 0; color: #fff; font: 700 20px/1.4 var(--ch-font); }
@@ -446,7 +446,7 @@ body .slide.chapter::before { display: none; }
 /* 0단계 가림막: .veil 영역(또는 지도)을 빗금으로 덮고 안내 글을 띄운다 */
 .ch-stepper .veil { position: relative; }
 .ch-stepper.is-veiled .veil { min-height: 160px; }   /* 안쪽이 모두 data-only로 숨어도 가림막이 보이게 */
-.ch-stepper.is-veiled .veil::after, .ch-veil-self.is-veiled::after { content: attr(data-veil); position: absolute; inset: 0; z-index: 3; display: grid; place-items: center; padding: 20px; border: 2px dashed #C3C9D1; border-radius: 10px; background: repeating-linear-gradient(135deg, #E7EAEE 0 22px, #DFE3E8 22px 44px); color: var(--ch-mute); font: 800 28px/1.4 var(--ch-font); text-align: center; }
+.ch-stepper.is-veiled .veil::after, .ch-veil-self.is-veiled::after { content: attr(data-veil); position: absolute; top: 0; right: 0; bottom: 0; left: 0; z-index: 3; display: grid; place-items: center; padding: 20px; border: 2px dashed #C3C9D1; border-radius: 10px; background: repeating-linear-gradient(135deg, #E7EAEE 0 22px, #DFE3E8 22px 44px); color: var(--ch-mute); font: 800 28px/1.4 var(--ch-font); text-align: center; }
 .ch-stepper.is-veiled .veil > * { visibility: hidden; }
 
 @media print {
@@ -460,7 +460,7 @@ body .slide.chapter::before { display: none; }
 :where(.slide) .calc input[type="range"] { width: 100%; }
 :where(.slide) .calc output { margin: 0; font: inherit; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
 :where(.slide) .calc .bar { position: relative; height: 26px; border-radius: 13px; background: var(--ch-soft); overflow: hidden; }
-:where(.slide) .calc .bar::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: var(--bar-c, var(--accent)); transform: scaleX(var(--f, 0)); transform-origin: 0 50%; }   /* 길이 변화는 엔진이 흘려 보낸다(58-calc.js) */
+:where(.slide) .calc .bar::after { content: ""; position: absolute; top: 0; right: 0; bottom: 0; left: 0; border-radius: inherit; background: var(--bar-c, var(--accent)); transform: scaleX(var(--f, 0)); transform-origin: 0 50%; }   /* 길이 변화는 엔진이 흘려 보낸다(58-calc.js) */
 :where(.slide) .calc [data-set] { min-height: 56px; }
 :where(.slide) .calc [data-set][aria-pressed="true"] { border-color: var(--accent); background: var(--accent); color: #fff; }
 
@@ -612,7 +612,7 @@ body .slide.chapter::before { display: none; }
 /* 끌 수 있는 점: 그림(SVG) 위에 겹친 56px 손잡이. 옅은 원이 누르는 자리, 가운데 점이 지금 자리다. */
 .ch-plot-area { position: relative; }
 .ch-plot-drag { position: absolute; z-index: 1; width: 56px; height: 56px; margin: -28px 0 0 -28px; border-radius: 50%; background: color-mix(in srgb, var(--c, var(--accent)) 16%, transparent); cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; outline: none; }
-.ch-plot-drag::before { content: ""; position: absolute; inset: 15px; box-sizing: border-box; border: 4px solid var(--ch-paper); border-radius: 50%; background: var(--c, var(--accent)); box-shadow: 0 1px 4px rgba(0, 0, 0, .35); transition: transform .12s var(--ch-ease-out); }
+.ch-plot-drag::before { content: ""; position: absolute; top: 15px; right: 15px; bottom: 15px; left: 15px; box-sizing: border-box; border: 4px solid var(--ch-paper); border-radius: 50%; background: var(--c, var(--accent)); box-shadow: 0 1px 4px rgba(0, 0, 0, .35); transition: transform .12s var(--ch-ease-out); }
 .ch-plot-drag:hover::before, .ch-plot-drag.is-drag::before { transform: scale(1.18); }
 .ch-plot-drag.is-drag { z-index: 2; cursor: grabbing; }
 .ch-plot-drag:focus-visible { box-shadow: 0 0 0 3px var(--ch-paper), 0 0 0 6px var(--c, var(--accent)); }
@@ -627,7 +627,7 @@ body .slide.chapter::before { display: none; }
 :where(.slide) .ch-ppt-ph b { font-size: 22px; line-height: 1.35; }
 :where(.slide) .ch-ppt-ph small { font-size: 20px; }
 :where(.slide) .ch-ppt-ph.is-bad { border-color: var(--ch-bad); color: var(--ch-bad); }
-.ch-dropzone { position: fixed; inset: 12px; z-index: 90; display: none; place-items: center; border: 6px dashed var(--accent); border-radius: 24px; background: rgba(255, 255, 255, .9); color: #1F2328; font: 800 40px/1.3 var(--ch-font); pointer-events: none; }
+.ch-dropzone { position: fixed; top: 12px; right: 12px; bottom: 12px; left: 12px; z-index: 90; display: none; place-items: center; border: 6px dashed var(--accent); border-radius: 24px; background: rgba(255, 255, 255, .9); color: #1F2328; font: 800 40px/1.3 var(--ch-font); pointer-events: none; }
 .ch-dropzone.is-on { display: grid; }
 .ch-banner { position: fixed; left: 50%; top: 14px; z-index: 80; display: flex; align-items: center; gap: 10px; box-sizing: border-box; max-width: min(920px, 94vw); padding: 10px 12px 10px 20px; border-radius: 14px; background: var(--ch-ui); color: var(--ch-ui-fg); font: 600 16px/1.45 var(--ch-font); box-shadow: 0 12px 34px rgba(0, 0, 0, .35); transform: translateX(-50%); animation: ch-fade-in .3s var(--ch-ease-out); }
 .ch-banner[hidden] { display: none; }
@@ -735,7 +735,7 @@ body .slide.chapter::before { display: none; }
 @keyframes ch-a-pop { from { opacity: 0; transform: scale(.85); } to { opacity: 1; transform: none; } }
 /* wipe·type: 바탕색 가림막이 오른쪽으로 걷힌다(type은 계단식) */
 [data-anim="wipe"], [data-anim="type"] { position: relative; }
-.ch-anim-on[data-anim="wipe"]::after, .ch-anim-on[data-anim="type"]::after { content: ""; position: absolute; inset: -2px; background: var(--ch-paper); transform-origin: 100% 50%; animation: ch-a-wipe .5s var(--ch-ease-out) var(--ch-delay, 0s) both; pointer-events: none; }
+.ch-anim-on[data-anim="wipe"]::after, .ch-anim-on[data-anim="type"]::after { content: ""; position: absolute; top: -2px; right: -2px; bottom: -2px; left: -2px; background: var(--ch-paper); transform-origin: 100% 50%; animation: ch-a-wipe .5s var(--ch-ease-out) var(--ch-delay, 0s) both; pointer-events: none; }
 .ch-anim-on[data-anim="type"]::after { animation-duration: .9s; animation-timing-function: steps(18); }
 @keyframes ch-a-wipe { from { transform: scaleX(1); } to { transform: scaleX(0); } }
 /* highlight: 형광 띠가 왼쪽에서 그어진다 */
@@ -788,7 +788,7 @@ html:not(.ch-editing) .ch-ed-ui { display: none !important; }
 .ch-ed-ui button.is-main { background: #2563EB; border-color: #2563EB; color: #fff; font-weight: 700; }
 .ch-ed-ui :focus-visible { outline: 2px solid #6B8DE8; outline-offset: 1px; }
 
-.ch-ed-bar { position: fixed; z-index: 9100; inset: 0 0 auto 0; height: 52px; display: flex; align-items: center; gap: 8px; padding: 0 14px; background: var(--ch-ui); border-bottom: 1px solid #2E323A; }
+.ch-ed-bar { position: fixed; z-index: 9100; top: 0; right: 0; bottom: auto; left: 0; height: 52px; display: flex; align-items: center; gap: 8px; padding: 0 14px; background: var(--ch-ui); border-bottom: 1px solid #2E323A; }
 .ch-ed-bar > b { margin-right: 6px; font-size: 15px; }
 .ch-ed-count { min-width: 56px; text-align: center; font: 600 13px var(--ch-mono); color: var(--ch-ui-mute); }
 .ch-ed-status { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: right; font-size: 13px; color: var(--ch-ui-mute); }
@@ -845,7 +845,7 @@ html:not(.ch-editing) .ch-ed-ui { display: none !important; }
 .ch-live-qr small { display: block; max-width: 220px; color: #1F2328; word-break: break-all; }
 
 /* QR 크게 보기: 교실 뒷자리에서도 찍히게 화면 가득. 아무 데나 누르면 닫힌다 */
-.ch-live-big { position: fixed; z-index: 9000; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2vh; padding: 16px; background: rgba(10, 12, 16, .94); text-align: center; cursor: zoom-out; }
+.ch-live-big { position: fixed; z-index: 9000; top: 0; right: 0; bottom: 0; left: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2vh; padding: 16px; background: rgba(10, 12, 16, .94); text-align: center; cursor: zoom-out; }
 .ch-live-big-qr { padding: 2vmin; border-radius: 12px; background: #fff; }
 .ch-live-big-qr img { display: block; width: min(64vh, calc(100vw - 64px)); height: min(64vh, calc(100vw - 64px)); image-rendering: pixelated; }
 .ch-live-big-qr small { display: block; max-width: min(80vw, 640px); font-size: 24px; color: #1F2328; word-break: break-all; }
@@ -892,7 +892,7 @@ html:not(.ch-editing) .ch-ed-ui { display: none !important; }
 .ch-live-short .ch-live-empty { grid-column: 1 / -1; }
 
 /* 학생: 입장 화면, 위 띠 */
-.ch-live-join { position: fixed; z-index: 9500; inset: 0; display: grid; place-items: center; padding: 16px; background: rgba(22, 24, 29, .78); }
+.ch-live-join { position: fixed; z-index: 9500; top: 0; right: 0; bottom: 0; left: 0; display: grid; place-items: center; padding: 16px; background: rgba(22, 24, 29, .78); }
 .ch-live-card { width: min(420px, 100%); display: flex; flex-direction: column; gap: 10px; padding: 24px; border-radius: 16px; background: var(--ch-ui); text-align: center; }
 .ch-live-card h2 { margin: 0; font-size: 22px; }
 .ch-live-card p { margin: 0; color: var(--ch-ui-mute); }

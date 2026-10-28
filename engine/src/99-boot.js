@@ -6,6 +6,7 @@ async function start() {
   Editor.tag();       // 원본 보관 전: 화면과 원본에 같은 편집 번호를 붙인다
   Source.capture();   // 엔진이 DOM을 바꾸기 전의 원본(저장할 때 쓴다)
   Stage.init();
+  await Compat.loosen();   // 옛 브라우저: 버려진 :where()·:is() 규칙을 풀어 넣는다. 장 모양을 재는 일보다 먼저
   Compat.init();    // 줄이기(Fit)·점검이 재기 전: 옛 브라우저에서 편집으로 옮긴 자리를 맞춘다
   MathTex.init();   // 어절 보정보다 먼저: $…$ 자리를 잡는다
   Parts.init();   // Nav보다 먼저: 정답 상자 내용을 단계로 묶는다
