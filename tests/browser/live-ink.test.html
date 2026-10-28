@@ -91,6 +91,7 @@ test('교사가 실시간을 켜고 학생 둘이 들어온다', async () => {
   assert(inkOn('a'), '학생 화면에 판서층');
   assert(visible(doc('a').querySelector('.ch-ink')), '판서층이 보인다');
   assert(!visible(doc('a').querySelector('.ch-toolbar')), '학생은 판서 도구가 없다');
+  assert(!visible(doc('a').querySelector('.ch-live-peek')), '칠판에 판서가 없으면 「칠판 보기」도 없다');
 });
 
 test('교사가 쓰면 학생 화면에 같은 판서가 그려진다', async () => {
@@ -156,6 +157,8 @@ test('넘기면 새 장의 판서를, 돌아오면 받아 둔 판서를 보여 �
 });
 
 test('교사가 칠판을 열면 따라가는 학생도 칠판, 칠판에 쓴 판서와 바탕이 보인다', async () => {
+  T.Nav.go(3);   // 4장 위에 칠판을 연다: 학생은 지난 장(1장)으로 갈 수 있다
+  await until(() => A.Nav.state.slide === 3);
   T.Board.open();
   await until(() => visible(doc('a').querySelector('.ch-board')) && A.Ink.ref.kind === 'board');
   assert(doc('a').body.classList.contains('ch-board-on'), '슬라이드는 가린다');
@@ -170,12 +173,13 @@ test('교사가 칠판을 열면 따라가는 학생도 칠판, 칠판에 쓴 �
   eq(doc('a').querySelector('.ch-board-label').textContent, '칠판 2 / 2');
   T.Board.prev();
   await until(() => A.Ink.ref.index === 0 && page(A).length === 1);
+  assert(!visible(doc('a').querySelector('.ch-live-peek')), '선생님 칠판을 따라 보는 동안은 「칠판 보기」를 숨긴다');
 });
 
 test('다른 장을 보는 학생에게는 「선생님은 칠판 화면」 띠, 누르면 칠판으로', async () => {
-  eq(A.Live.teacher.slide, 0, '교사는 1장 위에 칠판을 열었다');
-  A.Live.move(1);   // 교사가 연 다음 장(4장)으로
-  await until(() => !A.Live.follow && A.Nav.state.slide === 3 && !visible(doc('a').querySelector('.ch-board')));
+  eq(A.Live.teacher.slide, 3, '교사는 4장 위에 칠판을 열었다');
+  A.Live.move(-1);   // 교사가 연 지난 장(1장)으로
+  await until(() => !A.Live.follow && A.Nav.state.slide === 0 && !visible(doc('a').querySelector('.ch-board')));
   const bar = doc('a').querySelector('.ch-live-bar');
   await until(() => visible(bar) && bar.textContent.includes('선생님은 칠판 화면'));
   eq(A.Ink.ref.kind, 'slide', '지난 장의 판서');
@@ -185,23 +189,23 @@ test('다른 장을 보는 학생에게는 「선생님은 칠판 화면」 띠,
 
 test('다른 장을 보던 학생도 교사가 칠판을 새로 열거나 다른 칠판 쪽으로 옮기면 칠판으로 데려온다', async () => {
   const onBoard = (i) => A.Live.follow && visible(doc('a').querySelector('.ch-board')) && A.Ink.ref.kind === 'board' && A.Ink.ref.index === i;
-  A.Live.move(1);
+  A.Live.move(-1);
   await until(() => !A.Live.follow && !visible(doc('a').querySelector('.ch-board')));
   T.Board.next();
   await until(() => onBoard(1));
   T.Board.prev();
   await until(() => onBoard(0) && page(A).length === 1);
-  A.Live.move(1);
+  A.Live.move(-1);
   await until(() => !A.Live.follow);
   T.Board.close();
   await wait(600);
-  assert(!A.Live.follow && A.Nav.state.slide === 3, '칠판을 닫을 때는 보던 장에 둔다');
+  assert(!A.Live.follow && A.Nav.state.slide === 0, '칠판을 닫을 때는 보던 장에 둔다');
   T.Board.open();
   await until(() => onBoard(0) && page(A).length === 1);
 });
 
 test('칠판이 열린 채 지난 장을 보던 학생도 교사가 칠판에 쓰면 칠판으로 데려온다', async () => {
-  A.Live.move(1);
+  A.Live.move(-1);
   await until(() => !A.Live.follow && A.Ink.ref.kind === 'slide');
   await wait(600);
   assert(!A.Live.follow, '쓰지 않으면 보던 장에 둔다');
@@ -217,8 +221,54 @@ test('칠판을 닫으면 학생도 슬라이드로 돌아온다', async () => {
   await until(() => !visible(doc('a').querySelector('.ch-board')) && A.Ink.ref.kind === 'slide');
   assert(!doc('a').body.classList.contains('ch-board-on'));
   assert(!doc('a').body.classList.contains('ch-dark-page'), '어두운 바탕을 걷는다');
-  eq(A.Nav.state.slide, 0);
-  eq(page(A).map((x) => wire(x.p)).join('|'), page(T).map((x) => wire(x.p)).join('|'), '1장의 판서');
+  eq(A.Nav.state.slide, 3);
+  eq(page(A).map((x) => wire(x.p)).join('|'), page(T).map((x) => wire(x.p)).join('|'), '4장의 판서');
+});
+
+const peekEl = (name) => doc(name).querySelector('.ch-live-peek');
+const boardOn = (name, X, i) => visible(doc(name).querySelector('.ch-board')) && X.Ink.ref.kind === 'board' && X.Ink.ref.index === i;
+
+test('「칠판 보기」: 선생님이 슬라이드로 돌아가도 학생은 오른쪽 위 단추로 칠판 판서를 다시 본다', async () => {
+  await until(() => visible(peekEl('a')) && peekEl('a').textContent === '칠판 보기');
+  const r = peekEl('a').getBoundingClientRect();
+  assert(r.right > 640 - 40 && r.top < 40, `오른쪽 위: ${Math.round(r.left)},${Math.round(r.top)}`);
+  peekEl('a').querySelector('button').click();
+  await until(() => boardOn('a', A, 0) && page(A).length === 1);
+  eq(doc('a').querySelector('.ch-board').dataset.bg, 'green', '칠판 바탕');
+  assert(peekEl('a').textContent.includes('칠판 1 / 2'), `단추 묶음: ${peekEl('a').textContent}`);
+  T.Nav.go(0);   // 선생님이 다른 장으로 넘겨도 학생은 칠판을 계속 본다(뒤의 장은 따라간다)
+  await until(() => A.Nav.state.slide === 0 && A.Live.follow);
+  await wait(300);
+  assert(boardOn('a', A, 0), '칠판을 계속 본다');
+  A.Nav.next();   // 칠판을 보는 중에는 →가 칠판 쪽을 넘긴다
+  await until(() => boardOn('a', A, 1) && page(A).length === 0 && peekEl('a').textContent.includes('칠판 2 / 2'));
+  eq(A.Nav.state.slide, 0, '장은 그대로');
+  peekEl('a').querySelector('.ch-live-go').click();   // 「슬라이드로」
+  await until(() => !visible(doc('a').querySelector('.ch-board')) && A.Ink.ref.kind === 'slide' && A.Nav.state.slide === 0);
+  eq(page(A).length, 2, '1장의 판서');
+  assert(visible(peekEl('a')) && peekEl('a').textContent === '칠판 보기', '단추는 다시 「칠판 보기」');
+});
+
+test('「칠판 보기」 중에 선생님이 칠판을 열면 선생님 칠판으로 데려온다', async () => {
+  peekEl('a').querySelector('button').click();
+  await until(() => boardOn('a', A, 0));
+  A.Live.move(1);
+  await until(() => boardOn('a', A, 1));
+  T.Board.open();   // 선생님 칠판은 1쪽
+  await until(() => boardOn('a', A, 0) && A.Live.peekBd === -1);
+  T.Board.close();
+  await until(() => !visible(doc('a').querySelector('.ch-board')) && A.Ink.ref.kind === 'slide');
+});
+
+test('칠판을 닫은 뒤에 들어온 학생도 「칠판 보기」로 칠판 판서를 받는다', async () => {
+  const D = await open('d', `&join=${T.Live.code}`);
+  await until(() => D.Live.teacher && D.Live.teacher.bd);
+  eq((D.Live.inkPages.get('b0') || { arr: [] }).arr.length, 0, '아직 칠판 판서가 없다');
+  await until(() => visible(peekEl('d')));
+  peekEl('d').querySelector('button').click();
+  await until(() => boardOn('d', D, 0) && (D.Ink.page || []).length === 1 && D.Live.inkPlay.size === 0, 8000);
+  eq(wire(D.Ink.page[0].p), wire(T.Session.doc.boards[0].strokes[0].p), '선생님 칠판과 같은 판서');
+  frames.d.remove();
 });
 
 test('교사 화면이 장을 더 줄였으면(글꼴 차이) 학생 화면도 그 배율로 맞춰 판서가 같은 자리에 놓인다', async () => {

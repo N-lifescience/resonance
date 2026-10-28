@@ -113,16 +113,21 @@ test('교사가 점검(D)을 돌려도 단계 막대를 다 연 상태가 학생
   eq(A.Stepper.bySlide[2][0].pos, 1, '학생 막대도 그대로');
 });
 
-test('학생이 움직인 막대는 교사가 막대를 옮길 때까지 그대로 둔다', async () => {
+test('학생 막대는 교사 칸까지만 열리고, 지난 칸으로는 돌아가며, 교사가 막대를 옮길 때까지 그대로 둔다', async () => {
   const a = A.Stepper.bySlide[2][0];
   const b = B.Stepper.bySlide[2][0];
   a.input.value = '2';
   a.input.dispatchEvent(new Event('input', { bubbles: true }));
-  eq(a.pos, 2, '학생이 「나」까지 열었다');
+  eq(a.pos, 1, '교사(「가」)보다 앞 칸 「나」는 못 연다');
+  eq(a.input.value, '1', '끈 손잡이도 교사 칸으로 돌아온다');
+  assert(a.labels[2].classList.contains('is-locked') && !a.labels[1].classList.contains('is-locked'), '못 여는 칸 이름은 흐리게');
+  a.input.value = '0';
+  a.input.dispatchEvent(new Event('input', { bubbles: true }));
+  eq(a.pos, 0, '지난 칸으로는 돌아간다');
   eq(T.Stepper.bySlide[2][0].pos, 1, '교사 막대는 그대로');
   T.Live.sendState();
   await wait(300);
-  eq(a.pos, 2, '교사 소식이 그대로 오면 학생이 고른 칸을 둔다');
+  eq(a.pos, 0, '교사 소식이 그대로 오면 학생이 고른 칸을 둔다');
   eq(b.pos, 1, '다른 학생은 교사 칸');
   T.Stepper.bySlide[2][0].set(0, 'input');
   await until(() => a.pos === 0 && b.pos === 0);
@@ -164,6 +169,32 @@ test('지난 장의 단계 막대는 교사가 연 가장 먼 칸까지', async 
   eq(A.Stepper.bySlide[2][0].pos, 2, '교사가 「나」까지 열었다');
   bar('a').querySelector('button').click();
   await until(() => A.Nav.state.slide === 3);
+});
+
+test('교사가 지난 장으로 돌아가면 연 적이 있는 장이라도 교사보다 앞 장으로는 못 간다', async () => {
+  T.Nav.go(1);
+  await until(() => A.Nav.state.slide === 1 && B.Nav.state.slide === 1);
+  A.Nav.next();
+  await wait(100);
+  eq(A.Nav.state.slide, 1, '→로 못 간다');
+  A.Nav.go(3);
+  await wait(100);
+  eq(A.Nav.state.slide, 1, '차례 단추·Exploragram.go로도 못 간다');
+  A.Live.move(1);
+  await wait(100);
+  eq(A.Nav.state.slide, 1, '손가락 밀기로도 못 간다');
+  A.Nav.prev();
+  await until(() => A.Nav.state.slide === 0);
+  T.Nav.go(3);
+  await until(() => B.Nav.state.slide === 3);
+  A.Nav.next();
+  await until(() => A.Nav.state.slide === 1);
+  A.Nav.next();
+  await until(() => A.Nav.state.slide === 2 && !A.Live.follow);
+  T.Nav.go(1);   // 학생(3장)보다 앞 장으로 교사가 돌아갔다
+  await until(() => A.Nav.state.slide === 1 && A.Live.follow);
+  T.Nav.go(3);
+  await until(() => A.Nav.state.slide === 3 && B.Nav.state.slide === 3);
 });
 
 // 학생 iframe 안 슬라이더를 손으로 움직인 것처럼

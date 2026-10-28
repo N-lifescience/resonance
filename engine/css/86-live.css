@@ -81,6 +81,18 @@
 .ch-live-msg { min-height: 1.5em; }
 .ch-live-bar { position: fixed; z-index: 8700; top: 10px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 12px; max-width: calc(100vw - 20px); padding: 6px 8px 6px 18px; border-radius: 999px; background: var(--ch-ui); box-shadow: 0 8px 24px rgba(0, 0, 0, .3); white-space: nowrap; }
 
+/* 학생: 오른쪽 위 「칠판 보기」. 선생님이 슬라이드로 돌아가도 칠판 판서를 다시 본다. 연 동안은 칠판 쪽 넘기기와 「슬라이드로」 */
+.ch-live-peek { position: fixed; z-index: 8700; top: 10px; right: 12px; display: flex; align-items: center; gap: 6px; max-width: calc(100vw - 24px); padding: 6px; border-radius: 999px; background: var(--ch-ui); box-shadow: 0 8px 24px rgba(0, 0, 0, .3); white-space: nowrap; }
+.ch-live-ui.ch-live-peek button { border-radius: 999px; font-weight: 700; }
+.ch-live-ui.ch-live-peek .ch-live-peek-open { min-height: 48px; padding: 8px 20px; font-size: 17px; }
+.ch-live-ui.ch-live-peek .ch-live-peek-step { min-width: 44px; padding: 4px 0; font-size: 24px; line-height: 1; }
+.ch-live-peek span { padding: 0 4px; font-weight: 700; font-variant-numeric: tabular-nums; }
+/* 칠판을 보는 중이거나 좁은 화면에서는 위 띠가 「칠판 보기」와 겹치지 않게 한 줄 내린다 */
+html.ch-live-peeking .ch-live-bar { top: 66px; }
+@media (max-width: 640px) { .ch-live-bar { top: 66px; } }
+/* 학생 단계 막대: 선생님보다 앞 칸은 아직 못 연다 */
+html.ch-live-student .ch-stop-labels > span.is-locked { opacity: .35; }
+
 /* 학생: 교사 툴바 타이머의 남은 시간(오른쪽 아래) */
 .ch-live-timer { position: fixed; z-index: 8650; right: 12px; bottom: 12px; display: flex; align-items: baseline; gap: 10px; max-width: calc(100vw - 24px); padding: 10px 18px; border-radius: 16px; background: var(--ch-ui); box-shadow: 0 8px 24px rgba(0, 0, 0, .3); }
 .ch-live-timer span { font-size: 16px; color: var(--ch-ui-mute); }

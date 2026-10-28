@@ -23,6 +23,25 @@ test('step: 열린 장만 건너 다니고 끝에서는 -1', () => {
   assert.equal(LiveCore.step(r, 0, -1), -1);
 });
 
+test('step: last를 주면 그 장보다 앞으로는 못 가고 뒤로는 간다(학생은 교사보다 앞 장에 못 간다)', () => {
+  const r = [{ shown: 0, steps: [] }, { shown: 0, steps: [] }, { shown: 0, steps: [] }, { shown: 0, steps: [] }];
+  assert.equal(LiveCore.step(r, 1, 1, 1), -1);   // 교사가 1장으로 돌아왔으면 2·3장을 갔었어도 못 간다
+  assert.equal(LiveCore.step(r, 0, 1, 1), 1);
+  assert.equal(LiveCore.step(r, 1, -1, 1), 0);
+  assert.equal(LiveCore.step(r, 3, -1, 1), 1);   // 교사보다 앞 장에 있으면 뒤로 가면 교사 장 이하로
+  assert.equal(LiveCore.step(r, 3, 1, 1), -1);
+});
+
+test('clean state: 칠판 쪽 목록(bd)은 모양이 맞을 때만 받는다', () => {
+  const base = { tid: 'abcd1234', slide: 0, shown: 0, steps: [], reach: [null], lesson: { key: 'k', n: 1 } };
+  const ok = LiveCore.clean('state', Object.assign({ bd: { i: 1, list: [['white', 3, 2], ['green', -1, 5]] } }, base), 1);
+  assert.deepStrictEqual(plain(ok.bd), { i: 1, list: [{ bg: 'white', rev: 3, n: 2 }, { bg: 'green', rev: -1, n: 5 }] });
+  eq(LiveCore.clean('state', Object.assign({ bd: { i: 2, list: [['white', 0, 0]] } }, base), 1).bd, null);
+  eq(LiveCore.clean('state', Object.assign({ bd: { i: 0, list: [['pink', 0, 0]] } }, base), 1).bd, null);
+  eq(LiveCore.clean('state', Object.assign({ bd: { i: 0, list: [['white', -2, 0]] } }, base), 1).bd, null);
+  eq(LiveCore.clean('state', base, 1).bd, null);
+});
+
 test('bins: 값이 적으면 값마다 한 칸, 최빈값을 고른다', () => {
   const b = LiveCore.bins([3, 3, 7, 99, NaN, -5], 0, 10, 1);
   assert.equal(b.length, 11);
@@ -57,7 +76,7 @@ test('clean: 모양이 맞는 메시지만 받는다', () => {
     tid: 'tttt0000', slide: 1, shown: 0, steps: [2], reach: [null, { shown: 1, steps: [2, 'x'] }], lesson: { key: 'd', n: 2, title: 't' }, site: '../x',
   }, 2);
   assert.deepStrictEqual(plain(s), {
-    tid: 'tttt0000', slide: 1, shown: 0, steps: [2], reach: [null, { shown: 1, steps: [] }], lesson: { key: 'd', n: 2, title: 't' }, site: null, ink: null, board: null, timer: null,
+    tid: 'tttt0000', slide: 1, shown: 0, steps: [2], reach: [null, { shown: 1, steps: [] }], lesson: { key: 'd', n: 2, title: 't' }, site: null, ink: null, board: null, bd: null, timer: null,
   });
   assert.equal(LiveCore.clean('state', { tid: 'tttt0000', slide: -1, shown: 0, reach: [] }, 2), null);
   assert.equal(LiveCore.clean('state', { slide: 0, shown: 0, reach: [] }, 2), null, '교사 표시 없는 상태는 버린다');

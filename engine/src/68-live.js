@@ -42,9 +42,10 @@ const LiveCore = {
     return out;
   },
 
-  // dir(+1, -1) 쪽으로 가장 가까운 열린 장. 없으면 -1.
-  step(reach, from, dir) {
-    for (let i = from + dir; i >= 0 && i < reach.length; i += dir) if (reach[i]) return i;
+  // dir(+1, -1) 쪽으로 가장 가까운 열린 장. 없으면 -1. last가 있으면 그 장보다 뒤로는 가지 않는다(학생은 교사보다 앞 장에 못 간다).
+  step(reach, from, dir, last) {
+    const end = last == null ? reach.length - 1 : Math.min(reach.length - 1, last);
+    for (let i = from + dir; i >= 0 && i < reach.length && (dir < 0 || i <= end); i += dir) if (reach[i] && i <= end) return i;
     return -1;
   },
 
@@ -231,6 +232,11 @@ const LiveCore = {
           ? Object.assign({ ep: p.ink.ep, pg: p.ink.pg, rev: p.ink.rev }, zoom(p.ink.z) ? { z: p.ink.z } : null) : null,
         board: p.board && typeof p.board === 'object' && int(p.board.i, 0, 199) && int(p.board.n, 1, 200) && p.board.i < p.board.n && BOARD_BGS.includes(p.board.bg)
           ? { i: p.board.i, n: p.board.n, bg: p.board.bg } : null,
+        // 칠판 쪽마다 [바탕, 판 번호(-1: 아직 안 보낸 판서가 있다), 획 수]와 교사가 마지막으로 쓴 칠판. 학생 「칠판 보기」가 쓴다.
+        bd: p.bd && typeof p.bd === 'object' && Array.isArray(p.bd.list) && p.bd.list.length >= 1 && p.bd.list.length <= 200
+          && int(p.bd.i, 0, p.bd.list.length - 1)
+          && p.bd.list.every((b) => Array.isArray(b) && b.length === 3 && BOARD_BGS.includes(b[0]) && int(b[1], -1, LIVE_ID_MAX) && int(b[2], 0, 1e5))
+          ? { i: p.bd.i, list: p.bd.list.map((b) => ({ bg: b[0], rev: b[1], n: b[2] })) } : null,
         // 툴바 타이머가 떠 있을 때만: 남은 ms, 처음 정한 초, 가는 중인지
         timer: p.timer && typeof p.timer === 'object' && int(p.timer.left, 0, 1e8) && int(p.timer.total, 1, 1e5) && typeof p.timer.run === 'boolean'
           ? { left: p.timer.left, total: p.timer.total, run: p.timer.run } : null,
@@ -353,6 +359,7 @@ const Live = {
   inkSentAt: 0,
   inkSnapAt: 0,
   inkWanted: false,        // 학생이 쪽 전체를 다시 달라고 했다
+  inkBdAt: new Map(),      // 칠판 쪽 → 「칠판 보기」 학생에게 쪽 전체를 마지막으로 보낸 시각
   // 실시간 판서(학생)
   inkOn: false,
   inkPages: new Map(),     // 쪽 이름 → { rev, arr, ids: Map(번호 → 획) }
@@ -365,6 +372,9 @@ const Live = {
   teacher: null,       // 마지막으로 받은 교사 상태(clean을 거친 것)
   stepSeen: new Map(), // 장 → 학생 단계 막대를 마지막으로 맞춘 교사 단계(교사가 막대를 옮겼는지 가린다)
   follow: true,
+  peekBd: -1,          // 「칠판 보기」로 연 칠판 쪽(-1: 닫힘). 선생님이 슬라이드로 돌아가도 학생이 칠판 판서를 다시 본다
+  peekEl: null,
+  peekKey: '',
   heard: 0,
   pending: new Map(),  // '장|키' → 보내기 타이머
   join: null,
@@ -501,6 +511,7 @@ const Live = {
       s.ink = { ep: this.inkEp, pg: cur.pg, rev: rec && rec.pg === cur.pg ? rec.rev : 0, z: this.zoomOf(cur.pg) };
       const d = Session.doc;
       s.board = Board.active ? { i: d.board, n: d.boards.length, bg: d.boards[d.board].bg } : null;
+      s.bd = { i: clamp(d.board, 0, d.boards.length - 1), list: d.boards.map((b, i) => [b.bg, this.inkBdRev(b.strokes, `b${i}`), b.strokes.length]) };
     }
     return s;
   },
@@ -630,6 +641,32 @@ const Live = {
     this.inkSentAt = Date.now();
   },
 
+  // 칠판 쪽의 판 번호: 보낸 적이 있으면 그 판, 판서가 있는데 안 보냈으면 -1, 빈 쪽이면 0
+  inkBdRev(arr, pg) {
+    const rec = this.inkRec.get(arr);
+    if (rec && rec.pg === pg) return rec.rev;
+    return arr.length ? -1 : 0;
+  },
+
+  // 학생이 「칠판 보기」로 교사가 지금 보지 않는 칠판 쪽을 열었다: 그 쪽 전체를 보낸다(쪽마다 LIVE_JOIN_MS에 한 번).
+  // 모든 학생이 함께 받으므로 여러 학생이 한꺼번에 열어도 한 번이면 된다.
+  inkBoardSnap(i, have) {
+    const b = Session.doc.boards[i];
+    if (!b) return;
+    const pg = `b${i}`;
+    const rec = this.inkRec.get(b.strokes);
+    if (rec && rec.pg === pg && rec.rev === have) return;
+    if (!rec && !b.strokes.length) return;
+    const now = Date.now();
+    if (now - (this.inkBdAt.get(pg) || 0) < LIVE_JOIN_MS) return;
+    this.inkBdAt.set(pg, now);
+    const list = b.strokes.map((s) => ({ id: this.inkId(s), s }));
+    const { r, body } = this.inkFit((step) => LiveCore.inkSnap(list, step), (x) => ({ snap: x.snap }));
+    const rev = ++this.inkSeq;
+    this.inkRec.set(b.strokes, { pg, rev, sent: r.sent });
+    this.inkSend(pg, rev, body);
+  },
+
   // ⚙ 설정에서 기능을 켜고 껐다
   onFeatures() {
     if (this.role !== 'teacher') return;
@@ -657,10 +694,12 @@ const Live = {
       // 이미 최신 판을 가진 학생(상태가 엇갈려 온 것)이면 다시 보내지 않는다
       const cur = this.inkLive() && this.inkCur();
       const rec = cur && this.inkRec.get(cur.arr);
-      if (cur && p.pg === cur.pg && !(rec && rec.pg === cur.pg && rec.rev === p.have)) {
-        this.inkWanted = true;
-        this.inkDirty();
-      }
+      if (cur && p.pg === cur.pg) {
+        if (!(rec && rec.pg === cur.pg && rec.rev === p.have)) {
+          this.inkWanted = true;
+          this.inkDirty();
+        }
+      } else if (this.inkLive() && p.pg[0] === 'b') this.inkBoardSnap(Number(p.pg.slice(1)), p.have);   // 「칠판 보기」
     }
     if (event === 'val') {
       const input = this.rangeOf(p.slide, p.key);
@@ -1062,12 +1101,18 @@ const Live = {
     emit('live-role');   // 투표는 학생 화면에서 '세기'가 아니라 '고르기'가 된다
     Nav.override = { next: () => this.move(1), prev: () => this.move(-1), close() {} };
     Nav.revealTo = () => false;   // 정답 상자 ✓ 등이 교사보다 먼저 단계를 열지 않게
-    // 차례 장의 단추·Exploragram.go도 교사가 연 장으로만
+    // 차례 장의 단추·Exploragram.go도 교사가 연 장으로만, 교사가 있는 장까지만
     Nav.go = (index) => {
       const i = Math.round(Number(index));
-      if (this.teacher && this.teacher.reach[i]) this.showSlide(i);
+      const t = this.teacher;
+      if (t && i <= t.slide && t.reach[i]) {
+        this.peekBd = -1;
+        this.showSlide(i);
+      }
     };
     // 단계 막대(연표·지도 막대 포함)는 학생도 직접 움직인다. 교사가 막대를 옮길 때만 교사 단계로 맞춘다(showSlide).
+    // 교사보다 앞 칸은 열지 못한다(뒤 단계의 답을 먼저 보지 않게). 지난 칸으로는 마음대로 돌아간다.
+    Stepper.limit = (st) => this.stepCap(st);
     // 넘기기 키만 받는다. 펜·칠판·목차·점검 같은 단축키는 학생 화면에서 쓰지 않는다.
     window.addEventListener('keydown', (e) => {
       if (this.role !== 'student') return;
@@ -1082,7 +1127,8 @@ const Live = {
     on('poll-vote', (item, k) => this.sendPart('pick', item, 'p', { c: [k] }));
     this.buildJoin(code);
     this.bar = h('div', { class: 'ch-live-bar ch-live-ui', 'data-no-ink': '', role: 'status', hidden: true });
-    document.body.append(this.bar);
+    this.peekEl = h('div', { class: 'ch-live-peek ch-live-ui', 'data-no-ink': '', hidden: true });
+    document.body.append(this.bar, this.peekEl);
     if (code) this.connect(code);
   },
 
@@ -1198,12 +1244,15 @@ const Live = {
     // 교사가 칠판을 열거나 다른 칠판 쪽으로 옮기면 모두 보라는 뜻이다. 지난 장을 보던 학생도 칠판으로 데려온다.
     // 위 띠의 「선생님 화면으로」만으로는 칠판에 쓰는 판서를 못 보고 지나치는 학생이 많다.
     const toBoard = !!p.board && (!before || before.i !== p.board.i);
-    // 교사가 학생이 보던 장으로 오면 다시 따라간다
-    if (this.follow || toBoard || p.slide === Nav.state.slide) this.showSlide(p.slide);
+    if (toBoard) this.peekBd = -1;
+    // 교사가 학생이 보던 장으로 오면 다시 따라간다. 교사가 학생보다 앞 장으로 돌아가면 학생도 그 장으로 데려온다(교사보다 앞 장에 머물지 않는다).
+    if (this.follow || toBoard || p.slide <= Nav.state.slide) this.showSlide(p.slide);
     else {
       this.renderBar();
       this.inkShow();
+      this.capMark();
     }
+    this.peekNeed();
   },
 
   // 학생 화면에 장 i를 연다. 교사가 있는 장이면 교사의 지금 단계, 지난 장이면 교사가 연 가장 먼 단계까지.
@@ -1215,17 +1264,129 @@ const Live = {
     if (!r) return;
     const seen = Nav.state.slide === i ? this.stepSeen.get(i) || [] : [];
     Nav.set({ slide: i, shown: clamp(r.shown, 0, Nav.counts[i] || 0) }, false);
-    (Stepper.bySlide[i] || []).forEach((st, k) => { if (r.steps[k] >= 0 && r.steps[k] !== seen[k]) st.set(r.steps[k], 'live'); });
+    // 교사가 막대를 옮겼거나 학생 막대가 교사보다 앞 칸이면 교사 칸으로 맞춘다
+    (Stepper.bySlide[i] || []).forEach((st, k) => {
+      if (r.steps[k] >= 0 && (r.steps[k] !== seen[k] || st.pos > r.steps[k])) st.set(r.steps[k], 'live');
+    });
     this.stepSeen.set(i, r.steps.slice());
     this.follow = i === t.slide;
     this.renderBar();
     this.inkShow();
+    this.capMark();
   },
 
+  // ←·→·밀기: 지난 장으로는 가고, 교사가 있는 장보다 앞으로는 못 간다. 「칠판 보기」 중이면 칠판 쪽을 넘긴다.
   move(dir) {
-    if (!this.teacher) return;
-    const i = LiveCore.step(this.teacher.reach, Nav.state.slide, dir);
+    const t = this.teacher;
+    if (!t) return;
+    if (this.peekBd >= 0) {
+      const p = this.peekOf();
+      if (p && p.i + dir >= 0 && p.i + dir < p.n) this.peek(p.i + dir);
+      return;
+    }
+    const i = LiveCore.step(t.reach, Nav.state.slide, dir, t.slide);
     if (i >= 0) this.showSlide(i);
+  },
+
+  // 학생 단계 막대가 열 수 있는 마지막 칸: 교사가 있는 장은 교사의 지금 칸, 지난 장은 교사가 연 가장 먼 칸. 교사가 없으면 막지 않는다.
+  stepCap(st) {
+    const t = this.teacher;
+    if (!t) return st.max;
+    if (st.index > t.slide) return 0;
+    const r = st.index === t.slide ? t.steps : t.reach[st.index] ? t.reach[st.index].steps : null;
+    if (!r) return 0;
+    const k = (Stepper.bySlide[st.index] || []).indexOf(st);
+    return r[k] >= 0 ? r[k] : st.max;
+  },
+
+  // 아직 못 여는 칸의 이름을 흐리게, 단추형은 누르지 못하게 한다
+  capMark() {
+    for (const st of Stepper.bySlide[Nav.state.slide] || []) {
+      const cap = this.stepCap(st);
+      st.labels.forEach((s, i) => s.classList.toggle('is-locked', i > cap));
+      st.buttons.forEach((b, i) => { b.disabled = i + 1 > cap; });
+    }
+  },
+
+  // ---- 「칠판 보기」(학생) ----
+  // 열어 둔 칠판 쪽 { i, n, bg }. 교사가 칠판을 지워 쪽이 줄었으면 마지막 쪽.
+  peekOf() {
+    const bd = this.teacher && this.teacher.bd;
+    if (this.peekBd < 0 || !bd || !this.inkOn) return null;
+    const i = Math.min(this.peekBd, bd.list.length - 1);
+    return { i, n: bd.list.length, bg: bd.list[i].bg };
+  },
+
+  // 칠판 쪽 i를 연다. i < 0이면 닫고 보던 슬라이드로 돌아간다.
+  peek(i) {
+    this.peekBd = i >= 0 && this.teacher && this.teacher.bd ? i : -1;
+    this.inkShow();
+    this.peekNeed();
+  },
+
+  // 처음 열 쪽: 교사가 마지막으로 쓴 칠판, 그 쪽이 비었으면 판서가 있는 마지막 쪽
+  peekStart() {
+    const bd = this.teacher.bd;
+    if (bd.list[bd.i] && bd.list[bd.i].n > 0) return bd.i;
+    for (let i = bd.list.length - 1; i >= 0; i--) if (bd.list[i].n > 0) return i;
+    return 0;
+  },
+
+  // 연 칠판 쪽의 판이 교사가 알린 판과 다르면 쪽 전체를 달라고 한다(교사가 칠판을 쓴 뒤에 들어온 학생, 묶음을 놓친 학생).
+  // 교사 상태(5초)마다 다시 본다.
+  peekNeed() {
+    const p = this.peekOf();
+    if (!p || !this.inbox) return;
+    const pg = `b${p.i}`;
+    const want = this.teacher.bd.list[p.i];
+    if (!want.n) {   // 교사 칠판이 비었다(지웠거나 쪽 번호가 당겨졌다)
+      const e = this.inkPages.get(pg);
+      if (e && e.arr.length) {
+        for (const s of e.arr) this.inkPlay.delete(s);
+        e.arr.length = 0;
+        e.ids.clear();
+        Ink.redraw();
+      }
+      return;
+    }
+    if (want.rev > 0 && this.inkHave(pg) === want.rev) return;
+    if (Date.now() - this.needAt < LIVE_JOIN_MS) return;
+    this.needAt = Date.now();
+    this.inbox.send('need', { sid: this.sid, pg, have: this.inkHave(pg) });
+  },
+
+  // 오른쪽 위 「칠판 보기」: 선생님 칠판에 판서가 있으면 언제든 연다. 연 동안은 칠판 쪽 넘기기와 「슬라이드로」.
+  // 학생이 선생님을 따라 칠판을 보고 있으면 숨긴다. 내용이 같으면 다시 그리지 않는다.
+  renderPeek() {
+    const el = this.peekEl;
+    if (!el) return;
+    const t = this.teacher;
+    const bd = this.inkOn && t && t.bd;
+    const p = this.peekOf();
+    const any = !!bd && bd.list.some((b) => b.n > 0);
+    const withTeacher = !p && this.follow && !!t && !!t.board;
+    const key = !bd || withTeacher ? '' : p ? `p${p.i}/${p.n}` : any ? 'open' : '';
+    document.documentElement.classList.toggle('ch-live-peeking', !!p);   // 단추 묶음이 넓어지면 위 띠를 한 줄 내린다
+    if (key === this.peekKey) return;
+    this.peekKey = key;
+    el.hidden = !key;
+    if (!key) return;
+    if (!p) {
+      el.replaceChildren(h('button', { type: 'button', class: 'ch-live-peek-open', text: '칠판 보기',
+        onclick: (e) => { e.currentTarget.blur(); this.peek(this.peekStart()); } }));
+      return;
+    }
+    const kids = [];
+    if (p.n > 1) {
+      kids.push(
+        h('button', { type: 'button', class: 'ch-live-peek-step', text: '‹', 'aria-label': '이전 칠판', disabled: p.i === 0,
+          onclick: (e) => { e.currentTarget.blur(); this.move(-1); } }),
+        h('span', { text: `칠판 ${p.i + 1} / ${p.n}` }),
+        h('button', { type: 'button', class: 'ch-live-peek-step', text: '›', 'aria-label': '다음 칠판', disabled: p.i >= p.n - 1,
+          onclick: (e) => { e.currentTarget.blur(); this.move(1); } }));
+    }
+    kids.push(h('button', { type: 'button', class: 'ch-live-go', text: '슬라이드로', onclick: (e) => { e.currentTarget.blur(); this.peek(-1); } }));
+    el.replaceChildren(...kids);
   },
 
   // 위 띠: 지난 장을 보는 중이면 교사 위치와 「선생님 화면으로」, 교사 소식이 끊기면 기다리는 중.
@@ -1247,7 +1408,7 @@ const Live = {
         h('button', { type: 'button', text: '코드 다시 넣기', onclick: () => this.rejoin() }));
     } else {
       this.bar.replaceChildren(h('span', { text: onBoard ? '선생님은 칠판 화면' : `선생님은 ${t.slide + 1}장` }),
-        h('button', { type: 'button', text: '선생님 화면으로', onclick: (e) => { this.showSlide(this.teacher.slide); e.currentTarget.blur(); } }));
+        h('button', { type: 'button', text: '선생님 화면으로', onclick: (e) => { this.peekBd = -1; this.showSlide(this.teacher.slide); e.currentTarget.blur(); } }));
     }
   },
 
@@ -1294,6 +1455,9 @@ const Live = {
     this.teacher = null;
     this.barKey = '';
     this.bar.hidden = true;
+    this.peekBd = -1;
+    this.peekKey = '';
+    this.peekEl.hidden = true;
     this.join.hidden = false;
     clearTimeout(this.needTimer);
     this.needTimer = 0;
@@ -1408,7 +1572,10 @@ const Live = {
     // 손가락으로 밀다가 지난 장으로 넘어간 학생은 위 띠를 못 보고 칠판 판서를 놓친다.
     const t = this.teacher;
     const wrote = p.snap ? p.snap.length > 0 : p.put.length > 0 || p.more.length > 0;
-    if (!this.follow && wrote && t && t.board && p.pg === `b${t.board.i}`) this.showSlide(t.slide);
+    if (wrote && t && t.board && p.pg === `b${t.board.i}` && (!this.follow || this.peekBd >= 0)) {
+      this.peekBd = -1;
+      this.showSlide(t.slide);
+    }
     const shown = () => Ink.page === page.arr && document.documentElement.classList.contains('ch-live-ink');
     if (p.snap) {
       for (const s of page.arr) this.inkPlay.delete(s);
@@ -1521,7 +1688,7 @@ const Live = {
     p.push(x, y);
   },
 
-  // 학생 화면에 판서층과 교사 칠판을 맞춘다. 칠판은 교사를 따라가는 중일 때만 보인다.
+  // 학생 화면에 판서층과 교사 칠판을 맞춘다. 칠판은 교사를 따라가는 중이거나 학생이 「칠판 보기」로 열었을 때 보인다.
   inkShow() {
     if (this.role !== 'student') return;
     const t = this.teacher;
@@ -1529,14 +1696,17 @@ const Live = {
     const root = document.documentElement.classList;
     const was = root.contains('ch-live-ink');
     root.toggle('ch-live-ink', on);
-    const b = on && this.follow && t.board ? t.board : null;
+    const peek = this.peekOf();
+    const b = peek || (on && this.follow && t.board ? t.board : null);
     Board.el.hidden = !b;
     document.body.classList.toggle('ch-board-on', !!b);
     if (b) {
       Board.el.dataset.bg = b.bg;
       Board.label.textContent = `칠판 ${b.i + 1} / ${b.n}`;
+      Board.label.hidden = !!peek;   // 「칠판 보기」 중에는 오른쪽 위 단추 묶음에 쪽 번호가 있다
     }
     Board.setDark(b ? b.bg === 'green' : document.body.dataset.theme === 'chalk');
+    this.renderPeek();
     if (!on) return;
     const ref = b ? { kind: 'board', index: b.i } : { kind: 'slide', key: Stage.slides[Nav.state.slide].dataset.key };
     if (b) this.inkPage(`b${b.i}`);   // 칠판 쪽 배열을 만든다

@@ -4,6 +4,7 @@
 const Stepper = {
   all: [],
   bySlide: [],
+  limit: null,   // (st) → 손으로 열 수 있는 마지막 칸. 실시간 학생 화면이 교사보다 앞 칸을 막는 데 쓴다.
 
   init() {
     this.all = [];
@@ -117,8 +118,12 @@ const Stepper = {
   },
 
   set(st, pos, src) {
-    const next = clamp(Math.round(Number(pos) || 0), 0, st.max);
-    if (next === st.pos && src !== 'init') return;
+    let next = clamp(Math.round(Number(pos) || 0), 0, st.max);
+    if (src === 'input' && this.limit) next = Math.min(next, Math.max(0, this.limit(st)));
+    if (next === st.pos && src !== 'init') {
+      if (st.input && st.input.value !== String(next)) st.input.value = String(next);   // 막힌 칸까지 끈 손잡이를 되돌린다
+      return;
+    }
     const prev = st.pos;
     st.pos = next;
     st.el.dataset.pos = String(next);
