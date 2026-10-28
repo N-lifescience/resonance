@@ -1,7 +1,7 @@
-/*! exploragram engine v2.7.3 | © N-lifescience | https://github.com/N-lifescience/resonance */
+/*! exploragram engine v2.7.4 | © N-lifescience | https://github.com/N-lifescience/resonance */
 (function () {
 'use strict';
-const VERSION = '2.7.3';
+const VERSION = '2.7.4';
 const LIVE_CONFIG = {"url":"https://qtwigpxinccudhprrdnb.supabase.co","key":"sb_publishable_-3KCWch7Q7sBQbcdVzxR4g_imovkZv5","site":"https://n-lifescience.github.io/resonance/"};
 /* ---- 00-core.js ---- */
 // 공통 상수, 작은 DOM 도우미, 이벤트 훅, 공개 객체 Exploragram.

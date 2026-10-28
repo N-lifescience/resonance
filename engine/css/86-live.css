@@ -88,8 +88,8 @@
 .ch-live-ui.ch-live-peek .ch-live-peek-step { min-width: 44px; padding: 4px 0; font-size: 24px; line-height: 1; }
 .ch-live-peek span { padding: 0 4px; font-weight: 700; font-variant-numeric: tabular-nums; }
 /* 칠판을 보는 중이거나 좁은 화면에서는 위 띠가 「칠판 보기」와 겹치지 않게 한 줄 내린다 */
-html.ch-live-peeking .ch-live-bar { top: 66px; }
-@media (max-width: 640px) { .ch-live-bar { top: 66px; } }
+html.ch-live-peeking .ch-live-bar { top: 80px; }
+@media (max-width: 640px) { .ch-live-bar { top: 80px; } }
 /* 학생 단계 막대: 선생님보다 앞 칸은 아직 못 연다 */
 html.ch-live-student .ch-stop-labels > span.is-locked { opacity: .35; }
 
