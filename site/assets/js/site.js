@@ -235,6 +235,15 @@
     });
   });
 
+  // 접어 둔 구역: 주소 끝이 #lessons, #comparison이면 펼쳐서 보여 준다.
+  const openFold = () => {
+    const target = location.hash.length > 1 ? document.getElementById(location.hash.slice(1)) : null;
+    const fold = target?.querySelector('details.fold');
+    if (fold) fold.open = true;
+  };
+  openFold();
+  window.addEventListener('hashchange', openFold);
+
   // 스크롤 카드: 단추와 키보드 모두 같은 간격으로 이동한다.
   function initRail(section) {
     const rail = $('.rail', section);

@@ -829,6 +829,15 @@ html:not(.ch-editing) .ch-ed-ui { display: none !important; }
 .ch-live-ui :focus-visible { outline: 2px solid #6B8DE8; outline-offset: 2px; }
 .ch-live-ui .ch-live-x { min-height: 36px; padding: 2px 12px; font-size: 18px; line-height: 1; }
 
+/* 「실시간」 단추: 툴바와 떨어진 오른쪽 아래에 띄운다. 툴바가 아래나 오른쪽에 붙으면 그만큼 비켜 선다. 켜지면 초록 */
+.ch-tb-btn.ch-live-fab { position: fixed; z-index: 51; right: calc(var(--ch-reserve-right, 0px) + 16px); bottom: calc(var(--ch-reserve-bottom, 0px) + 16px); flex-direction: row; gap: 10px; height: 60px; min-width: 0; padding: 0 24px 0 20px; border-radius: 999px; background: #2563EB; color: #fff; font: 800 19px/1 var(--ch-font); box-shadow: 0 10px 28px rgba(0, 0, 0, .35); }
+.ch-tb-btn.ch-live-fab:hover { background: #1D4ED8; }
+.ch-tb-btn.ch-live-fab .ch-icon { width: 26px; height: 26px; }
+.ch-tb-btn.ch-live-fab.is-on { background: #1F8A5B; }
+.ch-tb-btn.ch-live-fab.is-on:hover { background: #18734B; }
+html.ch-editing .ch-live-fab { display: none !important; }
+@media print { .ch-live-fab { display: none !important; } }
+
 /* 교사 창: 오른쪽 위 */
 .ch-live { position: fixed; z-index: 8600; top: 16px; right: 16px; width: 300px; max-width: calc(100vw - 32px); display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; border-radius: 14px; background: var(--ch-ui); box-shadow: 0 12px 32px rgba(0, 0, 0, .35); }
 .ch-live-head { display: flex; align-items: center; justify-content: space-between; }

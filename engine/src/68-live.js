@@ -358,6 +358,7 @@ const Live = {
   inkPages: new Map(),     // 쪽 이름 → { rev, arr, ids: Map(번호 → 획) }
   inkPlay: new Map(),      // 그리는 중인 획 → { q: 남은 좌표, arr, until, at }
   inkRaf: 0,
+  fab: null,               // 교사 화면 오른쪽 아래의 「실시간 수업」 단추
   needTimer: 0,
   needAt: 0,
   // 학생
@@ -387,7 +388,11 @@ const Live = {
       this.startStudent(/^\d{6}$/.test(join || '') ? join : '');
       return;
     }
-    Toolbar.slots.misc.prepend(Toolbar.btn('live', '실시간', () => (this.role ? this.showPanel(true) : this.startTeacher())));
+    // 실시간은 공명의 핵심 기능이라 툴바에 섞지 않고 오른쪽 아래에 따로 띄운다
+    this.fab = Toolbar.btn('live', '실시간', () => (this.role ? this.showPanel(true) : this.startTeacher()), { 'data-no-ink': '' });
+    this.fab.classList.add('ch-live-fab');
+    document.body.append(this.fab);
+    this.syncFab();
     on('nav', () => this.onNav());
     on('ink-dirty', () => this.inkDirty());
     on('session', () => { this.inkEp++; this.sendState(); });   // 반을 바꿨다: 학생은 받아 둔 판서를 버리고 새로 받는다
@@ -822,7 +827,18 @@ const Live = {
 
   say(text) { if (this.ui) this.ui.status.textContent = text; },
 
+  // 켜져 있는 동안은 단추 이름과 색으로 수업 중임을 알린다
+  syncFab() {
+    if (!this.fab) return;
+    const on = this.role === 'teacher';
+    this.fab.classList.toggle('is-on', on);
+    this.fab.querySelector('span').textContent = on ? '실시간 켜짐' : '실시간';
+    this.fab.title = on ? '실시간 수업 중: 실시간 창 열기' : '실시간 수업 시작';
+    this.fab.setAttribute('aria-label', this.fab.title);
+  },
+
   renderPanel() {
+    this.syncFab();
     if (!this.ui) return;
     const U = this.ui;
     const on = this.role === 'teacher' && !!this.main;

@@ -1,7 +1,7 @@
 // 목차, 단축키 도움말, 화면 가리기(검정·흰색), 전체 화면.
 
 // 툴바·HUD의 단추: 창을 닫는 바깥 누름이어도 제 할 일을 한다.
-const UI_CONTROLS = '.ch-toolbar, .ch-tb-handle, .ch-hud';
+const UI_CONTROLS = '.ch-toolbar, .ch-tb-handle, .ch-hud, .ch-live-fab';
 
 // 화면 안 확인창. 브라우저 기본 confirm·alert·prompt는 전자칠판에서 작게 뜨거나 엉뚱한 화면에 뜨고,
 // 「이 페이지의 대화상자 차단」을 한 번 누르면 이후로는 묻지도 않고 '취소'가 돼 버튼이 먹통처럼 보인다.

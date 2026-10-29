@@ -111,6 +111,53 @@ h3 { font-size:clamp(1.4rem,2.2vw,1.9rem); }
 .intro-active .replay { margin-top:12px; font-size:16px; }
 .intro-active .ri-ctrl { bottom:80px; }
 
+/* ── 첫 화면(바로 시작): 한 문장, 바꾸기 전후, 1단계 복사가 첫 화면에 모두 보인다 ── */
+.start-page main { padding-top:var(--header-height); }
+.start-hero { display:grid; grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr); gap:clamp(28px,4vw,64px); align-items:center; padding-block:clamp(32px,5vw,64px) clamp(28px,4vw,48px); }
+.start-hero h1 { font-size:clamp(2rem,3.6vw,3.6rem); }
+.start-lead { margin:18px 0 0; max-inline-size:32em; color:var(--mute); font-size:clamp(1.1rem,1.6vw,1.3rem); line-height:1.6; }
+.start-step { margin-top:clamp(24px,3vw,36px); }
+.start-label { display:flex; align-items:center; gap:12px; margin:0 0 12px; font-size:19px; font-weight:750; }
+.start-label .step-num { width:36px; height:36px; font-size:17px; }
+.start-hero .prompt-box { margin-top:0; }
+.start-hero .copy-status:empty,.start-hero .copy-count[hidden] { display:none; }
+.start-hero .copy-status { margin:12px 0 0; color:var(--tide); }
+.start-ba { margin-top:0; gap:12px; align-items:start; }
+.start-ba .ba-arrow { align-self:center; }
+.start-ba .ba-card figcaption { padding:12px 16px 14px; }
+.start-ba .ba-card figcaption strong { font-size:16px; line-height:1.45; }
+.start-ba .ba-arrow { width:40px; height:40px; }
+.start-next { padding-bottom:clamp(48px,7vw,96px); }
+.start-step-title { margin:4px 0 8px; font-size:clamp(1.3rem,2vw,1.6rem); }
+@media (min-width:1200px) {
+  .start-hero { grid-template-columns:minmax(0,1fr) minmax(0,1fr); }
+  .start-hero h1 { font-size:clamp(2rem,3.4vw,3.4rem); }
+}
+@media (max-width:899px) {
+  .start-hero { grid-template-columns:minmax(0,1fr); }
+}
+@media (max-width:767px) {
+  .before-after.start-ba { grid-template-columns:minmax(0,1fr) auto minmax(0,1fr); gap:8px; }
+  .start-ba .ba-arrow.ba-arrow { width:32px; height:32px; transform:none; }
+  .start-ba .ba-tag { padding:3px 10px; }
+  .start-ba .ba-card figcaption { padding:10px 12px 12px; }
+}
+
+/* ── 제작하기 머리말: 사진 히어로 대신 제목과 한 줄 ── */
+.page-head { padding-block:calc(var(--header-height) + clamp(32px,5vw,64px)) 0; }
+.page-head h1 { font-size:clamp(2rem,3.6vw,3.2rem); }
+.page-head + .how { padding-top:clamp(28px,4vw,48px); }
+
+/* ── 접어 둔 부가 정보(예시 수업, 모델별 비교) ── */
+.fold-section { padding-block:clamp(20px,3vw,32px); }
+.fold > summary { display:flex; align-items:center; justify-content:space-between; gap:16px; min-height:64px; padding:16px 24px; border-radius:var(--radius); background:var(--paper); cursor:pointer; list-style:none; }
+.comparisons .fold > summary { background:var(--white); }
+.fold > summary::-webkit-details-marker { display:none; }
+.fold > summary::after { content:"펼치기"; flex:none; padding:6px 14px; border-radius:999px; background:var(--char); color:var(--white); font-size:16px; font-weight:650; }
+.fold[open] > summary::after { content:"접기"; }
+.fold-title { font-size:clamp(1.25rem,2vw,1.5rem); font-weight:800; letter-spacing:-.02em; }
+.fold[open] > summary { margin-bottom:24px; }
+
 /* ── 사진 히어로 ── */
 .photo-hero { min-height:92svh; display:flex; align-items:end; position:relative; isolation:isolate; color:var(--white); background:var(--char); overflow:clip; }
 .photo-hero::before { content:""; position:absolute; inset:0; z-index:-2; background-size:cover; background-position:center; }
