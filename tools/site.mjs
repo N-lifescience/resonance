@@ -9,6 +9,7 @@ const out = join(root, '_site');
 const examples = join(root, 'skills/exploragram/references/examples');
 const v3 = join(root, 'examples/v3');
 const CDN_ENGINE = /https:\/\/cdn\.jsdelivr\.net\/gh\/N-lifescience\/resonance@2\/engine\//g;
+const CDN_VIEWER = /https:\/\/cdn\.jsdelivr\.net\/gh\/N-lifescience\/resonance@2\/script-viewer\//g;
 const validSlug = (name) => /^[\w-]{1,60}$/.test(name);
 const names = new Set();
 const lessons = [];
@@ -67,10 +68,14 @@ writeFileSync(join(out, 'lessons/meta.json'), JSON.stringify(metadata, null, 2) 
 // 이미 나간 연수 슬라이드와 소개 덱 주소를 유지한다.
 cpSync(join(root, 'examples/assets'), join(out, 'examples/assets'), { recursive: true });
 for (const name of ['training.html', 'intro-story.html']) cpSync(join(root, 'examples', name), join(out, 'examples', name));
-// 강사 카드 탭이 대본 묶음에 합본 대본 지침을 넣는다. 대본 뷰어도 사이트에서 함께 연다.
+// 수업 대본 쪽이 대본 묶음에 합본 대본 지침을 넣는다. 대본 뷰어도 사이트에서 함께 연다.
 mkdirSync(join(out, 'guide'), { recursive: true });
 cpSync(join(root, 'guide/script-guide.md'), join(out, 'guide/script-guide.md'));
 cpSync(join(root, 'script-viewer'), join(out, 'script-viewer'), { recursive: true });
+// 예시 대본(첫 화면 「예시 대본 보기」)은 사이트의 대본 뷰어를 불러 태그 없이도 새 뷰어를 쓴다.
+mkdirSync(join(out, 'scripts'), { recursive: true });
+const exampleScript = readFileSync(join(root, 'skills/lecture-script/references/examples/v3-high-bio-script.html'), 'utf8');
+writeFileSync(join(out, 'scripts/v3-high-bio-script.html'), exampleScript.replace(CDN_VIEWER, '../script-viewer/'));
 const live = JSON.parse(readFileSync(join(root, 'live.config.json'), 'utf8'));
 writeFileSync(join(out, 'live-config.js'), `window.EXPLORAGRAM_LIVE = ${JSON.stringify(live)};\n`);
 writeFileSync(join(out, '.nojekyll'), '');

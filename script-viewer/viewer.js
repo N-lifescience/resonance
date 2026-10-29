@@ -1,7 +1,7 @@
 /*! lecture-script viewer | © N-lifescience | https://github.com/N-lifescience/resonance */
 /* 공명 대본 뷰어. 대본 HTML 안의 <script type="text/markdown" id="lecture-script">를 읽어 그린다.
-   시간 계산, 형식 점검, 수업 HTML과 장·단계 맞추기, 인쇄를 맡는다. 수업 엔진(exploragram)과는 따로다.
-   대본 글은 textContent로만 그리고, 불러온 수업 HTML은 DOMParser로 읽기만 한다(실행하지 않는다). */
+   시간 계산, 형식 점검, 수업 HTML과 장·단계 맞추기, 인쇄, 편집(글을 그 자리에서 고치고 HTML로 저장)을 맡는다.
+   수업 엔진(exploragram)과는 따로다. 대본 글은 textContent로만 그리고, 불러온 수업 HTML은 DOMParser로 읽기만 한다(실행하지 않는다). */
 (function () {
   'use strict';
 
@@ -62,6 +62,7 @@
     const meta = { 화법: {} };
     const slides = [];
     const errors = [];
+    let titleLine = 0;   // 머리말 title: 줄 번호(편집에서 제목을 고칠 때 쓴다)
     let i = 0;
     while (i < lines.length && !lines[i].trim()) i++;
     if (lines[i] && lines[i].trim() === '---') {
@@ -75,6 +76,7 @@
         if (indent && inMix) { if (value.trim()) meta.화법[key.trim()] = value.trim(); continue; }
         inMix = key.trim() === '화법' && !value.trim();
         if (!inMix) meta[key.trim()] = value.trim();
+        if (!indent && key.trim() === 'title') titleLine = i + 1;
       }
       if (i >= lines.length) errors.push({ lineNo: 1, msg: '머리말을 닫는 --- 줄이 없다' });
       i += 1;
@@ -109,8 +111,40 @@
       if (line) block.lines.push(line);
     }
     if (meta.minutes != null) meta.minutes = Number(meta.minutes);
-    return { meta, slides, errors };
+    return { meta, slides, errors, titleLine };
   }
+
+  // 편집: lineNo번째 줄의 글만 text로 바꾼다. 태그(@질문 등), @대기의 시간, @참고의 강사 이름, 장 id는 그대로 둔다.
+  // kind: 'line'(대사·태그 줄) | 'slide'(## 장 제목) | 'title'(머리말 title). 줄 수는 바뀌지 않는다(대사를 비우면 빈 줄이 되어 빠진다).
+  function editLine(md, lineNo, text, kind = 'line') {
+    const lines = String(md).replace(/\r\n?/g, '\n').split('\n');
+    const raw = lines[lineNo - 1];
+    if (raw == null) return lines.join('\n');
+    const indent = raw.match(/^\s*/)[0];
+    const t = raw.trim();
+    const clean = String(text).replace(/\s+/g, ' ').trim();
+    let next = t;
+    if (kind === 'title') next = `title: ${clean}`;
+    else if (kind === 'slide') {
+      const m = /^(##\s+[^\s·|▶]+)/.exec(t);
+      if (m) next = clean ? `${m[1]} · ${clean}` : m[1];
+    } else if (!t.startsWith('@')) {
+      next = clean.replace(/^[@#]/, (c) => (c === '@' ? '＠' : '＃'));   // 대사가 태그나 제목으로 읽히지 않게
+    } else {
+      const head = /^@[^\s(]+(?:\([^)]*\))?/.exec(t)[0];
+      const rest = t.slice(head.length).trim();
+      if (head === '@대기') {
+        const d = /^(\d+\s*분(?:\s*\d+\s*초)?|\d+\s*초|\d+)/.exec(rest);
+        next = `${head} ${d ? d[1] : rest}${clean ? ` ${clean}` : ''}`;
+      } else if (head === '@참고') next = `${head} ${rest.split('|')[0].trim()} | ${clean}`;
+      else next = `${head} ${clean}`;
+    }
+    lines[lineNo - 1] = indent + next;
+    return lines.join('\n');
+  }
+
+  // 대본 글을 <script> 안에 다시 넣을 때 </script>로 끊기지 않게 한다.
+  const scriptSafe = (md) => String(md).replace(/<\/(script)/gi, '<\\/$1');
 
   function slideTime(slide) {
     let total = 0, optional = 0;
@@ -240,7 +274,7 @@
     return r ? `${m}분 ${r}초` : `${m}분`;
   }
 
-  const LectureScript = { parse, check, compare, groupCount, stopCount, deckFromDocument, slideTime, totals, units, speechSeconds, parseDuration, aiMessage, fmt };
+  const LectureScript = { parse, check, compare, groupCount, stopCount, deckFromDocument, slideTime, totals, units, speechSeconds, parseDuration, aiMessage, fmt, editLine, scriptSafe };
   globalThis.LectureScript = LectureScript;
   if (typeof document === 'undefined') return;
 
@@ -258,18 +292,21 @@
   }
   // **굵게**만 살린다. 나머지는 글자 그대로.
   const rich = (text) => text.split(/\*\*(.+?)\*\*/g).map((part, k) => (k % 2 ? h('strong', { text: part }) : part));
+  // 편집 모드에서 고칠 수 있는 글. data-line은 대본 MD의 줄 번호다.
+  const editable = (lineNo, kind, ...children) => h('span', { class: 'ls-text', 'data-line': lineNo, 'data-kind': kind }, ...children);
+  const say = (l, text = l.text) => editable(l.lineNo, 'line', ...rich(text));
 
   function lineView(l) {
     switch (l.kind) {
-      case 'question': return h('p', { class: 'ls-line ls-q' }, h('span', { class: 'ls-tag', text: '질문' }), ...rich(l.text));
-      case 'answer': return h('p', { class: 'ls-line ls-a' }, h('span', { class: 'ls-tag', text: '예상 답' }), ...rich(l.text));
-      case 'wait': return h('p', { class: 'ls-line ls-wait' }, h('span', { class: 'ls-tag', text: `기다림 ${fmt(l.seconds)}` }), l.text);
-      case 'cue': return h('p', { class: 'ls-line ls-cue', text: `(${l.text})` });
-      case 'action': return h('p', { class: 'ls-line ls-act' }, h('span', { class: 'ls-tag', text: '조작' }), ...rich(l.text));
-      case 'ref': return h('p', { class: 'ls-line ls-ref' }, h('span', { class: 'ls-tag', text: '참고' }), h('b', { text: l.instructor }), ` — ${l.technique}`);
-      case 'optional': return h('p', { class: 'ls-line ls-opt' }, h('span', { class: 'ls-tag', text: l.reason ? `생략 가능 · ${l.reason}` : '생략 가능' }), ...rich(l.text));
-      case 'beat': return h('p', { class: 'ls-line ls-beat' }, h('span', { class: 'ls-tag', text: '비트' }), l.text);
-      default: return h('p', { class: 'ls-line ls-say' }, ...rich(l.text));
+      case 'question': return h('p', { class: 'ls-line ls-q' }, h('span', { class: 'ls-tag', text: '질문' }), say(l));
+      case 'answer': return h('p', { class: 'ls-line ls-a' }, h('span', { class: 'ls-tag', text: '예상 답' }), say(l));
+      case 'wait': return h('p', { class: 'ls-line ls-wait' }, h('span', { class: 'ls-tag', text: `기다림 ${fmt(l.seconds)}` }), say(l));
+      case 'cue': return h('p', { class: 'ls-line ls-cue' }, '(', say(l), ')');
+      case 'action': return h('p', { class: 'ls-line ls-act' }, h('span', { class: 'ls-tag', text: '조작' }), say(l));
+      case 'ref': return h('p', { class: 'ls-line ls-ref' }, h('span', { class: 'ls-tag', text: '참고' }), h('b', { text: l.instructor }), ' — ', say(l, l.technique));
+      case 'optional': return h('p', { class: 'ls-line ls-opt' }, h('span', { class: 'ls-tag', text: l.reason ? `생략 가능 · ${l.reason}` : '생략 가능' }), say(l));
+      case 'beat': return h('p', { class: 'ls-line ls-beat' }, h('span', { class: 'ls-tag', text: '비트' }), say(l));
+      default: return h('p', { class: 'ls-line ls-say' }, say(l));
     }
   }
 
@@ -291,7 +328,7 @@
         h('header', { class: 'ls-slide-head' },
           h('span', { class: 'ls-no', text: `${k + 1}/${slides.length}` }),
           h('code', { class: 'ls-id', text: s.id }),
-          h('h2', { text: s.title || (d && d.title) || s.id }),
+          h('h2', {}, editable(s.lineNo, 'slide', s.title || (d && d.title) || s.id)),
           h('span', { class: 'ls-time', text: `약 ${fmt(st)} · 누적 ${fmt(acc)}` }),
           d && d.steps + d.bars ? h('span', { class: 'ls-keys', text: `→ ${d.steps + d.bars}번${d.bars ? ` (단계 ${d.steps} · 막대 ${d.bars}칸)` : ''}` }) : null),
         d && d.sec ? h('p', { class: 'ls-sec', text: d.sec }) : null,
@@ -309,6 +346,7 @@
     ].filter(Boolean).map((text) => h('span', { class: 'ls-chip', text })));
     ui.mix.hidden = !mix.length;
     ui.mix.replaceChildren(h('caption', { text: '화법 배정' }), ...mix.map(([k, v]) => h('tr', {}, h('th', { scope: 'row', text: k }), h('td', { text: v }))));
+    markEditable();
     runCheck(false);
   }
 
@@ -343,12 +381,128 @@
     runCheck(true);
   }
 
+  /* ── 편집: 수업 HTML의 편집 모드처럼 글을 눌러 그 자리에서 고치고, 고친 대본을 HTML 파일로 받는다 ── */
+  const CDN = 'https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/script-viewer/';
+  let md = '';
+  let editing = false;
+  let dirty = false;
+
+  // 고치는 글의 지금 내용을 대본 글로 되돌린다. 굵게(<strong>)는 **로 감싼다.
+  function textOf(el) {
+    let out = '';
+    for (const n of el.childNodes) {
+      if (n.nodeType === 3) out += n.nodeValue;
+      else if (n.nodeName === 'BR') out += ' ';
+      else if (n.nodeName === 'STRONG' || n.nodeName === 'B') out += n.textContent ? `**${n.textContent}**` : '';
+      else out += textOf(n);
+    }
+    return out;
+  }
+
+  function markEditable() {
+    for (const el of document.querySelectorAll('.ls-app .ls-text')) {
+      if (!editing) { el.removeAttribute('contenteditable'); continue; }
+      el.setAttribute('contenteditable', 'plaintext-only');
+      if (el.contentEditable !== 'plaintext-only') el.setAttribute('contenteditable', 'true');
+      el.spellcheck = false;
+    }
+  }
+
+  function syncEditBar(note) {
+    ui.editBtn.textContent = editing ? '편집 끝내기' : '편집';
+    ui.editBtn.setAttribute('aria-pressed', String(editing));
+    ui.saveBtn.hidden = !editing && !dirty;
+    // 안내는 문장마다 끊어 붙인다. 좁은 화면에서도 「HTML 저장」 같은 단추 이름이 문장 안에서 갈라지지 않는다.
+    if (note != null) ui.editNote.replaceChildren(...note.split(/(?<=\.) /).filter(Boolean).flatMap((s, k) => [k ? ' ' : '', h('span', { text: s })]));
+    ui.editNote.hidden = !ui.editNote.textContent;
+  }
+
+  function setEditing(next) {
+    if (next === editing) return;
+    document.activeElement?.closest?.('.ls-text')?.blur();
+    editing = next;
+    document.body.classList.toggle('ls-editing', editing);
+    if (editing) markEditable(); else render();   // 끝낼 때 다시 그려 시간과 빈 줄을 맞춘다
+    syncEditBar(editing ? '글을 눌러 바로 고치세요. 다 고쳤으면 「HTML 저장」을 누르세요.'
+      : dirty ? '고친 내용을 아직 저장하지 않았습니다. 「HTML 저장」을 누르세요.' : '');
+  }
+
+  // 글자를 칠 때마다 대본 MD에 옮긴다. 화면은 다시 그리지 않는다(커서가 그대로 있게). 시간은 편집을 끝낼 때 다시 센다.
+  let titleSynced = false;   // <title>이 머리말 제목과 같았으면 제목을 고칠 때 함께 바꾼다
+  function apply(el) {
+    const text = textOf(el).replace(/\s+/g, ' ').trim();
+    md = editLine(md, Number(el.dataset.line), text, el.dataset.kind);
+    doc = parse(md);
+    if (el.dataset.kind === 'title' && titleSynced) document.title = text;
+    if (!dirty) { dirty = true; syncEditBar(); }
+  }
+
+  // 지금 문서에서 뷰어가 그린 화면을 빼고 고친 대본을 넣는다. 사이트처럼 뷰어를 상대 주소로 불렀으면 CDN 주소로 바꿔 내려받은 파일도 열리게 한다.
+  function exportHTML() {
+    const root = document.documentElement.cloneNode(true);
+    root.querySelectorAll('.ls-app, .ls-toolbar').forEach((el) => el.remove());
+    const body = root.querySelector('body');
+    body.classList.remove('ls-drag', 'ls-editing');
+    if (!body.classList.length) body.removeAttribute('class');
+    const box = root.querySelector('#lecture-script') || root.querySelector('script[type="text/markdown"]');
+    box.textContent = `\n${scriptSafe(md.replace(/^\n+|\n+$/g, ''))}\n`;
+    for (const el of root.querySelectorAll('link[href], script[src]')) {
+      const attr = el.hasAttribute('href') ? 'href' : 'src';
+      const m = /(?:^|\/)script-viewer\/(viewer\.(?:css|js))$/.exec(el.getAttribute(attr));
+      if (m && !/^https?:/i.test(el.getAttribute(attr))) el.setAttribute(attr, CDN + m[1]);
+    }
+    return `<!doctype html>\n${root.outerHTML}\n`;
+  }
+
+  function fileName() {
+    let last = '';
+    try { last = decodeURIComponent(location.pathname.split('/').pop() || ''); } catch { /* 이상한 주소면 제목으로 */ }
+    const name = /\.html?$/i.test(last) ? last : `${(doc.meta.title || document.title || '수업 대본').trim()}.html`;
+    return name.replace(/[\\/:*?"<>|]+/g, '-');
+  }
+
+  function save() {
+    document.activeElement?.closest?.('.ls-text')?.blur();
+    const name = fileName();
+    const url = URL.createObjectURL(new Blob([exportHTML()], { type: 'text/html;charset=utf-8' }));
+    const a = h('a', { href: url, download: name });
+    document.body.append(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    dirty = false;
+    syncEditBar(`${name} 파일로 저장했습니다. 원래 대본 파일 대신 내려받은 파일을 쓰세요.`);
+  }
+
+  function bindEditing(app) {
+    titleSynced = document.title.trim() === (doc.meta.title || '').trim();
+    app.addEventListener('focusin', (e) => { const el = e.target.closest('.ls-text'); if (editing && el) el.dataset.before = textOf(el); });
+    app.addEventListener('input', (e) => { const el = e.target.closest('.ls-text'); if (editing && el) apply(el); });
+    app.addEventListener('focusout', (e) => { const el = e.target.closest('.ls-text'); if (el) { delete el.dataset.before; runCheck(false); } });
+    app.addEventListener('keydown', (e) => {
+      const el = e.target.closest('.ls-text');
+      if (!editing || !el) return;
+      if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); el.blur(); }
+      if (e.key === 'Escape' && el.dataset.before != null) { el.replaceChildren(...rich(el.dataset.before)); apply(el); el.blur(); }   // 이 글을 고치기 전으로
+    });
+    app.addEventListener('paste', (e) => {
+      if (!editing || !e.target.closest('.ls-text')) return;
+      e.preventDefault();   // 다른 곳의 글꼴·줄바꿈이 따라 들어오지 않게 글만 한 줄로 붙인다
+      document.execCommand('insertText', false, e.clipboardData.getData('text/plain').replace(/\s+/g, ' '));
+    });
+    document.addEventListener('keydown', (e) => {
+      if ((editing || dirty) && (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') { e.preventDefault(); save(); }
+    });
+    window.addEventListener('beforeunload', (e) => { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
+  }
+
   function boot() {
     const src = document.getElementById('lecture-script') || document.querySelector('script[type="text/markdown"]');
     const app = h('div', { class: 'ls-app' });
     document.body.append(app);
     if (!src) { app.append(h('p', { class: 'ls-empty', text: '대본이 없습니다. <script type="text/markdown" id="lecture-script"> 안에 대본을 넣어 주세요.' })); return; }
-    doc = parse(src.textContent);
+    md = src.textContent;
+    doc = parse(md);
     if (doc.meta.title && !document.title.trim()) document.title = doc.meta.title;
     const fileInput = h('input', { type: 'file', accept: '.html,.htm,text/html', class: 'ls-file', onchange: (e) => { loadDeck(e.target.files[0]); e.target.value = ''; } });
     ui.checkBtn = h('button', { type: 'button', 'aria-expanded': 'false', onclick: () => { ui.panel.hidden = !ui.panel.hidden; ui.checkBtn.setAttribute('aria-expanded', String(!ui.panel.hidden)); } });
@@ -359,16 +513,26 @@
     ui.summary = h('div', { class: 'ls-summary' });
     ui.mix = h('table', { class: 'ls-mix' });
     ui.slides = h('div', { class: 'ls-slides' });
+    ui.editBtn = h('button', { type: 'button', class: 'ls-edit', 'aria-pressed': 'false', onclick: () => setEditing(!editing) });
+    ui.saveBtn = h('button', { type: 'button', class: 'ls-save', text: 'HTML 저장', title: 'Ctrl+S', hidden: true, onclick: save });
+    ui.editNote = h('p', { class: 'ls-edit-note', role: 'status', 'aria-live': 'polite', hidden: true });
+    const title = doc.meta.title || document.title || '수업 대본';
+    // 툴바는 본문 위에 붙여 둔다(sticky). 단추가 몇 줄로 접혀도 대본 글을 가리지 않는다.
+    document.body.insertBefore(h('nav', { class: 'ls-toolbar', 'aria-label': '대본 도구' },
+      ui.editBtn,
+      ui.saveBtn,
+      ui.checkBtn,
+      h('label', { class: 'ls-button' }, '수업 HTML 불러오기', fileInput),
+      h('button', { type: 'button', onclick: () => window.print(), text: '인쇄 · PDF' }),
+      ui.editNote), app);
     app.append(
-      h('nav', { class: 'ls-toolbar', 'aria-label': '대본 도구' },
-        ui.checkBtn,
-        h('label', { class: 'ls-button' }, '수업 HTML 불러오기', fileInput),
-        h('button', { type: 'button', onclick: () => window.print(), text: '인쇄 · PDF' })),
       ui.panel,
-      h('header', { class: 'ls-head' }, h('p', { class: 'ls-kicker', text: '수업 대본' }), h('h1', { text: doc.meta.title || document.title || '수업 대본' }), ui.summary, ui.mix,
+      h('header', { class: 'ls-head' }, h('p', { class: 'ls-kicker', text: '수업 대본' }), h('h1', {}, doc.titleLine ? editable(doc.titleLine, 'title', title) : title), ui.summary, ui.mix,
         h('p', { class: 'ls-legend' }, '시간은 보통 속도(분당 290음절)로 센 추정값입니다. ', h('span', { class: 'ls-tag', text: '질문' }), ' 학생에게 묻기 ', h('span', { class: 'ls-tag ls-tag-act', text: '조작' }), ' 화면 조작 ', h('span', { class: 'ls-tag ls-tag-wait', text: '기다림' }), ' 생각·필기 시간 ', h('span', { class: 'ls-legend-cue', text: '(연출)' }), ' 표정·동작')),
       ui.slides);
     render();
+    syncEditBar();
+    bindEditing(app);
     if (check(doc).errors.length) ui.panel.hidden = false;
     document.addEventListener('dragover', (e) => { e.preventDefault(); document.body.classList.add('ls-drag'); });
     document.addEventListener('dragleave', (e) => { if (!e.relatedTarget) document.body.classList.remove('ls-drag'); });

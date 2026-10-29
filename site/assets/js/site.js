@@ -40,7 +40,7 @@
   }
   $$('img').forEach((img) => img.addEventListener('error', () => { img.hidden = true; }, { once: true }));
 
-  // 만들기 시트: 머리 메뉴와 단추의 「만들기」가 연다. 시트가 없는 쪽(제작하기)에서는 링크대로 간다.
+  // 만들기 시트: 머리 메뉴와 단추의 「수업 HTML 만들기」가 연다. 시트가 없는 쪽(make.html)에서는 링크대로 간다.
   const sheet = $('[data-make-sheet]');
   if (sheet) {
     document.addEventListener('click', (event) => {

@@ -164,3 +164,47 @@ test('단계 제목을 잘못 쓴 "## ▶1"은 장으로 읽지 않고 오류로
 test('단계 막대 칸 이름의 <br>은 엔진처럼 줄바꿈으로 본다', () => {
   assert.equal(S.stopCount('시작<br>|가|<br>|나'), 2);
 });
+
+test('편집: 줄의 글만 바꾸고 태그, 대기 시간, 강사 이름, 장 id는 지킨다', () => {
+  const d = S.parse(MD);
+  const [ref, , say, q, , wait] = d.slides[0].blocks[0].lines;
+  const opt = d.slides[1].blocks[2].lines[0];
+  let md = MD;
+  md = S.editLine(md, say.lineNo, '배추가 왜 **흐물흐물**해질까요?');
+  md = S.editLine(md, q.lineNo, '소금이 물을 당길까요?');
+  md = S.editLine(md, wait.lineNo, '공책에 적게 한다');
+  md = S.editLine(md, ref.lineNo, '질문으로 시작');
+  md = S.editLine(md, opt.lineNo, '깍두기를 떠올려 보세요.');
+  md = S.editLine(md, d.slides[1].lineNo, '오늘 배울 것', 'slide');
+  md = S.editLine(md, d.titleLine, '삼투 대본', 'title');
+  const e = S.parse(md);
+  assert.deepEqual(plain(e.errors), []);
+  assert.equal(e.meta.title, '삼투 대본');
+  assert.equal(e.slides[1].id, 'goal');
+  assert.equal(e.slides[1].title, '오늘 배울 것');
+  const lines = e.slides[0].blocks[0].lines;
+  assert.deepEqual(plain(lines.map((l) => l.kind)), ['ref', 'cue', 'say', 'question', 'answer', 'wait']);
+  assert.equal(lines[2].text, '배추가 왜 **흐물흐물**해질까요?');
+  assert.equal(lines[3].text, '소금이 물을 당길까요?');
+  assert.equal(lines[5].seconds, 5);
+  assert.equal(lines[5].text, '공책에 적게 한다');
+  assert.equal(lines[0].instructor, '강사가');
+  assert.equal(lines[0].technique, '질문으로 시작');
+  assert.equal(e.slides[1].blocks[2].lines[0].reason, '부가 예시');
+  assert.equal(md.split('\n').length, MD.split('\n').length);
+});
+
+test('편집: 대사를 비우면 그 줄이 빠지고, @나 #로 시작하는 대사는 태그로 읽히지 않는다', () => {
+  const d = S.parse(MD);
+  const say = d.slides[0].blocks[0].lines[2];
+  const gone = S.parse(S.editLine(MD, say.lineNo, '  '));
+  assert.equal(gone.slides[0].blocks[0].lines.length, 5);
+  const odd = S.parse(S.editLine(MD, say.lineNo, '@질문 아님'));
+  assert.deepEqual(plain(odd.errors), []);
+  assert.equal(odd.slides[0].blocks[0].lines[2].kind, 'say');
+  assert.equal(odd.slides[0].blocks[0].lines[2].text, '＠질문 아님');
+});
+
+test('편집 저장: 대본 안의 </script>는 끊기지 않게 바꾼다', () => {
+  assert.equal(S.scriptSafe('a </script> b </SCRIPT>'), 'a <\\/script> b <\\/SCRIPT>');
+});

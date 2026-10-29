@@ -1,16 +1,9 @@
 <!doctype html>
-<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#141413"><title>제작하기 — 공명</title><meta name="description" content="수업 PPT와 한 줄로 시작하세요. 만드는 법, 예시 수업, 모델별 결과를 확인할 수 있습니다."><link rel="stylesheet" href="assets/css/site.css"></head>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#141413"><title>수업 HTML 만들기 — 공명</title><meta name="description" content="수업 PPT와 한 줄로 시작하세요. 만드는 법, 예시 수업, 모델별 결과를 확인할 수 있습니다."><link rel="stylesheet" href="assets/css/site.css"></head>
 <body class=""><a class="skip-link" href="#main">본문으로 건너뛰기</a>
 <header class="site-header">
-  <a class="logo" href="./" aria-label="공명 첫 화면"><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M2 16c4-16 10 16 14 0s10 16 14 0" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg><span class="brand-lockup"><span>공명</span><span class="brand-tagline">PPT를 실시간 수업 HTML로</span></span></a>
-  <nav class="pill-nav" aria-label="주 메뉴"><a href="./"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/></svg><span>수업</span></a><a href="explore.html"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4.5" width="18" height="15" rx="3"/><path d="m10 9.2 5 2.8-5 2.8z"/></svg><span>기능</span></a><a href="make.html" class="nav-make" data-make-open aria-current="page"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>만들기</span></a><a href="cards.html"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="6.5" width="13" height="14" rx="2"/><path d="M8 3.5h10.5a2 2 0 0 1 2 2V16"/><circle cx="10" cy="11.5" r="2.3"/><path d="M6.5 17.5c.7-1.6 2-2.4 3.5-2.4s2.8.8 3.5 2.4"/></svg><span>강사 카드</span></a></nav>
-  <div class="join-area"><button class="join-trigger" type="button" data-join-toggle aria-expanded="false" aria-controls="join-popover">수업 코드</button>
-    <section id="join-popover" class="join-popover" aria-labelledby="join-h" hidden>
-      <h2 id="join-h">실시간 수업 참여</h2><p>6자리 코드를 넣으면 수업에 바로 들어갑니다.</p>
-      <form id="join" class="join-form" autocomplete="off"><label class="sr-only" for="code">수업 코드 6자리</label><input id="code" name="code" inputmode="numeric" maxlength="6" placeholder="000000"><button class="button primary" type="submit">입장</button></form>
-      <p id="msg" role="status" aria-live="polite"></p>
-    </section>
-  </div>
+  <a class="logo" href="./" aria-label="공명 첫 화면"><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M2 16c4-16 10 16 14 0s10 16 14 0" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg><span class="brand-lockup"><span>공명</span><span class="brand-tagline">PPT로 수업 HTML과 대본까지</span></span></a>
+  <nav class="pill-nav" aria-label="주 메뉴"><a href="make.html" class="nav-html" data-make-open aria-current="page"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4.5" width="18" height="15" rx="3"/><path d="m10 9.2 5 2.8-5 2.8z"/></svg><span>수업 HTML 만들기</span></a><a href="cards.html" class="nav-script"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 3.5h8l3.5 3.5v13a1 1 0 0 1-1 1h-10.5a1 1 0 0 1-1-1v-15.5a1 1 0 0 1 1-1z"/><path d="M14 3.5V7.5h4M9 11.5h6M9 15h6M9 18.5h3.5"/></svg><span>수업 대본 만들기</span></a></nav>
 </header>
 <main id="main">
 <section class="page-head wrap" aria-labelledby="make-title">
@@ -88,7 +81,12 @@
 </details>
 </section>
 </main>
-<footer class="site-footer wrap"><div class="footer-links"><button class="maker-button" type="button" data-maker-open>Made by 엔의 생명과학</button><a class="footer-link" href="assets/intro/intro.html">공명 인트로 보기</a></div><p>공명은 평소 쓰던 PPT를 학생이 직접 참여하는 수업으로 바꿔 주는 도구입니다.</p></footer>
+<footer class="site-footer wrap"><div class="footer-links"><button class="maker-button" type="button" data-maker-open>Made by 엔의 생명과학</button><a class="footer-link" href="explore.html">기능 자세히 보기</a><div class="join-area"><button class="footer-link join-trigger" type="button" data-join-toggle aria-expanded="false" aria-controls="join-popover">수업 코드로 입장</button>
+<section id="join-popover" class="join-popover" aria-labelledby="join-h" hidden>
+<h2 id="join-h">실시간 수업 참여</h2><p>6자리 코드를 넣으면 수업에 바로 들어갑니다.</p>
+<form id="join" class="join-form" autocomplete="off"><label class="sr-only" for="code">수업 코드 6자리</label><input id="code" name="code" inputmode="numeric" maxlength="6" placeholder="000000"><button class="button primary" type="submit">입장</button></form>
+<p id="msg" role="status" aria-live="polite"></p>
+</section></div></div><p>공명은 쓰던 PPT로 학생이 직접 참여하는 수업 HTML과 그 수업의 대본을 만들게 돕는 도구입니다.</p></footer>
 <dialog class="maker-dialog" aria-labelledby="maker-title"><button class="dialog-close" type="button" data-maker-close aria-label="만든 사람 안내 닫기"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M6 18 18 6"/></svg></button><h2 id="maker-title">Made by 엔의 생명과학</h2><p>고등학교 생명과학 교사가 만들었습니다. 필요한 기능이나 궁금한 점은 아래 링크에 남겨 주세요. 이름과 학교, 연락처, 학생 정보는 적지 마세요.</p><div class="contact-links"><a data-form-link hidden target="_blank" rel="noopener noreferrer">기능 제안과 문의</a><span data-form-pending>문의와 기능 제안 창구를 준비하고 있습니다.</span><a data-github-link href="https://github.com/N-lifescience/resonance" target="_blank" rel="noopener noreferrer">GitHub <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6"/></svg></a></div><p>수업에는 자유롭게 쓰세요. 코드를 복제하거나 다시 배포할 때는 허락을 받아야 합니다.</p></dialog>
 
 <script src="live-config.js"></script>

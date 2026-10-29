@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
 import { plain } from './load.mjs';
 
-// 강사 카드 탭(site/assets/js/cards.js)의 순수 함수. document가 없으면 화면 코드는 건너뛴다.
+// 수업 대본 만들기 쪽의 강사 카드(site/assets/js/cards.js)의 순수 함수. document가 없으면 화면 코드는 건너뛴다.
 const code = readFileSync(new URL('../../site/assets/js/cards.js', import.meta.url), 'utf8');
 const ctx = vm.createContext({ console, URL });
 vm.runInContext(code, ctx);

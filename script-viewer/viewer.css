@@ -13,14 +13,25 @@ button, input { font:inherit; }
 :focus-visible { outline:3px solid var(--ls-tide); outline-offset:3px; }
 [hidden] { display:none !important; }
 
-.ls-app { width:min(100% - 32px, 920px); margin:0 auto; padding:84px 0 64px; }
-.ls-toolbar { position:fixed; top:0; inset-inline:0; z-index:10; display:flex; flex-wrap:wrap; justify-content:center; gap:8px; padding:10px 16px; background:#141413EE; }
+.ls-app { width:min(100% - 32px, 920px); margin:0 auto; padding:24px 0 64px; }
+.ls-toolbar { position:sticky; top:0; z-index:10; display:flex; flex-wrap:wrap; justify-content:center; gap:8px; padding:10px 16px; background:#141413EE; }
 .ls-toolbar button, .ls-button { display:inline-flex; align-items:center; min-height:44px; padding:8px 18px; border:0; border-radius:999px; background:#FFFFFF1A; color:#FFF; font-weight:650; font-size:16px; cursor:pointer; }
 .ls-toolbar button:hover, .ls-button:hover { background:#FFFFFF33; }
 .ls-toolbar button.is-bad { background:var(--ls-clay); color:var(--ls-ink); }
 .ls-button { position:relative; }
 .ls-file { position:absolute; width:1px; height:1px; opacity:0; pointer-events:none; }
 .ls-button:focus-within { outline:3px solid #FFF; outline-offset:2px; }
+.ls-toolbar .ls-edit[aria-pressed="true"] { background:#FFF; color:var(--ls-ink); }
+.ls-toolbar .ls-save { background:var(--ls-clay); color:var(--ls-ink); }
+.ls-toolbar .ls-save:hover { background:#E98C6D; }
+.ls-edit-note { flex-basis:100%; margin:0; color:#E4E0D7; font-size:15px; line-height:1.5; text-align:center; }
+.ls-edit-note span { display:inline-block; }
+
+/* 편집 모드: 고칠 수 있는 글에 점선 밑줄, 누른 글은 흰 바탕과 테두리 */
+.ls-editing .ls-text { border-radius:4px; text-decoration:underline dotted #2B6E6999; text-underline-offset:5px; cursor:text; }
+.ls-editing .ls-text:hover { background:#2B6E6912; }
+.ls-editing .ls-text:focus { outline:2px solid var(--ls-tide); outline-offset:2px; background:var(--ls-white); text-decoration:none; }
+.ls-editing .ls-text:empty { display:inline-block; min-width:4em; min-height:1.4em; vertical-align:middle; background:#2B6E6912; }
 
 .ls-panel { margin:0 0 24px; padding:20px 24px; border-radius:18px; background:var(--ls-white); box-shadow:0 12px 40px -24px #14141366; }
 .ls-panel h2 { margin:0 0 6px; font-size:22px; }
@@ -34,7 +45,7 @@ button, input { font:inherit; }
 
 .ls-head { margin-bottom:28px; }
 .ls-kicker { margin:0; color:var(--ls-clay-deep); font-weight:750; font-size:16px; }
-.ls-head h1 { margin:4px 0 14px; font-size:clamp(28px,5vw,40px); line-height:1.2; letter-spacing:-.03em; }
+.ls-head h1 { margin:4px 0 14px; font-size:clamp(28px,5vw,40px); line-height:1.2; letter-spacing:-.03em; text-wrap:balance; }
 .ls-summary { display:flex; flex-wrap:wrap; gap:8px; }
 .ls-chip { padding:4px 12px; border-radius:999px; background:var(--ls-white); font-size:15px; font-weight:650; }
 .ls-mix { margin-top:16px; border-collapse:collapse; font-size:16px; background:var(--ls-white); border-radius:12px; overflow:hidden; }
@@ -78,7 +89,6 @@ button, input { font:inherit; }
 @media (max-width:560px) {
   body { font-size:17px; }
   .ls-slide { padding:16px; }
-  .ls-app { padding-top:128px; }
 }
 
 @media print {
@@ -86,6 +96,7 @@ button, input { font:inherit; }
   body { background:#FFF; font-size:11pt; line-height:1.6; }
   .ls-toolbar, .ls-panel { display:none !important; }
   .ls-app { width:auto; padding:0; }
+  .ls-editing .ls-text { text-decoration:none; background:none; }
   .ls-slides { gap:0; }
   .ls-slide { padding:10pt 0; border-radius:0; border-bottom:1px solid #CCC; break-inside:avoid-page; }
   .ls-slide-head h2 { font-size:14pt; }

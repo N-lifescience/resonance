@@ -1,16 +1,16 @@
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css');
 :root {
   --clay:#D97757; --clay-deep:#C15F3C; --char:#141413; --char-2:#1F1E1C;
-  --paper:#F4F1EA; --paper-2:#EAE5DA; --white:#FFFFFF; --mute:#6B6A65; --night-mute:#B4B0A7; --tide:#2B6E69;
-  --line:#DAD6CD; --radius:20px; --panel-radius:28px;
+  --paper:#F4F1EA; --paper-2:#EAE5DA; --white:#FFFFFF; --mute:#5F5E59; --night-mute:#B4B0A7; --tide:#2B6E69;
+  --line:#DAD6CD; --page:#E6EAEF; --radius:20px; --panel-radius:28px;
   --font:"Pretendard Variable",Pretendard,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
   --shadow:0 24px 64px -26px #14141366; --header-height:72px;
 }
 
 /* ── 바탕 ── */
 * { box-sizing:border-box; }
-html { -webkit-text-size-adjust:100%; scroll-padding-top:96px; scrollbar-color:var(--tide) var(--paper); }
-body { margin:0; background:var(--paper); color:var(--char); font:400 17px/1.7 var(--font); word-break:keep-all; overflow-wrap:anywhere; caret-color:var(--clay-deep); accent-color:var(--tide); }
+html { -webkit-text-size-adjust:100%; scroll-padding-top:96px; scrollbar-color:var(--tide) var(--page); }
+body { margin:0; background:var(--page); color:var(--char); font:400 17px/1.7 var(--font); word-break:keep-all; overflow-wrap:anywhere; caret-color:var(--clay-deep); accent-color:var(--tide); }
 ::selection { background:var(--clay); color:var(--char); }
 [hidden] { display:none !important; }
 :focus-visible { outline:3px solid var(--tide); outline-offset:5px; }
@@ -64,7 +64,7 @@ h3 { font-size:clamp(1.4rem,2.2vw,1.9rem); }
 .brand-tagline { font-size:16px; font-weight:500; letter-spacing:-.02em; color:#C3BFB7; }
 .pill-nav { display:flex; align-items:center; padding:4px; gap:4px; border:1px solid #ffffff24; border-radius:999px; background:#ffffff0d; }
 .pill-nav a { display:flex; align-items:center; justify-content:center; min-height:44px; padding:8px 21px; border-radius:999px; text-decoration:none; font-weight:600; font-size:16px; color:#E4E0D7; }
-.pill-nav a:hover,.pill-nav a[aria-current="page"] { background:var(--white); color:var(--char); }
+.pill-nav a:hover { background:var(--white); color:var(--char); }
 .join-area { justify-self:end; }
 .join-trigger { display:inline-flex; align-items:center; min-height:44px; padding:10px 18px; border-radius:999px; background:var(--clay); color:var(--char); font-weight:700; text-decoration:none; }
 .join-popover { position:absolute; top:80px; right:clamp(12px,3vw,40px); width:min(390px,calc(100vw - 24px)); padding:26px; border-radius:var(--radius); background:var(--white); color:var(--char); box-shadow:var(--shadow); }
@@ -338,12 +338,15 @@ h3 { font-size:clamp(1.4rem,2.2vw,1.9rem); }
   .pill-nav::-webkit-scrollbar { display:none; }
 }
 
-/* ════════ 객체 중심 개편(2026-10-30): 수업·기능·강사 카드를 먼저 보이고, 할 일은 「만들기」 하나로 모은다 ════════ */
+/* ════════ 객체 중심 개편(2026-10-30): 수업 HTML과 수업 대본을 같은 높이에 두고, 결과물(수업·영상·대본)을 먼저 보인다 ════════ */
 
-/* ── 머리 메뉴: 아이콘과 이름. 좁은 화면에서는 아래 탭 막대가 된다 ── */
+/* ── 머리 메뉴: 「수업 HTML 만들기」(흙색)와 「수업 대본 만들기」(청록) 둘. 좁은 화면에서는 아래 막대가 된다 ── */
 .pill-nav a { gap:7px; padding:8px 18px; }
 .pill-nav .icon { width:19px; height:19px; stroke-width:1.9; }
-.pill-nav .nav-make { background:var(--clay); color:var(--char); }
+.pill-nav .nav-html,.pill-nav .nav-html:hover { background:var(--clay); color:var(--char); }
+.pill-nav .nav-script,.pill-nav .nav-script:hover { background:var(--tide); color:var(--white); }
+.pill-nav a:hover { filter:brightness(1.08); }
+.pill-nav a[aria-current="page"] { box-shadow:0 0 0 2px var(--white); }
 html:has(dialog[open]) { overflow:hidden; }
 
 /* ── 바닥글 ── */
@@ -360,7 +363,7 @@ html:has(dialog[open]) { overflow:hidden; }
 .easy-points li::before { content:""; width:12px; height:7px; margin-top:-3px; border-left:2.5px solid var(--tide); border-bottom:2.5px solid var(--tide); transform:rotate(-45deg); }
 .feed-cta { display:flex; flex-wrap:wrap; align-items:center; gap:12px 20px; margin-top:28px; }
 .feed-cta .button { gap:8px; padding-inline:22px 26px; }
-.feed-cta .copy-count { margin:0; }
+.feed-copy .copy-count { margin:14px 0 0; }
 .ba-post { margin:0; padding:clamp(12px,1.6vw,18px); border-radius:var(--panel-radius); background:var(--white); box-shadow:var(--shadow); }
 .ba-pair { display:grid; grid-template-columns:minmax(0,.82fr) auto minmax(0,1.18fr); gap:10px; align-items:center; }
 .ba-side { position:relative; display:flex; flex-direction:column; min-height:0; padding:0; border-radius:14px; overflow:clip; background:var(--paper-2); color:inherit; text-align:left; font-weight:inherit; }
@@ -381,7 +384,7 @@ button.ba-after:hover { transform:translateY(-2px); }
 .story-row > li { flex:none; }
 .story { display:grid; justify-items:center; align-content:start; gap:8px; min-width:100px; padding:0; background:transparent; color:var(--char); }
 .story-ring { display:block; width:88px; height:88px; padding:3px; border-radius:50%; background:conic-gradient(from 210deg,var(--clay),var(--tide),var(--clay)); transition:transform .2s; }
-.story-ring img { width:100%; height:100%; border-radius:50%; object-fit:cover; border:3px solid var(--paper); background:var(--paper-2); }
+.story-ring img { width:100%; height:100%; border-radius:50%; object-fit:cover; border:3px solid var(--page); background:var(--paper-2); }
 .story:hover .story-ring { transform:scale(1.05); }
 .story-name { font-size:15px; font-weight:650; line-height:1.3; text-align:center; white-space:nowrap; }
 
@@ -480,16 +483,14 @@ button.ba-after:hover { transform:translateY(-2px); }
   .promo-card { grid-template-columns:minmax(0,1fr); }
 }
 @media (max-width:767px) {
-  /* 머리글은 로고와 수업 코드만, 메뉴는 아래 탭 막대. 탭 막대가 화면 기준으로 붙게 머리글의 흐림 효과를 끈다. */
+  /* 머리글은 로고만, 두 메뉴는 아래 막대의 큰 단추. 막대가 화면 기준으로 붙게 머리글의 흐림 효과를 끈다. */
   .site-header { grid-template-columns:minmax(0,1fr) auto; background:var(--char); backdrop-filter:none; -webkit-backdrop-filter:none; }
-  .pill-nav { position:fixed; inset:auto 0 0 0; z-index:45; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:2px; justify-self:stretch; padding:6px 6px calc(6px + env(safe-area-inset-bottom)); border:0; border-top:1px solid #ffffff1f; border-radius:0; background:var(--char); overflow:visible; }
-  .pill-nav a { flex-direction:column; gap:3px; min-height:58px; padding:6px 2px; border-radius:14px; font-size:15px; font-weight:650; }
-  .pill-nav a:hover { background:transparent; color:#E4E0D7; }
-  .pill-nav a[aria-current="page"] { background:#ffffff17; color:var(--white); }
-  .pill-nav .icon { width:24px; height:24px; }
-  .pill-nav .nav-make,.pill-nav .nav-make:hover { background:transparent; color:#E4E0D7; }
-  .pill-nav .nav-make .icon { width:42px; height:28px; padding:3px 10px; border-radius:10px; background:var(--clay); color:var(--char); stroke-width:2.4; }
-  body { padding-bottom:calc(72px + env(safe-area-inset-bottom)); }
+  .pill-nav { position:fixed; inset:auto 0 0 0; z-index:45; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; justify-self:stretch; padding:8px 8px calc(8px + env(safe-area-inset-bottom)); border:0; border-top:1px solid #ffffff1f; border-radius:0; background:var(--char); overflow:visible; }
+  .pill-nav a { flex-direction:column; gap:3px; min-height:60px; padding:6px 4px; border-radius:14px; font-size:15px; font-weight:750; }
+  .pill-nav a:hover { filter:none; }
+  .pill-nav a[aria-current="page"] { box-shadow:inset 0 0 0 2px var(--white); }
+  .pill-nav .icon { width:22px; height:22px; }
+  body { padding-bottom:calc(80px + env(safe-area-inset-bottom)); }
   .site-footer { padding-bottom:40px; }
   .lesson-grid { gap:16px; }
   .promo-stack { min-height:230px; }
@@ -509,4 +510,64 @@ button.ba-after:hover { transform:translateY(-2px); }
 @media (prefers-reduced-motion:reduce) {
   .lesson-post,.story-ring,button.ba-after { transition:none; }
   .lesson-post:hover,button.ba-after:hover,.story:hover .story-ring { transform:none; }
+}
+
+/* ── 2차 고침: 두 만들기 단추를 같은 크기로. 수업 HTML은 흙색, 수업 대본은 청록 ── */
+.button.script { background:var(--tide); color:var(--white); }
+.button.script:hover { background:#24605B; }
+.feed-cta { gap:12px; }
+.feed-sub { margin:6px 0 0; max-inline-size:36em; color:var(--mute); font-size:16px; line-height:1.6; text-wrap:pretty; }
+.feed-head > div { min-width:0; }
+
+/* 수업 대본 구역: 강사 카드 → 대본 한 장면 */
+.promo { padding-block:clamp(20px,3vw,36px) clamp(4px,1vw,12px); }
+.promo-card { grid-template-columns:minmax(0,1fr) minmax(0,1.1fr); }
+.promo-kicker,.promo-card .promo-kicker { color:#7CCBC1; }
+.promo-card .new-dot { background:#7CCBC1; }
+.promo-actions { display:flex; flex-wrap:wrap; gap:10px; }
+.promo-card .button.script { background:var(--tide); color:var(--white); }
+.promo-card .button.script:hover { background:#24605B; }
+.promo-card .button.ghost { background:transparent; color:var(--paper); box-shadow:inset 0 0 0 1.5px #ffffff59; }
+.promo-card .button.ghost:hover { background:#ffffff14; }
+.promo-visual { display:grid; grid-template-columns:minmax(0,.9fr) auto minmax(0,1.1fr); align-items:center; gap:12px; }
+.promo-visual .promo-stack { min-height:220px; }
+.promo-visual .mini-card { width:min(220px,96%); min-height:168px; padding:16px; }
+.promo-visual .mini-card.is-back:nth-child(1) { transform:translateX(-10%) rotate(-8deg); }
+.promo-visual .mini-card.is-back:nth-child(2) { transform:translateX(9%) rotate(7deg); }
+.promo-arrow { position:relative; z-index:1; display:grid; place-items:center; width:38px; height:38px; border-radius:50%; background:var(--tide); color:var(--white); box-shadow:0 0 0 4px var(--char); }
+.promo-arrow .icon { width:20px; height:20px; }
+.mini-script { display:grid; gap:8px; padding:18px; border-radius:18px; background:var(--white); color:var(--char); box-shadow:var(--shadow); font-size:15px; line-height:1.55; }
+.promo-card .mini-script p { margin:0; color:var(--char); }
+.promo-card .mini-script .ms-head { display:flex; align-items:center; gap:8px; padding-bottom:8px; border-bottom:1px solid var(--line); font-size:16px; font-weight:800; }
+.ms-head b { flex:none; padding:1px 8px; border-radius:6px; background:var(--char); color:var(--white); font-size:15px; white-space:nowrap; }
+.promo-card .mini-script .ms-cue { color:var(--mute); }
+.ms-tag { display:inline-block; margin-right:6px; padding:0 8px; border-radius:6px; background:#2B6E691F; color:var(--tide); font-weight:750; }
+
+/* 기능 쪽 끝 띠: 두 만들기 단추 */
+div.next-step,div.next-step:hover { background:var(--white); }
+.next-actions { grid-area:go; display:flex; flex-wrap:wrap; gap:10px; }
+
+/* 수업 대본 쪽 머리말: 준비물, 순서, 예시 대본 */
+.head-kicker { margin:0 0 8px; color:var(--tide); font-size:16px; font-weight:750; }
+.head-row { display:flex; flex-wrap:wrap; align-items:center; gap:12px 16px; margin-top:20px; }
+.head-row .flow-chips { margin:0; }
+.head-row .button { min-height:44px; padding:8px 18px; gap:6px; }
+.head-row .button .icon { width:18px; height:18px; }
+
+/* 학생 입장은 바닥글 링크로. 창은 화면 위쪽에 띄워 수업 QR(?join=)로 들어와도 바로 보인다 */
+.site-footer .join-trigger { min-height:44px; padding:0; border-radius:0; background:none; color:var(--mute); font:inherit; font-size:16px; text-decoration:underline; text-underline-offset:3px; }
+.join-popover { position:fixed; top:calc(var(--header-height) + 12px); right:clamp(12px,3vw,40px); z-index:60; }
+
+@media (max-width:899px) {
+  .promo-card { grid-template-columns:minmax(0,1fr); }
+  .promo-visual { max-width:560px; }
+}
+@media (max-width:767px) {
+  /* 좁은 화면에서는 아래 막대가 늘 두 만들기 단추를 보이므로 첫 화면의 같은 단추는 뺀다 */
+  .feed-cta { display:none; }
+}
+@media (max-width:599px) {
+  .promo-visual { grid-template-columns:minmax(0,1fr); }
+  .promo-visual .promo-stack,.promo-arrow { display:none; }
+  .promo-actions .button { flex:1 1 100%; }
 }

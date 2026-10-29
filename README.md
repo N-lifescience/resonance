@@ -74,9 +74,9 @@
 | `guide/exploragram-guide.md` | 채팅 AI용 합본 지침(빌드 때 자동 생성) |
 | `examples/` | 직접 만든 예시 덱(`m2-parts.html`: 모든 부품), 연수 슬라이드(`training.html`: 21장, 실제 수업 시연·기능 지도·실시간 체험·실습·익스플로라그램 수요 설문. 사이트에서는 `/examples/training.html`, 한 파일판은 `bundle.py examples/training.html --offline --engine engine`), 소개 덱(`intro-story.html`: 23장, exploragram이 만들어진 이야기), 실습용 PPT(`practice/`: 과학 '확산', 사회 '수요와 공급', `tools/make_practice_pptx.py`로 만듦) |
 | `tests/`, `tools/` | 엔진 시험, 빌드, 화면 캡처·점검(`tools/shots.mjs`), 사이트 묶기(`tools/site.mjs` → `_site/`) |
-| `site/`, `live.config.json` | 배포 사이트와 실시간 설정. 메뉴는 수업(첫 화면: 바꾸기 전후, 기능 영상, 예시 수업 피드), 기능, ＋만들기(어느 쪽에서나 여는 만들기 창, 자세한 방법은 `make.html`), 강사 카드다. 좁은 화면에서는 메뉴가 아래 탭 막대가 된다. 첫 화면 스크립트는 `site/assets/js/feed.js`. `.github/workflows/pages.yml`이 main에 올라오면 Pages로 배포한다 |
-| `site/cards.html` | 「강사 카드」 탭. 보관함이 먼저 보이고 「새 카드」가 만들기 창을 연다. 유튜브 강의 영상으로 강사 카드를 만들고(선생님의 Gemini 키 또는 AI Studio 붙여넣기) 브라우저에만 보관한다. 화법 항목마다 카드를 골라 대본 묶음 파일을 저장한다 |
-| `skills/lecture-script/`, `guide/script-guide.md`, `script-viewer/` | 강사 화법 대본 지침(스킬과 합본)과 대본 뷰어. 대본 HTML은 장마다 시간 계산, 수업 HTML과 장·단계 점검, A4 인쇄를 뷰어에 맡긴다 |
+| `site/`, `live.config.json` | 배포 사이트와 실시간 설정. 머리 메뉴는 「수업 HTML 만들기」(어느 쪽에서나 여는 만들기 창, 자세한 방법은 `make.html`)와 「수업 대본 만들기」(`cards.html`) 둘이다. 좁은 화면에서는 두 메뉴가 아래 막대의 큰 단추가 된다. 첫 화면은 바꾸기 전후, 소개 영상과 기능 영상, 수업 대본 소개(예시 대본은 빌드가 `scripts/`에 넣는다), 예시 수업 피드 순서다. 학생의 수업 코드 입력은 바닥글 「수업 코드로 입장」과 `?join=코드` 주소로 연다. 첫 화면 스크립트는 `site/assets/js/feed.js`. `.github/workflows/pages.yml`이 main에 올라오면 Pages로 배포한다 |
+| `site/cards.html` | 「수업 대본 만들기」 쪽. 재료인 강사 카드 보관함이 먼저 보이고 「새 카드」가 강사 카드 만들기 창을 연다. 유튜브 강의 영상으로 강사 카드를 만들고(선생님의 Gemini 키 또는 AI Studio 붙여넣기) 브라우저에만 보관한다. 화법 항목마다 카드를 골라 대본 묶음 파일을 저장한다 |
+| `skills/lecture-script/`, `guide/script-guide.md`, `script-viewer/` | 강사 화법 대본 지침(스킬과 합본)과 대본 뷰어. 대본 HTML은 장마다 시간 계산, 수업 HTML과 장·단계 점검, 「편집」(글을 그 자리에서 고치고 「HTML 저장」으로 받기), A4 인쇄를 뷰어에 맡긴다. 뷰어를 고치면 `v2.*` 태그를 달아야 CDN(`@2`)으로 부르는 대본 파일에 반영된다 |
 
 ## 개발
 
