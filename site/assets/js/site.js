@@ -40,6 +40,23 @@
   }
   $$('img').forEach((img) => img.addEventListener('error', () => { img.hidden = true; }, { once: true }));
 
+  // 만들기 시트: 머리 메뉴와 단추의 「만들기」가 연다. 시트가 없는 쪽(제작하기)에서는 링크대로 간다.
+  const sheet = $('[data-make-sheet]');
+  if (sheet) {
+    document.addEventListener('click', (event) => {
+      const opener = event.target.closest('[data-make-open]');
+      if (!opener || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      event.preventDefault();
+      // 수업 미리 보기 같은 다른 창 위에서 누르면 그 창을 닫고 연다.
+      const host = opener.closest('dialog');
+      if (host && host !== sheet) host.close();
+      sheet.showModal();
+    });
+    $('[data-sheet-close]', sheet).addEventListener('click', () => sheet.close());
+    sheet.addEventListener('click', (event) => { if (event.target === sheet) sheet.close(); });
+    if (location.hash === '#make') sheet.showModal();
+  }
+
   // 만든 사람: 기본 dialog의 Escape, 포커스 가두기, 복귀 동작을 사용한다.
   const dialog = $('.maker-dialog');
   const maker = $('[data-maker-open]');
@@ -405,8 +422,9 @@
   $$('[data-ai]').forEach((card) => {
     const info = AI[card.dataset.ai];
     if (!info) return;
-    const failed = `${info.name}를 여는 중입니다. 1단계에서 복사한 문장을 붙여 넣어 주세요.`;
-    $('[data-ai-web]', card)?.addEventListener('click', () => {
+    const failed = `${info.name}를 여는 중입니다. 부탁 문장을 복사해 붙여 넣어 주세요.`;
+    // 만들기 시트에서는 AI 단추 하나가 곧 웹 링크다.
+    (card.matches('[data-ai-web]') ? card : $('[data-ai-web]', card))?.addEventListener('click', () => {
       // 새 탭으로 넘어가기 전에 복사를 시작한다(링크 이동은 막지 않는다).
       copyPrompt().then((ok) => say([ok ? `문장을 복사해 두었습니다. 새 탭의 ${info.name}에 수업 자료를 올리고 붙여 넣으세요.` : failed]));
     });

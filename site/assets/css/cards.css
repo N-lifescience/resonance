@@ -1,11 +1,8 @@
 /* 강사 카드 탭. 색·글꼴 토큰은 site.css를 그대로 쓴다. */
-.cards-page main { padding-top:calc(var(--header-height) + clamp(32px,5vw,64px)); padding-bottom:clamp(48px,7vw,96px); display:grid; gap:clamp(20px,3vw,32px); }
-.cards-hero h1 { font-size:clamp(2.2rem,5vw,4.2rem); margin-bottom:clamp(24px,4vw,40px); }
-.cards-flow { list-style:none; counter-reset:flow; margin:0; padding:0; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; }
-.cards-flow li { counter-increment:flow; padding:22px; border-radius:var(--radius); background:var(--white); display:grid; gap:8px; align-content:start; }
-.cards-flow li::before { content:counter(flow); display:grid; place-items:center; width:40px; height:40px; border-radius:50%; background:var(--char); color:var(--white); font-weight:800; }
-.cards-flow b { font-size:19px; }
-.cards-flow span { color:var(--mute); font-size:16px; line-height:1.6; }
+.cards-page main { padding-bottom:clamp(48px,7vw,96px); display:grid; gap:clamp(20px,3vw,32px); }
+.flow-chips { display:flex; flex-wrap:wrap; gap:8px; margin:20px 0 0; padding:0; list-style:none; counter-reset:flow; }
+.flow-chips li { counter-increment:flow; display:inline-flex; align-items:center; gap:8px; padding:6px 14px 6px 6px; border-radius:999px; background:var(--white); box-shadow:inset 0 0 0 1px var(--line); font-size:16px; font-weight:650; }
+.flow-chips li::before { content:counter(flow); display:grid; place-items:center; width:28px; height:28px; border-radius:50%; background:var(--char); color:var(--white); font-size:15px; font-weight:800; }
 .cards-note { margin:20px 0 0; padding:16px 20px; border-radius:var(--radius); background:#2B6E6914; color:var(--tide); font-weight:600; font-size:16px; }
 
 .cards-panel { padding-block:clamp(28px,4vw,48px); }
@@ -15,7 +12,17 @@
 .cards-hint { color:var(--mute); font-size:16px; margin:12px 0; max-inline-size:52em; }
 .cards-status { min-height:1.7em; margin:16px 0 0; font-weight:650; color:var(--tide); }
 .cards-status.is-bad { color:var(--clay-deep); }
-.cards-empty { color:var(--mute); }
+.vault-top { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px 20px; }
+.vault-top h2 { font-size:clamp(1.8rem,3.2vw,2.6rem); }
+.vault-top .button,.empty-copy .button { gap:8px; }
+#vault-status:empty { display:none; }
+.cards-empty { display:grid; grid-template-columns:auto minmax(0,1fr); gap:clamp(20px,4vw,48px); align-items:center; margin-top:18px; padding:clamp(20px,3vw,36px); border-radius:var(--radius); background:var(--paper); }
+.empty-visual { width:240px; display:grid; gap:12px; padding:20px; border-radius:20px; background:var(--white); box-shadow:var(--shadow); transform:rotate(-3deg); }
+.empty-visual strong { font-size:19px; color:var(--mute); }
+.empty-copy h3 { font-size:clamp(1.3rem,2vw,1.6rem); margin-bottom:8px; }
+.empty-copy p { margin:0 0 18px; color:var(--mute); }
+.add-sheet { width:min(940px,calc(100% - 32px)); }
+.add-sheet h2 { margin-bottom:18px; }
 .cards-list { margin:0 0 12px; padding-left:1.2em; color:var(--mute); font-size:16px; }
 .cards-list li + li { margin-top:4px; }
 .settings h3, #settings h3 { margin-top:28px; }
@@ -77,12 +84,19 @@
 #bundle .prompt-box { margin-top:20px; }
 
 @media (max-width:900px) {
-  .cards-flow { grid-template-columns:repeat(2,minmax(0,1fr)); }
   .path-grid { grid-template-columns:1fr; }
 }
+@media (max-width:767px) {
+  .add-sheet { width:100%; }
+}
 @media (max-width:560px) {
-  .cards-flow, .field-row { grid-template-columns:1fr; }
+  .field-row,.cards-empty { grid-template-columns:1fr; }
+  .empty-visual { width:min(240px,100%); }
   .cards-panel { border-radius:var(--radius); }
   .vault-head { grid-template-columns:72px minmax(0,1fr); }
   .vault-head img, .vault-noimg { width:72px; height:54px; }
 }
+
+/* 카드 만들기 창은 바탕이 종이색이라 두 갈래와 입력 칸을 흰색으로 띄운다. */
+.add-sheet .path { background:var(--white); }
+.add-sheet .field input,.add-sheet .field select,.add-sheet .field textarea { background:var(--white); }

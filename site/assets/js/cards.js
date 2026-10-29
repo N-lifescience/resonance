@@ -302,7 +302,8 @@
     el.append(...children.flat().filter((c) => c != null && c !== false));
     return el;
   }
-  const say = (id, text, bad = false) => { const el = $(id); el.textContent = text; el.classList.toggle('is-bad', bad); };
+  // 카드 만들기 창이 닫혀 있으면 그 창의 알림은 보관함 위에 보인다(분석 진행, 사진·다시 분석 알림).
+  const say = (id, text, bad = false) => { const el = $(id === 'add-status' && !$('add').open ? 'vault-status' : id); el.textContent = text; el.classList.toggle('is-bad', bad); };
   // 단추 처리 중 실패(저장 공간 부족 등)를 조용히 삼키지 않고 알린다.
   const guard = (fn, where = 'add-status') => (...args) => Promise.resolve().then(() => fn(...args)).catch((e) => say(where, `하지 못했습니다: ${e && e.message ? e.message : e}`, true));
 
@@ -395,7 +396,7 @@
     let form;
     try { form = readForm(); } catch (e) { return say('add-status', e.message, true); }
     const key = $('key').value.trim();
-    if (!key) return say('add-status', 'Gemini API 키를 넣어 주세요. 키가 없으면 오른쪽 「AI Studio로 분석해 붙여넣기」를 쓰세요.', true);
+    if (!key) return say('add-status', 'Gemini API 키를 넣어 주세요. 키가 없으면 「AI Studio로 분석해 붙여넣기」를 쓰세요.', true);
     if (!form.urls.length) return say('add-status', '유튜브 주소를 넣어 주세요.', true);
     if (form.urls.length > MAX_URLS) return say('add-status', `한 번에 ${MAX_URLS}개까지 넣을 수 있습니다.`, true);
     try { form.urls.forEach(videoId); } catch (e) { return say('add-status', e.message, true); }
@@ -466,7 +467,7 @@
 
   async function retry(card, s) {
     const key = $('key').value.trim();
-    if (!key) return say('add-status', '다시 분석하려면 위 「Gemini API 키」를 넣어 주세요.', true);
+    if (!key) { openAdd(card.id); $('key').focus(); return say('add-status', '다시 분석하려면 「Gemini API 키」를 넣어 주세요.', true); }
     if (busy) return;
     busy = true; render();
     try { await runSources(card, [s], key); } finally { busy = false; render(); }
@@ -505,7 +506,8 @@
       openId = card.id;
       await save(card);
       $('paste').value = '';
-      say('add-status', `${card.instructor} 카드에 넣었습니다. AI는 부르지 않았습니다.`);
+      $('add').close();
+      say('vault-status', `${card.instructor} 카드에 넣었습니다. AI는 부르지 않았습니다.`);
     } finally { busy = false; render(); }
   }
 
@@ -547,6 +549,7 @@
         h('div', { class: 'vault-actions' },
           h('label', { class: `button secondary file-button${busy ? ' is-disabled' : ''}` }, '사진 바꾸기', photoInput),
           card.photo && h('button', { type: 'button', class: 'button secondary', disabled: busy, onclick: guard(async () => { card.photo = null; await save(card); }), text: '기본 사진으로' }),
+          h('button', { type: 'button', class: 'button', disabled: busy, onclick: () => openAdd(card.id), text: '영상 더 넣기' }),
           h('button', { type: 'button', class: 'button secondary', disabled: busy, onclick: guard(() => rename(card)), text: '이름 바꾸기' }),
           done.length > 0 && h('button', { type: 'button', class: 'button secondary', onclick: () => download(cardMarkdown(card), `강사카드-${safeName(card.instructor)}.md`, 'text/markdown'), text: '카드 파일로 저장' }),
           h('button', { type: 'button', class: 'button danger', disabled: busy, onclick: guard(() => trash(card)), text: '카드 삭제' }))));
@@ -609,6 +612,8 @@
   function renderMix() {
     const mix = readMix();
     const ready = live().filter((c) => doneSources(c).length);
+    $('bundle-empty').hidden = ready.length > 0;
+    $('bundle-body').hidden = !ready.length;
     $('mix').replaceChildren(...DIMENSIONS.map((dim) => {
       const sel = h('select', { 'data-dim': dim, onchange: () => { const m = readMix(); if (sel.value) m[dim] = sel.value; else delete m[dim]; storage.set(MIX_STORE, JSON.stringify(m)); } },
         h('option', { value: '', text: '(기본 화법)' }), ...ready.map((c) => h('option', { value: c.id, text: c.instructor })));
@@ -658,6 +663,14 @@
     say('settings-status', `${merged.added}개 카드를 새로 넣고 ${merged.updated}개를 바꿨습니다.${errors.length ? ` 읽지 못한 파일: ${errors.join(' / ')}` : ''}`, errors.length > 0);
   }
 
+  /* 카드 만들기 창: 「새 카드」는 빈 양식으로, 카드의 「영상 더 넣기」는 그 카드를 골라 둔 채로 연다. */
+  function openAdd(cardId = '') {
+    $('add-target').value = cardId && find(cardId) ? cardId : '';
+    render();
+    if (!$('add').open) $('add').showModal();
+    (cardId ? $('add-urls') : $('add-name')).focus();
+  }
+
   /* 시작 */
   async function start() {
     const saved = storage.get(KEY_STORE);
@@ -676,12 +689,16 @@
     $('backup-save').addEventListener('click', () => download(backupText(cards), `강사카드-백업-${localDay(new Date()).replace(/-/g, '')}.json`, 'application/json'));
     $('import').addEventListener('change', (e) => importFiles(e.target).catch((err) => say('settings-status', err.message, true)));
     window.addEventListener('beforeunload', (e) => { if (busy) { e.preventDefault(); e.returnValue = ''; } });
+    document.addEventListener('click', (e) => { if (e.target.closest('[data-add-open]')) openAdd(); });
+    document.querySelector('[data-add-close]').addEventListener('click', () => $('add').close());
+    $('add').addEventListener('click', (e) => { if (e.target === $('add')) $('add').close(); });
 
     await db.open();
     if (!db.handle) say('settings-status', '이 브라우저는 저장을 막고 있어, 탭을 닫으면 카드가 사라집니다. 백업 파일로 저장해 두세요.', true);
     cards = (await db.all()).map(normalizeCard);
     for (const c of cards) if (recoverInterrupted(c)) await db.put(c);
     render();
+    if (location.hash === '#add') openAdd();
   }
   start().catch((e) => say('settings-status', `보관함을 열지 못했습니다: ${e.message}`, true));
 })();

@@ -4,24 +4,68 @@
 <title>강사 카드 — 공명</title><meta name="description" content="유명 강사의 화법을 강사 카드로 모으고, 화법 항목마다 골라 공명 수업에 맞는 대본을 만듭니다."><link rel="stylesheet" href="assets/css/site.css"><link rel="stylesheet" href="assets/css/cards.css"></head>
 <body class="cards-page"><a class="skip-link" href="#main">본문으로 건너뛰기</a>
 <header class="site-header">
-  <a class="logo" href="./" aria-label="공명 첫 화면"><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M2 16c4-16 10 16 14 0s10 16 14 0" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg><span class="brand-lockup"><span>공명</span><span class="brand-tagline">교실의 진동수를 맞추다</span></span></a>
-  <nav class="pill-nav" aria-label="주 메뉴"><a href="explore.html" >살펴보기</a><a href="make.html" >제작하기</a><a href="cards.html" aria-current="page"><span class="nav-long">강사 </span>카드</a></nav>
+  <a class="logo" href="./" aria-label="공명 첫 화면"><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M2 16c4-16 10 16 14 0s10 16 14 0" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg><span class="brand-lockup"><span>공명</span><span class="brand-tagline">PPT를 실시간 수업 HTML로</span></span></a>
+  <nav class="pill-nav" aria-label="주 메뉴"><a href="./"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/></svg><span>수업</span></a><a href="explore.html"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4.5" width="18" height="15" rx="3"/><path d="m10 9.2 5 2.8-5 2.8z"/></svg><span>기능</span></a><a href="make.html" class="nav-make" data-make-open><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>만들기</span></a><a href="cards.html" aria-current="page"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="6.5" width="13" height="14" rx="2"/><path d="M8 3.5h10.5a2 2 0 0 1 2 2V16"/><circle cx="10" cy="11.5" r="2.3"/><path d="M6.5 17.5c.7-1.6 2-2.4 3.5-2.4s2.8.8 3.5 2.4"/></svg><span>강사 카드</span></a></nav>
+  <div class="join-area"><a class="join-trigger" href="./#join-h">수업 코드</a></div>
 </header>
 <main id="main">
 
-<section class="cards-hero wrap" aria-labelledby="cards-title">
-<p class="eyebrow">강사 카드</p>
-<h1 class="split-title" id="cards-title"><span>유명 강사의 화법을</span><strong>내 수업의 대본으로</strong></h1>
-<ol class="cards-flow">
-<li><b>강사 카드 만들기</b><span>유튜브 강의 영상을 Gemini가 보고, 설명·질문·비유·유머 방식을 카드로 정리합니다. 강사마다 한 번이면 됩니다.</span></li>
-<li><b>수업 HTML 만들기</b><span><a href="make.html">제작하기</a>에서 쓰던 AI로 수업 HTML을 만듭니다.</span></li>
-<li><b>대본 묶음 저장</b><span>아래 「대본 묶음」에서 화법 항목마다 카드를 고르고 파일 하나로 저장합니다.</span></li>
-<li><b>대본 받기</b><span>쓰던 AI에 수업 HTML과 묶음 파일을 올리고 부탁합니다. AI가 묻고 설계표를 확인받은 뒤 대본을 줍니다.</span></li>
-</ol>
-<p class="cards-note" id="storage-note">카드는 이 브라우저에만 저장됩니다. 이름·학교·연락처는 받지 않습니다. 학교 PC가 재부팅 때 기록을 지운다면 맨 아래 「보관함 백업 파일로 저장」을 쓰세요.</p>
+<section class="page-head wrap cards-head" aria-labelledby="cards-title">
+<h1 id="cards-title">강사 카드</h1>
+<p class="start-lead"><span class="u">좋아하는 강사의 말투를</span> <span class="u">카드로 모아</span> <span class="u">내 수업 대본에 섞습니다.</span></p>
+<ol class="flow-chips" aria-label="쓰는 순서"><li>영상으로 카드 만들기</li><li>화법마다 카드 고르기</li><li>쓰던 AI로 대본 받기</li></ol>
 </section>
 
-<section class="cards-panel wrap" id="add" aria-labelledby="add-title">
+<section class="cards-panel wrap" id="vault" aria-labelledby="vault-title">
+<div class="vault-top"><h2 id="vault-title">내 카드</h2><button class="button primary" type="button" data-add-open><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>새 카드</button></div>
+<p class="cards-status" id="vault-status" role="status" aria-live="polite"></p>
+<div class="card-grid" id="card-list"></div>
+<div class="cards-empty" id="card-empty" hidden>
+<div class="empty-visual" aria-hidden="true"><span class="mini-face"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="9" r="3.5"/><path d="M5.5 19c1.2-3 3.6-4.5 6.5-4.5s5.3 1.5 6.5 4.5"/></svg></span><strong>강사 이름</strong><span class="mini-chips"><span>비유</span><span>유머 방식</span><span>질문·문답</span></span></div>
+<div class="empty-copy"><h3>첫 카드를 만들어 보세요</h3><p><span class="u">유튜브 강의 영상 주소만 있으면 됩니다.</span> <span class="u">Gemini 키가 없어도</span> <span class="u">AI Studio로 만들 수 있습니다.</span></p><button class="button primary" type="button" data-add-open><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>첫 카드 만들기</button></div>
+</div>
+<details class="trash" id="trash"><summary>휴지통 <span id="trash-count">0</span></summary><div id="trash-list"></div><button class="button secondary" type="button" id="trash-empty">휴지통 비우기</button></details>
+<p class="cards-note" id="storage-note">카드는 이 브라우저에만 저장됩니다. 이름, 학교, 연락처는 받지 않습니다. 학교 PC가 재부팅 때 기록을 지운다면 아래 「백업과 안내」에서 백업 파일로 저장하세요.</p>
+</section>
+
+<section class="cards-panel wrap" id="bundle" aria-labelledby="bundle-title">
+<h2 id="bundle-title">대본 묶음</h2>
+<p class="cards-hint" id="bundle-empty" hidden>분석을 마친 카드가 생기면 화법 항목마다 카드를 골라 대본 묶음을 저장할 수 있습니다.</p>
+<div id="bundle-body">
+<p class="cards-hint">화법 항목마다 카드를 고르세요. 비워 두면 그 항목은 기본 화법으로 씁니다. 같은 카드를 여러 항목에 골라도 카드 내용은 한 번만 들어갑니다.</p>
+<div class="mix-grid" id="mix"></div>
+<div class="path-actions"><button class="button primary" type="button" id="bundle-save">대본 묶음 저장</button></div>
+<div class="prompt-box" id="script-prompt-box">
+<code id="script-prompt">이 묶음 파일의 지침대로 이 수업 HTML로 대본 써줘</code>
+<button type="button" id="script-prompt-copy">복사</button>
+</div>
+<p class="cards-hint">쓰던 AI에 수업 HTML과 묶음 파일을 함께 올리고 위 문장을 붙여 넣으세요. 대본이 길면 AI가 묶음마다 끊어 씁니다. 「계속」이라고 쓰면 이어서 씁니다.</p>
+<p class="cards-status" id="bundle-status" role="status" aria-live="polite"></p>
+</div>
+</section>
+
+<section class="cards-panel wrap" id="settings" aria-labelledby="settings-title">
+<details class="fold">
+<summary><span class="fold-title" id="settings-title">백업과 안내</span></summary>
+<div class="path-actions">
+<button class="button" type="button" id="backup-save">보관함 백업 파일로 저장</button>
+<label class="button secondary file-button">백업이나 카드 파일 불러오기<input id="import" type="file" accept=".json,.md,application/json,text/markdown,text/plain" multiple></label>
+</div>
+<p class="cards-hint">카드 파일(.md)은 수업자료제작기(class-helper)의 강사 카드도 불러옵니다.</p>
+<p class="cards-status" id="settings-status" role="status" aria-live="polite"></p>
+<h3>기기 밖으로 나가는 것</h3>
+<ul class="cards-list">
+<li>「Gemini로 분석」을 누르면 유튜브 주소와 분석 요청문이 내 키로 Google Gemini에 갑니다.</li>
+<li>카드의 기본 사진은 유튜브 이미지 서버에서 받습니다.</li>
+<li>이 쪽의 파일은 GitHub Pages에서 받습니다.</li>
+</ul>
+<p class="cards-hint">이 밖의 정보는 어디에도 보내지 않습니다. 카드와 묶음 파일에는 강사의 실제 말이 짧게 들어 있습니다. 개인 수업 참고용으로만 쓰고 인터넷에 공개하지 마세요.</p>
+</details>
+</section>
+
+</main>
+<footer class="site-footer wrap"><div class="footer-links"><button class="maker-button" type="button" data-maker-open>Made by 엔의 생명과학</button><a class="footer-link" href="assets/intro/intro.html">공명 인트로 보기</a></div><p>공명은 평소 쓰던 PPT를 학생이 직접 참여하는 수업으로 바꿔 주는 도구입니다.</p></footer>
+<dialog class="sheet add-sheet" id="add" aria-labelledby="add-title"><button class="dialog-close" type="button" data-add-close aria-label="카드 만들기 닫기"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M6 18 18 6"/></svg></button>
 <h2 id="add-title">카드 만들기</h2>
 <form class="cards-form" id="add-form" novalidate>
 <div class="field-row">
@@ -55,48 +99,21 @@
 </div>
 <p class="cards-status" id="add-status" role="status" aria-live="polite"></p>
 </form>
-</section>
-
-<section class="cards-panel wrap" id="vault" aria-labelledby="vault-title">
-<h2 id="vault-title">보관함</h2>
-<p class="cards-hint">카드 보기, 사진 바꾸기, 영상 빼기, 삭제에는 AI를 부르지 않습니다. 사진은 AI에 보내지 않습니다.</p>
-<div class="card-grid" id="card-list"></div>
-<p class="cards-empty" id="card-empty" hidden>아직 강사 카드가 없습니다. 위에서 첫 카드를 만들어 보세요.</p>
-<details class="trash" id="trash"><summary>휴지통 <span id="trash-count">0</span></summary><div id="trash-list"></div><button class="button secondary" type="button" id="trash-empty">휴지통 비우기</button></details>
-</section>
-
-<section class="cards-panel wrap" id="bundle" aria-labelledby="bundle-title">
-<h2 id="bundle-title">대본 묶음</h2>
-<p class="cards-hint">화법 항목마다 카드를 고르세요. 비워 두면 그 항목은 기본 화법으로 씁니다. 같은 카드를 여러 항목에 골라도 카드 내용은 한 번만 들어갑니다.</p>
-<div class="mix-grid" id="mix"></div>
-<div class="path-actions"><button class="button primary" type="button" id="bundle-save">대본 묶음 저장</button></div>
-<div class="prompt-box" id="script-prompt-box">
-<code id="script-prompt">이 묶음 파일의 지침대로 이 수업 HTML로 대본 써줘</code>
-<button type="button" id="script-prompt-copy">복사</button>
-</div>
-<p class="cards-hint">쓰던 AI에 수업 HTML과 묶음 파일을 함께 올리고 위 문장을 붙여 넣으세요. 대본이 길면 AI가 묶음마다 끊어 씁니다. 「계속」이라고 쓰면 이어서 씁니다.</p>
-<p class="cards-status" id="bundle-status" role="status" aria-live="polite"></p>
-</section>
-
-<section class="cards-panel wrap" id="settings" aria-labelledby="settings-title">
-<h2 id="settings-title">백업과 안내</h2>
-<div class="path-actions">
-<button class="button" type="button" id="backup-save">보관함 백업 파일로 저장</button>
-<label class="button secondary file-button">백업이나 카드 파일 불러오기<input id="import" type="file" accept=".json,.md,application/json,text/markdown,text/plain" multiple></label>
-</div>
-<p class="cards-hint">카드 파일(.md)은 수업자료제작기(class-helper)의 강사 카드도 불러옵니다.</p>
-<p class="cards-status" id="settings-status" role="status" aria-live="polite"></p>
-<h3>기기 밖으로 나가는 것</h3>
-<ul class="cards-list">
-<li>「Gemini로 분석」을 누르면 유튜브 주소와 분석 요청문이 내 키로 Google Gemini에 갑니다.</li>
-<li>카드의 기본 사진은 유튜브 이미지 서버에서 받습니다.</li>
-<li>이 쪽의 파일은 GitHub Pages에서 받습니다.</li>
-</ul>
-<p class="cards-hint">이 밖의 정보는 어디에도 보내지 않습니다. 카드와 묶음 파일에는 강사의 실제 말이 짧게 들어 있습니다. 개인 수업 참고용으로만 쓰고 인터넷에 공개하지 마세요.</p>
-</section>
-
-</main>
-<footer class="site-footer wrap"><button class="maker-button" type="button" data-maker-open>Made by 엔의 생명과학</button><p>공명은 평소 쓰던 PPT를 학생이 직접 참여하는 수업으로 바꿔 주는 도구입니다.</p></footer>
+</dialog>
+<dialog class="sheet make-sheet" data-make-sheet aria-labelledby="make-sheet-title"><button class="dialog-close" type="button" data-sheet-close aria-label="만들기 안내 닫기"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M6 18 18 6"/></svg></button>
+<p class="sheet-kicker">준비물: 수업 PPT나 PDF, 쓰던 AI</p>
+<h2 id="make-sheet-title">내 PPT로 수업 만들기</h2>
+<ol class="sheet-steps">
+<li><span class="sheet-num" aria-hidden="true">1</span><div><p class="sheet-step-title"><span class="u">쓰던 AI를 누르세요.</span> <span class="u">부탁 문장이 복사되고</span> <span class="u">AI가 새 탭에 열립니다.</span></p>
+<div class="ai-chips"><a class="ai-chip" data-ai="chatgpt" data-ai-web href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer"><svg class="ai-logo" viewBox="0 0 24 24" aria-hidden="true" fill="#0D0D0D" fill-rule="evenodd"><path d="M9.205 8.658v-2.26c0-.19.072-.333.238-.428l4.543-2.616c.619-.357 1.356-.523 2.117-.523 2.854 0 4.662 2.212 4.662 4.566 0 .167 0 .357-.024.547l-4.71-2.759a.797.797 0 00-.856 0l-5.97 3.473zm10.609 8.8V12.06c0-.333-.143-.57-.429-.737l-5.97-3.473 1.95-1.118a.433.433 0 01.476 0l4.543 2.617c1.309.76 2.189 2.378 2.189 3.948 0 1.808-1.07 3.473-2.76 4.163zM7.802 12.703l-1.95-1.142c-.167-.095-.239-.238-.239-.428V5.899c0-2.545 1.95-4.472 4.591-4.472 1 0 1.927.333 2.712.928L8.23 5.067c-.285.166-.428.404-.428.737v6.898zM12 15.128l-2.795-1.57v-3.33L12 8.658l2.795 1.57v3.33L12 15.128zm1.796 7.23c-1 0-1.927-.332-2.712-.927l4.686-2.712c.285-.166.428-.404.428-.737v-6.898l1.974 1.142c.167.095.238.238.238.428v5.233c0 2.545-1.974 4.472-4.614 4.472zm-5.637-5.303l-4.544-2.617c-1.308-.761-2.188-2.378-2.188-3.948A4.482 4.482 0 014.21 6.327v5.423c0 .333.143.571.428.738l5.947 3.449-1.95 1.118a.432.432 0 01-.476 0zm-.262 3.9c-2.688 0-4.662-2.021-4.662-4.519 0-.19.024-.38.047-.57l4.686 2.71c.286.167.571.167.856 0l5.97-3.448v2.26c0 .19-.07.333-.237.428l-4.543 2.616c-.619.357-1.356.523-2.117.523zm5.899 2.83a5.947 5.947 0 005.827-4.756C22.287 18.339 24 15.84 24 13.296c0-1.665-.713-3.282-1.998-4.448.119-.5.19-.999.19-1.498 0-3.401-2.759-5.947-5.946-5.947-.642 0-1.26.095-1.88.31A5.962 5.962 0 0010.205 0a5.947 5.947 0 00-5.827 4.757C1.713 5.447 0 7.945 0 10.49c0 1.666.713 3.283 1.998 4.448-.119.5-.19 1-.19 1.499 0 3.401 2.759 5.946 5.946 5.946.642 0 1.26-.095 1.88-.309a5.96 5.96 0 004.162 1.713z"/></svg><span>ChatGPT</span></a><a class="ai-chip" data-ai="gemini" data-ai-web href="https://gemini.google.com/app" target="_blank" rel="noopener noreferrer"><svg class="ai-logo" viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="gm-grad-sheet" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4285F4"/><stop offset=".55" stop-color="#9B72CB"/><stop offset="1" stop-color="#D96570"/></linearGradient></defs><path fill="url(#gm-grad-sheet)" d="M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81"/></svg><span>Gemini</span></a><a class="ai-chip" data-ai="claude" data-ai-web href="https://claude.ai/new" target="_blank" rel="noopener noreferrer"><svg class="ai-logo" viewBox="0 0 24 24" aria-hidden="true" fill="#D97757"><path d="m4.7144 15.9555 4.7174-2.6471.079-.2307-.079-.1275h-.2307l-.7893-.0486-2.6956-.0729-2.3375-.0971-2.2646-.1214-.5707-.1215-.5343-.7042.0546-.3522.4797-.3218.686.0608 1.5179.1032 2.2767.1578 1.6514.0972 2.4468.255h.3886l.0546-.1579-.1336-.0971-.1032-.0972L6.973 9.8356l-2.55-1.6879-1.3356-.9714-.7225-.4918-.3643-.4614-.1578-1.0078.6557-.7225.8803.0607.2246.0607.8925.686 1.9064 1.4754 2.4893 1.8336.3643.3035.1457-.1032.0182-.0728-.164-.2733-1.3539-2.4467-1.445-2.4893-.6435-1.032-.17-.6194c-.0607-.255-.1032-.4674-.1032-.7285L6.287.1335 6.6997 0l.9957.1336.419.3642.6192 1.4147 1.0018 2.2282 1.5543 3.0296.4553.8985.2429.8318.091.255h.1579v-.1457l.1275-1.706.2368-2.0947.2307-2.6957.0789-.7589.3764-.9107.7468-.4918.5828.2793.4797.686-.0668.4433-.2853 1.8517-.5586 2.9021-.3643 1.9429h.2125l.2429-.2429.9835-1.3053 1.6514-2.0643.7286-.8196.85-.9046.5464-.4311h1.0321l.759 1.1293-.34 1.1657-1.0625 1.3478-.8804 1.1414-1.2628 1.7-.7893 1.36.0729.1093.1882-.0183 2.8535-.607 1.5421-.2794 1.8396-.3157.8318.3886.091.3946-.3278.8075-1.967.4857-2.3072.4614-3.4364.8136-.0425.0304.0486.0607 1.5482.1457.6618.0364h1.621l3.0175.2247.7892.522.4736.6376-.079.4857-1.2142.6193-1.6393-.3886-3.825-.9107-1.3113-.3279h-.1822v.1093l1.0929 1.0686 2.0035 1.8092 2.5075 2.3314.1275.5768-.3218.4554-.34-.0486-2.2039-1.6575-.85-.7468-1.9246-1.621h-.1275v.17l.4432.6496 2.3436 3.5214.1214 1.0807-.17.3521-.6071.2125-.6679-.1214-1.3721-1.9246L14.38 17.959l-1.1414-1.9428-.1397.079-.674 7.2552-.3156.3703-.7286.2793-.6071-.4614-.3218-.7468.3218-1.4753.3886-1.9246.3157-1.53.2853-1.9004.17-.6314-.0121-.0425-.1397.0182-1.4328 1.9672-2.1796 2.9446-1.7243 1.8456-.4128.164-.7164-.3704.0667-.6618.4008-.5889 2.386-3.0357 1.4389-1.882.929-1.0868-.0062-.1579h-.0546l-6.3385 4.1164-1.1293.1457-.4857-.4554.0608-.7467.2307-.2429 1.9064-1.3114Z"/></svg><span>Claude</span></a></div>
+<p class="ai-status" data-ai-status role="status" aria-live="polite"></p></div></li>
+<li><span class="sheet-num" aria-hidden="true">2</span><div><p class="sheet-step-title"><span class="u">대화창에 수업 PPT를 올리고</span> <span class="u">복사한 문장을 붙여 넣어 보내세요.</span></p>
+<div class="prompt-box is-compact"><code id="prompt"><span class="u">https://github.com/N-lifescience/resonance</span> <span class="u">지침대로</span> <span class="u">이 자료를 수업 HTML로 바꿔줘</span></code><button type="button" data-copy="prompt" data-done="복사했습니다" data-success="복사했습니다. 쓰던 AI에 붙여 넣으세요." data-failed="복사하지 못했습니다. 위 문장을 선택해 직접 복사해 주세요."><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg><span>문장 복사</span></button></div>
+<p class="copy-status" data-copy-status role="status" aria-live="polite"></p></div></li>
+<li><span class="sheet-num" aria-hidden="true">3</span><div><p class="sheet-step-title"><span class="u">AI의 질문 몇 개에 답하면</span> <span class="u">HTML 파일이 나옵니다.</span></p><p class="sheet-note"><span class="u">파일을 더블클릭하면</span> <span class="u">바로 수업이 열립니다.</span></p></div></li>
+</ol>
+<a class="sheet-more" href="make.html">AI별 추천 설정과 자세한 방법 <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6"/></svg></a>
+</dialog>
 <dialog class="maker-dialog" aria-labelledby="maker-title"><button class="dialog-close" type="button" data-maker-close aria-label="만든 사람 안내 닫기"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M6 18 18 6"/></svg></button><h2 id="maker-title">Made by 엔의 생명과학</h2><p>고등학교 생명과학 교사가 만들었습니다. 필요한 기능이나 궁금한 점은 아래 링크에 남겨 주세요. 이름과 학교, 연락처, 학생 정보는 적지 마세요.</p><div class="contact-links"><a data-form-link hidden target="_blank" rel="noopener noreferrer">기능 제안과 문의</a><span data-form-pending>문의와 기능 제안 창구를 준비하고 있습니다.</span><a data-github-link href="https://github.com/N-lifescience/resonance" target="_blank" rel="noopener noreferrer">GitHub <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6"/></svg></a></div><p>수업에는 자유롭게 쓰세요. 코드를 복제하거나 다시 배포할 때는 허락을 받아야 합니다.</p></dialog>
 
 <script src="assets/js/config.js"></script>
