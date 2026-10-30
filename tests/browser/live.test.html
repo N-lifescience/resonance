@@ -90,6 +90,18 @@ test('학생 둘이 코드로 들어와 교사 장을 따라간다', async () =>
   eq(getComputedStyle(doc('a').querySelector('.ch-toolbar')).display, 'none', '학생은 툴바가 없다');
 });
 
+test('교사 화면의 쪽 번호는 「실시간」 단추에 가리지 않게 왼쪽 아래, 학생 화면과 실시간을 끈 화면은 오른쪽 아래', () => {
+  const side = (name) => {
+    const s = getComputedStyle(doc(name).querySelector('.slide.is-active'), '::after');
+    return parseFloat(s.left) < parseFloat(s.right) ? '왼쪽' : '오른쪽';
+  };
+  eq(side('t'), '왼쪽', '교사');
+  eq(side('a'), '오른쪽', '학생');
+  doc('t').documentElement.classList.add('ch-off-live');
+  eq(side('t'), '오른쪽', '⚙에서 실시간을 끄면 단추가 없으니 제자리');
+  doc('t').documentElement.classList.remove('ch-off-live');
+});
+
 test('교사가 넘기면 장과 단계를 따라가고, 열지 않은 답은 가린다', async () => {
   T.Nav.next();
   T.Nav.next();

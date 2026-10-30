@@ -17,6 +17,8 @@
 .ch-tb-btn.ch-live-fab.is-on:hover { background: #18734B; }
 html.ch-editing .ch-live-fab { display: none !important; }
 @media print { .ch-live-fab { display: none !important; } }
+/* 쪽 번호(.slide::after)는 오른쪽 아래라 이 단추에 가린다. 단추가 뜨는 교사 화면에서는 왼쪽 아래에 둔다(인쇄는 그대로) */
+@media screen { html:not(.ch-live-student):not(.ch-off-live) .slide::after { right: auto; left: 80px; } }
 
 /* 교사 창: 오른쪽 위 */
 .ch-live { position: fixed; z-index: 8600; top: 16px; right: 16px; width: 300px; max-width: calc(100vw - 32px); display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; border-radius: 14px; background: var(--ch-ui); box-shadow: 0 12px 32px rgba(0, 0, 0, .35); }
