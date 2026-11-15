@@ -494,7 +494,7 @@ test('weak-model dialect: sort header is a question, choice uses numbers as labe
   assert.doesNotMatch(numbered, /용액 <output/);
   const words = renderLesson('# 장\n[고르기] 전기가 통할까?\n그림: 전구\n- 증류수 = 통하지 않는다\n- 소금물 = 통한다');
   assert.match(words, /v = c == 1 \? 0 : 1/);
-  const cat = renderLesson('# 장\n[고르기] 어느 쪽이 화학적 소화일까?\n그림: 시험관\n- 음식물을 잘게 씹는다 = 기계적 소화 | 힘을 가한다.\n- 녹말이 엿당으로 바뀐다 = 화학적 소화 | 효소가 분해한다.');
+  const cat = renderLesson('# 장\n[고르기] 어느 쪽이 화학적 소화일까?\n그림: 시험관\n- 음식물을 잘게 씹는다 = 기계적 소화 | 힘을 가한다.\n- 위가 꿈틀 운동을 한다 = 기계적 소화 | 섞는다.\n- 녹말이 엿당으로 바뀐다 = 화학적 소화 | 효소가 분해한다.');
   assert.match(cat, /class="sort"/, 'category choice becomes a sort');
   assert.equal((cat.match(/class="bin"/g) || []).length, 2);
   const sw = renderLesson('# 장\n[고르기] 침은 녹말을 분해할까?\n- 시험관 A = 녹말이 그대로다 | 대조군이다.\n- 시험관 B = 녹말이 당분으로 바뀐다 | 아밀레이스가 작용했다.');
@@ -503,6 +503,11 @@ test('weak-model dialect: sort header is a question, choice uses numbers as labe
   const pill = renderLesson('# 장\n[끌려가기]\n왼쪽: 암죽관\n오른쪽: 모세혈관\n고르기: 융털 = 지방산·모노글리세리드 왼쪽 1, Na⁺ 오른쪽 1');
   assert.match(pill, /<rect height="40" rx="20" width="\d+"/, 'long particle name drawn as a pill');
   assert.match(pill, /<circle r="22"/, 'short name stays a circle');
+  const silly = renderLesson('# 장\n[끌려가기]\n왼쪽: 융털\n오른쪽: 온몸\n고르기: 포도당 = 융털 왼쪽 2, 심장 오른쪽 2\n처음: 융털에 있다.\n끝: 온몸으로 간다.');
+  assert.doesNotMatch(silly, /class="calc|왼쪽:/, 'particle named like a side becomes plain text');
+  assert.match(silly, /<p>융털에 있다\.<\/p><p class="step">온몸으로 간다\.<\/p>/);
+  const allDiff = renderLesson('# 장\n[고르기] 무엇을 넣었나?\n- 시험관 A = 녹말 용액 + 증류수 | 대조군\n- 시험관 B = 녹말 용액 + 침 용액 | 실험군');
+  assert.match(allDiff, /class="switch"/, 'all-different results become a switch even without sentence endings');
   const real = renderLesson('# 장\n[고르기] 이온 수\n값: 이온 수 | 개\n- 증류수 = 0 | 없다\n- 소금물 = 6 | 있다');
   assert.match(real, /v = c == 1 \? 0 : 6/, 'real numbers stay');
 });

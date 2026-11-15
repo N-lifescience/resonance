@@ -290,7 +290,12 @@
       return parts.length && parts.every(Boolean) ? { label: m[1], parts: parts } : null;
     }).filter(Boolean);
     if (!choices.length) return fallback(block);
-    var dirColor = { '왼쪽': '#DC2626', '오른쪽': '#2563EB', '위': '#7C3AED', '아래': '#B45309', '그대로': '#6B7280' };
+    // 입자 이름을 양쪽 끝 이름과 똑같이 쓰면(왼쪽: 융털, 입자 '융털 왼쪽 2') 뜻 없는 움직임이 된다. 글로만 보여 준다.
+    var sides = [first(f, '왼쪽', ''), first(f, '오른쪽', '')].map(function (s) { return s.trim(); });
+    if (choices.some(function (c) { return c.parts.some(function (p) { return sides.indexOf(p.name.trim()) >= 0; }); })) {
+      return (f['처음'] ? '<p>' + inline(first(f, '처음', '')) + '</p>' : '') + (f['끝'] ? '<p class="step">' + inline(first(f, '끝', '')) + '</p>' : '');
+    }
+    var dirColor ={ '왼쪽': '#DC2626', '오른쪽': '#2563EB', '위': '#7C3AED', '아래': '#B45309', '그대로': '#6B7280' };
     var art = '<rect x="10" y="48" width="580" height="280" rx="16" fill="#EFF6FF" stroke="#94A3B8" stroke-width="2"/>';
     art += '<rect x="26" y="65" width="18" height="245" fill="#64748B"/><rect x="556" y="65" width="18" height="245" fill="#64748B"/>';
     art += svgText(90, 31, first(f, '왼쪽', '왼쪽')) + svgText(510, 31, first(f, '오른쪽', '오른쪽'));
@@ -364,8 +369,8 @@
       var parsed = cats.map(function (l) { var p = pipes(unbullet(l.text)); var m = /^(.*?)\s*=\s*(.*)$/.exec(p[0]); return { label: m[1], result: m[2], why: p.slice(1).join(' | ') }; });
       var distinct = parsed.filter(function (c, i) { return parsed.findIndex(function (d) { return d.result === c.result; }) === i; }).length;
       // 고를 때마다 결과가 하나씩 다르면(시험관 A = 녹말이 그대로다, B = 당분으로 바뀐다) 비교 전환으로 연다.
-      var sentences = parsed.every(function (c) { return /다\.?$|\.$/.test(c.result.trim()); });
-      if (cats.length >= 2 && distinct === cats.length && sentences) {
+      // 결과가 모두 다르면(칸마다 카드 한 장뿐인 분류가 되므로) 비교 전환으로, 같은 결과가 있으면 분류로.
+      if (cats.length >= 2 && distinct === cats.length) {
         return (block.text ? '<p class="q" data-n="?">' + inline(block.text) + '</p>' : '') + '<div class="switch"' + attr('data-stops', '시작|' + parsed.map(function (c) { return c.label.replace(/\|/g, ' '); }).join('|')) + '>' +
           parsed.map(function (c, i) { return '<div' + attr('data-only', i + 1) + '><p><b>' + inline(c.result) + '</b></p>' + (c.why ? '<p>' + inline(c.why) + '</p>' : '') + '</div>'; }).join('') + '</div>';
       }
