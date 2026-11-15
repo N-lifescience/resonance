@@ -18,6 +18,10 @@
     '.lite-pictures .fig img,.lite-pictures .ch-ppt-ph{max-height:300px;width:100%;object-fit:contain;box-sizing:border-box}',
     '.lite-pictures.lite-two .fig img,.lite-pictures.lite-two .ch-ppt-ph{height:180px;max-height:200px}',
     '.lite-pictures.lite-many .fig img,.lite-pictures.lite-many .ch-ppt-ph{max-height:120px}',
+    // 작은 그림 자리(3~4개 격자)에는 '끌어다 놓으세요' 안내를 빼고 쪽·그림 번호만 남긴다. 넘치면 자른다.
+    '.lite-pictures.lite-many .ch-ppt-ph{height:120px;padding:8px 40px 8px 8px;overflow:hidden;align-content:center}',
+    '.lite-pictures.lite-many .ch-ppt-ph b{display:none}',
+    '.lite-pictures.lite-many .ch-ppt-ph small{font-size:16px;line-height:1.35}',
     '.lite-figure-only{display:flex;justify-content:center;gap:24px}',
     '.lite-figure-only .fig{display:flex;flex-direction:column;max-width:900px;max-height:460px}',
     '.lite-figure-only .fig img,.lite-figure-only .ch-ppt-ph{min-height:0;flex-shrink:1}',
