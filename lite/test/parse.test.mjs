@@ -464,4 +464,16 @@ await asyncTest('ready document and loaded stylesheet skip waits; explicit deck 
   assert.equal(h.doc.querySelectorAll('link[rel="stylesheet"]').length, 1); assert.equal(h.doc.scripts.filter(s => s.src).length, 1);
   assert.equal(h.doc.querySelectorAll('section.slide').length, 1); assert(h.doc.getElementById('lite-css'));
 });
+// 마주온 기본 모델이 실제로 쓴 말투(2026-11-15 시험)
+test('weak-model dialect: bare color line and bulleted/grouped figures', () => {
+  const lesson = parseLesson('#568A35\n# [표지] 제목\n학년\n[그림 1-2] 표지 그림\n# 장\n- 문장\n- 그림 2-5: 광고 화면\n- 그림 6-1, 6-2, 6-5: 원자 모형\n그림 9-3~9-8: 이온식 예시\n(그림 19-9·19-13) 녹는 모형');
+  assert.equal(lesson.settings.accent, '#568A35');
+  assert.equal(lesson.slides.length, 2, 'color line is not a slide');
+  assert.equal(lesson.slides[0].blocks.filter(b => b.type === 'figure').length, 0, 'no figure on the cover');
+  const figs = lesson.slides[1].blocks.filter(b => b.type === 'figure').map(b => b.ppt);
+  assert.deepEqual(figs, ['2-5', '6-1', '6-2', '6-5', '9-3', '9-4', '9-5', '9-6', '19-9', '19-13']);
+  assert.equal(lesson.slides[1].blocks.find(b => b.ppt === '6-2').text, '원자 모형');
+  assert.equal(parseLesson('색 568A35\n# 장').settings.accent, '#568A35');
+  assert.equal(parseLesson('# 568 문제\n- 문장').slides[0].title, '568 문제', 'a title with a space is still a title');
+});
 console.log('\n' + passed + ' total tests passed. Chrome and browser layout/audit not run.');

@@ -89,6 +89,22 @@
     if (type === 'sort') return /^.+?\s*=\s*.+/.test(s);
     return ['quiz', 'order', 'stages'].indexOf(type) >= 0;
   }
+  // '[그림 7-4] 설명', '- 그림 6-1, 6-2, 6-5: 설명', '그림 9-3~9-8: 설명', '(그림 19-9·19-13) 설명'을 모두 그림 자리로 읽는다.
+  // 한 줄에서 그림은 4개까지만 받는다(장이 넘치지 않게).
+  function figureRefs(line) {
+    var m = /^(?:[-*•·]\s*)?[\[(（]?\s*그림\s*(\d+\s*-\s*\d+(?:\s*(?:,|·|~|및|와|과)\s*\d+(?:\s*-\s*\d+)?)*)\s*[\])）]?\s*[:：]?\s*(.*)$/.exec(line);
+    if (!m) return null;
+    var refs = [];
+    m[1].replace(/\s+/g, '').split(/,|·|및|와|과/).forEach(function (token) {
+      var r = /^(\d+)-(\d+)~(?:(\d+)-)?(\d+)$/.exec(token);
+      if (r && (!r[3] || r[3] === r[1])) {
+        for (var k = Number(r[2]); k <= Number(r[4]) && refs.length < 4; k++) refs.push(r[1] + '-' + k);
+      } else if (/^\d+-\d+$/.test(token)) refs.push(token);
+    });
+    if (!refs.length) return null;
+    return { refs: refs.slice(0, 4), text: m[2].trim() };
+  }
+
   function parseLesson(text) {
     var lesson = { settings: { accent: '', deck: '' }, slides: [], warnings: [] };
     var lines = String(text == null ? '' : text).replace(/^\uFEFF/, '').split(/\r\n?|\n/).map(normalize);
@@ -108,6 +124,17 @@
       var m;
       if (!line) continue;
       if ((m = /^\[묶음\]\s*(.*)$/.exec(line))) { section = m[1]; continue; }
+      // 약한 모델은 '색:'을 빼고 '#568A35'만 쓰거나 '색 568A35'로 쓴다. 장 제목으로 읽지 않는다.
+      if ((m = /^(?:(?:주\s*)?색\s*:?\s*)?#?([\da-f]{6}|[\da-f]{3})$/i.exec(line)) && (/^#[\da-f]+$/i.test(line) || /색/.test(line))) {
+        lesson.settings.accent = '#' + m[1];
+        continue;
+      }
+      var figs = figureRefs(line);
+      if (figs) {
+        if (current && current.type !== 'normal') continue;   // 표지·장표지에 그림 자리를 넣으면 제목이 밀려난다
+        figs.refs.forEach(function (ref, k) { add({ type: 'figure', ppt: ref, text: figs.text || '그림 ' + ref, line: i + 1 }); });
+        continue;
+      }
       if ((m = /^#\s*(?:\[(표지|장표지)\]\s*)?(.*)$/.exec(line))) {
         if (m[1] === '장표지') section = m[2];
         newSlide(m[2], m[1] === '표지' ? 'cover' : m[1] === '장표지' ? 'chapter' : 'normal');
