@@ -314,7 +314,12 @@
       var n = /^-?(?:\d+(?:\.\d*)?|\.\d+)$/.test(m[2].trim()) ? Number(m[2]) : verdict(m[2]);
       return n === null ? null : { label: m[1], value: n, text: parts.slice(1).join(' | ') || m[2], word: isNaN(Number(m[2])) };
     }).filter(Boolean);
-    if (!choices.length) return fallback(block);
+    if (!choices.length) {
+      // '= 기계적 소화'처럼 갈래 이름을 쓴 고르기는 분류 카드로 펼친다(약한 모델이 분류와 고르기를 섞는다).
+      var cats = items(block).filter(function (l) { return /=/.test(l.text); });
+      if (cats.length >= 2) return renderSort({ text: block.text, lines: cats });
+      return fallback(block);
+    }
     var value = pipes(first(f, '값', '값'));
     // 약한 모델이 값 자리에 번호(1, 2, 3…)를 쓰면 설탕물이 가장 밝은 전구처럼 틀린 모형이 된다.
     // 번호처럼 보이고 문장마다 판정이 있으면 문장의 판정(1/0)으로 바로잡는다.
