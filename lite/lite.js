@@ -513,12 +513,15 @@
       // '= 통한다'와 칸 '전기가 통하는 물질'처럼 말이 조금 다를 때: 겹치는 글자가 가장 긴 칸,
       // 같으면 부정어(않·없·못·안) 유무가 같은 칸을 고른다.
       var neg = function (s) { return /않|없|못|안\s|아니/.test(s); };
-      var best = -1, bestScore = 1;
+      // 한글은 활용하면 음절이 바뀐다(통한다/통하는). 자모로 풀어서 겹친 길이를 잰다.
+      var jamo = function (s) { return s.normalize ? s.normalize('NFD') : s; };
+      var kj = jamo(k);
+      var best = -1, bestScore = 3;
       bins.forEach(function (b, bi) {
-        var kb = key(b), common = 0;
-        for (var a = 0; a < k.length; a++) for (var z = a + 1; z <= k.length; z++) if (z - a > common && kb.indexOf(k.slice(a, z)) >= 0) common = z - a;
-        var score = common + (neg(name) === neg(b) ? 0.5 : 0);
-        if (common >= 2 && score > bestScore) { best = bi; bestScore = score; }
+        var kb = jamo(key(b)), common = 0;
+        for (var a = 0; a < kj.length; a++) for (var z = a + common + 1; z <= kj.length; z++) { if (kb.indexOf(kj.slice(a, z)) >= 0) common = z - a; else break; }
+        var score = common + (neg(name) === neg(b) ? 1.5 : 0);
+        if (common >= 4 && score > bestScore) { best = bi; bestScore = score; }
       });
       return best;
     }
