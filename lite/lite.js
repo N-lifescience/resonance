@@ -177,8 +177,14 @@
       } else if ((m = /^\[그림\s+([^\]]+)\]\s*(.*)$/.exec(line))) {
         add({ type: 'figure', ppt: m[1], text: m[2] || '그림 ' + m[1], line: i + 1 });
       } else if ((m = /^\[영상\]\s*(.*)$/.exec(line)) && /^https?:\/\//i.test(m[1])) {
+        // 엔진 영상 카드는 유튜브만 튼다. 유튜브 영상 ID(11자)가 있으면 영상 카드, 다른 주소면 링크 카드.
+        // 약한 모델은 'watch?v='처럼 빈 유튜브 주소를 쓴다. 그런 줄은 버리고 경고만 남긴다.
         var video = pipes(m[1]);
-        add({ type: 'video', url: video[0], text: video[1] || '영상', line: i + 1 });
+        var isYoutube = /(?:youtube\.com|youtu\.be)\//i.test(video[0]);
+        var vid = /(?:youtu\.be\/|[?&]v=|\/embed\/|\/shorts\/)([\w-]{11})(?![\w-])/.exec(video[0]);
+        if (vid) add({ type: 'video', url: video[0], text: video[1] || '영상', line: i + 1 });
+        else if (!isYoutube) add({ type: 'link', url: video[0], text: video[1] || '자료 보기', line: i + 1 });
+        else lesson.warnings.push({ line: i + 1, message: '영상 주소를 읽지 못해 영상 카드를 만들지 않았다: ' + video[0] });
       } else if ((m = /^\[(꼬리표|AI)\]\s*(.*)$/.exec(line))) {
         add({ type: m[1] === 'AI' ? 'ai' : 'kicker', text: m[2], line: i + 1 });
       } else if ((m = /^(?:답\s*:|A\.)\s*(.*)$/.exec(line))) {
@@ -553,6 +559,7 @@
       case 'ai': return '<p data-ai="AI 작성">' + inline(b.text) + '</p>';
       case 'figure': return figure(b.ppt, b.text);
       case 'video': return '<div class="video"' + attr('data-youtube', b.url) + attr('data-title', b.text) + '></div>';
+      case 'link': return '<p><a class="link-card"' + attr('href', b.url) + ' target="_blank" rel="noopener">' + inline(b.text) + '</a></p>';
       case 'table': return '<table class="compare"><thead><tr>' + b.rows[0].map(function (c) { return '<th>' + inline(c) + '</th>'; }).join('') + '</tr></thead><tbody>' + b.rows.slice(1).map(function (row) { return '<tr>' + row.map(function (c, i) { var tag = i === 0 ? 'th' : 'td'; return '<' + tag + '>' + inline(c) + '</' + tag + '>'; }).join('') + '</tr>'; }).join('') + '</tbody></table>';
       case 'quiz': return renderQuiz(b);
       case 'sort': return renderSort(b);
@@ -626,11 +633,29 @@
       if (source.type !== 'normal' || source.blocks.length < 2) { result.slides.push(source); return; }
       var part = 0;
       var current = Object.assign({}, source, { blocks: [] });
-      var budget = source.section ? 470 : 510;
+      // 잴 때와 실제 화면의 글꼴·어절 감싸기 차이로 20px쯤 더 길어질 수 있어 여유를 둔다.
+      var budget = (source.section ? 470 : 510) - 20;
+      function heightOf(slide) {
+        var measured = measure ? measure(slide) : 0;
+        return measured > 0 && isFinite(measured) ? measured : estimateSlide(slide);
+      }
+      // 표 하나가 혼자서도 넘치면 머리줄을 되풀이해 행을 나눈다.
+      var blocks = [];
       source.blocks.forEach(function (block) {
+        if (block.type !== 'table' || block.rows.length < 3 || heightOf(Object.assign({}, source, { blocks: [block] })) <= budget) { blocks.push(block); return; }
+        var head = block.rows[0], chunk = [];
+        block.rows.slice(1).forEach(function (row) {
+          var trial = chunk.concat([row]);
+          if (chunk.length && heightOf(Object.assign({}, source, { blocks: [Object.assign({}, block, { rows: [head].concat(trial) })] })) > budget) {
+            blocks.push(Object.assign({}, block, { rows: [head].concat(chunk) }));
+            chunk = [row];
+          } else chunk = trial;
+        });
+        if (chunk.length) blocks.push(Object.assign({}, block, { rows: [head].concat(chunk) }));
+      });
+      blocks.forEach(function (block) {
         var candidate = Object.assign({}, current, { blocks: current.blocks.concat([block]) });
-        var measured = measure ? measure(candidate) : 0;
-        var height = measured > 0 && isFinite(measured) ? measured : estimateSlide(candidate);
+        var height = heightOf(candidate);
         if (height > budget && current.blocks.length) {
           result.slides.push(current);
           part++;
@@ -666,6 +691,14 @@
       if (!link.parentNode) doc.head.appendChild(link);
       liteStyle();
     });
+  }
+  // 엔진 글꼴(Pretendard, 글자별 나눠 받기)이 오기 전에 재면 줄바꿈이 달라 실제 화면에서 넘친다.
+  // 수업 글의 글자로 글꼴을 미리 불러 두고, 3초 넘으면 그냥 잰다.
+  function waitFonts(doc, text) {
+    if (!doc.fonts || !doc.fonts.load) return Promise.resolve();
+    var sample = String(text || '').replace(/\s+/g, '').slice(0, 3000) || '가';
+    var load = Promise.all(['400', '700'].map(function (w) { return doc.fonts.load(w + ' 30px "Pretendard Variable"', sample); })).then(function () { return doc.fonts.ready; });
+    return Promise.race([load, new Promise(function (r) { root.setTimeout(r, 3000); })]).catch(function () {});
   }
   function measureSlides(doc, lesson) {
     var host = doc.createElement('div'); host.className = 'lite-measure'; host.setAttribute('aria-hidden', 'true'); doc.body.appendChild(host);
@@ -714,7 +747,7 @@
     if (lesson.settings.accent) { doc.body.style.setProperty('--accent', lesson.settings.accent); doc.body.style.setProperty('--tab', lesson.settings.accent); doc.body.style.setProperty('--tab-ink', '#fff'); }
     if (!doc.querySelector('meta[name="viewport"]')) { var meta = doc.createElement('meta'); meta.name = 'viewport'; meta.content = 'width=device-width, initial-scale=1'; doc.head.appendChild(meta); }
     lesson.warnings.forEach(function (w) { log(w.line + '행: ' + w.message); });
-    loadCSS(doc, base).then(function () {
+    loadCSS(doc, base).then(function () { return waitFonts(doc, source.textContent); }).then(function () {
       var marker = doc.createElement('div');
       doc.body.appendChild(marker);
       // Expand first, measure offscreen, then replace only these new slides.

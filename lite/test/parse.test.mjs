@@ -176,9 +176,10 @@ test('figures, two columns, stacked pairs, grid and figure-only placement', () =
   assert(renderLesson('# 그림\n문단\n[그림 1-1] 가\n[그림 1-2] 나\n[그림 1-3] 다').includes('lite-pictures lite-many'));
   assert(css.includes('.fig img[hidden]{display:none !important}')); assert(css.includes('max-height:300px')); assert(css.includes('max-height:200px')); assert(css.includes('max-height:460px'));
 });
-test('videos accept HTTP(S) URLs and preserve invalid lines as text', () => {
-  const html = renderLesson('# 영상\n[영상] https://example.test/watch?v=1&x=2 | 제목\n[영상] javascript:alert(1)');
-  assert(html.includes('<div class="video" data-youtube="https://example.test/watch?v=1&amp;x=2" data-title="제목"></div>'));
+test('videos: YouTube IDs make video cards, other HTTP(S) URLs make link cards, invalid lines stay text', () => {
+  const html = renderLesson('# 영상\n[영상] https://www.youtube.com/watch?v=M7lc1UVf-VE&t=80 | 제목\n[영상] https://example.test/page?a=1&b=2 | 자료\n[영상] javascript:alert(1)');
+  assert(html.includes('<div class="video" data-youtube="https://www.youtube.com/watch?v=M7lc1UVf-VE&amp;t=80" data-title="제목"></div>'));
+  assert(html.includes('<a class="link-card" href="https://example.test/page?a=1&amp;b=2" target="_blank" rel="noopener">자료</a>'));
   assert(html.includes('<p>[영상] javascript:alert(1)</p>'));
 });
 test('quiz shuffle is deterministic and correct positions vary by question', () => {
@@ -419,7 +420,8 @@ async function asyncTest(name, run) {
   try { await run(); passed++; console.log('ok ' + passed + ' - ' + name); }
   catch (error) { console.error('FAIL - ' + name); throw error; }
 }
-const flush = async () => { await Promise.resolve(); await Promise.resolve(); };
+// 글꼴 기다리기(waitFonts) 단계가 들어가 마이크로태스크가 두 번 더 돈다.
+const flush = async () => { for (let i = 0; i < 4; i++) await Promise.resolve(); };
 await asyncTest('browser waits for DOM and CSS, preserves source and loads engine last', async () => {
   const h = browserHarness({ base: '../../engine/' });
   assert.equal(h.trace.length, 0, 'DOMContentLoaded has not fired');
@@ -496,5 +498,16 @@ test('weak-model dialect: sort header is a question, choice uses numbers as labe
   assert.equal((cat.match(/class="bin"/g) || []).length, 2);
   const real = renderLesson('# 장\n[고르기] 이온 수\n값: 이온 수 | 개\n- 증류수 = 0 | 없다\n- 소금물 = 6 | 있다');
   assert.match(real, /v = c == 1 \? 0 : 6/, 'real numbers stay');
+});
+test('weak-model dialect: empty video URL is dropped; a tall table is split with its header', () => {
+  const v = parseLesson('# 장\n[영상] https://www.youtube.com/watch?v= | 실험 영상\n[영상] https://youtu.be/M7lc1UVf-VE | 좋은 영상');
+  assert.equal(v.slides[0].blocks.filter(b => b.type === 'video').length, 1);
+  assert(v.warnings.some(w => /영상 주소/.test(w.message)));
+  const rows = Array.from({ length: 12 }, (_, i) => `| ${i} | 아주 긴 설명 칸이 여러 줄로 감겨 표가 길어지는 경우를 만든다 ${i} |`).join('\n');
+  const paged = paginateLesson(parseLesson('# 표 장\n| 머리 | 설명 |\n' + rows + '\n- 끝 문장'));
+  const tables = paged.slides.flatMap(s => s.blocks.filter(b => b.type === 'table'));
+  assert(tables.length >= 2, 'table split into pieces');
+  tables.forEach(t => assert.deepEqual(t.rows[0], ['머리', '설명'], 'header repeated'));
+  assert.equal(tables.reduce((n, t) => n + t.rows.length - 1, 0), 12, 'no row lost');
 });
 console.log('\n' + passed + ' total tests passed. Chrome and browser layout/audit not run.');
