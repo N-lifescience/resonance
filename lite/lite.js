@@ -135,6 +135,16 @@
         figs.refs.forEach(function (ref, k) { add({ type: 'figure', ppt: ref, text: figs.text || '그림 ' + ref, line: i + 1 }); });
         continue;
       }
+      // 약한 모델은 활동·모형을 '# [퀴즈] 물음'처럼 장 제목 줄에 붙여 쓴다. 장을 만들고 그 줄을 활동 머리로 다시 읽는다.
+      if ((m = /^#\s*\[([^\]]+)\]\s*(.*)$/.exec(line)) && Object.prototype.hasOwnProperty.call(TEMPLATES, m[1])) {
+        var kind = TEMPLATES[m[1]], rest = m[2].trim();
+        var defaults = { quiz: '확인 문제', sort: '나누어 보자', order: '순서대로 놓아 보자', drift: '어느 쪽으로 끌려갈까?', choice: '골라서 비교해 보자', electron: '원자는 어떻게 이온이 될까?', graph: '어떻게 변할까?', diffusion: '어떻게 퍼질까?', stages: '과정을 따라가 보자' };
+        var activity = kind === 'quiz' || kind === 'sort' || kind === 'order';
+        newSlide(activity || !rest || /\|/.test(rest) ? defaults[kind] : rest, 'normal');
+        lines[i] = '[' + m[1] + '] ' + (activity || kind === 'stages' || /\|/.test(rest) ? rest : '');
+        i--;
+        continue;
+      }
       if ((m = /^#\s*(?:\[(표지|장표지)\]\s*)?(.*)$/.exec(line))) {
         if (m[1] === '장표지') section = m[2];
         newSlide(m[2], m[1] === '표지' ? 'cover' : m[1] === '장표지' ? 'chapter' : 'normal');
