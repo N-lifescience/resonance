@@ -140,6 +140,12 @@
         var kind = TEMPLATES[m[1]], rest = m[2].trim();
         var defaults = { quiz: '확인 문제', sort: '나누어 보자', order: '순서대로 놓아 보자', drift: '어느 쪽으로 끌려갈까?', choice: '골라서 비교해 보자', electron: '원자는 어떻게 이온이 될까?', graph: '어떻게 변할까?', diffusion: '어떻게 퍼질까?', stages: '과정을 따라가 보자' };
         var activity = kind === 'quiz' || kind === 'sort' || kind === 'order';
+        // 다음 줄에 같은 활동 머리('[분류] 칸1 | 칸2')가 또 오면 제목 줄은 제목으로만 쓴다.
+        var next = i + 1; while (next < lines.length && !lines[next]) next++;
+        if (next < lines.length && lines[next].indexOf('[' + m[1] + ']') === 0) {
+          newSlide(rest && !/\|/.test(rest) ? rest : defaults[kind], 'normal');
+          continue;
+        }
         newSlide(activity || !rest || /\|/.test(rest) ? defaults[kind] : rest, 'normal');
         lines[i] = '[' + m[1] + '] ' + (activity || kind === 'stages' || /\|/.test(rest) ? rest : '');
         i--;
@@ -172,7 +178,10 @@
             lesson.warnings.push({ line: i + 1, message: '활동 문법을 알 수 없어 문단으로 표시한다: ' + lines[i] });
           }
         }
-        add(block);
+        // 보기·카드·항목이 2개 안 되는 퀴즈·분류·순서는 엔진이 오류로 알리므로 버린다.
+        var listed = block.lines.filter(function (l) { return /^[-*•·]/.test(l.text); }).length;
+        if ((['quiz', 'order'].indexOf(block.type) >= 0 && listed < 2) || (block.type === 'sort' && listed < 1)) lesson.warnings.push({ line: block.line, message: '보기·카드·항목이 2개보다 적어 활동을 뺐다: ' + block.source });
+        else add(block);
         unknown.forEach(add);
       } else if (/^\|/.test(line)) {
         var rows = [];
@@ -581,7 +590,10 @@
     return html + '</div>';
   }
   function renderOrder(block) {
-    return '<p class="q" data-n="?">' + inline(block.text) + '</p><ol class="order">' + items(block).map(function (l) { var p = pipes(unbullet(l.text)); return '<li' + attr('data-why', p.slice(1).join(' | ')) + '>' + inline(p[0]) + '</li>'; }).join('') + '</ol>';
+    // 엔진은 맞은 칸 아래에 이유를 붙여 길어진다. 항목이 5개 이상이면 이유를 빼서 다 푼 뒤 넘치지 않게 한다.
+    var list = items(block);
+    var keepWhy = list.length < 5;
+    return (block.text ? '<p class="q" data-n="?">' + inline(block.text) + '</p>' : '') + '<ol class="order">' + list.map(function (l) { var p = pipes(unbullet(l.text)); return '<li' + (keepWhy ? attr('data-why', p.slice(1).join(' | ')) : '') + '>' + inline(p[0]) + '</li>'; }).join('') + '</ol>';
   }
   function renderBlock(b) {
     switch (b.type) {

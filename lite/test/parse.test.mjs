@@ -528,5 +528,15 @@ test('weak-model dialect: activity and model names on the slide title line', () 
   assert.equal(l.slides[1].blocks[0].lines.length, 2);
   const html = renderLesson('# [퀴즈] 물음?\n* 정답 | 맞다\n- 오답 | 아니다');
   assert.match(html, /class="quiz"/);
+  // 제목 줄과 다음 줄에 같은 활동 머리를 두 번 쓴 경우
+  const twice = parseLesson('# [분류] 전기가 통하는가?\n[분류] 통한다 | 통하지 않는다\n- 이온 음료 = 통한다 | 있다\n- 증류수 = 통하지 않는다 | 없다');
+  assert.equal(twice.slides.length, 1); assert.equal(twice.slides[0].title, '전기가 통하는가?');
+  assert.equal(twice.slides[0].blocks.length, 1); assert.equal(twice.slides[0].blocks[0].text, '통한다 | 통하지 않는다');
+  // 보기가 2개 안 되는 활동은 버린다
+  const thin = parseLesson('# 장\n[순서] 하나뿐\n- 첫째\n[퀴즈] 보기 없음');
+  assert.equal(thin.slides[0].blocks.length, 0); assert.equal(thin.warnings.filter(w => /활동을 뺐다/.test(w.message)).length, 2);
+  // 항목이 5개 이상인 순서 배열은 이유를 뺀다
+  const five = renderLesson('# 장\n[순서] 순서\n- 가 | 이유\n- 나 | 이유\n- 다 | 이유\n- 라 | 이유\n- 마 | 이유');
+  assert.doesNotMatch(five, /data-why/);
 });
 console.log('\n' + passed + ' total tests passed. Chrome and browser layout/audit not run.');
