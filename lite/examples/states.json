@@ -1,0 +1,62 @@
+[
+  {
+    "slide": 1,
+    "name": "끌려가기-처음",
+    "js": "var s = document.querySelector('#s1'); s.querySelector('[data-set=sol]').click(); s.querySelector('[data-set=on][data-value=\"0\"]').click(); var r = s.querySelector('input[name=t]'); r.value = r.min; r.dispatchEvent(new Event('input', { bubbles: true }));"
+  },
+  {
+    "slide": 1,
+    "name": "끌려가기-끝",
+    "js": "var s = document.querySelector('#s1'); var b = s.querySelectorAll('[data-set=sol]'); b[b.length - 1].click(); s.querySelector('[data-set=on][data-value=\"1\"]').click(); var r = s.querySelector('input[name=t]'); r.value = r.max; r.dispatchEvent(new Event('input', { bubbles: true }));"
+  },
+  {
+    "slide": 2,
+    "name": "고르기-처음",
+    "js": "document.querySelector('#s2 [data-set=c]').click();"
+  },
+  {
+    "slide": 2,
+    "name": "고르기-끝",
+    "js": "var b = document.querySelectorAll('#s2 [data-set=c]'); b[b.length - 1].click();"
+  },
+  {
+    "slide": 3,
+    "name": "전자-처음",
+    "js": "var s = document.querySelector('#s3'); s.querySelector('[data-set=el]').click(); var r = s.querySelector('.ch-stops input'); r.value = r.min; r.dispatchEvent(new Event('input', { bubbles: true }));"
+  },
+  {
+    "slide": 3,
+    "name": "전자-끝",
+    "js": "var s = document.querySelector('#s3'); var b = s.querySelectorAll('[data-set=el]'); b[b.length - 1].click(); var r = s.querySelector('.ch-stops input'); r.value = r.max; r.dispatchEvent(new Event('input', { bubbles: true }));"
+  },
+  {
+    "slide": 4,
+    "name": "그래프-처음",
+    "js": "var s = document.querySelector('#s4'); s.querySelector('[data-set=v]').click(); var r = s.querySelector('input[name=t]'); r.value = r.min; r.dispatchEvent(new Event('input', { bubbles: true }));"
+  },
+  {
+    "slide": 4,
+    "name": "그래프-끝",
+    "js": "var s = document.querySelector('#s4'); var b = s.querySelectorAll('[data-set=v]'); b[b.length - 1].click(); var r = s.querySelector('input[name=t]'); r.value = r.max; r.dispatchEvent(new Event('input', { bubbles: true }));"
+  },
+  {
+    "slide": 5,
+    "name": "퍼지기-처음",
+    "js": "var s = document.querySelector('#s5'); var b = s.querySelector('.ch-particles-run'); if (b.textContent.indexOf('멈추기') >= 0) b.click(); s.querySelector('.particles .ch-reset').click();"
+  },
+  {
+    "slide": 5,
+    "name": "퍼지기-움직임",
+    "js": "var b = document.querySelector('#s5 .ch-particles-run'); if (b.textContent.indexOf('움직이기') >= 0) b.click();"
+  },
+  {
+    "slide": 6,
+    "name": "단계-처음",
+    "js": "var r = document.querySelector('#s6 .ch-stops input'); r.value = r.min; r.dispatchEvent(new Event('input', { bubbles: true }));"
+  },
+  {
+    "slide": 6,
+    "name": "단계-끝",
+    "js": "var r = document.querySelector('#s6 .ch-stops input'); r.value = r.max; r.dispatchEvent(new Event('input', { bubbles: true }));"
+  }
+]
