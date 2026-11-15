@@ -146,7 +146,8 @@
           newSlide(rest && !/\|/.test(rest) ? rest : defaults[kind], 'normal');
           continue;
         }
-        newSlide(activity || !rest || /\|/.test(rest) ? defaults[kind] : rest, 'normal');
+        // 물음은 장 제목으로 쓴다(활동 안의 물음 줄은 그리지 않아 높이를 아낀다). '칸1 | 칸2'는 제목이 아니다.
+        newSlide(!rest || /\|/.test(rest) ? defaults[kind] : rest, 'normal');
         lines[i] = '[' + m[1] + '] ' + (activity || kind === 'stages' || /\|/.test(rest) ? rest : '');
         i--;
         continue;
@@ -169,6 +170,8 @@
       if (current && current.type === 'chapter') continue;
       if ((m = /^\[([^\]]+)\]\s*(.*)$/.exec(line)) && Object.prototype.hasOwnProperty.call(TEMPLATES, m[1])) {
         var block = { type: TEMPLATES[m[1]], text: m[2], source: line, lines: [], line: i + 1 };
+        // 물음이 장 제목과 같으면 활동 안에서 물음 줄을 다시 그리지 않는다.
+        block.asTitle = !!(current && block.text && current.title === block.text);
         var unknown = [];
         while (i + 1 < lines.length && lines[i + 1] && !/^(#|\[[^\]]+\])/.test(lines[i + 1])) {
           i++;
@@ -543,7 +546,7 @@
   function renderQuiz(block) {
     var choices = items(block).map(function (l) { var p = pipes(unbullet(l.text)); return { text: p[0], why: p.slice(1).join(' | '), ok: l.text.charAt(0) === '*' }; });
     if (!choices.length) return fallback(block);
-    return '<p class="q" data-n="?">' + inline(block.text) + '</p><div class="quiz"' + (choices.length > 4 ? ' data-cols="2"' : '') + (choices.filter(function (c) { return c.ok; }).length > 1 ? ' data-multi' : '') + '>' + shuffled(choices, block.text).map(function (c) { return '<button type="button" class="opt"' + (c.ok ? ' data-ok' : '') + attr('data-why', c.why) + '>' + inline(c.text) + '</button>'; }).join('') + '</div>';
+    return (block.text && !block.asTitle ? '<p class="q" data-n="?">' + inline(block.text) + '</p>' : '') + '<div class="quiz"' + (choices.length > 4 ? ' data-cols="2"' : '') + (choices.filter(function (c) { return c.ok; }).length > 1 ? ' data-multi' : '') + '>' + shuffled(choices, block.text).map(function (c) { return '<button type="button" class="opt"' + (c.ok ? ' data-ok' : '') + attr('data-why', c.why) + '>' + inline(c.text) + '</button>'; }).join('') + '</div>';
   }
   function renderSort(block) {
     var bins = pipes(block.text).filter(Boolean);
@@ -555,7 +558,7 @@
     // 약한 모델은 첫 줄에 '칸1 | 칸2' 대신 물음을 쓴다. 그러면 카드의 '= 칸'에서 칸을 모은다.
     var question = '';
     if (bins.length < 2) {
-      question = block.text;
+      question = block.asTitle ? '' : block.text;
       bins = [];
       cards.forEach(function (c) { if (bins.indexOf(c.bin) < 0) bins.push(c.bin); });
     }
@@ -593,7 +596,7 @@
     // 엔진은 맞은 칸 아래에 이유를 붙여 길어진다. 항목이 5개 이상이면 이유를 빼서 다 푼 뒤 넘치지 않게 한다.
     var list = items(block);
     var keepWhy = list.length < 5;
-    return (block.text ? '<p class="q" data-n="?">' + inline(block.text) + '</p>' : '') + '<ol class="order">' + list.map(function (l) { var p = pipes(unbullet(l.text)); return '<li' + (keepWhy ? attr('data-why', p.slice(1).join(' | ')) : '') + '>' + inline(p[0]) + '</li>'; }).join('') + '</ol>';
+    return (block.text && !block.asTitle ? '<p class="q" data-n="?">' + inline(block.text) + '</p>' : '') + '<ol class="order">' + list.map(function (l) { var p = pipes(unbullet(l.text)); return '<li' + (keepWhy ? attr('data-why', p.slice(1).join(' | ')) : '') + '>' + inline(p[0]) + '</li>'; }).join('') + '</ol>';
   }
   function renderBlock(b) {
     switch (b.type) {

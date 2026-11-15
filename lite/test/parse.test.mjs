@@ -521,7 +521,9 @@ test('weak-model dialect: empty video URL is dropped; a tall table is split with
 });
 test('weak-model dialect: activity and model names on the slide title line', () => {
   const l = parseLesson('# 장\n- 문장\n# [퀴즈] 소장이 대장보다 긴 까닭은?\n* 흡수가 소장에서 일어난다 | 맞다.\n- 대장에서 소화된다 | 아니다.\n# [분류] 양이온 | 음이온\n- Na⁺ = 양이온 | 잃음\n- Cl⁻ = 음이온 | 얻음\n# [단계] 소화 과정\n- 입 | 녹말 분해\n- 위 | 단백질 분해\n# [고르기] 어떤 용액에 전기가 통할까?\n그림: 전구\n- 증류수 = 통하지 않는다 | 없다\n- 소금물 = 통한다 | 있다');
-  assert.deepEqual(l.slides.map(s => s.title), ['장', '확인 문제', '나누어 보자', '소화 과정', '어떤 용액에 전기가 통할까?']);
+  assert.deepEqual(l.slides.map(s => s.title), ['장', '소장이 대장보다 긴 까닭은?', '나누어 보자', '소화 과정', '어떤 용액에 전기가 통할까?']);
+  assert.equal(l.slides[1].blocks[0].asTitle, true, 'question shown as the slide title');
+  assert.doesNotMatch(renderLesson('# [퀴즈] 물음?\n* 가 | 맞다\n- 나 | 아니다'), /<p class="q"/, 'no duplicated question line');
   assert.deepEqual(l.slides.slice(1).map(s => s.blocks[0].type), ['quiz', 'sort', 'stages', 'choice']);
   assert.equal(l.slides[1].blocks[0].text, '소장이 대장보다 긴 까닭은?');
   assert.equal(l.slides[2].blocks[0].text, '양이온 | 음이온');
