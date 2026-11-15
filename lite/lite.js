@@ -85,7 +85,7 @@
     if (!/^[-*•·]/.test(text)) return false;
     if (type === 'electron') return /^\S+\s+\S+\s+\d+\s+(잃음|얻음)\s+\d+$/.test(s);
     if (type === 'diffusion') return /^\S+\s+\d+\s+\d+\s+(통과|막힘)\s+\S+$/.test(s);
-    if (type === 'choice') return /^.+?\s*=\s*-?(?:\d+(?:\.\d*)?|\.\d+)(?:\s*\||$)/.test(s);
+    if (type === 'choice') return /^.+?\s*=\s*.+/.test(s);
     if (type === 'sort') return /^.+?\s*=\s*.+/.test(s);
     return ['quiz', 'order', 'stages'].indexOf(type) >= 0;
   }
@@ -298,15 +298,34 @@
     return model('drift', lets, svg(art, '방향에 따른 입자 이동 모형'), right, constants.length ? attr('data-const', constants.join('; ')) : '');
   }
 
+  // 판정 말(통한다/통하지 않는다, 있다/없다, 켜진다/꺼진다)을 1/0으로 읽는다. 모르면 null.
+  function verdict(text) {
+    var s = String(text || '');
+    if (/않|없|안\s|아니|꺼|못|×/.test(s)) return 0;
+    if (/통한다|통함|난다|켜|있|흐른다|흐름|○/.test(s)) return 1;
+    return null;
+  }
   function renderChoice(block) {
     var f = fields(block);
     var choices = items(block).map(function (line) {
       var parts = pipes(unbullet(line.text));
-      var m = /^(.*?)\s*=\s*(-?(?:\d+(?:\.\d*)?|\.\d+))$/.exec(parts[0]);
-      return m ? { label: m[1], value: Number(m[2]), text: parts.slice(1).join(' | ') } : null;
+      var m = /^(.*?)\s*=\s*(.+)$/.exec(parts[0]);
+      if (!m) return null;
+      var n = /^-?(?:\d+(?:\.\d*)?|\.\d+)$/.test(m[2].trim()) ? Number(m[2]) : verdict(m[2]);
+      return n === null ? null : { label: m[1], value: n, text: parts.slice(1).join(' | ') || m[2], word: isNaN(Number(m[2])) };
     }).filter(Boolean);
     if (!choices.length) return fallback(block);
     var value = pipes(first(f, '값', '값'));
+    // 약한 모델이 값 자리에 번호(1, 2, 3…)를 쓰면 설탕물이 가장 밝은 전구처럼 틀린 모형이 된다.
+    // 번호처럼 보이고 문장마다 판정이 있으면 문장의 판정(1/0)으로 바로잡는다.
+    var numbered = choices.length >= 3 && choices.every(function (c, i) { return c.value === i + 1; });
+    var judged = choices.map(function (c) { return verdict(c.text); });
+    var onOff = choices.every(function (c) { return c.word; });
+    if (numbered && judged.every(function (v) { return v !== null; })) {
+      choices.forEach(function (c, i) { c.value = judged[i]; });
+      onOff = true;
+    }
+    if (onOff) value = ['전기가 통하는 정도', ''];
     var max = Math.max.apply(null, choices.map(function (c) { return c.value; }).concat([0])) || 1;
     var lets = 'v = ' + selectExpr('c', choices.map(function (c) { return String(c.value); })) + '; m = ' + max;
     var art = '';
@@ -327,7 +346,7 @@
       art = svg(art + svgText(300, 330, '입자 수(모형)'), '값에 따른 점 개수 모형');
     } else art = '<div style="padding:120px 24px 0"><div class="bar" data-value="v"' + attr('data-max', max) + '></div><p>' + output('v', value[1]) + ' (모형)</p></div>';
     var right = (block.text ? '<p class="q">' + inline(block.text) + '</p>' : '') + buttons('c', choices.map(function (c) { return c.label; }));
-    right += '<p>' + inline(value[0]) + ' ' + output('v', value[1]) + ' (모형)</p>';
+    if (!onOff) right += '<p>' + inline(value[0]) + ' ' + output('v', value[1]) + ' (모형)</p>';
     choices.forEach(function (c, i) { right += '<p' + attr('data-show', 'c == ' + (i + 1)) + '>' + inline(c.text) + '</p>'; });
     return model('choice', lets, art, right);
   }
@@ -473,14 +492,32 @@
     return '<p class="q" data-n="?">' + inline(block.text) + '</p><div class="quiz"' + (choices.length > 4 ? ' data-cols="2"' : '') + (choices.filter(function (c) { return c.ok; }).length > 1 ? ' data-multi' : '') + '>' + shuffled(choices, block.text).map(function (c) { return '<button type="button" class="opt"' + (c.ok ? ' data-ok' : '') + attr('data-why', c.why) + '>' + inline(c.text) + '</button>'; }).join('') + '</div>';
   }
   function renderSort(block) {
-    var bins = pipes(block.text);
-    var html = '<div class="sort">' + bins.map(function (bin, i) { return '<div class="bin"' + attr('data-bin', 'b' + (i + 1)) + '><h3>' + inline(bin) + '</h3></div>'; }).join('');
-    items(block).forEach(function (line) {
+    var bins = pipes(block.text).filter(Boolean);
+    var cards = items(block).map(function (line) {
       var p = pipes(unbullet(line.text));
       var m = /^(.*?)\s*=\s*(.*)$/.exec(p[0]);
-      if (!m) return;
-      var at = bins.indexOf(m[2]);
-      if (at < 0) return;
+      return m ? { name: m[1], bin: m[2].trim(), why: p.slice(1).join(' | ') } : null;
+    }).filter(Boolean);
+    // 약한 모델은 첫 줄에 '칸1 | 칸2' 대신 물음을 쓴다. 그러면 카드의 '= 칸'에서 칸을 모은다.
+    var question = '';
+    if (bins.length < 2) {
+      question = block.text;
+      bins = [];
+      cards.forEach(function (c) { if (bins.indexOf(c.bin) < 0) bins.push(c.bin); });
+    }
+    var key = function (s) { return String(s).replace(/[\s'"‘’“”()（）]/g, ''); };
+    function findBin(name) {
+      var k = key(name);
+      for (var i = 0; i < bins.length; i++) if (key(bins[i]) === k) return i;
+      for (var j = 0; j < bins.length; j++) if (key(bins[j]).indexOf(k) >= 0 || k.indexOf(key(bins[j])) >= 0) return j;
+      return -1;
+    }
+    var html = (question ? '<p class="q" data-n="?">' + inline(question) + '</p>' : '') + '<div class="sort">' + bins.slice(0, 4).map(function (bin, i) { return '<div class="bin"' + attr('data-bin', 'b' + (i + 1)) + '><h3>' + inline(bin) + '</h3></div>'; }).join('');
+    cards.forEach(function (c) {
+      var at = findBin(c.bin);
+      if (at < 0 || at > 3) return;
+      var p = [c.name, c.why];
+      var m = [null, c.name];
       html += '<span' + attr('data-bin', 'b' + (at + 1)) + attr('data-why', p.slice(1).join(' | ')) + ' data-hint="칸 이름의 특징을 다시 보자.">' + inline(m[1]) + '</span>';
     });
     return html + '</div>';

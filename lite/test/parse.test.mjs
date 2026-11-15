@@ -476,4 +476,19 @@ test('weak-model dialect: bare color line and bulleted/grouped figures', () => {
   assert.equal(parseLesson('색 568A35\n# 장').settings.accent, '#568A35');
   assert.equal(parseLesson('# 568 문제\n- 문장').slides[0].title, '568 문제', 'a title with a space is still a title');
 });
+test('weak-model dialect: sort header is a question, choice uses numbers as labels or verdict words', () => {
+  const sort = renderLesson('# 장\n[분류] 전기가 통하는지 나누어 보자.\n- 이온 음료 = 통한다 | 이온이 있다.\n- 설탕 수용액 = 통하지 않는다 | 이온이 없다.\n- 증류수 = 통하지 않는다 | 이온이 거의 없다.');
+  assert.match(sort, /<p class="q"[^>]*>전기가 통하는지 나누어 보자\.<\/p>/);
+  assert.equal((sort.match(/class="bin"/g) || []).length, 2);
+  assert.equal((sort.match(/<span data-bin="b2"/g) || []).length, 2);
+  const fuzzy = renderLesson('# 장\n[분류] 양이온 | 음이온\n- Na⁺ = 양이온 | 잃음\n- Cl⁻ = \'음이온\' | 얻음');
+  assert.equal((fuzzy.match(/<span data-bin=/g) || []).length, 2, 'quoted bin name still matches');
+  const numbered = renderLesson('# 장\n[고르기] 전기가 통할까?\n값: 용액 | 가지\n그림: 전구\n- 증류수 = 1 | 소리가 나지 않는다.\n- 이온 음료 = 2 | 소리가 난다.\n- 설탕 수용액 = 3 | 소리가 나지 않는다.');
+  assert.match(numbered, /v = c == 1 \? 0 : c == 2 \? 1 : 0/, 'index values corrected from verdict sentences');
+  assert.doesNotMatch(numbered, /용액 <output/);
+  const words = renderLesson('# 장\n[고르기] 전기가 통할까?\n그림: 전구\n- 증류수 = 통하지 않는다\n- 소금물 = 통한다');
+  assert.match(words, /v = c == 1 \? 0 : 1/);
+  const real = renderLesson('# 장\n[고르기] 이온 수\n값: 이온 수 | 개\n- 증류수 = 0 | 없다\n- 소금물 = 6 | 있다');
+  assert.match(real, /v = c == 1 \? 0 : 6/, 'real numbers stay');
+});
 console.log('\n' + passed + ' total tests passed. Chrome and browser layout/audit not run.');
