@@ -510,7 +510,17 @@
       var k = key(name);
       for (var i = 0; i < bins.length; i++) if (key(bins[i]) === k) return i;
       for (var j = 0; j < bins.length; j++) if (key(bins[j]).indexOf(k) >= 0 || k.indexOf(key(bins[j])) >= 0) return j;
-      return -1;
+      // '= 통한다'와 칸 '전기가 통하는 물질'처럼 말이 조금 다를 때: 겹치는 글자가 가장 긴 칸,
+      // 같으면 부정어(않·없·못·안) 유무가 같은 칸을 고른다.
+      var neg = function (s) { return /않|없|못|안\s|아니/.test(s); };
+      var best = -1, bestScore = 1;
+      bins.forEach(function (b, bi) {
+        var kb = key(b), common = 0;
+        for (var a = 0; a < k.length; a++) for (var z = a + 1; z <= k.length; z++) if (z - a > common && kb.indexOf(k.slice(a, z)) >= 0) common = z - a;
+        var score = common + (neg(name) === neg(b) ? 0.5 : 0);
+        if (common >= 2 && score > bestScore) { best = bi; bestScore = score; }
+      });
+      return best;
     }
     var html = (question ? '<p class="q" data-n="?">' + inline(question) + '</p>' : '') + '<div class="sort">' + bins.slice(0, 4).map(function (bin, i) { return '<div class="bin"' + attr('data-bin', 'b' + (i + 1)) + '><h3>' + inline(bin) + '</h3></div>'; }).join('');
     cards.forEach(function (c) {

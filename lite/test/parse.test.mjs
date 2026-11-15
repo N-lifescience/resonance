@@ -483,6 +483,9 @@ test('weak-model dialect: sort header is a question, choice uses numbers as labe
   assert.equal((sort.match(/<span data-bin="b2"/g) || []).length, 2);
   const fuzzy = renderLesson('# 장\n[분류] 양이온 | 음이온\n- Na⁺ = 양이온 | 잃음\n- Cl⁻ = \'음이온\' | 얻음');
   assert.equal((fuzzy.match(/<span data-bin=/g) || []).length, 2, 'quoted bin name still matches');
+  const loose = renderLesson('# 장\n[분류] 전기가 통하는 물질 | 전기가 통하지 않는 물질\n- 이온 음료 = 통한다 | 있다\n- 증류수 = 통하지 않는다 | 없다');
+  assert.match(loose, /<span data-bin="b1"[^>]*>이온 음료<\/span>/);
+  assert.match(loose, /<span data-bin="b2"[^>]*>증류수<\/span>/);
   const numbered = renderLesson('# 장\n[고르기] 전기가 통할까?\n값: 용액 | 가지\n그림: 전구\n- 증류수 = 1 | 소리가 나지 않는다.\n- 이온 음료 = 2 | 소리가 난다.\n- 설탕 수용액 = 3 | 소리가 나지 않는다.');
   assert.match(numbered, /v = c == 1 \? 0 : c == 2 \? 1 : 0/, 'index values corrected from verdict sentences');
   assert.doesNotMatch(numbered, /용액 <output/);
