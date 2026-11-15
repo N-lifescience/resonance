@@ -561,5 +561,9 @@ test('weak-model dialect: non-template title tags are dropped; pictures never sp
   const only = paginateLesson(parseLesson('[묶음] 1. 장\n# 그림만\n[그림 23-1] 가\n[그림 23-3] 나\n[그림 23-4] 다'));
   assert.equal(only.slides.length, 1);
   assert.equal(only.slides[0].blocks.length, 3);
+  // '# [그림 23-1] 설명'이 잇달아 오면 그림 장 하나로 모은다.
+  const titled = parseLesson('# 정리\n- 글\n\n# [그림 23-1] 단원 정리 그림\n# [그림 23-3] 단원 정리 그림\n# 다음 장\n- 글');
+  assert.deepEqual(titled.slides.map(s => s.title), ['정리', '단원 정리 그림', '다음 장']);
+  assert.deepEqual(titled.slides[1].blocks.map(b => b.ppt), ['23-1', '23-3']);
 });
 console.log('\n' + passed + ' total tests passed. Chrome and browser layout/audit not run.');

@@ -17,7 +17,7 @@
     '.lite-pictures .fig,.lite-figure-only .fig{width:100%}',
     '.lite-pictures .fig img,.lite-pictures .ch-ppt-ph{max-height:300px;width:100%;object-fit:contain;box-sizing:border-box}',
     '.lite-pictures.lite-two .fig img,.lite-pictures.lite-two .ch-ppt-ph{height:180px;max-height:200px}',
-    '.lite-pictures.lite-many .fig img,.lite-pictures.lite-many .ch-ppt-ph{max-height:150px}',
+    '.lite-pictures.lite-many .fig img,.lite-pictures.lite-many .ch-ppt-ph{max-height:120px}',
     '.lite-figure-only{display:flex;justify-content:center;gap:24px}',
     '.lite-figure-only .fig{display:flex;flex-direction:column;max-width:900px;max-height:460px}',
     '.lite-figure-only .fig img,.lite-figure-only .ch-ppt-ph{min-height:0;flex-shrink:1}',
@@ -110,6 +110,7 @@
     var lines = String(text == null ? '' : text).replace(/^\uFEFF/, '').split(/\r\n?|\n/).map(normalize);
     var current = null;
     var section = '';
+    var figureTitleSlide = null;
     function newSlide(title, type) {
       current = { id: 's' + (lesson.slides.length + 1), title: title, type: type || 'normal', section: section, blocks: [] };
       lesson.slides.push(current);
@@ -127,6 +128,13 @@
       // 약한 모델은 '색:'을 빼고 '#568A35'만 쓰거나 '색 568A35'로 쓴다. 장 제목으로 읽지 않는다.
       if ((m = /^(?:(?:주\s*)?색\s*:?\s*)?#?([\da-f]{6}|[\da-f]{3})$/i.exec(line)) && (/^#[\da-f]+$/i.test(line) || /색/.test(line))) {
         lesson.settings.accent = '#' + m[1];
+        continue;
+      }
+      // '# [그림 23-1] 설명'처럼 그림을 장 제목 줄에 쓰면 그 그림의 장으로 받는다. 잇달아 오면 같은 장에 모은다.
+      var figureTitle = /^#\s*(\[?\s*그림\s*\d.*)$/.exec(line), titleFigs = figureTitle && figureRefs(figureTitle[1]);
+      if (titleFigs) {
+        if (!current || current !== figureTitleSlide) { newSlide(titleFigs.text || '그림', 'normal'); figureTitleSlide = current; }
+        titleFigs.refs.forEach(function (ref) { add({ type: 'figure', ppt: ref, text: titleFigs.text || '그림 ' + ref, line: i + 1 }); });
         continue;
       }
       var figs = figureRefs(line);
@@ -671,7 +679,7 @@
       var width = figures > 2 ? 212 : 440;
       var heights = pictureBlocks.map(function (b) {
         var caption = Math.max(1, Math.ceil((b.text.length * 22 + 32) / width)) * 36 + 12;
-        return (figures === 1 ? 300 : figures === 2 ? 180 : 150) + caption;
+        return (figures === 1 ? 300 : figures === 2 ? 180 : 120) + caption;
       });
       for (var i = 0; i < heights.length; i += figures > 2 ? 2 : 1) pictureHeight += Math.max(heights[i], figures > 2 && heights[i + 1] || 0) + (i ? 16 : 0);
     }
