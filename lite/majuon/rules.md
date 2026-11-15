@@ -2,17 +2,20 @@
 
 # 순서(질문하지 말고 한 답 안에서 끝낸다)
 1. PPT의 장마다 제목, 본문, 빈칸 정답, 표, 그림을 읽는다. PPT 파일이 올라오면 코드 실행으로 아래 코드를 그대로 돌린다('올라온파일.pptx'만 실제 경로로 바꾼다). 장마다 글과 그림 번호가 나온다. [그림 n-k]는 이 목록의 번호를 그대로 쓴다. 숫자 하나만 쓰지 않는다.
-    import zipfile,re
+    import zipfile,re,collections
     z=zipfile.ZipFile('올라온파일.pptx')
     R=lambda p:{re.search(r'Id="([^"]+)"',r)[1]:re.search(r'Target="([^"]+)"',r)[1] for r in re.findall(r'<Relationship [^>]*>',z.read(p).decode())}
-    pr=R('ppt/_rels/presentation.xml.rels')
-    for n,rid in enumerate(re.findall(r'<p:sldId [^>]*r:id="([^"]+)"',z.read('ppt/presentation.xml').decode()),1):
-        x=z.read('ppt/'+pr[rid]).decode()
+    P=z.read('ppt/presentation.xml').decode();pr=R('ppt/_rels/presentation.xml.rels')
+    W,H=[int(v)//9525 for v in re.search(r'sldSz cx="(\d+)" cy="(\d+)"',P).groups()]
+    S=[(z.read('ppt/'+pr[i]).decode(),R('ppt/'+pr[i].replace('slides/','slides/_rels/')+'.rels')) for i in re.findall(r'<p:sldId [^>]*r:id="([^"]+)"',P)]
+    B=r'<a:blip [^>]*r:embed="([^"]+)"'
+    use=collections.Counter(r[m] for x,r in S for m in re.findall(B,x))
+    for n,(x,r) in enumerate(S,1):
         print(f'## {n}쪽',' '.join(re.findall(r'<a:t>([^<]*)</a:t>',x)))
-        for k,m in enumerate(re.finditer(r'<a:blip [^>]*r:embed=',x),1):
-            c=x[x.rfind('<p:cNvPr',0,m.start()):m.start()];d=re.search(r'descr="([^"]*)"',c) or re.search(r'name="([^"]*)"',c)
+        for k,m in enumerate(re.finditer(B,x),1):
+            t=r[m[1]];c=x[x.rfind('<p:cNvPr',0,m.start()):m.start()];d=re.search(r'descr="([^"]*)"',c) or re.search(r'name="([^"]*)"',c)
             e=re.search(r'<a:ext cx="(\d+)" cy="(\d+)"',x[m.start():]);w,h=(int(e[1])//9525,int(e[2])//9525) if e else (0,0)
-            if 150<=w<3000 and h>=120:print(f'[그림 {n}-{k}] {d[1] if d else ""} {w}x{h}')
+            if 150<=w<.9*W and 120<=h<.9*H and use[t]<3 and z.getinfo('ppt/'+re.sub(r'^(\.\./|/?ppt/)','',t)).file_size>8000:print(f'[그림 {n}-{k}] {d[1] if d else ""}')
 2. 코드 블록보다 먼저 '모형 계획'을 쓴다: 아래 '움직이는 모형' 대응표에서 PPT에 있는 내용을 2~3개 찾아 '개념 → 틀' 목록으로. 과정은 [단계], 조건 비교는 [고르기]가 거의 늘 맞는다. 계획에 적은 틀은 수업 글에 [틀] 덩어리로 반드시 넣는다.
 3. 아래 '파일 형식'을 첫 줄 ```html부터 마지막 줄 ```까지 그대로 쓴다. ```html 줄을 빼면 선생님이 코드를 볼 수 없다.
 4. 코드 블록 뒤에 사용법과 확인할 것을 짧게 쓴다.

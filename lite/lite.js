@@ -154,7 +154,9 @@
       }
       if ((m = /^#\s*(?:\[(표지|장표지)\]\s*)?(.*)$/.exec(line))) {
         if (m[1] === '장표지') section = m[2];
-        newSlide(m[2], m[1] === '표지' ? 'cover' : m[1] === '장표지' ? 'chapter' : 'normal');
+        // '# [모형] 제목', '# [그림] 제목'처럼 틀이 아닌 머리는 떼고 제목만 쓴다.
+        var title = m[1] ? m[2] : m[2].replace(/^\[([^\]\d]{1,8})\]\s*(.*)$/, function (all, tag, rest) { return rest || tag; });
+        newSlide(title, m[1] === '표지' ? 'cover' : m[1] === '장표지' ? 'chapter' : 'normal');
         continue;
       }
       if (!current && (m = /^(색|덱)\s*:\s*(.*)$/.exec(line))) {
@@ -708,15 +710,33 @@
         });
         if (chunk.length) blocks.push(Object.assign({}, block, { rows: [head].concat(chunk) }));
       });
-      blocks.forEach(function (block) {
+      // 그림은 쪽을 나누는 까닭이 되지 않는다. 한 쪽에 4개까지 묶어 첫 쪽부터 차례로 붙이고,
+      // 글만 쪽 높이에 맞춰 나눈다. 남은 그림 묶음은 그림만 있는 이어지는 쪽이 된다.
+      function isFigure(b) { return b.type === 'figure'; }
+      // 설명이 길어 그림 둘도 한 쪽에 넘치면 묶음을 줄인다(글 한 줄이 곁에 있다고 보고 어림한다).
+      // 둘은 세로로, 셋 이상은 두 줄 격자로 놓여 셋이 둘보다 낮을 수 있으니 4개부터 줄여 본다.
+      var figureChunks = [], probe = { type: 'p', text: '' };
+      var figureList = blocks.filter(isFigure), textless = figureList.length === blocks.length;
+      for (var f = 0; f < figureList.length;) {
+        var n = Math.min(4, figureList.length - f);
+        while (!textless && n > 1 && estimateSlide({ blocks: figureList.slice(f, f + n).concat([probe]) }) > budget) n--;
+        figureChunks.push(figureList.slice(f, f + n));
+        f += n;
+      }
+      var chunk = 0, hasText = false;
+      function nextPage(extra) {
+        result.slides.push(current);
+        part++;
+        current = Object.assign({}, source, { id: continuationId(source.id, part), title: source.title + ' (' + (part + 1) + ')', blocks: (figureChunks[++chunk] || []).concat(extra) });
+      }
+      current.blocks = (figureChunks[0] || []).slice();
+      blocks.filter(function (b) { return !isFigure(b); }).forEach(function (block) {
         var candidate = Object.assign({}, current, { blocks: current.blocks.concat([block]) });
-        var height = heightOf(candidate);
-        if (height > budget && current.blocks.length) {
-          result.slides.push(current);
-          part++;
-          current = Object.assign({}, source, { id: continuationId(source.id, part), title: source.title + ' (' + (part + 1) + ')', blocks: [block] });
-        } else current = candidate;
+        if (hasText && heightOf(candidate) > budget) nextPage([block]);
+        else current = candidate;
+        hasText = true;
       });
+      while (chunk < figureChunks.length - 1) nextPage([]);
       result.slides.push(current);
     });
     return result;

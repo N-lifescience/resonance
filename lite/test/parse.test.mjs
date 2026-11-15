@@ -546,4 +546,20 @@ test('weak-model dialect: activity and model names on the slide title line', () 
   const five = renderLesson('# 장\n[순서] 순서\n- 가 | 이유\n- 나 | 이유\n- 다 | 이유\n- 라 | 이유\n- 마 | 이유');
   assert.doesNotMatch(five, /data-why/);
 });
+test('weak-model dialect: non-template title tags are dropped; pictures never split a page on their own', () => {
+  const tagged = parseLesson('# [모형] 이온이 끌려가는 모습\n- 글\n# [그림]\n[그림 3-1] 사진');
+  assert.equal(tagged.slides.length, 2);
+  assert.equal(tagged.slides[0].title, '이온이 끌려가는 모습');
+  assert.equal(tagged.slides[1].title, '그림');
+  // 짧은 설명 그림 5개 + 글: 첫 쪽에 그림 4개와 글이 함께, 남은 그림 1개는 이어지는 쪽.
+  const many = paginateLesson(parseLesson('# 그림 많은 장\n- 글 한 줄\n' + [1, 2, 3, 4, 5].map(k => '[그림 9-' + k + '] 틀').join('\n')));
+  assert.equal(many.slides.length, 2);
+  assert.equal(many.slides[0].blocks.filter(b => b.type === 'figure').length, 4);
+  assert(many.slides[0].blocks.some(b => b.type !== 'figure'));
+  assert.deepEqual(many.slides[1].blocks.map(b => b.ppt), ['9-5']);
+  // 그림만 있는 장 3개는 한 쪽에 남는다.
+  const only = paginateLesson(parseLesson('[묶음] 1. 장\n# 그림만\n[그림 23-1] 가\n[그림 23-3] 나\n[그림 23-4] 다'));
+  assert.equal(only.slides.length, 1);
+  assert.equal(only.slides[0].blocks.length, 3);
+});
 console.log('\n' + passed + ' total tests passed. Chrome and browser layout/audit not run.');
