@@ -256,6 +256,16 @@
     return '<p>' + inline(block.source || block.text) + '</p>' + (block.lines || []).map(function (l) { return '<p>' + inline(l.text) + '</p>'; }).join('');
   }
 
+  // SVG 글자 폭 어림: 한글·한자는 글자 크기만큼, 영문·숫자는 0.6배, 위·아래첨자는 0.4배.
+  function labelWidth(text, size) {
+    var w = 0;
+    String(text).split('').forEach(function (ch) {
+      if (/[⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻₀₁₂₃₄₅₆₇₈₉]/.test(ch)) w += size * 0.4;
+      else if (/[ᄀ-ᇿ㄰-㆏가-힯一-鿿]/.test(ch)) w += size * 0.95;
+      else w += size * 0.6;
+    });
+    return w;
+  }
   function renderDrift(block) {
     var f = fields(block);
     var choices = (f['고르기'] || []).map(function (line) {
@@ -286,17 +296,23 @@
       var cols = Math.min(5, Math.max(1, Math.ceil(Math.sqrt(parts.length))));
       var rows = Math.ceil(parts.length / cols);
       parts.forEach(function (p, i) {
+        // 이름이 길면(예: 지방산·모노글리세리드) 원 대신 글자 길이에 맞춘 둥근 상자로 그린다.
+        var textW = labelWidth(p.name, 22);
+        var pill = textW > 40;
+        var half = pill ? Math.round(Math.min(150, textW / 2 + 12)) : 22;
         var x0 = cols === 1 ? 300 : 160 + (i % cols) * 280 / (cols - 1);
+        x0 = Math.max(52 + half, Math.min(548 - half, x0));
         var y0 = rows === 1 ? 180 : 80 + Math.floor(i / cols) * 220 / (rows - 1);
         var at = counts[p.dir]++;
         var total = totals[p.dir];
         var x1 = x0, y1 = y0;
-        if (p.dir === '왼쪽' || p.dir === '오른쪽') { x1 = p.dir === '왼쪽' ? 95 : 505; y1 = 85 + at * 210 / Math.max(1, total - 1); }
-        if (p.dir === '위' || p.dir === '아래') { x1 = 160 + at * 280 / Math.max(1, total - 1); y1 = p.dir === '위' ? 85 : 285; }
+        if (p.dir === '왼쪽' || p.dir === '오른쪽') { x1 = p.dir === '왼쪽' ? 52 + half : 548 - half; y1 = 85 + at * 210 / Math.max(1, total - 1); }
+        if (p.dir === '위' || p.dir === '아래') { x1 = Math.max(52 + half, Math.min(548 - half, 160 + at * 280 / Math.max(1, total - 1))); y1 = p.dir === '위' ? 85 : 285; }
         var ex = x0 + ' + (' + x1 + ' - ' + x0 + ') * p';
         var ey = y0 + ' + (' + y1 + ' - ' + y0 + ') * p';
-        art += '<circle r="22"' + attr('fill', dirColor[p.dir]) + attr('data-attr', 'cx: ' + ex + '; cy: ' + ey) + '/>';
-        art += '<text text-anchor="middle" font-size="22" fill="white"' + attr('data-attr', 'x: ' + ex + '; y: ' + ey + ' + 8') + '>' + esc(p.name) + '</text>';
+        if (pill) art += '<rect height="40" rx="20"' + attr('width', 2 * half) + attr('fill', dirColor[p.dir]) + attr('data-attr', 'x: ' + ex + ' - ' + half + '; y: ' + ey + ' - 20') + '/>';
+        else art += '<circle r="22"' + attr('fill', dirColor[p.dir]) + attr('data-attr', 'cx: ' + ex + '; cy: ' + ey) + '/>';
+        art += '<text text-anchor="middle"' + attr('font-size', pill ? 20 : 22) + ' fill="white"' + attr('data-attr', 'x: ' + ex + '; y: ' + ey + ' + 8') + '>' + esc(p.name) + '</text>';
       });
       art += '</g>';
     });
@@ -333,6 +349,14 @@
     if (!choices.length) {
       // '= 기계적 소화'처럼 갈래 이름을 쓴 고르기는 분류 카드로 펼친다(약한 모델이 분류와 고르기를 섞는다).
       var cats = items(block).filter(function (l) { return /=/.test(l.text); });
+      var parsed = cats.map(function (l) { var p = pipes(unbullet(l.text)); var m = /^(.*?)\s*=\s*(.*)$/.exec(p[0]); return { label: m[1], result: m[2], why: p.slice(1).join(' | ') }; });
+      var distinct = parsed.filter(function (c, i) { return parsed.findIndex(function (d) { return d.result === c.result; }) === i; }).length;
+      // 고를 때마다 결과가 하나씩 다르면(시험관 A = 녹말이 그대로다, B = 당분으로 바뀐다) 비교 전환으로 연다.
+      var sentences = parsed.every(function (c) { return /다\.?$|\.$/.test(c.result.trim()); });
+      if (cats.length >= 2 && distinct === cats.length && sentences) {
+        return (block.text ? '<p class="q" data-n="?">' + inline(block.text) + '</p>' : '') + '<div class="switch"' + attr('data-stops', '시작|' + parsed.map(function (c) { return c.label.replace(/\|/g, ' '); }).join('|')) + '>' +
+          parsed.map(function (c, i) { return '<div' + attr('data-only', i + 1) + '><p><b>' + inline(c.result) + '</b></p>' + (c.why ? '<p>' + inline(c.why) + '</p>' : '') + '</div>'; }).join('') + '</div>';
+      }
       if (cats.length >= 2) return renderSort({ text: block.text, lines: cats });
       return fallback(block);
     }

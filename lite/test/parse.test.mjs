@@ -212,7 +212,8 @@ test('drift uses numeric groups, switch, playback and exact drawn counts', () =>
   assert.equal(begin.p, 0); assert.equal(begin.nL, 0); assert.equal(begin.nR, 0);
   assert.equal(end.p, 1); assert.equal(end.nL, 2); assert.equal(end.nR, 4);
   const group = list.find(n => n.tag === 'g' && n.attrs['data-show'] === 'sol == 2');
-  const circles = list.filter(n => n.tag === 'circle' && n.parent === group);
+  // 입자는 이름이 짧으면 원, 길면(Ca²⁺ 등) 둥근 상자(rx 20)로 그린다.
+  const circles = list.filter(n => (n.tag === 'circle' || (n.tag === 'rect' && n.attrs.rx === '20')) && n.parent === group);
   assert.equal(circles.length, 6);
   assert.equal(circles.filter(n => n.attrs.fill === '#DC2626').length, end.nL);
   assert.equal(circles.filter(n => n.attrs.fill === '#2563EB').length, end.nR);
@@ -496,6 +497,12 @@ test('weak-model dialect: sort header is a question, choice uses numbers as labe
   const cat = renderLesson('# 장\n[고르기] 어느 쪽이 화학적 소화일까?\n그림: 시험관\n- 음식물을 잘게 씹는다 = 기계적 소화 | 힘을 가한다.\n- 녹말이 엿당으로 바뀐다 = 화학적 소화 | 효소가 분해한다.');
   assert.match(cat, /class="sort"/, 'category choice becomes a sort');
   assert.equal((cat.match(/class="bin"/g) || []).length, 2);
+  const sw = renderLesson('# 장\n[고르기] 침은 녹말을 분해할까?\n- 시험관 A = 녹말이 그대로다 | 대조군이다.\n- 시험관 B = 녹말이 당분으로 바뀐다 | 아밀레이스가 작용했다.');
+  assert.match(sw, /class="switch" data-stops="시작\|시험관 A\|시험관 B"/, 'one result per option becomes a switch');
+  assert.match(sw, /<div data-only="2"><p><b>녹말이 당분으로 바뀐다<\/b><\/p>/);
+  const pill = renderLesson('# 장\n[끌려가기]\n왼쪽: 암죽관\n오른쪽: 모세혈관\n고르기: 융털 = 지방산·모노글리세리드 왼쪽 1, Na⁺ 오른쪽 1');
+  assert.match(pill, /<rect height="40" rx="20" width="\d+"/, 'long particle name drawn as a pill');
+  assert.match(pill, /<circle r="22"/, 'short name stays a circle');
   const real = renderLesson('# 장\n[고르기] 이온 수\n값: 이온 수 | 개\n- 증류수 = 0 | 없다\n- 소금물 = 6 | 있다');
   assert.match(real, /v = c == 1 \? 0 : 6/, 'real numbers stay');
 });
