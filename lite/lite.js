@@ -630,7 +630,8 @@
   function paginateLesson(lesson, measure) {
     var result = { settings: lesson.settings, warnings: lesson.warnings.slice(), slides: [] };
     lesson.slides.forEach(function (source) {
-      if (source.type !== 'normal' || source.blocks.length < 2) { result.slides.push(source); return; }
+      // 블록이 하나뿐이어도 그것이 표면 행을 나눌 수 있으니 건너뛰지 않는다.
+      if (source.type !== 'normal' || !source.blocks.length || (source.blocks.length < 2 && source.blocks[0].type !== 'table')) { result.slides.push(source); return; }
       var part = 0;
       var current = Object.assign({}, source, { blocks: [] });
       // 잴 때와 실제 화면의 글꼴·어절 감싸기 차이로 20px쯤 더 길어질 수 있어 여유를 둔다.

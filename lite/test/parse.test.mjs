@@ -509,5 +509,7 @@ test('weak-model dialect: empty video URL is dropped; a tall table is split with
   assert(tables.length >= 2, 'table split into pieces');
   tables.forEach(t => assert.deepEqual(t.rows[0], ['머리', '설명'], 'header repeated'));
   assert.equal(tables.reduce((n, t) => n + t.rows.length - 1, 0), 12, 'no row lost');
+  const alone = paginateLesson(parseLesson('# 표만 있는 장\n| 머리 | 설명 |\n' + rows));
+  assert(alone.slides.length >= 2, 'a slide holding only a tall table is split too');
 });
 console.log('\n' + passed + ' total tests passed. Chrome and browser layout/audit not run.');
