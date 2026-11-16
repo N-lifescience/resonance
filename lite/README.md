@@ -1,5 +1,7 @@
 # Resonance lite
 
+> 2026-11-16: 이 폴더는 공개 저장소 [N-lifescience/resonance-lite](https://github.com/N-lifescience/resonance-lite)로 옮겼다. 마주온 에이전트는 `https://cdn.jsdelivr.net/gh/N-lifescience/resonance-lite@1/lite.js`를 쓴다. 고칠 때는 그 저장소에서 고친다.
+
 수업 글을 공명 엔진 HTML로 바꾸는 단일 파일 렌더러다. 빌드와 외부 라이브러리가 필요 없으며, 브라우저 코드는 ES2017 범위에서 작성했다. 입력 문법은 [SPEC.md](SPEC.md), 엔진 부품 문법은 `skills/exploragram/references/components.md`를 따른다.
 
 - `lite.js`: 파서, 순수 렌더러, 틀 6개, CSS, 브라우저 초기화와 장 나누기.
