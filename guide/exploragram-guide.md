@@ -4,7 +4,7 @@
 > **AI에게**: 이 파일 하나가 Exploragram 지침 전체다. 선생님이 수업 PPT를 주면 이 지침대로 수업용 HTML을 만든다.
 > **반드시**: `<head>`에 아래 엔진 css·js 두 줄을 넣는다(지금 환경에서 안 열려도 그대로 둔다). 넘기기·툴바를 직접 짜지 않고, PPT 장을 통째로 그림으로 넣지 않는다(1절 기준 8·9).
 > 본문의 `references/…`는 이 파일의 해당 절을, `scripts/…`는 저장소 https://github.com/N-lifescience/resonance 의 `skills/exploragram/scripts/`를 가리킨다.
-> 엔진: `https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/engine/exploragram.css`·`.js` (v2.8.2)
+> 엔진: `https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/engine/exploragram.css`·`.js` (v2.8.3)
 > 레퍼런스 완성본(`references/examples/`): https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/skills/exploragram/references/examples/elem-shadow.html · https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/skills/exploragram/references/examples/eth-exploragram.html · https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/skills/exploragram/references/examples/mid-linear.html · https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/skills/exploragram/references/examples/sci-diffusion.html · https://cdn.jsdelivr.net/gh/N-lifescience/resonance@2/skills/exploragram/references/examples/soc-supply-demand.html
 
 ## 차례
@@ -800,7 +800,7 @@ Ctrl+P로 장마다 한 쪽씩 인쇄된다. 엔진이 단계를 모두 펼치�
 | 빈칸 | `<span class="blank">확산</span>` | 누르면 열린다. 활동으로 치지 않는다 |
 | 정답 상자 | `<div class="answer"><p>…</p></div>` | ✓ 단추나 →로 연다. `.answer.sheet`는 흰 답안지 |
 | 그림 | `<figure class="fig"><img src="data:…" alt="…"><figcaption>…</figcaption></figure>` | 오른쪽 위 확대 단추, 손 모드에서 눌러 확대. 단추가 그림 속 글자를 가리면 `data-zoom="off"` |
-| 표지 | 아래 '표지' 예시 | `img.cover-art`는 오른쪽 560px를 차지한다. 제목은 왼쪽 600px 안에서 `<br>`로 나눈다(겹치면 점검 경고). 그림의 보일 부분은 `style="object-position: 20% 50%"`로 고른다 |
+| 표지 | 아래 '표지' 예시 | `img.cover-art`는 오른쪽 560px를 차지한다. 제목은 왼쪽 600px 안에서 `<br>`로 나눈다(겹치면 점검 경고). 그림의 보일 부분은 `style="object-position: 20% 50%"`로 고른다. 띠(`.band`) 글자는 `--tab-ink`(기본 흰색)이고, 밝은 띠색이면 `--band-ink`로 어둡게 한다 |
 | 수식 | `$x^2 + 1$`(줄 안), `$$E = mc^2$$`(가운데 한 줄) | KaTeX로 그린다(수식이 있을 때만 불러옴). 글자 그대로 $는 `\$`. `$5`처럼 $ 안쪽이 빈칸이면 수식이 아니다 |
 | 장 표지 | `<section class="slide chapter" data-sec="2. 확산"><p class="kicker">2</p><h1>확산</h1></section>` | 띠 색 바탕의 소단원 시작 |
 | 목차 슬라이드 | `<section class="slide toc"></section>` | 엔진이 `data-sec` 묶음 목록을 만든다(누르면 그 묶음 첫 장) |

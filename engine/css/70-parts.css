@@ -62,8 +62,10 @@
 :where(.slide) table.compare thead th { background: var(--table-head, color-mix(in srgb, var(--tab, var(--accent)) 28%, var(--ch-card))); text-align: center; font-weight: 800; border-left: 2px solid #fff; }
 :where(.slide) table.compare tbody th { width: 3.6em; background: var(--table-side, color-mix(in srgb, var(--tab, var(--accent)) 12%, var(--ch-card))); text-align: center; font-weight: 800; }
 
-/* 표지 꾸밈: .band는 위쪽 가득 찬 색 띠(--band), .cover-art는 오른쪽 둥근 그림 */
-:where(.slide) .band { margin: -72px -80px 40px; padding: 56px 80px 40px; background: var(--band, var(--tab, var(--accent))); }
+/* 표지 꾸밈: .band는 위쪽 가득 찬 색 띠(--band), .cover-art는 오른쪽 둥근 그림.
+   띠 글자는 장 표지처럼 --tab-ink(기본 흰색). kicker는 원래 --accent 글자라 띠 바탕과 같은 색이 되어 안 보였다. 밝은 띠는 --band-ink로 바꾼다. */
+:where(.slide) .band { margin: -72px -80px 40px; padding: 56px 80px 40px; background: var(--band, var(--tab, var(--accent))); color: var(--band-ink, var(--tab-ink, #fff)); }
+:where(.slide) .band .kicker { color: inherit; }
 .slide.cover:has(.cover-art) .band { padding-right: 620px; }
 :where(.slide) .cover-art { position: absolute; right: 0; top: 0; z-index: 1; width: 560px; height: 100%; object-fit: cover; clip-path: ellipse(100% 78% at 100% 50%); }
 [data-theme="ppt"] .slide.cover { justify-content: flex-start; padding-top: 72px; }
@@ -78,6 +80,7 @@ body .slide.chapter::before { display: none; }
 .slide.chapter h1, .slide.chapter h2 { color: inherit; border: 0; }
 .slide.chapter .kicker { color: inherit; opacity: .85; font-size: 28px; }
 .slide.chapter p { color: inherit; }
+.slide.chapter::after { color: inherit; }   /* 쪽 번호: 흐린 글자색(--ch-mute)은 색 바탕에서 안 읽힌다 */
 
 /* 목차 슬라이드: <section class="slide toc"></section> (엔진이 data-sec 묶음 목록을 만든다) */
 .ch-toc-list { margin: 0; padding: 0; list-style: none; counter-reset: ch-toc; display: grid; grid-template-columns: 1fr 1fr; gap: 12px 28px; }

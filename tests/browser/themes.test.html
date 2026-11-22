@@ -10,6 +10,8 @@
 <body data-theme="chalk">
 <section class="slide" id="t1" data-sec="1. 단원"><h2>제목</h2><p id="body">본문</p>
   <div class="quiz"><button class="opt" data-ok>보기</button></div></section>
+<section class="slide cover" id="t2"><div class="band" id="band"><p class="kicker" id="kick">고등학교 생명과학</p></div><h1>표지</h1></section>
+<section class="slide chapter" id="t3" data-sec="2. 확산"><p class="kicker">2</p><h1 id="chap">확산</h1></section>
 <pre id="results" data-summary="pending"></pre>
 <script>
 const I = () => Exploragram._internal;
@@ -36,6 +38,27 @@ for (const theme of ['paper', 'ppt', 'grid', 'chalk']) {
     }
   });
 }
+for (const theme of ['paper', 'ppt', 'grid', 'chalk']) {
+  // 20px 굵은 kicker와 h1은 큰 글자라 3:1이 기준
+  test(`${theme} 테마: 표지 띠 안 kicker, 장 표지 제목과 쪽 번호가 바탕과 3:1 이상`, () => {
+    document.body.dataset.theme = theme;
+    const $ = (id) => document.getElementById(id);
+    const kick = ratio(getComputedStyle($('kick')).color, getComputedStyle($('band')).backgroundColor);
+    assert(kick >= 3, `${theme} band kicker = ${kick.toFixed(2)}`);
+    const chap = ratio(getComputedStyle($('chap')).color, getComputedStyle($('t3')).backgroundColor);
+    assert(chap >= 3, `${theme} chapter h1 = ${chap.toFixed(2)}`);
+    const page = ratio(getComputedStyle($('t3'), '::after').color, getComputedStyle($('t3')).backgroundColor);
+    assert(page >= 3, `${theme} chapter page number = ${page.toFixed(2)}`);
+  });
+}
+test('밝은 띠색은 --band-ink로 글자색을 바꾼다', () => {
+  document.body.dataset.theme = 'paper';
+  const band = document.getElementById('band');
+  band.style.cssText = '--band: #F7E9A0; --band-ink: #1F2328';
+  eq(getComputedStyle(document.getElementById('kick')).color, 'rgb(31, 35, 40)');
+  band.style.cssText = '';
+  document.body.dataset.theme = 'chalk';
+});
 test('본문 글자는 28px', () => {
   document.body.dataset.theme = 'chalk';
   eq(getComputedStyle(document.getElementById('body')).fontSize, '28px');

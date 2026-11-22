@@ -17,6 +17,7 @@
   --ch-paper: #1F3A2E; --ch-ink: #F1F5EE; --ch-mute: #B9CABE; --ch-line: #4A6B5A;
   --ch-card: #29493A; --ch-soft: #355846; --ch-ok: #7FD99A; --ch-bad: #FF8A80; --ch-ok-bg: #24553A; --ch-bad-bg: #5A2A27;
   --ch-hl: #8C7A1E; --accent: #F2C14E; --table-head: #2F6B4A; --table-side: #29493A;
+  --tab-ink: #1F3A2E;   /* 노란 강조색 띠(장 표지, 표지 .band) 위 글자는 칠판색. 흰 글자는 대비 1.7:1이었다 */
 }
 [data-theme="chalk"] .slide { background: radial-gradient(ellipse at 30% 20%, #26473A, var(--ch-paper) 70%); }
 [data-theme="chalk"] .slide button, [data-theme="chalk"] .slide .ch-card, [data-theme="chalk"] .slide .quiz .opt { border-color: var(--ch-line); }
