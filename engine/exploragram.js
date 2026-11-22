@@ -1,7 +1,7 @@
-/*! exploragram engine v2.8.1 | © N-lifescience | https://github.com/N-lifescience/resonance */
+/*! exploragram engine v2.8.2 | © N-lifescience | https://github.com/N-lifescience/resonance */
 (function () {
 'use strict';
-const VERSION = '2.8.1';
+const VERSION = '2.8.2';
 const LIVE_CONFIG = {"url":"https://qtwigpxinccudhprrdnb.supabase.co","key":"sb_publishable_-3KCWch7Q7sBQbcdVzxR4g_imovkZv5","site":"https://n-lifescience.github.io/resonance/"};
 /* ---- 00-core.js ---- */
 // 공통 상수, 작은 DOM 도우미, 이벤트 훅, 공개 객체 Exploragram.
@@ -5278,6 +5278,9 @@ const PptFill = {
       const v = img.getAttribute(dim) || img.style[dim];
       if (v) ph.style[dim] = /^\d+$/.test(v) ? `${v}px` : v;
     }
+    // 그림을 폭에 맞춰 늘리는 부품(라벨 붙이기, 지도)에서도 그림과 같은 비율이 되게
+    const [w, ht] = ['width', 'height'].map((d) => img.getAttribute(d));
+    if (/^\d+$/.test(w) && /^\d+$/.test(ht) && +w > 0 && +ht > 0) ph.style.aspectRatio = `${w} / ${ht}`;
     img.after(ph);
     this.ph.set(img, ph);
     this.show(img);

@@ -1,6 +1,13 @@
 /* 그림 자리, 끌어다 놓기 안내, 알림 줄, 그림 바꾸기 창 */
 :where(.slide) .ch-ppt-ph { display: inline-grid; place-content: center; gap: 6px; box-sizing: border-box; width: 100%; max-width: 100%; aspect-ratio: 16 / 9; padding: 16px; border: 3px dashed #AEB4BC; border-radius: 12px; background: repeating-linear-gradient(135deg, var(--ch-soft) 0 18px, var(--ch-card) 18px 36px); color: var(--ch-mute); text-align: center; vertical-align: top; cursor: pointer; }
 :where(.slide) .ch-ppt-ph[hidden] { display: none; }
+/* 빈 그림(img[data-ppt])은 hidden으로 숨긴다. 부품(.fig img, figure.hotspots > img, .ch-lb-art > img)이나 수업 CSS가 img에 display를 주면
+   브라우저 기본 [hidden]이 져서 깨진 그림이 회색 상자 옆에 한 번 더 자리를 차지했다(height를 주면 그 높이만큼 장이 넘쳤다). */
+img[hidden] { display: none !important; }
+/* 표지 그림(.cover-art)은 오른쪽에 떠 있는 그림이라, 비었을 때 회색 상자도 같은 자리에 띄운다. 안 그러면 상자가 글 흐름에 들어가 제목을 장 밖으로 민다. */
+/* 라벨 붙이기와 지도는 그림을 상자 폭에 꽉 채운다(.ch-lb-art > img, .ch-map-box > img). 회색 상자도 같게 해야 자리(--x, --y)가 그림 위 같은 곳에 놓인다. */
+:where(.slide) .ch-lb-art > .ch-ppt-ph:not([hidden]), :where(.slide) .ch-map-box > .ch-ppt-ph:not([hidden]) { display: grid; width: 100% !important; height: auto !important; }
+:where(.slide) .cover-art + .ch-ppt-ph { position: absolute; right: 0; top: 0; z-index: 1; width: 560px; max-width: none; height: 100%; aspect-ratio: auto; padding-left: 64px; border-radius: 0; clip-path: ellipse(100% 78% at 100% 50%); }
 :where(.slide) .ch-ppt-ph b { font-size: 22px; line-height: 1.35; }
 :where(.slide) .ch-ppt-ph small { font-size: 20px; }
 :where(.slide) .ch-ppt-ph.is-bad { border-color: var(--ch-bad); color: var(--ch-bad); }

@@ -70,6 +70,9 @@ const PptFill = {
       const v = img.getAttribute(dim) || img.style[dim];
       if (v) ph.style[dim] = /^\d+$/.test(v) ? `${v}px` : v;
     }
+    // 그림을 폭에 맞춰 늘리는 부품(라벨 붙이기, 지도)에서도 그림과 같은 비율이 되게
+    const [w, ht] = ['width', 'height'].map((d) => img.getAttribute(d));
+    if (/^\d+$/.test(w) && /^\d+$/.test(ht) && +w > 0 && +ht > 0) ph.style.aspectRatio = `${w} / ${ht}`;
     img.after(ph);
     this.ph.set(img, ph);
     this.show(img);

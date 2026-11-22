@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="ko" data-deck="test-pptfill-hidden" data-fit="off">
+<head>
+<meta charset="utf-8">
+<title>pptfill hidden</title>
+<link rel="stylesheet" href="../../engine/exploragram.css">
+<script defer src="../../engine/exploragram.js"></script>
+<script src="harness.js"></script>
+</head>
+<body>
+<section class="slide" id="s1">
+  <h2>그림 부품 안의 빈 그림</h2>
+  <figure class="fig" id="fig"><img data-ppt="1-1" id="figImg" alt="세포" width="400" height="300"><figcaption id="figCap">자체 제작</figcaption></figure>
+</section>
+<section class="slide" id="s2">
+  <figure class="hotspots" id="hs"><img data-ppt="1-2" id="hsImg" alt="핫스팟 그림" width="400" height="200"><span class="hs" style="--x:30%; --y:40%">설명</span></figure>
+</section>
+<section class="slide" id="s3">
+  <div style="width:600px"><figure class="labeling" id="lb"><img data-ppt="1-3" id="lbImg" alt="라벨 그림" width="400" height="200"><span class="lb" style="--x:20%; --y:30%">핵</span><span class="lb" style="--x:60%; --y:50%">막</span></figure></div>
+</section>
+<section class="slide cover" id="cover">
+  <img class="cover-art" data-ppt="1-4" id="coverImg" alt="표지 그림">
+  <div class="band"><p class="kicker">고등학교 생명과학</p></div>
+  <h1 id="coverTitle">세포막을 통한<br>물질 이동</h1>
+</section>
+<pre id="results" data-summary="pending"></pre>
+<script>
+const I = () => Exploragram._internal;
+const $ = (id) => document.getElementById(id);
+const ph = (id) => $(id).nextElementSibling;
+const shown = (el) => getComputedStyle(el).display !== 'none';
+const DOT = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2240%22 height=%2230%22/%3E';
+
+test('그림 부품(.fig) 안의 빈 그림은 숨고, 회색 상자가 그림 크기로 한 번만 자리를 차지한다', () => {
+  Exploragram.go(0);
+  assert($('figImg').hidden && !shown($('figImg')), 'img display none');
+  assert(ph('figImg').classList.contains('ch-ppt-ph') && shown(ph('figImg')), 'placeholder shown');
+  eq(ph('figImg').offsetWidth, 400, 'ph width');
+  eq(ph('figImg').offsetHeight, 300, 'ph height');
+  // figure = 회색 상자 + 캡션 + 틈. 깨진 그림 300px이 한 번 더 들어가면 600px을 넘는다
+  const extra = $('fig').offsetHeight - ph('figImg').offsetHeight - $('figCap').offsetHeight;
+  assert(extra < 40, `figure has only one box (extra ${extra}px)`);
+});
+test('핫스팟과 라벨 붙이기 안의 빈 그림도 숨는다', () => {
+  Exploragram.go(1);
+  assert(!shown($('hsImg')) && shown(ph('hsImg')), 'hotspots');
+  Exploragram.go(2);
+  assert($('lbImg').parentElement.classList.contains('ch-lb-art'), 'labeling art box');
+  assert(!shown($('lbImg')) && shown(ph('lbImg')), 'labeling');
+  // 라벨 붙이기는 그림을 폭에 꽉 채우므로 회색 상자도 폭을 채우고 그림 비율(400:200)을 지킨다
+  const art = $('lbImg').parentElement;
+  eq(ph('lbImg').offsetWidth, art.clientWidth, 'labeling ph fills art');
+  assert(Math.abs(ph('lbImg').offsetHeight - art.clientWidth / 2) <= 1, `labeling ratio (${ph('lbImg').offsetHeight})`);
+  eq(art.clientHeight, ph('lbImg').offsetHeight, 'art box = placeholder');
+});
+test('표지 빈 그림(.cover-art): 회색 상자가 오른쪽 그림 자리에 떠 있고 제목은 장 안에 있다', () => {
+  Exploragram.go(3);
+  const slide = $('cover');
+  assert(!shown($('coverImg')), 'img hidden');
+  const p = ph('coverImg');
+  eq(getComputedStyle(p).position, 'absolute', 'placeholder floats');
+  eq(p.offsetWidth, 560, 'placeholder width');
+  eq(p.offsetHeight, slide.clientHeight, 'placeholder height');
+  eq(p.offsetLeft + p.offsetWidth, slide.clientWidth, 'right edge');
+  const t = $('coverTitle');
+  assert(t.offsetTop + t.offsetHeight <= slide.clientHeight, `title inside (${t.offsetTop + t.offsetHeight} > ${slide.clientHeight})`);
+});
+test('엔진 점검: 빈 그림이 있는 장에 넘침·잘림 오류가 없다', () => {
+  const errors = Exploragram.audit().errors.filter((e) => e.slide <= 3);
+  eq(errors.map((e) => `${e.slide + 1}장 ${e.code}: ${e.msg}`), []);
+});
+test('그림을 채우면 회색 상자는 숨고 그림이 원래 모양으로 보인다', () => {
+  for (const id of ['figImg', 'hsImg', 'lbImg', 'coverImg']) I().PptFill.set($(id), DOT);
+  Exploragram.go(0);
+  eq(getComputedStyle($('figImg')).display, 'block', 'fig block');
+  assert(!shown(ph('figImg')), 'fig ph hidden');
+  Exploragram.go(2);
+  assert(shown($('lbImg')) && !shown(ph('lbImg')), 'labeling filled');
+  eq($('lbImg').offsetWidth, $('lbImg').parentElement.clientWidth, 'labeling img fills art');
+  Exploragram.go(3);
+  eq(getComputedStyle($('coverImg')).position, 'absolute', 'cover art floats');
+  eq($('coverImg').offsetWidth, 560, 'cover art width');
+  assert(!shown(ph('coverImg')), 'cover ph hidden');
+  I().PptFill.dirty = false;
+});
+</script>
+</body>
+</html>
