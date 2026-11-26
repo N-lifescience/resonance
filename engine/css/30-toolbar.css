@@ -1,24 +1,15 @@
-.ch-toolbar { position: fixed; z-index: 50; display: flex; align-items: center; gap: 6px; padding: 8px 10px; background: var(--ch-ui); color: var(--ch-ui-fg); border-radius: 18px; box-shadow: 0 10px 30px rgba(0, 0, 0, .35); font-family: var(--ch-font); }
-.ch-toolbar[data-dock="bottom"] { left: 50%; bottom: 8px; transform: translateX(-50%); max-width: calc(100vw - 16px); overflow-x: auto; }
-.ch-toolbar[data-dock="left"], .ch-toolbar[data-dock="right"] { top: 50%; transform: translateY(-50%); flex-direction: column; max-height: calc(100vh - 16px); overflow-y: auto; }
-.ch-toolbar[data-dock="left"] { left: 8px; }
-.ch-toolbar[data-dock="right"] { right: 8px; }
-.ch-toolbar[hidden], .ch-tb-handle[hidden] { display: none; }
+.ch-toolbar { display: flex; align-items: center; gap: 6px; padding: 8px 10px; background: var(--ch-ui); color: var(--ch-ui-fg); border-radius: 18px; box-shadow: 0 10px 30px rgba(0, 0, 0, .35); font-family: var(--ch-font); }
+.ch-toolbar[hidden] { display: none; }
 .ch-tb-group { display: flex; align-items: center; gap: 4px; }
-.ch-toolbar[data-dock="left"] .ch-tb-group, .ch-toolbar[data-dock="right"] .ch-tb-group { flex-direction: column; }
 .ch-tb-group:empty { display: none; }
 .ch-tb-group + .ch-tb-group { padding-left: 6px; border-left: 1px solid rgba(255, 255, 255, .12); }
-.ch-toolbar[data-dock="left"] .ch-tb-group + .ch-tb-group, .ch-toolbar[data-dock="right"] .ch-tb-group + .ch-tb-group { padding: 6px 0 0; border-left: 0; border-top: 1px solid rgba(255, 255, 255, .12); }
-.ch-tb-btn, .ch-tb-handle { all: unset; box-sizing: border-box; min-width: 52px; height: 56px; padding: 6px 6px 4px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; cursor: pointer; color: var(--ch-ui-fg); font: 600 11px/1 var(--ch-font); white-space: nowrap; -webkit-tap-highlight-color: transparent; transition: background .15s, transform .15s; }
+.ch-tb-btn { all: unset; box-sizing: border-box; min-width: 52px; height: 56px; padding: 6px 6px 4px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; cursor: pointer; color: var(--ch-ui-fg); font: 600 11px/1 var(--ch-font); white-space: nowrap; -webkit-tap-highlight-color: transparent; transition: background .15s, transform .15s; }
 .ch-tb-btn:hover { background: var(--ch-ui-2); }
 .ch-tb-btn:active { transform: scale(.95); }
-.ch-tb-btn:focus-visible, .ch-tb-handle:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.ch-tb-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 .ch-tb-btn[aria-pressed="true"] { background: var(--accent); color: #fff; }
-.ch-toolbar[data-dock="left"] .ch-tb-btn, .ch-toolbar[data-dock="right"] .ch-tb-btn { min-width: 52px; height: 52px; }
-.ch-toolbar[data-dock="left"] .ch-tb-btn span, .ch-toolbar[data-dock="right"] .ch-tb-btn span { display: none; }
 /* 「반」 단추: 지금 반 이름을 색 알약으로(판서는 반마다 따로 저장된다). 옆 붙임에서도 이름은 보인다 */
 .ch-tb-btn[data-name="class"] span { max-width: 6em; overflow: hidden; text-overflow: ellipsis; padding: 2px 8px; border-radius: 999px; background: var(--accent); color: #fff; font-size: 13px; font-weight: 800; line-height: 1.1; }
-.ch-toolbar[data-dock="left"] .ch-tb-btn[data-name="class"] span, .ch-toolbar[data-dock="right"] .ch-tb-btn[data-name="class"] span { display: block; max-width: 46px; padding: 1px 4px; font-size: 11px; }
 /* 반을 바꾸면 화면 가운데에 잠깐: 「B반 판서로 바꿨어요」 */
 .ch-notice { position: fixed; z-index: 85; left: 16px; right: 16px; top: 40%; box-sizing: border-box; width: fit-content; margin: 0 auto; padding: 16px 28px; border-radius: 18px; background: var(--ch-ui); color: var(--ch-ui-fg); font: 700 28px/1.35 var(--ch-font); text-align: center; word-break: keep-all; overflow-wrap: anywhere; box-shadow: 0 16px 40px rgba(0, 0, 0, .4); pointer-events: none; transform: translateY(-50%); opacity: 0; visibility: hidden; transition: opacity .25s, visibility 0s .25s; }
 .ch-notice.is-on { opacity: 1; visibility: visible; transition: opacity .2s; }
@@ -26,10 +17,6 @@
 @media print { .ch-notice { display: none !important; } }
 .ch-icon { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .ch-icon-style path { fill: var(--swatch, currentColor); stroke: rgba(255, 255, 255, .6); stroke-width: 1.5; }
-.ch-tb-handle { position: fixed; z-index: 50; background: var(--ch-ui); box-shadow: 0 8px 24px rgba(0, 0, 0, .3); }
-.ch-tb-handle[data-dock="bottom"] { left: 50%; bottom: 8px; transform: translateX(-50%); }
-.ch-tb-handle[data-dock="left"] { left: 8px; top: 50%; transform: translateY(-50%); }
-.ch-tb-handle[data-dock="right"] { right: 8px; top: 50%; transform: translateY(-50%); }
 .ch-pop { position: fixed; z-index: 75; min-width: 200px; max-width: min(420px, 92vw); padding: 14px; background: var(--ch-ui); color: var(--ch-ui-fg); border-radius: 16px; box-shadow: 0 16px 40px rgba(0, 0, 0, .4); font-family: var(--ch-font); animation: ch-pop .3s var(--ch-ease-out); }
 .ch-pop h3 { margin: 0 0 10px; font-size: 14px; font-weight: 700; color: var(--ch-ui-mute); }
 .ch-swatches, .ch-widths, .ch-class-list { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -45,22 +32,40 @@
 .ch-pop-class .ch-class-list { margin-bottom: 8px; }
 .ch-menu-item { display: block; width: 100%; margin-top: 6px; padding: 12px; border-radius: 10px; font-size: 15px; }
 .ch-menu-item:hover, .ch-menu-item:focus-visible { background: var(--ch-ui-2); }
-/* 양옆 HUD: 가장자리에 붙은 작은 반원 탭(‹ ›). 누르면 이름 달린 도구판이 화면 가운데 쪽으로 나온다.
-   탭을 끌면 어디든 옮길 수 있고(떠 있을 땐 동그란 단추), 가장자리에 놓으면 다시 붙는다. 자리는 30-toolbar가 정한다. */
+/* 화면 양옆 가장자리의 반원 탭: 왼쪽 ‹ 이전 장, 오른쪽 › 다음 장(30-toolbar의 buildEdges). */
+.ch-edge-nav { all: unset; position: fixed; top: 50%; z-index: 52; box-sizing: border-box; display: grid; place-items: center; width: 28px; height: 80px; margin-top: -40px; background: var(--ch-ui); color: var(--ch-ui-fg); cursor: pointer; opacity: .85; -webkit-tap-highlight-color: transparent; box-shadow: 0 0 0 2px #fff, 0 0 0 4px #111, 0 6px 18px rgba(0, 0, 0, .35); transition: opacity .15s, transform .15s; }
+.ch-edge-nav[data-side="left"] { left: 0; border-radius: 0 16px 16px 0; }
+.ch-edge-nav[data-side="right"] { right: 0; border-radius: 16px 0 0 16px; }
+.ch-edge-nav:hover { opacity: 1; }
+.ch-edge-nav:active { transform: scale(.94); }
+.ch-edge-nav:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.ch-edge-nav .ch-icon { width: 22px; height: 22px; stroke-width: 2.5; }
+/* 떠 있는 판서 도구 단추(HUD). 누르면 이름 달린 도구판이 화면 가운데 쪽으로 나오고, 끌면 어디든 옮긴다.
+   도구판의 「더보기」는 나머지 수업 도구(.ch-toolbar)를 도구판 옆에 펼친다. 자리는 30-toolbar가 정한다. */
 .ch-hud { position: fixed; left: 0; top: 50%; z-index: 52; font-family: var(--ch-font); }
 .ch-hud[hidden] { display: none; }
-.ch-hud-tab { all: unset; box-sizing: border-box; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: var(--ch-ui); color: var(--ch-ui-fg); opacity: .7; box-shadow: 0 6px 18px rgba(0, 0, 0, .3); cursor: grab; touch-action: none; -webkit-tap-highlight-color: transparent; transition: opacity .15s; }
-.ch-hud[data-edge="left"] .ch-hud-tab { width: 22px; height: 64px; border-radius: 0 14px 14px 0; }
-.ch-hud[data-edge="right"] .ch-hud-tab { width: 22px; height: 64px; border-radius: 14px 0 0 14px; }
+.ch-hud-tab { all: unset; box-sizing: border-box; display: grid; place-items: center; width: 52px; height: 52px; border-radius: 50%; background: var(--ch-ui); color: var(--ch-ui-fg); opacity: .85; box-shadow: 0 0 0 2px #fff, 0 0 0 4px #111, 0 6px 18px rgba(0, 0, 0, .35); cursor: grab; touch-action: none; -webkit-tap-highlight-color: transparent; transition: opacity .15s; }
 .ch-hud-tab:hover, .ch-hud.is-open .ch-hud-tab { opacity: 1; }
 .ch-hud-tab:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
-.ch-hud-tab .ch-icon { width: 20px; height: 20px; }
-.ch-hud[data-edge="left"] .ch-hud-tab .ch-icon, .ch-hud[data-edge="right"] .ch-hud-tab .ch-icon { width: 18px; height: 18px; }
-.ch-hud-panel { position: absolute; top: 50%; display: none; flex-direction: column; gap: 2px; padding: 8px 6px; max-height: calc(100vh - 16px); overflow-y: auto; box-sizing: border-box; background: var(--ch-ui); color: var(--ch-ui-fg); border-radius: 18px; box-shadow: 0 10px 30px rgba(0, 0, 0, .35); transform: translateY(calc(-50% + var(--dy, 0px))); }
-.ch-hud[data-open="right"] .ch-hud-panel { left: calc(100% + 8px); }
-.ch-hud[data-open="left"] .ch-hud-panel { right: calc(100% + 8px); }
-.ch-hud.is-open .ch-hud-panel { display: flex; }
+.ch-hud-tab .ch-icon { width: 24px; height: 24px; }
+.ch-hud-body { position: absolute; top: 50%; display: none; align-items: flex-end; gap: 8px; transform: translate(var(--dx, 0px), calc(-50% + var(--dy, 0px))); }
+.ch-hud[data-open="right"] .ch-hud-body { left: calc(100% + 10px); }
+.ch-hud[data-open="left"] .ch-hud-body { right: calc(100% + 10px); flex-direction: row-reverse; }
+.ch-hud.is-open .ch-hud-body { display: flex; }
+.ch-hud-panel { display: flex; flex-direction: column; gap: 2px; padding: 8px 6px; max-height: calc(100vh - 16px); overflow-y: auto; box-sizing: border-box; background: var(--ch-ui); color: var(--ch-ui-fg); border-radius: 18px; box-shadow: 0 10px 30px rgba(0, 0, 0, .35); }
 .ch-hud-panel .ch-tb-btn { min-width: 60px; height: 54px; }
 .ch-hud-panel .ch-seg { flex-direction: column; }
-/* HUD 탭 테두리: 흰색 안쪽 + 검정 바깥쪽 이중선. 밝은 슬라이드·어두운 칠판 어디서나 잘 보이게 */
-.ch-hud-tab { box-shadow: 0 0 0 2px #fff, 0 0 0 4px #111, 0 6px 18px rgba(0, 0, 0, .35); opacity: .85; }
+.ch-hud-panel .ch-tb-btn[data-name="more"] { margin-top: 4px; }
+/* 더보기: 나머지 수업 도구를 네 칸 격자로 펼친다. 판서 도구·되돌리기·슬라이드|칠판은 도구판에 있으니 뺀다 */
+.ch-toolbar[data-dock="float"] { display: grid; grid-template-columns: repeat(4, 64px); grid-auto-flow: row dense; gap: 4px; padding: 8px; max-height: calc(100vh - 16px); overflow-y: auto; box-sizing: border-box; }
+.ch-toolbar[data-dock="float"][hidden] { display: none; }
+.ch-toolbar[data-dock="float"] .ch-tb-group { display: contents; }
+.ch-toolbar[data-dock="float"] :is(.ch-tb-tools, .ch-tb-edit [data-name="undo"], .ch-tb-board > .ch-seg) { display: none; }
+.ch-toolbar[data-dock="float"] .ch-tb-btn { width: 64px; min-width: 0; padding-left: 2px; padding-right: 2px; }
+.ch-toolbar[data-dock="float"] .ch-tb-btn span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+.ch-toolbar[data-dock="float"] .ch-tb-btn[data-name="class"] span { max-width: 56px; padding: 2px 6px; }
+/* 좁은 화면: 더보기를 펼치면 도구판은 「더보기」 단추만 남기고, 격자는 세 칸 */
+@media (max-width: 480px) {
+  .ch-hud.is-more .ch-hud-panel > :not([data-name="more"]) { display: none; }
+  .ch-toolbar[data-dock="float"] { grid-template-columns: repeat(3, 64px); }
+}

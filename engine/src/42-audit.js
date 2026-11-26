@@ -59,7 +59,9 @@ const Audit = {
     const label = `점검 ${n}`;
     if (!this.badge) {
       this.badge = Toolbar.btn('check', label, () => this.toggle(), { class: 'ch-tb-btn ch-audit-badge' });
-      Toolbar.slots.misc.prepend(this.badge);
+      // 툴바는 더보기 안에 숨어 있으니 떠 있는 판서 도구 단추 위에 붙여 늘 보이게 한다(단추를 옮기면 같이 간다)
+      const hud = Toolbar.huds.float;
+      if (hud) hud.append(this.badge); else Toolbar.slots.misc.prepend(this.badge);
     }
     this.badge.lastChild.textContent = label;
     this.badge.title = `자동 점검: 고칠 곳 ${n}건`;

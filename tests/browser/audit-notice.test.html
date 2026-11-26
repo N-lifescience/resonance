@@ -13,11 +13,12 @@
 <pre id="results" data-summary="pending"></pre>
 <script>
 const I = () => Exploragram._internal;
-const badge = () => document.querySelector('.ch-toolbar .ch-audit-badge');
+const badge = () => document.querySelector('.ch-hud > .ch-audit-badge');
 
 test('처음 연 파일에 고칠 곳이 있으면 툴바에 「점검 N」 단추가 뜬다', async () => {
   for (let i = 0; i < 40 && !badge(); i++) await wait(150);
   assert(badge(), 'badge');
+  { const r = badge().getBoundingClientRect(); assert(r.width > 0 && r.top >= 0 && r.left >= 0 && r.right <= innerWidth && r.bottom <= innerHeight, `떠 있는 단추 위에 보인다 ${r.left},${r.top}`); }
   const n = Exploragram.audit().errors.length;
   assert(n >= 1, 'errors');
   eq(badge().textContent.trim(), `점검 ${n}`);

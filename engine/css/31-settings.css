@@ -15,8 +15,8 @@
 .ch-switch.is-blocked { cursor: default; }
 .ch-switch.is-blocked b { color: var(--ch-ui-mute); }
 .ch-switch input:disabled { opacity: .35; cursor: not-allowed; }
-/* 꺼진 기능(⚙ 설정의 기능 켜고 끄기): 툴바·양옆 도구에서 숨긴다 */
-html.ch-off-ink :is(.ch-tb-tools, .ch-tb-style, .ch-tb-edit, .ch-tb-class, .ch-hud, .ch-ink, .ch-ink-live) { display: none !important; }
+/* 꺼진 기능(⚙ 설정의 기능 켜고 끄기): 도구판·더보기에서 숨긴다. 떠 있는 단추와 「더보기」는 남겨야 설정을 다시 켤 수 있다 */
+html.ch-off-ink :is(.ch-tb-tools, .ch-tb-style, .ch-tb-edit, .ch-tb-class, .ch-hud-panel > [data-tool], .ch-hud-panel > [data-name="undo"], .ch-ink, .ch-ink-live) { display: none !important; }
 html.ch-off-board :is(.ch-tb-board, .ch-hud .ch-seg) { display: none !important; }
 html.ch-off-live .ch-tb-btn[data-name="live"] { display: none !important; }
 .slide .w { white-space: nowrap; }

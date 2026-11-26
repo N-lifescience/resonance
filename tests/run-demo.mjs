@@ -143,9 +143,17 @@ async function runViewport(width, height) {
       }]);
       await touch('touchEnd', []);
     };
-    const toolbar = (name) => `.ch-toolbar [data-name="${name}"]`;
+    // 넘기기는 화면 양옆 탭, 판서 도구는 떠 있는 도구판, 나머지는 도구판의 「더보기」 안에 있다.
+    const PANEL_TOOLS = ['hand', 'pen', 'hl', 'eraser', 'laser', 'undo', 'slides', 'board', 'more'];
+    const tool = async (name) => {
+      if (name === 'prev' || name === 'next') { await click(`.ch-edge-nav[data-name="${name}"]`); return; }
+      if (!await evaluate("document.querySelector('.ch-hud').classList.contains('is-open')")) await click('.ch-hud-tab');
+      if (PANEL_TOOLS.includes(name)) { await click(`.ch-hud-panel [data-name="${name}"]`); return; }
+      if (!await evaluate("document.querySelector('.ch-hud').classList.contains('is-more')")) await click('.ch-hud-panel [data-name="more"]');
+      await click(`.ch-toolbar [data-name="${name}"]`);
+    };
     const menu = async (text) => {
-      await click(toolbar('class'));
+      await tool('class');
       const index = await evaluate(`Array.from(document.querySelectorAll('.ch-menu-item')).findIndex(b=>b.textContent.includes(${JSON.stringify(text)}))`);
       check(index >= 0, `Missing menu: ${text}`);
       await click(`.ch-menu-item:nth-of-type(${index + 1})`);
@@ -191,11 +199,11 @@ async function runViewport(width, height) {
     await send('Emulation.setTouchEmulationEnabled', { enabled: false });
     pass('실제 touch: 손 모드 좌우 스와이프 · 판서 없음');
 
-    await click(toolbar('pen'));
+    await tool('pen');
     await draw(200, 490, 540, 520);
     check(await evaluate('Exploragram._internal.Ink.page.length === 1'), 'Cover pen stroke not recorded');
-    await click(toolbar('next'));
-    await click(toolbar('prev'));
+    await tool('next');
+    await tool('prev');
     check(await evaluate("Exploragram._internal.Nav.state.slide===0 && Exploragram._internal.Tools.current==='pen' && Exploragram._internal.Ink.page.length===1"), 'Pen/navigation/cover preservation failed');
     pass('펜 유지 · 앞 장 판서 보존');
 
@@ -236,11 +244,11 @@ async function runViewport(width, height) {
     await send('Emulation.setTouchEmulationEnabled', { enabled: false });
     pass('실제 multi-touch: 첫 접촉만 판서 · 두 번째 접촉 무시 · 펜/현재 장 유지');
 
-    await click(toolbar('pen'));
+    await tool('pen');
     await key('c', 'KeyC', 67);
     check(await evaluate('Exploragram._internal.Board.active'), 'C did not open board');
-    await click(toolbar('boardAdd'));
-    await click(toolbar('bg'));
+    await tool('boardAdd');
+    await tool('bg');
     await click('.ch-bg[data-bg="green"]');
     await draw(200, 360, 610, 420);
     check(await evaluate("Exploragram._internal.Session.doc.boards.length===2 && Exploragram._internal.Session.doc.board===1 && Exploragram._internal.Ink.page.length===1 && Exploragram._internal.Tools.penColor==='#FFFFFF'"), 'Green board/page/white pen failed');
@@ -253,20 +261,22 @@ async function runViewport(width, height) {
     await answer('2반');
     await until("Exploragram._internal.Session.current==='2반'");
     check(await evaluate('Exploragram._internal.Ink.page.length===0 && Exploragram._internal.Session.doc.boards.length===1'), 'New class must have separate ink and board');
-    await click(toolbar('class'));
+    await tool('class');
     const baseIndex = await evaluate("Array.from(document.querySelectorAll('.ch-class')).findIndex(b=>b.textContent==='기본')");
     await click(`.ch-class:nth-child(${baseIndex + 1})`);
     await until("Exploragram._internal.Session.current==='기본'");
     check(await evaluate('Exploragram._internal.Ink.page.length===2 && Exploragram._internal.Session.doc.boards.length===2'), 'Original class ink/board missing');
     pass('반 추가/전환 · 반별 슬라이드/칠판 분리');
 
-    await click(toolbar('dock'));
+    // 떠 있는 판서 도구 단추를 실제로 끌어 옮긴다(자리는 새로 고침 뒤에도 남는다)
+    if (await evaluate("document.querySelector('.ch-hud').classList.contains('is-open')")) await click('.ch-hud-tab');
+    await drag(await center('.ch-hud-tab'), await evaluate('({ x: innerWidth * 0.5, y: innerHeight * 0.2 })'), 'mouse');
     await evaluate('Exploragram._internal.Session.flush()');
     const expected = await canonicalDoc();
     await load('Page.reload', { ignoreCache: true });
     await key('Escape', 'Escape', 27);
     check(await canonicalDoc() === expected, 'Stored slide/board ink changed after reload');
-    check(await evaluate("Exploragram._internal.Session.current==='기본' && Exploragram._internal.Session.classes.includes('2반') && Exploragram._internal.Toolbar.prefs.dock==='left'"), 'Class/toolbar preferences missing after reload');
+    check(await evaluate("Exploragram._internal.Session.current==='기본' && Exploragram._internal.Session.classes.includes('2반') && Exploragram._internal.Toolbar.prefs.hud.y < 0.4 && Exploragram._internal.Toolbar.prefs.hud.x > 0.3"), 'Class/toolbar preferences missing after reload');
     pass('reload 후 슬라이드/칠판 판서 · 반 · 툴바 위치 유지');
 
     await menu('백업 파일로 저장');
@@ -282,7 +292,7 @@ async function runViewport(width, height) {
     await menu('판서 모두 지우기');
     await answer();
     await until('Object.values(Exploragram._internal.Session.doc.slides).every(p=>!p.length) && Exploragram._internal.Session.doc.boards.length===1');
-    await click(toolbar('class'));
+    await tool('class');
     const root = await send('DOM.getDocument');
     const input = await send('DOM.querySelector', { nodeId: root.root.nodeId, selector: '.ch-pop input[type="file"]' });
     check(input.nodeId, 'Backup file input is missing');

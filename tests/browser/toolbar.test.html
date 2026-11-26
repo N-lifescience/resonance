@@ -14,7 +14,7 @@
 <pre id="results" data-summary="pending"></pre>
 <script>
 const I = () => Exploragram._internal;
-const btn = (name) => document.querySelector(`.ch-toolbar [data-name="${name}"]`);
+const btn = (name) => document.querySelector(`.ch-toolbar [data-name="${name}"], .ch-edge-nav[data-name="${name}"]`);
 const key = (k, opts) => document.dispatchEvent(new KeyboardEvent('keydown', Object.assign({ key: k, bubbles: true, cancelable: true }, opts)));
 
 test('툴바가 있고 처음에는 손 모드', () => {
@@ -104,21 +104,23 @@ test('화면 안 확인창: 확인·취소·Esc·글자 입력', async () => {
   document.querySelector('.ch-ask-ok').click();
   eq(await p, true);
 });
-test('위치 바꾸기: 아래 → 왼쪽, 화면 여백도 옮긴다', () => {
-  btn('dock').click();
-  eq(document.querySelector('.ch-toolbar').dataset.dock, 'left');
-  eq(document.documentElement.style.getPropertyValue('--ch-reserve-left'), '80px');
-  eq(document.documentElement.style.getPropertyValue('--ch-reserve-bottom'), '0px');
-  btn('dock').click();
-  btn('dock').click();
-  eq(document.querySelector('.ch-toolbar').dataset.dock, 'bottom');
+test('화면 아래에는 툴바가 없고 무대 여백도 없다', () => {
+  assert(document.querySelector('.ch-toolbar').hidden, '툴바는 더보기 안에 숨어 있다');
+  eq(document.querySelector('.ch-tb-handle'), null);
+  for (const side of ['bottom', 'left', 'right']) eq(document.documentElement.style.getPropertyValue(`--ch-reserve-${side}`), '0px', side);
+  for (const name of ['dock', 'collapse', 'prev', 'next']) eq(document.querySelector(`.ch-toolbar [data-name="${name}"]`), null, name);
 });
-test('접기와 펼치기', () => {
-  btn('collapse').click();
-  assert(document.querySelector('.ch-toolbar').hidden, 'hidden');
-  assert(!document.querySelector('.ch-tb-handle').hidden, 'handle shown');
-  document.querySelector('.ch-tb-handle').click();
-  assert(!document.querySelector('.ch-toolbar').hidden, 'shown again');
+test('가장자리 탭: 왼쪽 ‹는 이전, 오른쪽 ›는 다음이고 화면 끝에 붙어 있다', () => {
+  const prev = document.querySelector('.ch-edge-nav[data-side="left"]');
+  const next = document.querySelector('.ch-edge-nav[data-side="right"]');
+  eq(prev.dataset.name, 'prev'); eq(next.dataset.name, 'next');
+  const a = prev.getBoundingClientRect(); const b = next.getBoundingClientRect();
+  assert(a.left <= 1 && b.right >= innerWidth - 1, `끝에 붙음 ${a.left} ${b.right}`);
+  assert(a.height >= 64 && b.height >= 64, '누르기 쉬운 높이');
+  assert(Math.abs(a.top + a.height / 2 - innerHeight / 2) < 2, '세로 가운데');
+  I().Nav.go(0);
+  next.click(); eq(I().Nav.state.slide, 1);
+  prev.click(); eq(I().Nav.state.slide, 0);
 });
 test('반 메뉴: 반을 추가하면 그 반으로 바뀌고 이름이 보인다', async () => {
   btn('class').click();
@@ -142,19 +144,12 @@ test('반 단추: 지금 반 이름이 색 알약으로 보이고, 반을 바꾸
   eq(note().textContent, '기본 판서로 바꿨어요');
   await wait(2200);
   assert(!note().classList.contains('is-on'), '2초쯤 뒤 사라진다');
-  btn('dock').click();   // 왼쪽 붙임에서도 반 이름은 보인다(다른 단추 이름은 숨김)
-  eq(document.querySelector('.ch-toolbar').dataset.dock, 'left');
-  assert(getComputedStyle(btn('class').querySelector('span')).display !== 'none', '반 이름');
-  eq(getComputedStyle(btn('next').querySelector('span')).display, 'none');
-  btn('dock').click();
-  btn('dock').click();
-  eq(document.querySelector('.ch-toolbar').dataset.dock, 'bottom');
   await I().Session.switchTo('3반');
 });
 test('툴바 설정은 저장된다', async () => {
   await wait(100);
   const saved = await I().Store.get('toolbar');
-  eq(saved.dock, 'bottom');
+  assert(saved.float && typeof saved.float.x === 'number', '떠 있는 단추 자리');
   eq(saved.penColor, '#D7263D');
   eq(saved.penWidth, 12);
 });
@@ -178,9 +173,8 @@ test('툴바·팝오버·손잡이의 Enter·Space는 장을 넘기지 않고 �
   btn('class').click();
   press(document.querySelector('.ch-pop .ch-class'));
   Toolbar.closePop();
-  Toolbar.setCollapsed(true);
-  press(Toolbar.handle);
-  Toolbar.setCollapsed(false);
+  press(document.querySelector('.ch-edge-nav[data-name="next"]'));
+  press(document.querySelector('.ch-hud-tab'));
   document.activeElement.blur();
 });
 
@@ -195,72 +189,81 @@ test('Esc는 색·반 팝오버를 닫고 손 모드로 돌아간다', () => {
   }
 });
 
-test('좌우 도킹의 도구 버튼도 최소 52px이다', () => {
+test('떠 있는 판서 도구: 처음부터 떠 있고, 누르면 도구가 나오고, 고르면 들어간다', async () => {
   const T = I().Toolbar;
-  for (const dock of ['left', 'right']) {
-    T.prefs.dock = dock;
-    T.applyDock();
-    const rect = btn('pen').getBoundingClientRect();
-    assert(rect.width >= 52 && rect.height >= 52, `${dock}: ${rect.width}×${rect.height}`);
+  const huds = document.querySelectorAll('.ch-hud');
+  eq(huds.length, 1, '판서 도구 단추는 하나');
+  const hud = huds[0];
+  const tab = hud.querySelector('.ch-hud-tab');
+  const r = tab.getBoundingClientRect();
+  assert(r.left > 8 && r.right < innerWidth - 8, '가장자리에 붙지 않고 떠 있다 ' + r.left);
+  assert(r.width >= 48 && r.height >= 48, '누르기 쉬운 크기 ' + r.width);
+  eq(getComputedStyle(hud.querySelector('.ch-hud-body')).display, 'none');
+  tab.click();
+  eq(tab.getAttribute('aria-expanded'), 'true');
+  for (const b of hud.querySelectorAll('.ch-hud-panel .ch-tb-btn')) {
+    const q = b.getBoundingClientRect();
+    assert(q.width >= 52 && q.height >= 52, `${b.dataset.name} ${q.width}×${q.height}`);
   }
-  T.prefs.dock = 'bottom';
-  T.applyDock();
-});
-test('양옆 HUD: 탭을 누르면 판서 도구가 나오고, 고르면 들어간다', async () => {
-  const T = I().Toolbar;
-  for (const side of ['left', 'right']) {
-    const hud = document.querySelector('.ch-hud[data-side="' + side + '"]');
-    assert(hud && !hud.hidden, side + ' hud');
-    const tab = hud.querySelector('.ch-hud-tab');
-    const r = tab.getBoundingClientRect();
-    assert(side === 'left' ? r.left <= 1 : r.right >= innerWidth - 1, side + ' edge');
-    assert(r.width <= 24 && r.height <= 64, side + ' small tab ' + r.width + '×' + r.height);
-    eq(hud.dataset.edge, side);
-    eq(getComputedStyle(hud.querySelector('.ch-hud-panel')).display, 'none');
-    tab.click();
-    eq(tab.getAttribute('aria-expanded'), 'true');
-    hud.querySelector('[data-tool="pen"]').click();
-    eq(I().Tools.current, 'pen');
-    assert(!hud.classList.contains('is-open'), 'closes after pick');
-    eq(btn('pen').getAttribute('aria-pressed'), 'true');   // 아래 툴바와 같이 맞춘다
-    await wait(400);                                       // 두 번 톡(모드 전환)으로 읽히지 않게
-    tab.click();
-    hud.querySelector('[data-tool="pen"]').click();       // 고른 펜을 다시: 색 고르기
-    assert(document.querySelector('.ch-pop .ch-swatches'), 'style pop');
-    T.closePop();
-    hud.querySelector('[data-tool="hand"]').click();
-    await wait(400);
-  }
+  eq(hud.querySelector('.ch-hud-panel [data-name="next"]'), null, '넘기기는 가장자리 탭이 맡는다');
+  hud.querySelector('[data-tool="pen"]').click();
+  eq(I().Tools.current, 'pen');
+  assert(!hud.classList.contains('is-open'), 'closes after pick');
+  eq(btn('pen').getAttribute('aria-pressed'), 'true');
+  tab.click();
+  hud.querySelector('[data-tool="pen"]').click();       // 고른 펜을 다시: 색 고르기
+  assert(document.querySelector('.ch-pop .ch-swatches'), 'style pop');
+  T.closePop();
+  hud.querySelector('[data-tool="hand"]').click();
   eq(I().Tools.current, 'hand');
 });
-test('HUD의 슬라이드 | 칠판도 지금 쪽에 불이 들어온다', () => {
-  const hud = document.querySelector('.ch-hud[data-side="left"]');
+test('더보기: 나머지 수업 도구가 도구판 옆에 펼쳐지고, 도구판을 닫으면 함께 닫힌다', () => {
+  const T = I().Toolbar;
+  const hud = document.querySelector('.ch-hud');
   hud.querySelector('.ch-hud-tab').click();
-  hud.querySelector('[data-name="board"]').click();
+  const more = hud.querySelector('[data-name="more"]');
+  more.click();
+  const bar = document.querySelector('.ch-toolbar');
+  assert(!bar.hidden && hud.contains(bar), '더보기는 도구판 안에 열린다');
+  eq(more.getAttribute('aria-expanded'), 'true');
+  const shown = (n) => { const b = bar.querySelector(`[data-name="${n}"]`); return !!b && b.getClientRects().length > 0; };
+  for (const n of ['style', 'clear', 'class', 'timer', 'toc', 'full']) assert(shown(n), `${n} 보임`);
+  for (const n of ['pen', 'undo', 'slides']) assert(!shown(n), `${n}은 도구판에 있어 뺀다`);
+  const pr = hud.querySelector('.ch-hud-panel').getBoundingClientRect();
+  const br = bar.getBoundingClientRect();
+  assert(br.left >= pr.right, '도구판 옆(화면 가운데 쪽)');
+  assert(br.top >= 0 && br.bottom <= innerHeight && br.right <= innerWidth, '화면 안');
+  btn('timer').click();
+  assert(document.querySelector('.ch-pop'), '더보기 단추의 팝오버');
+  document.querySelector('.ch-pop .ch-tb-btn, .ch-pop button').click();   // 팝오버에서 고르면
+  eq(document.querySelector('.ch-pop'), null);
+  assert(!hud.classList.contains('is-open'), '도구판도 닫혀 화면이 빈다');
+  I().PopTimer && I().PopTimer.close && I().PopTimer.close();
+  hud.querySelector('.ch-hud-tab').click();
+  more.click();
+  bar.querySelector('[data-name="toc"]').click();          // 바로 일하는 단추도 도구판을 닫는다
+  assert(!hud.classList.contains('is-open'), '목차를 누르면 닫힘');
+  I().Panels.toggle(I().Panels.toc);
+  hud.querySelector('.ch-hud-tab').click();
+  more.click();
+  T.setHud(hud, false);
+  assert(bar.hidden && !hud.classList.contains('is-more'), '함께 닫힘');
+});
+test('도구판의 슬라이드 | 칠판도 지금 쪽에 불이 들어온다', () => {
+  const hud = document.querySelector('.ch-hud');
+  hud.querySelector('.ch-hud-tab').click();
+  hud.querySelector('.ch-hud-panel [data-name="board"]').click();
   assert(I().Board.active, 'board on');
-  eq(hud.querySelector('[data-name="board"]').getAttribute('aria-pressed'), 'true');
-  eq(hud.querySelector('[data-name="slides"]').getAttribute('aria-pressed'), 'false');
-  hud.querySelector('[data-name="slides"]').click();
+  eq(hud.querySelector('.ch-hud-panel [data-name="board"]').getAttribute('aria-pressed'), 'true');
+  eq(hud.querySelector('.ch-hud-panel [data-name="slides"]').getAttribute('aria-pressed'), 'false');
+  hud.querySelector('.ch-hud-panel [data-name="slides"]').click();
   assert(!I().Board.active, 'board off');
-  eq(hud.querySelector('[data-name="slides"]').getAttribute('aria-pressed'), 'true');
+  eq(hud.querySelector('.ch-hud-panel [data-name="slides"]').getAttribute('aria-pressed'), 'true');
   I().Toolbar.setHud(hud, false);
 });
-test('툴바가 왼쪽에 붙어 펼쳐져 있으면 왼쪽 HUD는 숨고, 접으면 다시 나온다', () => {
+test('판서 도구 단추를 끌면 어디로든 옮겨지고, 화면 끝에 놓아도 떠 있으며 자리는 저장된다', async () => {
   const T = I().Toolbar;
-  const left = document.querySelector('.ch-hud[data-side="left"]');
-  T.prefs.dock = 'left';
-  T.applyDock();
-  eq(left.hidden, true);
-  T.setCollapsed(true);
-  eq(left.hidden, false);
-  T.setCollapsed(false);
-  T.prefs.dock = 'bottom';
-  T.applyDock();
-  eq(left.hidden, false);
-});
-test('HUD 탭을 끌면 화면 어디로든 옮겨지고(동그란 단추), 끝에 놓으면 다시 붙으며 자리는 저장된다', async () => {
-  const T = I().Toolbar;
-  const hud = document.querySelector('.ch-hud[data-side="left"]');
+  const hud = document.querySelector('.ch-hud');
   const tab = hud.querySelector('.ch-hud-tab');
   const at = (type, x, y) => tab.dispatchEvent(new PointerEvent(type, { bubbles: true, cancelable: true, pointerId: 9, pointerType: 'touch', isPrimary: true, clientX: x, clientY: y, buttons: type === 'pointerup' ? 0 : 1 }));
   const r = tab.getBoundingClientRect();
@@ -270,10 +273,9 @@ test('HUD 탭을 끌면 화면 어디로든 옮겨지고(동그란 단추), 끝�
   at('pointerup', 500, 260);
   tab.click();                                      // 끌기 끝의 클릭은 도구판을 열지 않는다
   assert(!hud.classList.contains('is-open'), 'not opened by drag');
-  eq(hud.dataset.edge, '');
   await wait(400);
   const f = tab.getBoundingClientRect();
-  assert(Math.abs(f.width - 44) < 1 && f.left > 300, 'floating ' + f.left);
+  assert(f.left > 300, 'moved ' + f.left);
   tab.click();
   assert(hud.classList.contains('is-open'), 'tap opens');
   const panel = hud.querySelector('.ch-hud-panel').getBoundingClientRect();
@@ -282,45 +284,22 @@ test('HUD 탭을 끌면 화면 어디로든 옮겨지고(동그란 단추), 끝�
   T.setHud(hud, false);
   await wait(100);
   const saved = await I().Store.get('toolbar');
-  assert(saved.hud.left.x > 0 && saved.hud.left.x < 1, 'saved float x');
-  // 오른쪽 끝 가까이 놓으면 오른쪽에 붙는다
+  assert(saved.float.x > 0 && saved.float.x < 1, 'saved float x');
+  // 오른쪽 끝에 놓아도 가장자리 탭이 되지 않는다(가장자리는 넘기기 자리)
   const g = tab.getBoundingClientRect();
   at('pointerdown', g.left + 10, g.top + 10);
-  at('pointermove', innerWidth - 20, 200);
-  at('pointerup', innerWidth - 20, 200);
-  eq(hud.dataset.edge, 'right');
-  assert(tab.getBoundingClientRect().right >= innerWidth - 1, 'snapped right');
-  // 원래 자리로
-  T.prefs.hud.left = { x: 0, y: 0.5 };
+  at('pointermove', innerWidth - 5, 200);
+  at('pointerup', innerWidth - 5, 200);
+  await wait(400);
+  const e = tab.getBoundingClientRect();
+  assert(e.width >= 48 && e.right <= innerWidth, '동그란 단추 그대로 ' + e.width);
+  tab.click();
+  const pr = hud.querySelector('.ch-hud-panel').getBoundingClientRect();
+  assert(pr.right <= e.left, '오른쪽에 있으면 도구판은 왼쪽(가운데 쪽)으로');
+  T.setHud(hud, false);
+  T.prefs.hud = { x: 0.03, y: 0.8 };
   T.placeHud(hud);
   T.savePrefs();
-  eq(hud.dataset.edge, 'left');
-});
-test('HUD 탭을 두 번 톡 누르면 가장자리 ↔ 떠 있기가 바뀌고, 떠 있던 자리를 기억한다', async () => {
-  const T = I().Toolbar;
-  const hud = document.querySelector('.ch-hud[data-side="right"]');
-  const tab = hud.querySelector('.ch-hud-tab');
-  await wait(400);
-  eq(hud.dataset.edge, 'right');
-  tab.click(); tab.click();
-  eq(hud.dataset.edge, '');
-  assert(!hud.classList.contains('is-open'), 'panel closed after double tap');
-  assert(tab.getBoundingClientRect().right < innerWidth - 20, 'floating away from edge');
-  T.prefs.hud.right = { x: 0.5, y: 0.3 };                 // 떠 있는 자리를 옮겨 둔다
-  T.placeHud(hud);
-  await wait(400);
-  tab.click(); tab.click();
-  eq(hud.dataset.edge, 'right');
-  eq(T.prefs.hudFloat.right, { x: 0.5, y: 0.3 });
-  await wait(400);
-  tab.click(); tab.click();
-  eq(T.prefs.hud.right, { x: 0.5, y: 0.3 });             // 기억한 자리로 다시 뜬다
-  await wait(400);
-  tab.click(); tab.click();
-  eq(hud.dataset.edge, 'right');
-  await wait(100);
-  eq((await I().Store.get('toolbar')).hudFloat.right, { x: 0.5, y: 0.3 });
-  await wait(400);
 });
 test('색 창이 열려 있을 때 무대를 누르면 닫기만 하고 판서가 되지 않는다', () => {
   I().Tools.set('pen');

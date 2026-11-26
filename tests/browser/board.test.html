@@ -14,7 +14,7 @@
 <pre id="results" data-summary="pending"></pre>
 <script>
 const I = () => Exploragram._internal;
-const btn = (name) => document.querySelector(`.ch-toolbar [data-name="${name}"]`);
+const btn = (name) => document.querySelector(`.ch-toolbar [data-name="${name}"], .ch-edge-nav[data-name="${name}"]`);
 const key = (k, opts, target) => (target || document).dispatchEvent(new KeyboardEvent('keydown', Object.assign({ key: k, bubbles: true, cancelable: true }, opts || {})));
 const toggleLabel = () => btn('board').querySelector('span').textContent;
 const boardLabel = () => document.querySelector('.ch-board-label').textContent;

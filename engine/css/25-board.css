@@ -9,7 +9,6 @@ body.ch-board-on .slide.is-active { visibility: hidden; }
 body:not(.ch-board-on) .ch-board-only { display: none !important; }
 /* 슬라이드 | 칠판 두 칸: 지금 보는 쪽만 색이 든다 */
 .ch-seg { display: flex; gap: 2px; padding: 2px; border-radius: 14px; background: rgba(255, 255, 255, .08); }
-.ch-toolbar[data-dock="left"] .ch-seg, .ch-toolbar[data-dock="right"] .ch-seg { flex-direction: column; }
 .ch-bg-list { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; width: 360px; max-width: calc(92vw - 28px); }
 .ch-bg { all: unset; box-sizing: border-box; display: grid; justify-items: center; gap: 6px; cursor: pointer; font-size: 12px; text-align: center; }
 .ch-bg:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 8px; }

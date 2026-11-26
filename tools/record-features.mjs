@@ -39,7 +39,7 @@ function lessonScenes(html) {
 
 async function openLesson(browser, base) {
   await browser.send('Page.navigate', { url: `${base}/lessons/sci-diffusion.html` });
-  await waitFor(browser, '!!window.Exploragram && !!document.querySelector(\'.ch-toolbar [data-name="next"]\')', 'lesson engine');
+  await waitFor(browser, '!!window.Exploragram && !!document.querySelector(\'.ch-edge-nav[data-name="next"]\')', 'lesson engine');
   await browser.evaluate('Exploragram.ready.then(() => document.fonts.ready).then(() => true)');
   await sleep(350);
 }
@@ -48,7 +48,7 @@ async function nextTo(browser, input, target, viaToolbar = false) {
     const current = await browser.evaluate('Exploragram._internal.Nav.state.slide');
     if (current === target) { await sleep(300); return; }
     if (current > target) throw new Error(`Cannot advance from ${current + 1} to ${target + 1}`);
-    if (viaToolbar) await input.click('.ch-toolbar [data-name="next"]');
+    if (viaToolbar) await input.click('.ch-edge-nav[data-name="next"]');
     else { await input.key('ArrowRight'); await sleep(150); }
   }
   throw new Error(`Could not reach slide ${target + 1}`);

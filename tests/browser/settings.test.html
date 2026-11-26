@@ -26,7 +26,9 @@
 <script>
 const I = () => Exploragram._internal;
 // 「실시간」은 툴바 밖 오른쪽 아래에 따로 뜬다
-const btn = (name) => document.querySelector(`.ch-toolbar [data-name="${name}"], .ch-live-fab[data-name="${name}"]`);
+const btn = (name) => document.querySelector(`.ch-toolbar [data-name="${name}"], .ch-edge-nav[data-name="${name}"], .ch-live-fab[data-name="${name}"]`);
+// 더보기 안의 단추는 도구판을 열고 더보기를 펼쳐야 화면에 보인다
+const openMore = () => { const hud = document.querySelector('.ch-hud'); I().Toolbar.setHud(hud, true); I().Toolbar.setMore(hud, true); };
 const sw = (k) => document.querySelector(`.ch-pop input[data-key="${k}"]`);
 const clean = (text) => text.replace(/\u2060/g, '');
 
@@ -103,7 +105,9 @@ test('판서를 끄면 판서 도구·칠판·양옆 도구가 사라지고 손 
   eq(I().Settings.values.ink, false);
   assert(document.documentElement.classList.contains('ch-off-ink'), 'class');
   for (const n of ['hand', 'pen', 'hl', 'eraser', 'laser', 'style', 'undo', 'clear', 'class', 'slides', 'board']) assert(!shown(btn(n)), `${n} 숨김`);
-  for (const hud of document.querySelectorAll('.ch-hud')) assert(!shown(hud), '양옆 도구 숨김');
+  openMore();
+  for (const b of document.querySelectorAll('.ch-hud-panel > [data-tool], .ch-hud-panel > [data-name="undo"]')) assert(!shown(b), `도구판의 ${b.dataset.name} 숨김`);
+  assert(shown(document.querySelector('.ch-hud-tab')) && shown(document.querySelector('.ch-hud-panel [data-name="more"]')), '떠 있는 단추와 더보기는 남아 설정을 다시 켤 수 있다');
   assert(!shown(document.querySelector('.ch-ink')), '판서층 숨김');
   eq(I().Tools.current, 'hand', '쓰던 펜은 손으로');
   I().Tools.set('pen');
@@ -126,7 +130,9 @@ test('판서를 다시 켜면 도구가 돌아오고 칠판 스위치는 저장�
   eq(sw('board').disabled, false);
   eq(sw('board').checked, true);
   eq(small('board'), '슬라이드 대신 빈 칠판을 열어 씁니다');
-  for (const n of ['pen', 'undo', 'board']) assert(shown(btn(n)), `${n} 보임`);
+  openMore();
+  for (const n of ['style', 'clear', 'class']) assert(shown(btn(n)), `${n} 보임`);
+  for (const n of ['pen', 'undo', 'board']) assert(shown(document.querySelector(`.ch-hud-panel [data-name="${n}"]`)), `도구판 ${n} 보임`);
   assert(!document.querySelector('.ch-pop .ch-set-group[data-need="ink"]').hidden, '판서 설정 묶음');
   I().Tools.set('pen');
   eq(I().Tools.current, 'pen');
@@ -139,13 +145,15 @@ test('칠판만 끄면 슬라이드·칠판 전환이 사라지고, 열려 있�
   sw('board').click();
   eq(I().Board.active, false, '칠판을 닫는다');
   gear();   // 칠판을 닫으면 떠 있던 창도 닫힌다
+  openMore();
   assert(!shown(btn('board')) && !shown(btn('slides')), '전환 단추 숨김');
   for (const seg of document.querySelectorAll('.ch-hud .ch-seg')) assert(!shown(seg), '양옆 도구의 전환도 숨김');
   document.body.dispatchEvent(new KeyboardEvent('keydown', { key: 'c', code: 'KeyC', bubbles: true }));
   eq(I().Board.active, false, '단축키 c도 안 된다');
-  assert(shown(btn('pen')), '판서는 그대로');
+  assert(shown(document.querySelector('.ch-hud-panel [data-name="pen"]')), '판서는 그대로');
   sw('board').click();
-  assert(shown(btn('board')), '다시 켜면 돌아온다');
+  openMore();
+  assert(shown(document.querySelector('.ch-hud-panel [data-name="board"]')), '다시 켜면 돌아온다');
 });
 test('실시간 수업을 끄면 「실시간」 단추가 사라지고, 학생 화면 판서 스위치는 이유와 함께 잠긴다', () => {
   gear();

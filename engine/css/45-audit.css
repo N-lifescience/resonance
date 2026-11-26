@@ -15,6 +15,12 @@
 .ch-audit-said:empty { display: none; }
 .ch-audit-copybox { position: fixed; left: -9999px; top: 0; opacity: 0; }
 .ch-tb-btn.ch-audit-badge { color: #F5B83D; }
+.ch-hud > .ch-audit-badge { position: absolute; left: 0; bottom: calc(100% + 12px); flex-direction: row; gap: 6px; height: 44px; min-width: 0; padding: 0 16px 0 12px; border-radius: 999px; background: var(--ch-ui); font-size: 15px; font-weight: 800; box-shadow: 0 0 0 2px #fff, 0 0 0 4px #111, 0 6px 18px rgba(0, 0, 0, .35); }
+/* 단추가 화면 오른쪽 반에 있으면 오른쪽 끝을, 화면 위쪽에 있으면 아래로 붙여 화면 밖으로 나가지 않게 */
+.ch-hud[data-open="left"] > .ch-audit-badge { left: auto; right: 0; }
+.ch-hud[data-top] > .ch-audit-badge { bottom: auto; top: calc(100% + 12px); }
+.ch-hud > .ch-audit-badge .ch-icon { width: 20px; height: 20px; }
+.ch-hud.is-open > .ch-audit-badge { display: none; }
 .ch-auditing *, .ch-auditing *::before, .ch-auditing *::after { animation: none !important; transition: none !important; }
 .ch-auditing body.ch-board-on .slide.is-active { visibility: visible; }
 .ch-auditing .ch-deck > .ch-board, .ch-auditing .ch-ink { visibility: hidden; }

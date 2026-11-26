@@ -1106,7 +1106,7 @@ const Live = {
     Ink.mirror = this.inkMirror();
     // 학생은 판서하지 않는다: 손으로 두고 판서 도구를 숨긴다. CSS로도 숨기지만 그 규칙을 모르는 옛 브라우저가 있어 여기서도 숨긴다.
     Tools.set('hand');
-    for (const el of qsa('.ch-toolbar, .ch-tb-handle, .ch-hud, .ch-progress, .ch-ink-live, .ch-dropzone')) el.style.setProperty('display', 'none', 'important');
+    for (const el of qsa('.ch-toolbar, .ch-edge-nav, .ch-hud, .ch-progress, .ch-ink-live, .ch-dropzone')) el.style.setProperty('display', 'none', 'important');
     emit('live-role');   // 투표는 학생 화면에서 '세기'가 아니라 '고르기'가 된다
     Nav.override = { next: () => this.move(1), prev: () => this.move(-1), close() {} };
     Nav.revealTo = () => false;   // 정답 상자 ✓ 등이 교사보다 먼저 단계를 열지 않게

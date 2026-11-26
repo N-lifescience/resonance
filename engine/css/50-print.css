@@ -4,7 +4,7 @@
   @page { size: 1280px 720px; margin: 0; }
   * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   html, body { height: auto; overflow: visible; background: #fff; }
-  .ch-toolbar, .ch-tb-handle, .ch-hud, .ch-ink-live, .ch-pop, .ch-panel, .ch-shade, .ch-progress, .ch-ink { display: none !important; }
+  .ch-toolbar, .ch-edge-nav, .ch-hud, .ch-ink-live, .ch-pop, .ch-panel, .ch-shade, .ch-progress, .ch-ink { display: none !important; }
   .ch-viewport { position: static; display: block; }
   .ch-deck { transform: none !important; width: 1280px; height: auto; }
   .ch-deck > .ch-board { display: none !important; }
